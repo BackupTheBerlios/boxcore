@@ -66,21 +66,20 @@ $(EXP): $(DEF)
 
 # --------------------------------------------------------------------
 ifndef VERSION
-VERSION="native"
+VERSION = native
 endif
 
-ifeq ($(VERSION),"native")
+ifeq ($(VERSION),native)
 CC      = gcc.exe
 CP      = g++.exe
 WINDRES = windres.exe -J rc -O coff --include-dir $(<D)
 DLLTOOL = dlltool.exe
-else
-ifeq ($(VERSION),"cross_x64")
+endif
+ifeq ($(VERSION),cross_x64)
 CC      = x86_64-pc-mingw32-gcc.exe
 CP      = x86_64-pc-mingw32-g++.exe
 WINDRES = x86_64-pc-mingw32-windres.exe -J rc -O coff --include-dir $(<D)
 DLLTOOL = x86_64-pc-mingw32-dlltool.exe
-endif
 endif
 
 CFLAGS  = -Os -Wall -fno-rtti -fno-exceptions -c $(DEFINES)
@@ -91,6 +90,7 @@ LIBS    = -lversion -lole32 -luuid -lcomctl32 -lcomdlg32 -lshell32 \
 # --------------------------------------------------------------------
 
 $(BIN): $(OBJ) $(RES) $(EXP) makefile
+	$(VERSION)
 	$(CC) $(LFLAGS) $(OBJ) $(EXP) $(RES) $(LIBS) -o $(BIN)
 	ls -al $(BIN)
 
