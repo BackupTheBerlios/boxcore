@@ -1,0 +1,28 @@
+--- C:/Soft/bblean/src/bbLean_mod_test_070426/src/blackbox/BBApi.cpp	Fri Aug 18 18:44:00 2006
++++ C:/Soft/bblean/src/my/blackbox/BBApi.cpp	Fri May 11 19:59:47 2007
+@@ -2033,7 +2033,9 @@
+     return TRUE;
+ }
+ 
+-void update_screen_areas(struct dt_margins *dt_margins)
++/// CyberShadow 2007.05.11: SystemParametersInfo(SPI_SETWORKAREA, ...) can sometimes block due to
++/// a non-responsive application. Moved the code into a thread proc.
++void WINAPI update_screen_areas_thread(struct dt_margins *dt_margins)
+ {
+     struct _screen_list si = { NULL, &si.pScr, 0 };
+ 
+@@ -2091,6 +2093,14 @@
+ 
+     freeall(&si.pScr);
+ }
++
++void update_screen_areas(struct dt_margins *dt_margins)
++{
++    DWORD tid;
++    CloseHandle(CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)update_screen_areas_thread, (LPVOID)dt_margins, 0, &tid));
++}
++
++// ------------------------------------------------------------
+ 
+ //===========================================================================
+ 
