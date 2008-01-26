@@ -32,25 +32,31 @@
 
 #include "BB.H"
 
+extern bool usingx64;
+
 enum { A_DEL, A_DW, A_SZ };
 
 static int write_key(int action, HKEY root, const char *ckey, const char *cval, const char *cdata)
 {
 	HKEY k;
 	DWORD result;
-	int r = RegCreateKeyEx(root, ckey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &k, &result);
-	if (ERROR_SUCCESS == r)
+	int r;
+	for(int i=0;i<(usingx64?2:1);++i)
 	{
-		if (A_DEL==action)
-			r = RegDeleteValue(k, cval);
-		else
-		if (A_DW==action)
-			r = RegSetValueEx(k, cval, 0, REG_DWORD, (LPBYTE)&cdata, sizeof(DWORD));
-		else
-		if (A_SZ==action)
-			r = RegSetValueEx(k, cval, 0, REG_SZ, (LPBYTE)cdata, strlen(cdata)+1);
+		r = RegCreateKeyEx(root, ckey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE|(i?KEY_WOW64_64KEY:KEY_WOW64_32KEY), NULL, &k, &result);
+		if (ERROR_SUCCESS == r)
+		{
+			if (A_DEL==action)
+				r = RegDeleteValue(k, cval);
+			else
+			if (A_DW==action)
+				r = RegSetValueEx(k, cval, 0, REG_DWORD, (LPBYTE)&cdata, sizeof(DWORD));
+			else
+			if (A_SZ==action)
+				r = RegSetValueEx(k, cval, 0, REG_SZ, (LPBYTE)cdata, strlen(cdata)+1);
 
-		RegCloseKey(k);
+			RegCloseKey(k);
+		}
 	}
 	return r == ERROR_SUCCESS;
 }

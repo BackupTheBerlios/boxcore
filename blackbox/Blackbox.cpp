@@ -60,6 +60,7 @@ const char ShellTrayClass   [] = "Shell_TrayWnd";
 OSVERSIONINFO osInfo;
 bool usingWin2kXP;
 bool usingNT;
+bool usingx64;
 
 //====================
 
@@ -342,6 +343,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	GetVersionEx(&osInfo);
 	usingNT         = osInfo.dwPlatformId == VER_PLATFORM_WIN32_NT;
 	usingWin2kXP    = usingNT && osInfo.dwMajorVersion >= 5;
+
+	//64-bit OS test, when running as 32-bit under WoW
+	BOOL bIs64BitOS= FALSE;
+	typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
+	LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(GetModuleHandle("kernel32"),"IsWow64Process");
+	if (NULL != fnIsWow64Process)
+		fnIsWow64Process(GetCurrentProcess(), &bIs64BitOS);
+	usingx64=bIs64BitOS;
+	//64-bit OS test, if compiled as native 64-bit. In case we ever need it.
+	if (!usingx64)
+		usingx64=(sizeof(int)!=sizeof(void*));
 
 	setlocale(LC_TIME, "");
 
@@ -1643,37 +1655,53 @@ leave:
 bool RunEntriesIn (HKEY root_key, LPCSTR subpath, UINT flags)
 {
 	int index; HKEY hKey; bool ret = false; char path[100];
+	typedef BOOL (WINAPI *LPFN_WOW64ENABLEREDIR)(BOOL);
+	LPFN_WOW64ENABLEREDIR fnEnableRedir;
 
 	sprintf(path, "Software\\Microsoft\\Windows\\CurrentVersion\\%s", subpath);
-	if (ERROR_SUCCESS != RegOpenKeyEx(root_key, path, 0, KEY_ALL_ACCESS, &hKey))
-		return ret;
-
-	//log_printf(2, "\In Registry: %s\\%s", HKEY_CURRENT_USER == root_key ? "HKCU": "HKLM", path);
-	for (index=0;;++index)
+	for(int i=0;i<(usingx64?2:1);++i)
 	{
-		char szNameBuffer[200]; char szValueBuffer[1000];
-		DWORD dwNameSize = sizeof szNameBuffer;
-		DWORD dwValueSize = sizeof szValueBuffer;
-		DWORD dwType;
+		if (ERROR_SUCCESS != RegOpenKeyEx(root_key, path, 0, KEY_ALL_ACCESS|(i?KEY_WOW64_64KEY:KEY_WOW64_32KEY), &hKey))
+			return ret;
 
-		if (ERROR_SUCCESS != RegEnumValue(
-				hKey, index,
-				szNameBuffer, &dwNameSize,
-				NULL, &dwType,
-				(BYTE*)szValueBuffer, &dwValueSize
-				)) break;
+		//if busy with x64 section, disable the filesystem redirection
+		if (i==1)
+		{
+			fnEnableRedir = (LPFN_WOW64ENABLEREDIR)GetProcAddress(GetModuleHandle("kernel32"),"Wow64EnableWow64FsRedirection");
+			fnEnableRedir(FALSE);
+		}
 
-		ret = true;
-		if (flags & RS_CHCK) break;
+		//log_printf(2, "\In Registry: %s\\%s", HKEY_CURRENT_USER == root_key ? "HKCU": "HKLM", path);
+		for (index=0;;++index)
+		{
+			char szNameBuffer[200]; char szValueBuffer[1000];
+			DWORD dwNameSize = sizeof szNameBuffer;
+			DWORD dwValueSize = sizeof szValueBuffer;
+			DWORD dwType;
 
-		//log_printf(2, "\t\tRunning: %s", szValueBuffer);
-		WinExec(szValueBuffer, SW_SHOWNORMAL);
+			if (ERROR_SUCCESS != RegEnumValue(
+					hKey, index,
+					szNameBuffer, &dwNameSize,
+					NULL, &dwType,
+					(BYTE*)szValueBuffer, &dwValueSize
+					)) break;
 
-		if (flags & RS_ONCE)
-			if (ERROR_SUCCESS == RegDeleteValue(hKey, szNameBuffer))
-				--index;
+			ret = true;
+			if (flags & RS_CHCK) break;
+
+			//log_printf(2, "\t\tRunning: %s", szValueBuffer);
+			WinExec(szValueBuffer, SW_SHOWNORMAL);
+
+			if (flags & RS_ONCE)
+				if (ERROR_SUCCESS == RegDeleteValue(hKey, szNameBuffer))
+					--index;
+		}
+		RegCloseKey (hKey);
+
+		//Enable filesystem redirection, if we disabled it;
+		if (i==1)
+			fnEnableRedir(TRUE);
 	}
-	RegCloseKey (hKey);
 	return ret;
 }
 

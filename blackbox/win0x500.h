@@ -32,6 +32,14 @@
 #ifndef __WIN0X500_H_
 #define __WIN0X500_H_
 
+// defines for 64 bit registry access. With these here we don't need a 64-bit OS SDK
+#ifndef KEY_WOW64_64KEY
+#define KEY_WOW64_64KEY 0x0100
+#endif
+#ifndef KEY_WOW64_32KEY
+#define KEY_WOW64_32KEY 0x0200
+#endif
+
 //===========================================================================
 #ifdef __BORLANDC__
 //===========================================================================
