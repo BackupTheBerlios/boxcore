@@ -62,12 +62,27 @@ clean:
 	$(RM) -f $(OBJ) $(RES) $(BIN) $(EXP)
 
 $(EXP): $(DEF)
-	dlltool -d $(DEF) -e $(EXP) -l libBlackbox.a -D blackbox.exe
+	$(DLLTOOL) -d $(DEF) -e $(EXP) -l libBlackbox.a -D blackbox.exe
 
 # --------------------------------------------------------------------
+ifndef VERSION
+VERSION="native"
+endif
+
+ifeq ($(VERSION),"native")
 CC      = gcc.exe
 CP      = g++.exe
 WINDRES = windres.exe -J rc -O coff --include-dir $(<D)
+DLLTOOL = dlltool.exe
+else
+ifeq ($(VERSION),"cross_x64")
+CC      = x86_64-pc-mingw32-gcc.exe
+CP      = x86_64-pc-mingw32-g++.exe
+WINDRES = x86_64-pc-mingw32-windres.exe -J rc -O coff --include-dir $(<D)
+DLLTOOL = x86_64-pc-mingw32-dlltool.exe
+endif
+endif
+
 CFLAGS  = -Os -Wall -fno-rtti -fno-exceptions -c $(DEFINES)
 LFLAGS  = -mwindows -s
 LIBS    = -lversion -lole32 -luuid -lcomctl32 -lcomdlg32 -lshell32 \
