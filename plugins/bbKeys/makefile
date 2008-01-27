@@ -29,7 +29,23 @@ clean:
 	rm -f $(OBJ1) $(OBJ2) $(BIN1) $(BIN2) *.exp
 
 # --------------------------------------------------------------------
-CC      = gcc
+ifndef VERSION
+VERSION = native
+endif
+
+ifeq ($(VERSION),native)
+CC      = gcc.exe
+CP      = g++.exe
+WINDRES = windres.exe -J rc -O coff --include-dir $(<D)
+DLLTOOL = dlltool.exe
+endif
+ifeq ($(VERSION),cross_x64)
+CC      = x86_64-pc-mingw32-gcc.exe
+CP      = x86_64-pc-mingw32-g++.exe
+WINDRES = x86_64-pc-mingw32-windres.exe -J rc -O coff --include-dir $(<D)
+DLLTOOL = x86_64-pc-mingw32-dlltool.exe
+endif
+
 CFLAGS  = -Os -Wall -c -mwindows -I../../blackbox
 LIBS    = -lshell32 -luser32 -lkernel32 -lgdi32 -lcomctl32 -lstdc++ ../../blackbox/libBlackbox.a
 
