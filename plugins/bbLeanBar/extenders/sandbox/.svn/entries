@@ -1,0 +1,52 @@
+8
+
+dir
+88
+svn://dev.noccy.com:969/plugins/bbLeanBar/extenders/sandbox
+svn://dev.noccy.com:969
+
+
+
+2007-07-07T02:45:31.619646Z
+55
+noccy
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+ff27d5c6-da57-e948-aa95-ec4af68e88df
+
+sandbox.cpp
+file
+
+
+
+
+2008-01-13T15:54:12.453125Z
+de99b7aac2795eaadfcf2303515dd2b0
+2007-07-07T02:45:31.619646Z
+55
+noccy
+
+makefile
+file
+
+
+
+
+2008-01-13T15:54:12.468750Z
+6327583348ca71d0c3c63658157955e2
+2007-07-06T03:01:52.833464Z
+54
+noccy
+

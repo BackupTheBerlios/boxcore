@@ -1,0 +1,67 @@
+8
+
+dir
+88
+svn://dev.noccy.com:969/plugins/bbLeanSkin
+svn://dev.noccy.com:969
+
+
+
+2007-11-14T20:33:46.333883Z
+80
+noccy
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+ff27d5c6-da57-e948-aa95-ec4af68e88df
+
+engine
+dir
+
+bbLeanSkin.cpp
+file
+
+
+
+
+2008-01-13T15:54:17.796875Z
+fe25d7a4ff8086fa3c5be57b766db6fa
+2007-11-14T03:08:59.684908Z
+78
+noccy
+
+bbLeanSkin.cbp
+file
+
+
+
+
+2008-01-13T15:54:17.812500Z
+0dd53a25cf703ceb68fb0e5fe9c99240
+2007-06-20T13:29:29.479368Z
+21
+noccy
+
+makefile
+file
+
+
+
+
+2008-01-13T15:54:17.828125Z
+4b93f671c9caa7676706d1aac390181d
+2007-08-06T08:40:20.782216Z
+69
+noccy
+

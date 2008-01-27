@@ -1,0 +1,58 @@
+8
+
+dir
+88
+svn://dev.noccy.com:969/plugins/bbLeanBar/extenders
+svn://dev.noccy.com:969
+
+
+
+2007-07-12T04:49:44.469110Z
+60
+noccy
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+ff27d5c6-da57-e948-aa95-ec4af68e88df
+
+label
+dir
+
+label.cbp
+file
+
+
+
+
+2008-01-13T15:54:12.484375Z
+9a5c910b6cc2575c1f1b8efab082810d
+2007-07-09T05:08:34.515441Z
+57
+noccy
+
+barextender.h
+file
+
+
+
+
+2008-01-13T15:54:12.500000Z
+7041d86e96aa065376248b0d3614a55c
+2007-07-07T02:45:31.619646Z
+55
+noccy
+
+sandbox
+dir
+
