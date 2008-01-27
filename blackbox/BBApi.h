@@ -35,7 +35,7 @@
 /*------------------------------------------ */
 
 #ifdef __GNUC__
-  #define _WIN32_IE 0x0500
+  #define _WIN32_IE 0x0501
   #ifndef __BBCORE__
 	#define GetBlackboxPath _GetBlackboxPath
   #endif

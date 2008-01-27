@@ -36,7 +36,9 @@
 #include <Shellapi.h>
 
 // Quick-hack. Drop shadows to menus.
+#ifndef CS_DROPSHADOW
 #define CS_DROPSHADOW 0x20000
+#endif
 #define SPI_GETDROPSHADOW 0x1024
 
 //#define CHECKFOCUS

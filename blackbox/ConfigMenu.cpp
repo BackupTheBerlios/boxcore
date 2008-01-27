@@ -157,10 +157,10 @@ static Menu * GetPluginMenu(
 
 Menu *CfgMenuMaker(const char *title, const struct cfgmenu *pm, bool pop, char *menu_id)
 {
-	if (SUB_PLUGIN_LOAD == (long)pm || SUB_PLUGIN_SLIT == (long)pm)
+	if (SUB_PLUGIN_LOAD == (LONG_PTR)pm || SUB_PLUGIN_SLIT == (LONG_PTR)pm)
 	{
 		struct plugins *q = bbplugins;
-		return GetPluginMenu(title, menu_id, pop, (long)pm, &q);
+		return GetPluginMenu(title, menu_id, pop, (LONG_PTR)pm, &q);
 	}
 
 	char *save_id = strchr(menu_id, 0);
@@ -219,7 +219,7 @@ Menu *CfgMenuMaker(const char *title, const struct cfgmenu *pm, bool pop, char *
 				if (pSub)
 				{
 					MakeSubmenu(pMenu, pSub, item_text);
-					if (SUB_PLUGIN_SLIT == (long)sub && NULL == hSlit)
+					if (SUB_PLUGIN_SLIT == (LONG_PTR)sub && NULL == hSlit)
 						DisableLastItem(pMenu);
 				}
 			}
@@ -407,7 +407,7 @@ static const struct cfgmenu * find_cfg_item(
 		if (NULL == p->command)
 		{
 			const struct cfgmenu* psub = (struct cfgmenu*)p->pvalue;
-			if ((unsigned long)psub >= 100 && NULL != (psub = find_cfg_item(cmd, psub, pp_menu)))
+			if ((ULONG_PTR)psub >= 100 && NULL != (psub = find_cfg_item(cmd, psub, pp_menu)))
 				return psub;
 		}
 		else

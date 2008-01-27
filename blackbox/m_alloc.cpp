@@ -335,7 +335,7 @@ void operator delete[] (void *v)
 #else
 #ifdef __GNUC__  // get rid of bloated libstdc++ implementation
 #include <malloc.h>
-void * operator new (unsigned n)
+void * operator new (size_t n)
 {
 	return malloc(n);
 }
@@ -343,7 +343,7 @@ void operator delete (void *v)
 {
 	 free(v);
 }
-void * operator new[] (unsigned n)
+void * operator new[] (size_t n)
 {
 	return malloc(n);
 }

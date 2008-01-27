@@ -61,7 +61,7 @@ static int getsetVolume(int x)
 	if (MMSYSERR_NOERROR != mixerOpen(&m_hMixer, 0, 0, 0, MIXER_OBJECTF_MIXER))
 		return 0;
 
-	if (MMSYSERR_NOERROR != mixerGetDevCaps((UINT)m_hMixer, &m_mxcaps, sizeof(MIXERCAPS)))
+	if (MMSYSERR_NOERROR != mixerGetDevCaps((UINT_PTR)m_hMixer, &m_mxcaps, sizeof(MIXERCAPS)))
 		return 0;
 
 	// get dwLineID

@@ -212,12 +212,12 @@ struct _SHChangeNotifyEntry;
 
 //#define MK_ALT  32
 
-#ifndef CDSIZEOF_STRUCT
+/*#ifndef CDSIZEOF_STRUCT
 #define CDSIZEOF_STRUCT(structname,member) ((int)&((structname*)0)->member + sizeof(((structname*)0)->member))
 #endif
 
 #ifndef OPENFILENAME_SIZE_VERSION_400
 #define OPENFILENAME_SIZE_VERSION_400 CDSIZEOF_STRUCT(OPENFILENAMEA,lpTemplateName)
-#endif
+#endif*/
 
 #endif // __BBGCC_W500_H_

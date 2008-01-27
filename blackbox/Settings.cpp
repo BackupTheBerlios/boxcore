@@ -644,7 +644,7 @@ static void read_style_item (const char * style, StyleItem *si, char *key, int v
 //===========================================================================
 static void ReadStyle(const char *style)
 {
-	ZeroMemory(&mStyle, (unsigned)&((StyleStruct*)NULL)->bulletUnix);
+	ZeroMemory(&mStyle, (UINT_PTR)&((StyleStruct*)NULL)->bulletUnix);
 	mStyle.metricsUnix = true;
 	Settings_newMetrics = is_newstyle(style);
 
@@ -659,7 +659,7 @@ static void ReadStyle(const char *style)
 				break;
 
 			case C_INT:
-				n = HIWORD(def) ? *(int*)def : (int) def;
+				n = HIWORD(def) ? *(int*)def : (INT_PTR) def;
 				*(int*)p->v = ReadInt(style, p->rc_string, n);
 				break;
 
@@ -669,7 +669,7 @@ static void ReadStyle(const char *style)
 				break;
 
 			case C_ALPHA:
-				n = HIWORD(def) ? *(int*)def : (int) def;
+				n = HIWORD(def) ? *(int*)def : (INT_PTR) def;
 				*(BYTE*)p->v = ReadInt(style, p->rc_string, n);
 				break;
 
@@ -822,7 +822,7 @@ static void Settings_ReadSettings(const char *bbrc, struct rccfg * cp)
 		switch (cp->mode)
 		{
 			case C_INT:
-				*(int*) cp->ptr = ReadInt(bbrc, key, (int) cp->def);
+				*(int*) cp->ptr = ReadInt(bbrc, key, (INT_PTR) cp->def);
 				break;
 			case C_BOL:
 				*(bool*) cp->ptr = ReadBool (bbrc, key, (bool) cp->def);

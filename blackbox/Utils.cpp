@@ -557,7 +557,7 @@ void dbg_window(HWND window, const char *fmt, ...)
 {
 	char buffer[4096];
 	int x = GetClassName(window, buffer, sizeof buffer);
-	x += sprintf(buffer+x, " <%lX>: ", (DWORD)window);
+	x += sprintf(buffer+x, " <%lX>: ", (DWORD_PTR)window);
 	va_list arg; va_start(arg, fmt);
 	vsprintf (buffer+x, fmt, arg);
 	strcat(buffer, "\n");
@@ -746,11 +746,13 @@ int exec_pidl(const _ITEMIDLIST *pidl, LPCSTR verb, LPCSTR arguments)
 //===========================================================================
 
 #ifndef SHCNF_ACCEPT_INTERRUPTS
+#ifndef _WIN64
 struct _SHChangeNotifyEntry
 {
 	const _ITEMIDLIST *pidl;
 	BOOL fRecursive;
 };
+#endif
 #define SHCNF_ACCEPT_INTERRUPTS 0x0001 
 #define SHCNF_ACCEPT_NON_INTERRUPTS 0x0002
 #define SHCNF_NO_PROXY 0x8000

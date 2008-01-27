@@ -90,7 +90,6 @@ LIBS    = -lversion -lole32 -luuid -lcomctl32 -lcomdlg32 -lshell32 \
 # --------------------------------------------------------------------
 
 $(BIN): $(OBJ) $(RES) $(EXP) makefile
-	$(VERSION)
 	$(CC) $(LFLAGS) $(OBJ) $(EXP) $(RES) $(LIBS) -o $(BIN)
 	ls -al $(BIN)
 

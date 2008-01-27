@@ -1571,7 +1571,7 @@ void ShutdownWindows(int mode, int no_msg)
 
 DWORD WINAPI ShutdownThread(void *mode)
 {
-	if (usingNT && BBSD_LOGOFF != (int)mode)
+	if (usingNT && BBSD_LOGOFF != (INT_PTR)mode)
 	{
 		// Under WinNT/2k/XP we need to adjust privileges to be able to
 		// shutdown/reboot/hibernate/suspend...
@@ -1605,7 +1605,7 @@ DWORD WINAPI ShutdownThread(void *mode)
 
 	}
 
-	switch ((int)mode)
+	switch ((INT_PTR)mode)
 	{
 		case BBSD_SHUTDOWN:
 			if (ExitWindowsEx(EWX_SHUTDOWN|EWX_POWEROFF, 0))
@@ -1638,7 +1638,7 @@ DWORD WINAPI ShutdownThread(void *mode)
 	}
 
 	BBMessageBox(MB_OK, NLS2("$BBError_Shutdown$",
-		"Error: Failed to %s."), NLS1(shutdn_cmds_display[(int)mode]));
+		"Error: Failed to %s."), NLS1(shutdn_cmds_display[(INT_PTR)mode]));
 leave:
 	return 0;
 }

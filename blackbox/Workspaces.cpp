@@ -516,7 +516,7 @@ ST void WS_ShadeWindow(HWND hwnd)
 {
 	RECT rc; get_rect(hwnd, &rc);
 	int height = rc.bottom - rc.top;
-	DWORD prop = (DWORD)GetProp(hwnd, BBSHADE_PROP);
+	DWORD prop = (DWORD_PTR)GetProp(hwnd, BBSHADE_PROP);
 
 	int h1 = LOWORD(prop);
 	int h2 = HIWORD(prop);
