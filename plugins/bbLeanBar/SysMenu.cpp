@@ -5,7 +5,7 @@
 #define COPY_MENU
 
 #ifdef COPY_MENU
-#define MENUITEMINFO_SIZE_0400 ((int)&((MENUITEMINFO*)NULL)->cch + sizeof ((MENUITEMINFO*)NULL)->cch)
+#define MENUITEMINFO_SIZE_0400 ((size_t)&((MENUITEMINFO*)NULL)->cch + sizeof ((MENUITEMINFO*)NULL)->cch)
 
 static Menu *copymenu (HWND hwnd, HMENU hm, const char *title)
 {
@@ -41,7 +41,7 @@ static Menu *copymenu (HWND hwnd, HMENU hm, const char *title)
 		if (!(info.fState & MFS_DISABLED) && !(info.fState & MFS_GRAYED))
 		{
 			char broam[256];
-			sprintf(broam, "@BBLeanbar.SysCommand <%d> <%d>", (int)hwnd, info.wID);
+			sprintf(broam, "@BBLeanbar.SysCommand <%d> <%d>", (INT_PTR)hwnd, info.wID);
 			MakeMenuItem(m, item_string, broam, false);
 		}
 	}

@@ -402,8 +402,8 @@ public:
 		SendMessage(hwndBalloon, TTM_TRACKPOSITION, 0, MAKELPARAM(xpos, ypos));
 		SendMessage(hwndBalloon, TTM_TRACKACTIVATE, TRUE, (LPARAM)&ti);
 
-		SetWindowLong(hwndBalloon, GWL_USERDATA, (LONG)this);
-		prev_wndproc = (WNDPROC)SetWindowLong(hwndBalloon, GWL_WNDPROC, (LONG)wndproc);
+		SetWindowLongPtr(hwndBalloon, GWLP_USERDATA, (LONG_PTR)this);
+		prev_wndproc = (WNDPROC)SetWindowLongPtr(hwndBalloon, GWLP_WNDPROC, (LONG_PTR)wndproc);
 
 		debugPrint("win_balloon:win_balloon, setting timer. balloonTimeout=%i.",balloonTimeout);
 
@@ -425,7 +425,7 @@ private:
 
 	static LRESULT wndproc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
-		win_balloon *p = (win_balloon *)GetWindowLong(hwnd, GWL_USERDATA);
+		win_balloon *p = (win_balloon *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 		switch (message)
 		{
 			case WM_CREATE:

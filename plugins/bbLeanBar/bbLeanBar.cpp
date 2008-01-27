@@ -24,9 +24,9 @@
  ============================================================================
 */ // bbLeanBar as plugin
 
-#define WINVER 0x0500
-#define _WIN32_WINNT 0x0500
-#define _WIN32_IE 0x0500
+//#define WINVER 0x0500
+//#define _WIN32_WINNT 0x0500
+//#define _WIN32_IE 0x0500
 
 #include "BBApi.h"
 #include "m_alloc.h"
@@ -888,11 +888,11 @@ void barinfo::GetRCSettings()
 	struct config *p = cfg_list;
 	do switch (p->mode) {
 		case R_BOL:
-			*(bool*)p->ptr = BBP_read_bool(this, p->str, (bool)(int)p->def);
+			*(bool*)p->ptr = BBP_read_bool(this, p->str, (bool)(INT_PTR)p->def);
 			break;
 
 		case R_INT:
-			*(int*)p->ptr  = BBP_read_int(this, p->str, (int)p->def);
+			*(int*)p->ptr  = BBP_read_int(this, p->str, (INT_PTR)p->def);
 			break;
 
 		case R_STR:
