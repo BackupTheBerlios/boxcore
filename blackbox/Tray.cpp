@@ -36,10 +36,6 @@
 
 #define INCLUDE_NIDS
 #include "Tray.h"
-#ifdef _WIN64
-#undef NOTIFYICONDATA
-#define NID2K6 NOTIFYICONDATA
-#endif
 
 #include <shlobj.h>
 #include <shellapi.h>
@@ -47,6 +43,11 @@
 #include <shlwapi.h>
 #endif
 #include <docobj.h>
+
+#ifdef _WIN64
+#undef NOTIFYICONDATA
+#define NOTIFYICONDATA NID2K
+#endif
 
 #define ST static
 
