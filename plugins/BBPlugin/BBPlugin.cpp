@@ -1192,7 +1192,7 @@ LRESULT CALLBACK BBP_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 			// bind the window to the structure
 			PI = (plugin_info *)((CREATESTRUCT*)lParam)->lpCreateParams;
 			PI->hwnd = hwnd;
-			SetWindowLong(hwnd, 0, (LONG)PI);
+			SetWindowLongPtr(hwnd, 0, (LONG_PTR)PI);
 		}
 		return DefWindowProc(hwnd, message, wParam, lParam);
 	}

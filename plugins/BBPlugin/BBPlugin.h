@@ -116,7 +116,7 @@ enum
 #define AUTOHIDE_TIMER 1
 
 #define BBP_clear(_P) ZeroMemory(&_P->hInstance,\
-	sizeof *_P - ((int)&_P->hInstance - (int)_P));
+	sizeof *_P - ((size_t)&_P->hInstance - (size_t)_P));
 
 
 BBP_DLL_EXPORT int  BBP_Init_Plugin(struct plugin_info *PI);
