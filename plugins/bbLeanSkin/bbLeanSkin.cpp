@@ -230,7 +230,7 @@ BOOL CreateSharedMem(int size)
 {
 	// handle to file mapping
 	hMapObject = CreateFileMapping(
-		(HANDLE)0xFFFFFFFF,     // use paging file
+		INVALID_HANDLE_VALUE,     // use paging file
 		NULL,                   // no security attributes
 		PAGE_READWRITE,         // read/write access
 		0,                      // size: high 32-bits
