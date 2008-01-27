@@ -44,6 +44,13 @@ struct MsgMap
 	struct wnd_entry *winlist;
 };
 
+const struct MsgMap *assoc(const struct MsgMap *a0, UINT e0)
+{
+	const struct MsgMap *a = a0;
+	for ( ;a; a = a->next) if (e0 == a->msg) break;
+	return a;
+}
+
 static struct MsgMap *msgs;
 
 //===========================================================================
