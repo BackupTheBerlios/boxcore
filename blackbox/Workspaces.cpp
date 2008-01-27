@@ -1012,7 +1012,7 @@ ST void get_ico(struct tasklist *tl)
 	// Noccy 2007-06-06: Changed waiting time from 500ms to 2s to hopefully avoid icon garbling. This may
 	// cause issues with hung applications.
 	SendMessageTimeout(hwnd, WM_GETICON, ICON_SMALL, 0, SMTO_ABORTIFHUNG|SMTO_NORMAL, 2000, (DWORD_PTR*)&hIco);
-	if (NULL==hIco) hIco = (HICON)GetClassLong(hwnd, GCLP_HICONSM);
+	if (NULL==hIco) hIco = (HICON)GetClassLongPtr(hwnd, GCLP_HICONSM);
 	if (tl->orig_icon != hIco && NULL != hIco)
 	{
 		if (tl->icon && tl->orig_icon_big != tl->orig_icon) DestroyIcon(tl->icon);
@@ -1021,7 +1021,7 @@ ST void get_ico(struct tasklist *tl)
 
 	hIco_big = NULL;
 	SendMessageTimeout(hwnd, WM_GETICON, ICON_BIG, 0, SMTO_ABORTIFHUNG|SMTO_NORMAL, 500, (DWORD_PTR*)&hIco_big);
-	if (NULL==hIco_big) hIco_big = (HICON)GetClassLong(hwnd, GCLP_HICON);
+	if (NULL==hIco_big) hIco_big = (HICON)GetClassLongPtr(hwnd, GCLP_HICON);
 	if (tl->orig_icon_big != hIco_big && NULL != hIco_big)
 	{
 		if (tl->icon_big && tl->orig_icon_big != tl->orig_icon) DestroyIcon(tl->icon_big);
