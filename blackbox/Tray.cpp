@@ -36,6 +36,10 @@
 
 #define INCLUDE_NIDS
 #include "Tray.h"
+#ifdef _WIN64
+#undef NOTIFYICONDATA
+#define NID2K6 NOTIFYICONDATA
+#endif
 
 #include <shlobj.h>
 #include <shellapi.h>
@@ -298,7 +302,7 @@ ST UINT ModifyTrayIcon(systemTrayNode *p, NOTIFYICONDATA *iconData, UINT uFlags)
 		{
 			systemTrayNode *o;
 			dolist (o, trayIconList)
-				if (o->orig_icon == iconData->hIcon && false == o->shared)
+				if (o->orig_icon == (HICON)iconData->hIcon && false == o->shared)
 					break;
 
 			if (NULL == o || NULL == o->orig_icon)
@@ -306,22 +310,22 @@ ST UINT ModifyTrayIcon(systemTrayNode *p, NOTIFYICONDATA *iconData, UINT uFlags)
 				uChanged |= SHARED_NOT_FOUND;
 			}
 			else
-			if (p->orig_icon != iconData->hIcon)
+			if (p->orig_icon != (HICON)iconData->hIcon)
 			{
 				p->t.hIcon = o->t.hIcon;
 				o->referenced = true;
-				p->orig_icon = iconData->hIcon;
+				p->orig_icon = (HICON)iconData->hIcon;
 				uChanged |= NIF_ICON;
 			}
 		}
 		else
-		if (p->orig_icon != iconData->hIcon)
+		if (p->orig_icon != (HICON)iconData->hIcon)
 		{
 			reset_icon(p);
 			if (iconData->hIcon)
 			{
-				p->t.hIcon = CopyIcon(iconData->hIcon);
-				p->orig_icon = iconData->hIcon;
+				p->t.hIcon = CopyIcon((HICON)iconData->hIcon);
+				p->orig_icon = (HICON)iconData->hIcon;
 			}
 			uChanged |= NIF_ICON;
 		}
@@ -406,7 +410,7 @@ ST LRESULT CALLBACK TrayWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 	// search the list and set defaults for hidden & shared
 	systemTrayNode *p;
 	dolist (p, trayIconList)
-		if (p->t.hWnd == iconData->hWnd && p->t.uID == iconData->uID)
+		if (p->t.hWnd == (HWND)iconData->hWnd && p->t.uID == iconData->uID)
 		{
 			hidden = p->hidden;
 			shared = p->shared;
@@ -449,7 +453,7 @@ ST LRESULT CALLBACK TrayWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 		return TRUE;
 	}
 
-	if (FALSE == IsWindow(iconData->hWnd)) // has been seen even with NIM_ADD (crap:)
+	if (FALSE == IsWindow((HWND)iconData->hWnd)) // has been seen even with NIM_ADD (crap:)
 	{
 		if (p) RemoveTrayIcon(p, true);
 		return FALSE;
@@ -500,7 +504,7 @@ add_icon:
 		{
 			p = (systemTrayNode*)c_alloc(sizeof *p);
 			append_node(&trayIconList, p);
-			p->t.hWnd = iconData->hWnd;
+			p->t.hWnd = (HWND)iconData->hWnd;
 			p->t.uID  = iconData->uID;
 		}
 		else

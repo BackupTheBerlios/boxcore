@@ -45,7 +45,7 @@ API_EXPORT void EnumTray (TRAYENUMPROC lpEnumFunc, LPARAM lParam);
 
 //===========================================================================
 #ifdef INCLUDE_NIDS
-
+#ifndef _WIN64
 typedef struct _NID95 {
 	DWORD cbSize;
 	HWND hWnd;
@@ -143,6 +143,105 @@ typedef struct _NID2KW6 {
 	DWORD dwInfoFlags;
 	GUID guidItem;
 } NID2KW6;
+#else
+typedef struct _NID95 {
+	DWORD cbSize;
+	UINT hWnd;
+	UINT uID;
+	UINT uFlags;
+	UINT uCallbackMessage;
+	UINT hIcon;
+	CHAR szTip[64];
+} NID95;
+
+typedef struct _NIDNT {
+	DWORD cbSize;
+	UINT hWnd;
+	UINT uID;
+	UINT uFlags;
+	UINT uCallbackMessage;
+	UINT hIcon;
+	WCHAR szTip[64];
+} NIDNT;
+
+typedef struct _NID2K {
+	DWORD cbSize;
+	UINT hWnd;
+	UINT uID;
+	UINT uFlags;
+	UINT uCallbackMessage;
+	UINT hIcon;
+	CHAR szTip[128];
+	DWORD dwState;
+	DWORD dwStateMask;
+	CHAR szInfo[256];
+	union {
+		UINT uTimeout;
+		UINT uVersion;
+	};
+	CHAR szInfoTitle[64];
+	DWORD dwInfoFlags;
+} NID2K;
+
+typedef struct _NID2K6 {
+	DWORD cbSize;
+	UINT hWnd;
+	UINT uID;
+	UINT uFlags;
+	UINT uCallbackMessage;
+	UINT hIcon;
+	CHAR szTip[128];
+	DWORD dwState;
+	DWORD dwStateMask;
+	CHAR szInfo[256];
+	union {
+		UINT uTimeout;
+		UINT uVersion;
+	};
+	CHAR szInfoTitle[64];
+	DWORD dwInfoFlags;
+	GUID guidItem;
+} NID2K6;
+
+typedef struct _NID2KW {
+	DWORD cbSize;
+	UINT hWnd;
+	UINT uID;
+	UINT uFlags;
+	UINT uCallbackMessage;
+	UINT hIcon;
+	WCHAR szTip[128];
+	DWORD dwState;
+	DWORD dwStateMask;
+	WCHAR szInfo[256];
+	union {
+		UINT uTimeout;
+		UINT uVersion;
+	};
+	WCHAR szInfoTitle[64];
+	DWORD dwInfoFlags;
+} NID2KW;
+
+typedef struct _NID2KW6 {
+	DWORD cbSize;
+	UINT hWnd;
+	UINT uID;
+	UINT uFlags;
+	UINT uCallbackMessage;
+	UINT hIcon;
+	WCHAR szTip[128];
+	DWORD dwState;
+	DWORD dwStateMask;
+	WCHAR szInfo[256];
+	union {
+		UINT uTimeout;
+		UINT uVersion;
+	};
+	WCHAR szInfoTitle[64];
+	DWORD dwInfoFlags;
+	GUID guidItem;
+} NID2KW6;
+#endif
 
 #endif
 
