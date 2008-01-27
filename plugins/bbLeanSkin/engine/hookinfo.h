@@ -181,8 +181,8 @@ struct SkinStruct
 	struct exclusion_info exInfo;
 };
 
-#define offset_exInfo ((int)&((SkinStruct*)NULL)->exInfo)
-#define offset_hooks ((int)&((SkinStruct*)NULL)->hCallWndHook)
+#define offset_exInfo ((size_t)&((SkinStruct*)NULL)->exInfo)
+#define offset_hooks ((size_t)&((SkinStruct*)NULL)->hCallWndHook)
 
 // ---------------------------------------------
 

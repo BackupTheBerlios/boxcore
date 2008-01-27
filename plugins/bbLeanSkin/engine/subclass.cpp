@@ -150,7 +150,7 @@ void ShadeWindow(HWND hwnd)
 {
 	RECT rc; get_rect(hwnd, &rc);
 	int height = rc.bottom - rc.top;
-	DWORD prop = (DWORD)GetProp(hwnd, BBSHADE_PROP);
+	DWORD prop = (DWORD_PTR)GetProp(hwnd, BBSHADE_PROP);
 	int h1 = LOWORD(prop);
 	int h2 = HIWORD(prop);
 	if (IsZoomed(hwnd))
@@ -624,7 +624,7 @@ void post_redraw(HWND hwnd)
 //-----------------------------------------------------------------
 bool get_rolled(WinInfo *WI)
 {
-	DWORD prop = (DWORD)GetProp(WI->hwnd, BBSHADE_PROP);
+	DWORD prop = (DWORD_PTR)GetProp(WI->hwnd, BBSHADE_PROP);
 	bool rolled = IsZoomed(WI->hwnd)
 		? 0 != HIWORD(prop)
 		: 0 != LOWORD(prop);
@@ -725,8 +725,8 @@ void subclass_window(HWND hwnd)
 	set_WinInfo(hwnd, WI);
 
 	WI->wpOrigWindowProc = (WNDPROC)
-		(WI->is_unicode ? SetWindowLongW : SetWindowLongA)
-			(hwnd, GWL_WNDPROC, (LONG)WindowSubclassProc);
+		(WI->is_unicode ? SetWindowLongPtrW : SetWindowLongPtrA)
+			(hwnd, GWLP_WNDPROC, (LONG_PTR)WindowSubclassProc);
 
 	// some programs dont handle the posted "MSGID_LOAD" msg, so set
 	// the region here (is WI causing the 'opera does not start' issue?)
@@ -751,13 +751,13 @@ void detach_skinner(WinInfo *WI)
 	DeleteBitmaps(WI, 0, NUMOFGDIOBJS);
 
 	// the currently set WindowProc
-	WNDPROC wpNow = (WNDPROC)(WI->is_unicode ? GetWindowLongW : GetWindowLongA)(hwnd, GWL_WNDPROC);
+	WNDPROC wpNow = (WNDPROC)(WI->is_unicode ? GetWindowLongPtrW : GetWindowLongPtrA)(hwnd, GWLP_WNDPROC);
 
 	// check, if it's still what we have set
 	if (WindowSubclassProc == wpNow)
 	{
 		// if so, set back to the original WindowProc
-		(WI->is_unicode ? SetWindowLongW : SetWindowLongA)(hwnd, GWL_WNDPROC, (LONG)WI->wpOrigWindowProc);
+		(WI->is_unicode ? SetWindowLongPtrW : SetWindowLongPtrA)(hwnd, GWLP_WNDPROC, (LONG_PTR)WI->wpOrigWindowProc);
 		// remove the property
 		del_WinInfo(WI->hwnd);
 		// send a note to the log window

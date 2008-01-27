@@ -102,7 +102,7 @@ HWND GetRootWindow(HWND hwnd)
 int get_module(HWND hwnd, char *buffer, int buffsize)
 {
 	char sFileName[MAX_PATH]; HINSTANCE hi; int i, r;
-	hi = (HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE);
+	hi = (HINSTANCE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
 	r = GetModuleFileName(hi, sFileName, MAX_PATH);
 	if (0 == r) r = GetModuleFileName(NULL, sFileName, MAX_PATH);
 	for (i = r; i && sFileName[i-1] != '\\'; i--);
