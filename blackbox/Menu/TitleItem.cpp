@@ -111,7 +111,7 @@ void TitleItem::Mouse(HWND hwnd, UINT uMsg, DWORD wParam, DWORD lParam)
 		if (false == p->m_bOnTop)
 		{
 			HWND hwnd = window_under_mouse();
-			if (hwnd && (WS_EX_TOPMOST & GetWindowLong(hwnd, GWL_EXSTYLE)))
+			if (hwnd && (WS_EX_TOPMOST & GetWindowLongPtr(hwnd, GWL_EXSTYLE)))
 				p->m_bOnTop = true, p->SetZPos();
 		}
 		break;

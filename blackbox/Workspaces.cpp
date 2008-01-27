@@ -385,7 +385,7 @@ void Workspaces_Command(UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			hwnd = get_default_window(hwnd);
 			if (NULL == hwnd) break;
-			LONG style = GetWindowLong(hwnd, GWL_STYLE);
+			LONG style = GetWindowLongPtr(hwnd, GWL_STYLE);
 			switch (msg)
 			{
 				case BB_WINDOWMINIMIZE:
@@ -473,7 +473,7 @@ static const char BBSHADE_PROP[] = "BBNormalHeight";
 ST void get_rect(HWND hwnd, RECT *rp)
 {
 	GetWindowRect(hwnd, rp);
-	if (WS_CHILD & GetWindowLong(hwnd, GWL_STYLE))
+	if (WS_CHILD & GetWindowLongPtr(hwnd, GWL_STYLE))
 	{
 		HWND pw = GetParent(hwnd);
 		ScreenToClient(pw, (LPPOINT)&rp->left);
@@ -499,12 +499,12 @@ ST int get_shade_height(HWND hwnd)
 	if (shade) return shade;
 
 	int border = GetSystemMetrics(
-		(WS_SIZEBOX & GetWindowLong(hwnd, GWL_STYLE))
+		(WS_SIZEBOX & GetWindowLongPtr(hwnd, GWL_STYLE))
 		? SM_CYFRAME
 		: SM_CYFIXEDFRAME);
 
 	int caption = GetSystemMetrics(
-		(WS_EX_TOOLWINDOW & GetWindowLong(hwnd, GWL_EXSTYLE))
+		(WS_EX_TOOLWINDOW & GetWindowLongPtr(hwnd, GWL_EXSTYLE))
 		? SM_CYSMCAPTION
 		: SM_CYCAPTION);
 

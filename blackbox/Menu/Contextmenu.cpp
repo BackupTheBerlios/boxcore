@@ -187,7 +187,7 @@ int ShellContext::ShellMenu()
 		| TPM_RETURNCMD,
 		point.x, point.y, 0, hwnd, NULL);
 
-	SetWindowLong(hwnd, GWLP_WNDPROC, (LONG_PTR)g_pOldWndProc);
+	SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)g_pOldWndProc);
 	return nCmd;
 }
 

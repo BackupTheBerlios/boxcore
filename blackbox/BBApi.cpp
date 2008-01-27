@@ -1659,13 +1659,13 @@ bool IsAppWindow(HWND hwnd)
 	if (CheckSticky(hwnd))
 		return false;
 
-	nStyle = GetWindowLong(hwnd, GWL_STYLE);
+	nStyle = GetWindowLongPtr(hwnd, GWL_STYLE);
 
 	// if it is a WS_CHILD or not WS_VISIBLE, fail it
 	if((nStyle & WS_CHILD) || !(nStyle & WS_VISIBLE) || (nStyle & WS_DISABLED))
 		return false;
 
-	nExStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+	nExStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
 	// if the window is a WS_EX_TOOLWINDOW fail it
 	if((nExStyle & WS_EX_TOOLWINDOW) && !(nExStyle & WS_EX_APPWINDOW))
 		return false;
@@ -1854,13 +1854,13 @@ bool SetTransparency(HWND hwnd, BYTE alpha)
 	if (NULL == pSetLayeredWindowAttributes) return false;
 
 	LONG wStyle1, wStyle2;
-	wStyle1 = wStyle2 = GetWindowLong(hwnd, GWL_EXSTYLE);
+	wStyle1 = wStyle2 = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
 
 	if (alpha < 255) wStyle2 |= WS_EX_LAYERED;
 	else wStyle2 &= ~WS_EX_LAYERED;
 
 	if (wStyle2 != wStyle1)
-		SetWindowLong(hwnd, GWL_EXSTYLE, wStyle2);
+		SetWindowLongPtr(hwnd, GWL_EXSTYLE, wStyle2);
 
 	if (wStyle2 & WS_EX_LAYERED)
 		return 0 != pSetLayeredWindowAttributes(hwnd, 0, alpha, LWA_ALPHA);
@@ -2150,7 +2150,7 @@ void SnapWindowToEdge(WINDOWPOS* wp, LPARAM nDist_or_pContent, UINT Flags)
 		snap_tick = ticknow + 100;
 	}
 
-	HWND parent = (WS_CHILD & GetWindowLong(self, GWL_STYLE)) ? GetParent(self) : NULL;
+	HWND parent = (WS_CHILD & GetWindowLongPtr(self, GWL_STYLE)) ? GetParent(self) : NULL;
 
 	//RECT r; GetWindowRect(self, &r);
 	//bool sizing         = wp->cx != r.right-r.left || wp->cy != r.bottom-r.top;
@@ -2243,7 +2243,7 @@ void SnapWindowToEdge(WINDOWPOS* wp, LPARAM nDist_or_pContent, UINT Flags)
 ST BOOL CALLBACK SnapEnumProc(HWND hwnd, LPARAM lParam)
 {
 	struct snap_info *si = (struct snap_info *)lParam;
-	LONG style = GetWindowLong(hwnd, GWL_STYLE);
+	LONG style = GetWindowLongPtr(hwnd, GWL_STYLE);
 
 	if (hwnd != si->self && (style & WS_VISIBLE))
 	{

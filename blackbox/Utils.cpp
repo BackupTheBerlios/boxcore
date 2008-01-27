@@ -703,7 +703,7 @@ int EditBox(const char *caption, const char *message, const char *initvalue, cha
 
 void SetOnTop (HWND hwnd)
 {
-	if (hwnd && IsWindowVisible(hwnd) && !(GetWindowLong(hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST))
+	if (hwnd && IsWindowVisible(hwnd) && !(GetWindowLongPtr(hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST))
 		SetWindowPos(hwnd,
 			HWND_TOP,
 			0, 0, 0, 0,
