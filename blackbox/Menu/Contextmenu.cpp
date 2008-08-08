@@ -32,7 +32,7 @@
 #include "../BB.h"
 #include "../Pidl.h"
 #include "../Settings.h"
-#include "Menumaker.h"
+#include "MenuMaker.h"
 #include "Menu.h"
 
 #include <shlobj.h>

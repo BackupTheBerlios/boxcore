@@ -30,7 +30,7 @@
 // execute a bsetroot command and load the generated <tempfile.bmp>
 // file into a HBITMAP, for Desk.cpp to paint the wallpaper.
 
-#include "BB.H"
+#include "BB.h"
 #include "Settings.h"
 
 //#define EXTERN_WALLPAPER

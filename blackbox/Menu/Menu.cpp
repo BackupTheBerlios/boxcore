@@ -33,7 +33,7 @@
 #include "MenuMaker.h"
 #include "Menu.h"
 #include <commctrl.h>
-#include <Shellapi.h>
+#include <shellapi.h>
 
 // Quick-hack. Drop shadows to menus.
 #ifndef CS_DROPSHADOW

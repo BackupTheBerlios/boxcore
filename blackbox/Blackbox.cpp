@@ -36,7 +36,7 @@
 #include "Tray.h"
 #include "Toolbar.h"
 #include "Menu/MenuMaker.h"
-#include "Resource.h"
+#include "resource.h"
 #include "BBSendData.h"
 #include "VolumeControl.h"
 

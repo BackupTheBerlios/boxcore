@@ -30,8 +30,8 @@
 
 #include "BBApi.h"
 #include "m_alloc.h"
-#include "..\BBPlugin\BBPlugin.h"
-#include "tinylist.cpp"
+#include "../BBPlugin/BBPlugin.h"
+#include "Tinylist.cpp"
 #include <shellapi.h>
 #include <commctrl.h>
 #include <time.h>
@@ -325,13 +325,13 @@ struct barinfo : plugin_info
 
 //==========================================================================={
 
-#include "utils.cpp"
+#include "Utils.cpp"
 #include "bartender.cpp"
-#include "tooltips.cpp"
-#include "drawico.cpp"
+#include "Tooltips.cpp"
+#include "DrawIco.cpp"
 #include "BuffBmp.cpp"
 #include "bbLeanClasses.cpp"
-#include "sysmenu.cpp"
+#include "SysMenu.cpp"
 #include "TinyDropTarg.cpp"
 
 //===========================================================================

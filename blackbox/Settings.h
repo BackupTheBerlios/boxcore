@@ -34,7 +34,7 @@
 #define BBSETTING extern
 #endif
 
-#include "stylestruct.h"
+#include "Stylestruct.h"
 
 //===========================================================================
 // Settings.cpp functions

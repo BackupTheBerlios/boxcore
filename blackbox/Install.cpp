@@ -30,7 +30,7 @@
 // perform the 'install / uninstall' options
 // set / unset blackbox as the default shell
 
-#include "BB.H"
+#include "BB.h"
 
 extern bool usingx64;
 

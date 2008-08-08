@@ -28,7 +28,7 @@
 #include <stdio.h>
 #include <string>
 
-#include "extenders\barextender.h"
+#include "extenders/barextender.h"
 
 using namespace std;
 

@@ -30,7 +30,7 @@
 // deal with the Shellfolder ITEMIDLISTs
 
 #ifndef __BBAPI_H_
-#include "BB.H"
+#include "BB.h"
 #endif
 
 #include "Pidl.h"

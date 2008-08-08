@@ -30,7 +30,7 @@
 // implements a system tray and keeps icons in a structure
 // for any plugin, that wants to display it.
 
-#include "BB.H"
+#include "BB.h"
 #include "Settings.h"
 #include "Pidl.h"
 

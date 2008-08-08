@@ -29,7 +29,7 @@
 */ // winkeyhook.cpp
 
 #define _WIN32_WINNT 0x500
-#include "BBAPI.h"
+#include "../../blackbox/BBApi.h"
 
 //#define TESTING
 

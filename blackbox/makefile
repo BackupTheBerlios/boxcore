@@ -8,6 +8,7 @@ LIB     = libBlackbox.a
 EXP     = libBlackbox.o
 # INSTDIR = c:\bblean
 RM      = rm
+CP	= cp
 DEFINES =
 
 COREOBJ=\
@@ -56,7 +57,7 @@ all: $(BIN)
 endif
 
 $(INSTDIR)\$(BIN): $(BIN)
-	command.com /c copy $(BIN) $(INSTDIR)
+	$(CP) $(BIN) $(INSTDIR)
 
 clean:
 	$(RM) -f $(OBJ) $(RES) $(BIN) $(EXP)
@@ -76,10 +77,10 @@ WINDRES = windres.exe -J rc -O coff --include-dir $(<D)
 DLLTOOL = dlltool.exe
 endif
 ifeq ($(VERSION),cross_x64)
-CC      = x86_64-pc-mingw32-gcc.exe
-CP      = x86_64-pc-mingw32-g++.exe
-WINDRES = x86_64-pc-mingw32-windres.exe -J rc -O coff --include-dir $(<D)
-DLLTOOL = x86_64-pc-mingw32-dlltool.exe
+CC      = x86_64-pc-mingw32-gcc
+CP      = x86_64-pc-mingw32-g++
+WINDRES = x86_64-pc-mingw32-windres -J rc -O coff --include-dir $(<D)
+DLLTOOL = x86_64-pc-mingw32-dlltool
 endif
 
 CFLAGS  = -Os -Wall -fno-rtti -fno-exceptions -c $(DEFINES)
