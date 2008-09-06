@@ -1,11 +1,10 @@
 # this one is important
 SET(CMAKE_SYSTEM_NAME Windows)
-#this one not so much
-SET(CMAKE_SYSTEM_VERSION 1)
 
 # specify the cross compiler
 SET(CMAKE_C_COMPILER   x86_64-pc-mingw32-gcc)
 set (WINDRES x86_64-pc-mingw32-windres)
+set (DLLTOOL x86_64-pc-mingw32-dlltool)
 
 # where is the target environment 
 SET(CMAKE_FIND_ROOT_PATH  /usr/x86_64-pc-mingw32)

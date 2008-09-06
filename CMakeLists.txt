@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 2.6)
+set (CPACK_GENERATOR "ZIP")
+set (CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_CURRENT_BINARY_DIR};BLACKBOX;ALL;/")
+set (CPACK_PACKAGE_EXECUTABLEs "blackbox")
+set (CPACK_PACKAGE_NAME "Blackbox")
 project (BLACKBOX)
 
 add_subdirectory (blackbox)
-				
+add_subdirectory (plugins)
+include (CPack)
