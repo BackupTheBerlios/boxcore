@@ -1,0 +1,12 @@
+syntax: glob
+
+*.o
+*.a
+*.res
+*.dll
+*.exe
+*~
+*CMakeFiles*
+*CMakeCache.txt
+*cmake_install.cmake
+build*
