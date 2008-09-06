@@ -1,7 +1,6 @@
 # this one is important
 SET(CMAKE_SYSTEM_NAME Windows)
-#this one not so much
-SET(CMAKE_SYSTEM_VERSION 1)
+set (CMAKE_SYSTEM_PROCESSOR i686)
 
 # specify the cross compiler
 SET(CMAKE_C_COMPILER   i686-pc-mingw32-gcc)

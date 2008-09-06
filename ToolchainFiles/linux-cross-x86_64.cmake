@@ -1,5 +1,6 @@
 # this one is important
 SET(CMAKE_SYSTEM_NAME Windows)
+SET(CMAKE_SYSTEM_PROCESSOR "AMD64")
 
 # specify the cross compiler
 SET(CMAKE_C_COMPILER   x86_64-pc-mingw32-gcc)

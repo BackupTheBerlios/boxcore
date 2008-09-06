@@ -1,3 +1,5 @@
+project (BLACKBOX)
+
 set (BLACKBOX_CORE_SRCS
 Blackbox.cpp
 BBApi.cpp
