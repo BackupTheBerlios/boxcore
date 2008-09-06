@@ -207,7 +207,7 @@ void BBKeys_LoadHotkeys(HWND hwnd)
 
 		if (keytograb[1])
 		{
-			static const struct vkTable { char* key; int vKey; } vkTable[] =
+			static const struct vkTable { const char* key; int vKey; } vkTable[] =
 			{
 				{"F1", VK_F1},
 				{"F2", VK_F2},

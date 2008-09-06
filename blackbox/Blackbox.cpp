@@ -156,7 +156,7 @@ static const char *rtl_libs   [] =
 ////////////////////////////////////////////////////////
 void init_runtime_libs(void)
 {
-	struct proc_info { const char *lib; char *procname; void *procadr; };
+	struct proc_info { const char *lib; const char *procname; void *procadr; };
 
 	static struct proc_info rtl_list [] =
 	{
@@ -1151,7 +1151,7 @@ enum {
 //===========================================================================
 static const struct corebroam_table
 {
-	char *str; unsigned short msg; short wParam;
+	const char *str; unsigned short msg; short wParam;
 }
 	corebroam_table [] =
 {

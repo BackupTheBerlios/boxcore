@@ -1205,7 +1205,7 @@ LPCSTR stylePath(LPCSTR other)
 // (old)Out: LPCSTR = literal hex value
 //===========================================================================
 
-ST struct litcolor1 { char *cname; COLORREF cref; } litcolor1_ary[] = {
+ST struct litcolor1 { const char *cname; COLORREF cref; } litcolor1_ary[] = {
 
 	{ "ghostwhite", RGB(248,248,255) },
 	{ "whitesmoke", RGB(245,245,245) },
@@ -1345,7 +1345,7 @@ ST struct litcolor1 { char *cname; COLORREF cref; } litcolor1_ary[] = {
 	{ "lightgreen", RGB(144,238,144) }
 	};
 
-ST struct litcolor4 { char *cname; COLORREF cref[4]; } litcolor4_ary[] = {
+ST struct litcolor4 { const char *cname; COLORREF cref[4]; } litcolor4_ary[] = {
 
 	{ "snow", { RGB(255,250,250), RGB(238,233,233), RGB(205,201,201), RGB(139,137,137) }},
 	{ "seashell", { RGB(255,245,238), RGB(238,229,222), RGB(205,197,191), RGB(139,134,130) }},
@@ -1733,7 +1733,7 @@ void MakeStyleGradient(HDC hdc, RECT *rp, StyleItem * pSI, bool withBorder)
 // Out: void = None
 //===========================================================================
 
-struct styleprop { char *key; int  val; };
+struct styleprop { const char *key; int  val; };
 
 ST struct styleprop styleprop_1[] = {
 	{"flat"        ,BEVEL_FLAT           },

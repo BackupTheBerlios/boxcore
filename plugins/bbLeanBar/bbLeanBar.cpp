@@ -119,7 +119,7 @@ struct plugin_info *g_PI;
 
 //===========================================================================
 struct config { const char *str; char mode; void *def; void *ptr; };
-struct pmenu { char *displ; char *msg; char f; void *ptr; };
+struct pmenu { const char *displ; const char *msg; char f; void *ptr; };
 
 struct barinfo : plugin_info
 {

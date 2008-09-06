@@ -275,7 +275,7 @@ static ShortStyleItem DefStyleB =
 static COLORREF DefBorderColor = 0x777777;
 
 //===========================================================================
-struct items { void *v; char * rc_string; void *def; unsigned short id; unsigned flags; };
+struct items { void *v; const char * rc_string; void *def; unsigned short id; unsigned flags; };
 
 #define HAS_TEXTURE (VALID_TEXTURE|VALID_COLORFROM|VALID_COLORTO|VALID_BORDER|VALID_BORDERCOLOR)
 #define HAS_FONT (VALID_FONT|VALID_FONTHEIGHT|VALID_FONTWEIGHT)
@@ -478,9 +478,9 @@ static const char *check_global_font(const char *p, const char *fullkey)
 
 //===========================================================================
 
-static void read_style_item (const char * style, StyleItem *si, char *key, int v,  StyleItem *def)
+static void read_style_item (const char * style, StyleItem *si, const char *key, int v,  StyleItem *def)
 {
-	static struct s_prop { char *k; char mode; short v; } s_prop[]= {
+	static struct s_prop { const char *k; char mode; short v; } s_prop[]= {
 
 	// texture type
 	{ ":",                  C_TEX  , VALID_TEXTURE },
@@ -688,7 +688,7 @@ static void ReadStyle(const char *style)
 //===========================================================================
 #ifndef BBSETTING_STYLEREADER_ONLY
 //===========================================================================
-struct rccfg { char *key; char mode; void *def; void *ptr; };
+struct rccfg { const char *key; char mode; void *def; void *ptr; };
 
 static struct rccfg ext_rccfg[] = {
 
