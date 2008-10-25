@@ -1,4 +1,4 @@
 #/bin/bash
-mkdir build
-cd build
+mkdir build32
+cd build32
 cmake -DCMAKE_TOOLCHAIN_FILE=../ToolchainFiles/linux-cross-i686.cmake ..

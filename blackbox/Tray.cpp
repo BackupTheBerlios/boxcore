@@ -2,8 +2,8 @@
  ============================================================================
 
   This file is part of the bbLean source code
-  Copyright © 2001-2003 The Blackbox for Windows Development Team
-  Copyright © 2004 grischka
+  Copyright ï¿½ 2001-2003 The Blackbox for Windows Development Team
+  Copyright ï¿½ 2004 grischka
 
   http://bb4win.sourceforge.net/bblean
   http://sourceforge.net/projects/bb4win
@@ -419,7 +419,17 @@ ST LRESULT CALLBACK TrayWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 		}
 
 	uFlags = iconData->uFlags;
-
+	if (iconData->cbSize >= sizeof(NID2KW))
+	{
+		
+		version     = ((NID2KW*)iconData)->uVersion;
+	}
+	else
+		if (iconData->cbSize >= sizeof(NID2K))
+	{
+		
+		version     = ((NID2K*)iconData)->uVersion;
+	}
 	if (uFlags & NIF_STATE)
 	{
 		if (iconData->cbSize >= sizeof(NID2KW))
@@ -536,6 +546,9 @@ add_icon:
 	{
 		if (NULL == p) return FALSE;
 		p->version = version; // affects supposed keyboard behaviour, unused still.
+		char msg[100];
+		sprintf(msg,"The version requested was %d",version);
+		MessageBox(NULL,msg,"Special version requested",MB_OK);
 		return TRUE;
 	}
 
@@ -551,26 +564,89 @@ ST void LoadShellServiceObjects()
 
 	HKEY hkeyServices;
 	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-		"Software\\Microsoft\\Windows\\CurrentVersion\\"
-		"ShellServiceObjectDelayLoad", 0, KEY_READ, &hkeyServices))
+	    "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\"
+			    "ShellServiceObjectDelayLoad", 0, KEY_READ, &hkeyServices))
 		return;
-
+	//MessageBox(NULL,"Key open","Key open",MB_OK);
+	bool killme=false;
 	for (int i=0;;i++)
 	{
 		char szValueName[100]; char szData[200];
 		DWORD cbValueName   = sizeof szValueName;
 		DWORD cbData        = sizeof szData;
 		DWORD dwDataType;
-
 		if (ERROR_SUCCESS != RegEnumValue(hkeyServices, i,
-			szValueName, &cbValueName, 0,
-			&dwDataType, (LPBYTE) szData, &cbData))
-			break;
-
+		    szValueName, &cbValueName, 0,
+				&dwDataType, (LPBYTE) szData, &cbData))
+				break;
+		
 		//dbg_printf("ShellService %s %s", szValueName, szData);
 
 		WCHAR wszCLSID[sizeof szData];
 		MultiByteToWideChar(CP_ACP, 0, szData, cbData, wszCLSID, sizeof szData);
+
+		CLSID clsid;
+		CLSIDFromString(wszCLSID, &clsid);
+
+		IOleCommandTarget *pOCT;
+		HRESULT hr = CoCreateInstance(clsid, NULL, CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
+					      IID_IOleCommandTarget, (void **) &pOCT);
+
+		if (SUCCEEDED(hr))
+		{
+			// Open ShellServiceObject...
+			//pOCT->Exec(&CGID_ShellServiceObject,
+			pOCT->Exec(&CGID_ShellServiceObject,
+				    2, // start
+	0,
+ NULL, NULL);
+
+			append_node(&SSOIconList, new_node(pOCT));
+		}
+		//MessageBox(NULL,szData,szValueName,MB_OK);
+		if (killme) break;
+	}
+	RegCloseKey(hkeyServices);
+}
+
+//ST void WINAPI LoadShellServiceObjects(void* dummy)
+ST void LoadShellServiceObjectsVista()
+{
+	// redundant by 'OleInitialize' in the main startup
+	//CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+	//CoInitialize(NULL); // win95 compatible
+
+	HKEY hkeyServices;
+	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+		"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\"
+		"explorer\\ShellServiceObjects", 0, KEY_READ, &hkeyServices))
+		return;
+	//MessageBox(NULL,"Key open","Key open",MB_OK);
+	bool killme=false;
+	for (int i=0;;i++)
+	{
+		char szValueName[100]; char szData[200];
+		DWORD cbValueName   = sizeof szValueName;
+		DWORD cbData        = sizeof szData;
+		DWORD dwDataType;
+		if (i>=0)
+		{
+		if (ERROR_SUCCESS != RegEnumKeyEx(hkeyServices, i,
+			szValueName, &cbValueName, 0,
+			 szData, &cbData,NULL))
+			break;
+		}
+		else
+		{
+			//strcpy(szValueName,"{35CEC8A3-2BE6-11D2-8773-92E220524153}");
+			strcpy(szValueName,"{730F6CDC-2C86-11D2-8773-92E220524153}");
+			cbValueName=strlen(szValueName)+1;
+		}
+
+		//dbg_printf("ShellService %s %s", szValueName, szData);
+
+		WCHAR wszCLSID[sizeof szValueName];
+		MultiByteToWideChar(CP_ACP, 0, szValueName, cbValueName, wszCLSID, sizeof szValueName);
 
 		CLSID clsid;
 		CLSIDFromString(wszCLSID, &clsid);
@@ -589,6 +665,8 @@ ST void LoadShellServiceObjects()
 
 			append_node(&SSOIconList, new_node(pOCT));
 		}
+		//MessageBox(NULL,szData,szValueName,MB_OK);
+		if (killme) break;
 	}
 	RegCloseKey(hkeyServices);
 }
@@ -644,6 +722,7 @@ ST void broadcast_tbcreated(void)
 
 ST const char TrayNotifyClass [] = "TrayNotifyWnd";
 ST const char TrayClockClass [] = "TrayClockWClass";
+ST const char SysPagerClass [] = "SysPager";
 
 ST LRESULT CALLBACK TrayNotifyWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -698,9 +777,9 @@ void Tray_Init()
 
 	// Some programs want these child windows so they can
 	// figure out the presence/location of the tray.
-	create_tray_child(
-		create_tray_child(hTrayWnd, TrayNotifyClass),
-		TrayClockClass);
+	HWND TrayNot=create_tray_child(hTrayWnd, TrayNotifyClass);
+	create_tray_child(TrayNot,TrayClockClass);
+	create_tray_child(TrayNot,SysPagerClass);
 
 	broadcast_tbcreated();
 
@@ -714,6 +793,7 @@ void Tray_Init()
 		*/
 		// LoadShellServiceObjectsAsync();
 		LoadShellServiceObjects();
+		LoadShellServiceObjectsVista();
 #endif
 	}
 }
@@ -730,6 +810,7 @@ void Tray_Exit()
 	UnregisterClass(ShellTrayClass, hMainInstance);
 	UnregisterClass(TrayNotifyClass, hMainInstance);
 	UnregisterClass(TrayClockClass, hMainInstance);
+	UnregisterClass(SysPagerClass, hMainInstance);
 
 	while (trayIconList)
 		RemoveTrayIcon(trayIconList, false);
@@ -747,7 +828,7 @@ The taskbar notification area is sometimes erroneously called the "tray."
 
 Version 5.0 of the Shell, found on Windows 2000, handles Shell_NotifyIcon
 mouse and keyboard events differently than earlier Shell versions, found on
-Microsoft Windows NT® 4.0, Windows 95, and Windows 98. The differences are:
+Microsoft Windows NTï¿½ 4.0, Windows 95, and Windows 98. The differences are:
 
 - If a user selects a notify icon's shortcut menu with the keyboard, the
   version 5.0 Shell sends the associated application a WM_CONTEXTMENU message.

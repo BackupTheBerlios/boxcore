@@ -5,6 +5,7 @@ set (CMAKE_SYSTEM_PROCESSOR i686)
 # specify the cross compiler
 SET(CMAKE_C_COMPILER   i686-pc-mingw32-gcc)
 set (WINDRES i686-pc-mingw32-windres)
+set (DLLTOOL i686-pc-mingw32-dlltool)
 
 # where is the target environment 
 SET(CMAKE_FIND_ROOT_PATH  /usr/i686-pc-mingw32/usr)

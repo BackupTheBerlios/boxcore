@@ -1,3 +1,3 @@
 add_subdirectory (bbLeanBar)
 add_subdirectory (bbKeys)
-add_subdirectory (bbLeanSkin)
+#add_subdirectory (bbLeanSkinNew)
