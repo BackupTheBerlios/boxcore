@@ -623,13 +623,13 @@ ST void LoadShellServiceObjectsVista()
 		return;
 	//MessageBox(NULL,"Key open","Key open",MB_OK);
 	bool killme=false;
-	for (int i=0;;i++)
+	for (int i=2;;i++)
 	{
 		char szValueName[100]; char szData[200];
 		DWORD cbValueName   = sizeof szValueName;
 		DWORD cbData        = sizeof szData;
 		DWORD dwDataType;
-		if (i>=0)
+		if (i>2)
 		{
 		if (ERROR_SUCCESS != RegEnumKeyEx(hkeyServices, i,
 			szValueName, &cbValueName, 0,
@@ -873,3 +873,83 @@ Note:
 */
 //===========================================================================
 
+/**
+ *Starts up the shell service objects
+ */
+coreTray::coreTray()
+{
+	loadShellServices();
+	loadShellServicesVista();
+}
+
+/**
+ * Destroys the system tray
+ */
+coreTray::~coreTray()
+{
+	//unloadShellServices();
+}
+
+/**
+ * Cleans out the system tray
+ */
+void coreTray::clean()
+{
+}
+
+/**
+ * This loads the shell service objects (Network Connections, Volume Control,
+ * Battery Monitor etc) for which the shell is responsible  from Win2k.
+ * \note This function uses the original Win2k registry key
+ */
+void coreTray::loadShellServices()
+{
+	HKEY hkeyServices;
+	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, 
+	    "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad",
+	    0, KEY_READ, &hkeyServices))
+		return; /// \note Returns immediately if we cannot open the registry key
+	
+	for (int i=0;;i++)
+	{
+		char szValueName[100]; char szData[200];
+		DWORD cbValueName   = sizeof szValueName;
+		DWORD cbData        = sizeof szData;
+		DWORD dwDataType;
+		
+		//Run through the registry values, break the loop once we fail (there are no more values)
+		if (ERROR_SUCCESS != RegEnumValue(hkeyServices, i, szValueName, &cbValueName, 0, 
+		    &dwDataType, (LPBYTE) szData, &cbData))
+			break;
+
+		WCHAR wszCLSID[sizeof szData];
+		MultiByteToWideChar(CP_ACP, 0, szData, cbData, wszCLSID, sizeof szData);
+
+		CLSID clsid;
+		CLSIDFromString(wszCLSID, &clsid);
+
+		IOleCommandTarget *pOCT;
+		//Try to create an instance of this service object, then start it if succesfull
+		HRESULT hr = CoCreateInstance(clsid, NULL, CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
+					      IID_IOleCommandTarget, (void **) &pOCT);
+
+		if (SUCCEEDED(hr))
+		{
+			pOCT->Exec(&CGID_ShellServiceObject,
+				    OLECMDID_NEW, OLECMDEXECOPT_DODEFAULT, NULL, NULL);
+			shellServiceList.push_back(pOCT);
+		}
+	}
+	RegCloseKey(hkeyServices);
+}
+
+/**
+ * This loads the shell service objects (Network Connections, Volume Control,
+ * Battery Monitor etc) for which the shell is responsible  from Win2k.
+ * \n This function uses the new Vista registry key
+ * \note
+ * The function will return without taking any further action should the key not exist
+ */
+void coreTray::loadShellServicesVista()
+{
+}
