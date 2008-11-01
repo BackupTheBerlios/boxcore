@@ -13,6 +13,16 @@ using std::vector;
 #endif
 #include <docobj.h>
 
+/**
+ * @class shellServiceObjects
+ *
+ * @brief Start and stops ShellServiceObjects
+ *
+ * Starts ShellServiceObjects based on CLSID. CLSID's are retrieved from any
+ * number of objects of clsidSource. All ShellServiceObjects are stopped on destruction
+ * , but the entire list can also be stopped on demand. There is currently no support for
+ * stopping individual ShellServiceObjects.
+ */
 class shellServiceObjects
 {
 public:

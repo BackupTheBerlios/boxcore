@@ -89,14 +89,13 @@ clsidInjected::clsidInjected(const string &pClsidString)
 	used=false;
 }
 
-clsidInjected::~clsidInjected()
-{
-}
-
 CLSID clsidInjected::getNextCLSID()
 {
 	if (used)
 		return CLSID_NULL;
 	else
+	{
+		used=true;
 		return inject;
+	}
 }

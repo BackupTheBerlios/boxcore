@@ -37,13 +37,6 @@
 #define INCLUDE_NIDS
 #include "Tray.h"
 
-#include <shlobj.h>
-#include <shellapi.h>
-#ifdef __GNUC__
-#include <shlwapi.h>
-#endif
-#include <docobj.h>
-
 #include "shellserviceobjects/shellServiceObjects.h"
 
 #ifdef _WIN64

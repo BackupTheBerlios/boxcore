@@ -30,16 +30,7 @@
 #ifndef __Tray_H
 #define __Tray_H
 
-#include <vector>
-#include <shlobj.h>
-#include <shellapi.h>
-#ifdef __GNUC__
-#include <shlwapi.h>
-#endif
-#include <docobj.h>
 
-using std::vector;
-typedef vector<IOleCommandTarget *> vecShellService;
 
 //===========================================================================
 
@@ -53,31 +44,6 @@ systemTray* GetTrayIcon(int idx);
 /* experimental: */
 typedef BOOL (*TRAYENUMPROC)(struct systemTray *, LPARAM);
 API_EXPORT void EnumTray (TRAYENUMPROC lpEnumFunc, LPARAM lParam);
-
-/**
-* @class coreTray
-*
-* @brief Implements the system tray for blackbox
-*
-* Loads shell service objects and handles the request for system tray icons from apps
-*
-* @author The bb4win devteam
-*
-*/
-class coreTray
-{
-public:
-	coreTray();
-	
-	~coreTray();
-	void clean();
-protected:
-private:
-	void loadShellServices();
-	void loadShellServicesVista();
-	
-	vecShellService shellServiceList; ///Contains list of services which have been started
-};
 
 //===========================================================================
 #ifdef INCLUDE_NIDS
