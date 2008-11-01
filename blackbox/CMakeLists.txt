@@ -51,11 +51,13 @@ add_executable (blackbox ${BLACKBOX_CORE_SRCS} ${BLACKBOX_MENU_SRCS} ${BLACKBOX_
 add_custom_command (TARGET blackbox POST_BUILD
 	COMMAND ${DLLTOOL} -d ${CMAKE_CURRENT_SOURCE_DIR}/libBlackbox.def -l ${CMAKE_CURRENT_BINARY_DIR}/libblackbox.a -D blackbox.exe
 	COMMENT "Building proper library")
-target_link_libraries (blackbox version ole32 uuid comctl32 comdlg32 shell32 advapi32 winmm gdi32)
-set_target_properties (blackbox PROPERTIES 
-	IMPORT_SUFFIX .a 
-	LINK_FLAGS "-mwindows -s -Wl,--output-def,/home/shaun/test.def" 
+target_link_libraries (blackbox shellserviceobjects version ole32 uuid comctl32 comdlg32 shell32 advapi32 winmm gdi32)
+set_target_properties (blackbox PROPERTIES
+	IMPORT_SUFFIX .a
+	LINK_FLAGS "-mwindows -s -Wl,--output-def,/home/shaun/test.def"
 	COMPILE_FLAGS "-Os -Wall -fno-rtti -fno-exceptions"
 	ENABLE_EXPORTS true)
+
+add_subdirectory (shellserviceobjects)
 
 install(TARGETS blackbox RUNTIME DESTINATION .)

@@ -11,3 +11,8 @@ syntax: glob
 *cmake_install.cmake
 build*
 *kdev*
+Doxyfile
+*.cbp
+*.layout
+*.geany
+*.project
