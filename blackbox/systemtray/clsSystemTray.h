@@ -4,8 +4,13 @@
 #include <string>
 #include <vector>
 
-using std::string;
 using std::vector;
+
+#ifdef UNICODE
+#define tstring std::wstring
+#else
+#define tstring std::string
+#endif
 
 /**
  * @class clsSystemTray
@@ -25,13 +30,13 @@ class clsSystemTray
 		static LRESULT CALLBACK trayWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 		static LRESULT CALLBACK trayChildWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 		HINSTANCE &hInstance;
-		const string trayWndName;
+		const tstring trayWndName;
 		HWND hTrayWnd;
-		void createTrayChild(const string pParentClass, const string pChildClass);
+		void createTrayChild(const tstring pParentClass, const tstring pChildClass);
 
 		UINT trayCreatedMessage;
 
-		vector<string> childClasses;
+		vector<tstring> childClasses;
 
 		HMODULE hUser32;
 		BOOL (*ChangeWindowMessageFilter)(UINT message, DWORD dwFlag);

@@ -26,23 +26,23 @@ struct SHELLTRAYDATA
  * added to the User Interface Privilage Isolation (UIPI) filter if present. This ensures
  * that the message will be able to reach all processes.
  */
-clsSystemTray::clsSystemTray(HINSTANCE &phInstance):hInstance(phInstance),trayWndName("Shell_TrayWnd")
+clsSystemTray::clsSystemTray(HINSTANCE &phInstance):hInstance(phInstance),trayWndName(TEXT("Shell_TrayWnd"))
 {
 	trayCreatedMessage=RegisterWindowMessage(TEXT("TaskbarCreated"));
 	hUser32 = LoadLibrary(TEXT("user32.dll"));
 	if (hUser32)
 	{
-		ChangeWindowMessageFilter = (BOOL (*)(UINT,DWORD))GetProcAddress(hUser32,TEXT("ChangeWindowMessageFilter"));
+		ChangeWindowMessageFilter = (BOOL (*)(UINT,DWORD))GetProcAddress(hUser32,"ChangeWindowMessageFilter");
 		if (ChangeWindowMessageFilter)
 		{
 			if(ChangeWindowMessageFilter(trayCreatedMessage,MSGFLT_ADD))
-				MessageBox(NULL,"Message added to filter","UIPI is present",MB_OK);
+				MessageBox(NULL,TEXT("Message added to filter"),TEXT("UIPI is present"),MB_OK);
 			else
-				MessageBox(NULL,"Message not added to filter","UIPI is present",MB_OK);
+				MessageBox(NULL,TEXT("Message not added to filter"),TEXT("UIPI is present"),MB_OK);
 		}
 		else
 		{
-			MessageBox(NULL,"Nothing done","UIPI is not present",MB_OK);
+			MessageBox(NULL,TEXT("Nothing done"),TEXT("UIPI is not present"),MB_OK);
 		}
 	}
 	else
@@ -110,7 +110,7 @@ void clsSystemTray::terminate()
   *
   *
   */
-void clsSystemTray::createTrayChild(const string pParentClass, const string pChildClass)
+void clsSystemTray::createTrayChild(const tstring pParentClass, const tstring pChildClass)
 {
 	HWND parent = FindWindow(pParentClass.c_str(),NULL);
 
