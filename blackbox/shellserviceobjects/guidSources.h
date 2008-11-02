@@ -11,7 +11,7 @@
 #endif
 #include <docobj.h>
 
-using std::string;
+using std::wstring;
 
 
 /**
@@ -56,7 +56,7 @@ public:
  * set to true on suceesfully opening a key.
  * @param[in] pRegKeyName The registry key to open under HKEY_LOCAL_MACHINE
  */
-	clsidRegValues(const string &pRegKeyName);
+	clsidRegValues(const wstring &pRegKeyName);
 /**
  * Closes the handle to the registry key, if it was open.
  */
@@ -69,7 +69,7 @@ public:
 	virtual CLSID getNextCLSID();
 private:
 	HKEY regKey;
-	string keyName;
+	wstring keyName;
 	bool keyValid;
 	int index;
 };
@@ -82,16 +82,18 @@ private:
  * This class reads CLSID's stored as registry keys under a given key. The CLSID's
  * are read from the names of the subkeys.
  * This is the style used in the Windows Vista ShellServiceObjects key
+ *
+ * @note Currently not used, due to double icons when combined with the injected key
  */
 class clsidRegKeys : public clsidSource
 {
 	public:
-		clsidRegKeys(const string &);
+		clsidRegKeys(const wstring &);
 		~clsidRegKeys();
 		virtual CLSID getNextCLSID();
 	private:
 		HKEY regKey;
-		string keyName;
+		wstring keyName;
 		bool keyValid;
 		int index;
 };
@@ -108,7 +110,7 @@ class clsidRegKeys : public clsidSource
 class clsidInjected : public clsidSource
 {
 	public:
-		clsidInjected(const string &);
+		clsidInjected(const wstring &);
 		virtual CLSID getNextCLSID();
 	private:
 		CLSID inject;

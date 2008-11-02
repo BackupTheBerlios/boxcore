@@ -650,13 +650,15 @@ void Tray_Init()
 			Noccy: Remoevd async load. fails to properly start all shell services
 		*/
 
-		clsidRegValues normalKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad");
-		clsidRegKeys vistaKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\explorer\\ShellServiceObjects");
-		clsidInjected vistaInject("{730F6CDC-2C86-11D2-8773-92E220524153}");
+		clsidRegValues normalKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad");
+		//clsidRegKeys vistaKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\explorer\\ShellServiceObjects");
+		clsidInjected vistaInject(L"{730F6CDC-2C86-11D2-8773-92E220524153}");
+		clsidInjected vistaInject2(L"{7007ACCF-3202-11D1-AAD2-00805FC1270E}");
 
 		SSOManager.startServiceObjects(normalKey);
-		SSOManager.startServiceObjects(vistaKey);
+		//SSOManager.startServiceObjects(vistaKey);
 		SSOManager.startServiceObjects(vistaInject);
+		SSOManager.startServiceObjects(vistaInject2);
 
 #endif
 	}

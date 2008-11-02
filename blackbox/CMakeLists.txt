@@ -59,5 +59,6 @@ set_target_properties (blackbox PROPERTIES
 	ENABLE_EXPORTS true)
 
 add_subdirectory (shellserviceobjects)
+add_subdirectory (systemtray)
 
 install(TARGETS blackbox RUNTIME DESTINATION .)

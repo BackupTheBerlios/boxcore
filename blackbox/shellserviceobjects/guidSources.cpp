@@ -1,8 +1,8 @@
 #include "guidSources.h"
 
-clsidRegValues::clsidRegValues(const string &pRegKeyName)
+clsidRegValues::clsidRegValues(const wstring &pRegKeyName)
 {
-	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, pRegKeyName.c_str(), 0, KEY_READ, &regKey))
+	if (ERROR_SUCCESS != RegOpenKeyExW(HKEY_LOCAL_MACHINE, pRegKeyName.c_str(), 0, KEY_READ, &regKey))
 	{
 		keyValid=false;
 	}
@@ -22,27 +22,24 @@ clsidRegValues::~clsidRegValues()
 
 CLSID clsidRegValues::getNextCLSID()
 {
-	char szValueName[100]; char szData[200];
+	WCHAR szValueName[100]; WCHAR szClsid[200];
 	DWORD cbValueName   = sizeof szValueName;
-	DWORD cbData        = sizeof szData;
+	DWORD cbClsid        = sizeof szClsid;
 	DWORD dwDataType;
 
-	if (ERROR_SUCCESS != RegEnumValue(regKey, index, szValueName, &cbValueName, 0,
-	    &dwDataType, (LPBYTE) szData, &cbData))
+	if (ERROR_SUCCESS != RegEnumValueW(regKey, index, szValueName, &cbValueName, 0,
+	    &dwDataType, (LPBYTE) szClsid, &cbClsid))
 		return CLSID_NULL;
 
-	WCHAR wszCLSID[sizeof szData];
-	MultiByteToWideChar(CP_ACP, 0, szData, cbData, wszCLSID, sizeof szData);
-
 	CLSID clsid;
-	CLSIDFromString(wszCLSID, &clsid);
+	CLSIDFromString(szClsid, &clsid);
 	index++;
 	return clsid;
 }
 
-clsidRegKeys::clsidRegKeys(const string &pRegKeyName)
+clsidRegKeys::clsidRegKeys(const wstring &pRegKeyName)
 {
-	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, pRegKeyName.c_str(), 0, KEY_READ, &regKey))
+	if (ERROR_SUCCESS != RegOpenKeyExW(HKEY_LOCAL_MACHINE, pRegKeyName.c_str(), 0, KEY_READ, &regKey))
 	{
 		keyValid=false;
 	}
@@ -62,29 +59,23 @@ clsidRegKeys::~clsidRegKeys()
 
 CLSID clsidRegKeys::getNextCLSID()
 {
-	char szValueName[100]; char szData[200];
-	DWORD cbValueName   = sizeof szValueName;
-	DWORD cbData        = sizeof szData;
+	WCHAR szCLSID[100];
+	DWORD cbCLSID   = sizeof szCLSID;
 
-	if (ERROR_SUCCESS != RegEnumKeyEx(regKey, index, szValueName, &cbValueName, 0, szData, &cbData,NULL))
+	if (ERROR_SUCCESS != RegEnumKeyExW(regKey, index, szCLSID, &cbCLSID, NULL, NULL, NULL, NULL))
 		return CLSID_NULL;
 
-	WCHAR wszCLSID[sizeof szValueName];
-	MultiByteToWideChar(CP_ACP, 0, szValueName, cbValueName, wszCLSID, sizeof szValueName);
-
 	CLSID clsid;
-	CLSIDFromString(wszCLSID, &clsid);
+	CLSIDFromString(szCLSID, &clsid);
 	index++;
 	return clsid;
 }
 
-clsidInjected::clsidInjected(const string &pClsidString)
+clsidInjected::clsidInjected(const wstring &pClsidString)
 {
-	DWORD stringSize = pClsidString.size()+1;
-	WCHAR wszCLSID[stringSize];
-	MultiByteToWideChar(CP_ACP, 0, pClsidString.c_str(), stringSize, wszCLSID, pClsidString.size()+1);
-
-	CLSIDFromString(wszCLSID, &inject);
+	WCHAR clsidString[pClsidString.size()+1];
+	pClsidString.copy(clsidString,pClsidString.size(),0);
+	CLSIDFromString(clsidString, &inject);
 
 	used=false;
 }

@@ -26,6 +26,7 @@ int shellServiceObjects::startServiceObjects(clsidSource &pSource)
 				serviceObjects.push_back(pOCT);
 				numStarted++;
 			}
+			//Sleep(1000);
 		}
 		else
 			break;
