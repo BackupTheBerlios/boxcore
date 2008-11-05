@@ -51,6 +51,7 @@ class clsSystemTray
 		UINT trayCreatedMessage;
 
 		vector<tstring> childClasses;
+		vector<HWND> childWindows;
 		list<clsTrayItem *> trayItems;
 
 		void clearIconData(clsTrayItem *);

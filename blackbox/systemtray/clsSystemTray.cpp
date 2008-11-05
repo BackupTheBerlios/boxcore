@@ -137,7 +137,17 @@ void clsSystemTray::terminate()
 void clsSystemTray::createTrayChild(const tstring pParentClass, const tstring pChildClass)
 {
 	HWND parent = FindWindow(pParentClass.c_str(), NULL);
-
+	if (parent==NULL)
+	{
+		for(int i=0;i<childClasses.size();++i)
+		{
+			if(childClasses[i]==pParentClass)
+			{
+				parent = childWindows[i];
+				break;
+			}
+		}
+	}
 	WNDCLASSEX wndClass;
 	ZeroMemory(&wndClass, sizeof(wndClass));
 	wndClass.cbSize = sizeof(wndClass);
@@ -146,9 +156,10 @@ void clsSystemTray::createTrayChild(const tstring pParentClass, const tstring pC
 	wndClass.lpszClassName = pChildClass.c_str();
 	RegisterClassEx(&wndClass);
 
-	CreateWindowEx( 0, pChildClass.c_str(), NULL,
+	HWND childWindow = CreateWindowEx( 0, pChildClass.c_str(), NULL,
 					WS_CHILD | WS_DISABLED, 0, 0, 0, 0, parent, NULL, hInstance, NULL);
 	childClasses.push_back(pChildClass);
+	childWindows.push_back(childWindow);
 }
 
 
