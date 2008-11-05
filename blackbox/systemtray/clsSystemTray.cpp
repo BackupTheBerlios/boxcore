@@ -7,6 +7,26 @@
 #define MSGFLT_REMOVE 2
 #endif
 
+//IsTextUnicode(...) for testing for unicode text if needed
+#ifndef NIF_INFO
+#define NIF_INFO 0x00000010
+#endif
+#ifndef NIIF_LARGE_ICON
+#define NIIF_LARGE_ICON 0x00000020
+#endif
+#ifndef NIM_SETFOCUS
+#define NIM_SETFOCUS 0x00000003
+#endif
+#ifndef NIM_SETVERSION
+#define NIM_SETVERSION 0x00000004
+#endif
+#ifndef NIS_HIDDEN
+#define NIS_HIDDEN 0x00000001
+#endif
+#ifndef NIS_SHAREDICON
+#define NIS_SHAREDICON 0x00000002
+#endif
+
 /**
  * @struct SHELLTRAYDATA
  *
@@ -26,28 +46,25 @@ struct SHELLTRAYDATA
  * added to the User Interface Privilage Isolation (UIPI) filter if present. This ensures
  * that the message will be able to reach all processes.
  */
-clsSystemTray::clsSystemTray(HINSTANCE &phInstance):hInstance(phInstance),trayWndName(TEXT("Shell_TrayWnd"))
+clsSystemTray::clsSystemTray(HINSTANCE &phInstance): hInstance(phInstance), trayWndName(TEXT("Shell_TrayWnd"))
 {
-	trayCreatedMessage=RegisterWindowMessage(TEXT("TaskbarCreated"));
+	trayCreatedMessage = RegisterWindowMessage(TEXT("TaskbarCreated"));
 	hUser32 = LoadLibrary(TEXT("user32.dll"));
 	if (hUser32)
 	{
-		ChangeWindowMessageFilter = (BOOL (*)(UINT,DWORD))GetProcAddress(hUser32,"ChangeWindowMessageFilter");
+		ChangeWindowMessageFilter = (BOOL (*)(UINT, DWORD))GetProcAddress(hUser32, "ChangeWindowMessageFilter");
 		if (ChangeWindowMessageFilter)
 		{
-			if(ChangeWindowMessageFilter(trayCreatedMessage,MSGFLT_ADD))
-				MessageBox(NULL,TEXT("Message added to filter"),TEXT("UIPI is present"),MB_OK);
-			else
-				MessageBox(NULL,TEXT("Message not added to filter"),TEXT("UIPI is present"),MB_OK);
-		}
-		else
-		{
-			MessageBox(NULL,TEXT("Nothing done"),TEXT("UIPI is not present"),MB_OK);
+			ChangeWindowMessageFilter(trayCreatedMessage, MSGFLT_ADD);
 		}
 	}
 	else
 		ChangeWindowMessageFilter = NULL;
 	hTrayWnd = NULL;
+	callbackAdded = NULL;
+	callbackModified = NULL;
+	callbackDeleted = NULL;
+	me=this;
 	/// @todo Start using ChangeWindowMessageFunction to make sure our message can get through
 }
 
@@ -60,7 +77,7 @@ clsSystemTray::clsSystemTray(HINSTANCE &phInstance):hInstance(phInstance),trayWn
  */
 clsSystemTray::~clsSystemTray()
 {
-	terminate();
+	//terminate();
 	if (hUser32)
 		FreeLibrary(hUser32);
 }
@@ -72,26 +89,30 @@ clsSystemTray::~clsSystemTray()
 void clsSystemTray::initialize()
 {
 	WNDCLASSEX wndClass;
-	ZeroMemory(&wndClass,sizeof(wndClass));
-	wndClass.cbSize=sizeof(wndClass);
-	wndClass.hInstance=hInstance;
-	wndClass.lpfnWndProc=trayWndProc;
-	wndClass.lpszClassName=trayWndName.c_str();
+	ZeroMemory(&wndClass, sizeof(wndClass));
+	wndClass.cbSize = sizeof(wndClass);
+	wndClass.hInstance = hInstance;
+	wndClass.lpfnWndProc = trayWndProc;
+	wndClass.cbClsExtra = sizeof(this);
+	wndClass.lpszClassName = trayWndName.c_str();
 	RegisterClassEx(&wndClass);
 
 	hTrayWnd = CreateWindowEx( WS_EX_TOOLWINDOW, trayWndName.c_str(), NULL,
-		WS_POPUP|WS_DISABLED, 0, 0, 0, 0, NULL, NULL, hInstance, NULL);
+							   WS_POPUP | WS_DISABLED, 0, 0, 0, 0, NULL, NULL, hInstance, NULL);
+	SetClassLongPtr(hTrayWnd, 0, (LONG_PTR)this);
 
-	createTrayChild(trayWndName,TEXT("TrayNotifyWnd"));
-	createTrayChild(TEXT("TrayNotifyWnd"),TEXT("TrayClockWClass"));
-	createTrayChild(TEXT("TrayNotifyWnd"),TEXT("SysPager"));
+	createTrayChild(trayWndName, TEXT("TrayNotifyWnd"));
+	createTrayChild(TEXT("TrayNotifyWnd"), TEXT("TrayClockWClass"));
+	createTrayChild(TEXT("TrayNotifyWnd"), TEXT("SysPager"));
 
 	announceSystemTray();
 }
 
-/** @brief Signals the destruction of the system tray and then cleans up
+/** @brief Destroys the system tray and then cleans up
   *
-  * @todo: document this function
+  * Destroys the traywindow and all its children. Unregisters all the window classes that were
+  * registered during initialization. Deletes all trayItems currently in the list
+  *
   */
 void clsSystemTray::terminate()
 {
@@ -100,10 +121,13 @@ void clsSystemTray::terminate()
 		DestroyWindow(hTrayWnd);
 		hTrayWnd = NULL;
 
-		UnregisterClass(trayWndName.c_str(),hInstance);
-		for(unsigned int i=0;i<childClasses.size();i++)
-			UnregisterClass(childClasses[i].c_str(),hInstance);
+		UnregisterClass(trayWndName.c_str(), hInstance);
+		for (unsigned int i = 0;i < childClasses.size();i++)
+			UnregisterClass(childClasses[i].c_str(), hInstance);
 	}
+
+	for (list<clsTrayItem *>::iterator i = trayItems.begin();i != trayItems.end();i++)
+		delete *i;
 }
 
 /** @brief Register a child window class and creates an instance attached to the specified parent
@@ -112,18 +136,18 @@ void clsSystemTray::terminate()
   */
 void clsSystemTray::createTrayChild(const tstring pParentClass, const tstring pChildClass)
 {
-	HWND parent = FindWindow(pParentClass.c_str(),NULL);
+	HWND parent = FindWindow(pParentClass.c_str(), NULL);
 
 	WNDCLASSEX wndClass;
-	ZeroMemory(&wndClass,sizeof(wndClass));
-	wndClass.cbSize=sizeof(wndClass);
-	wndClass.hInstance=hInstance;
-	wndClass.lpfnWndProc=trayChildWndProc;
-	wndClass.lpszClassName=pChildClass.c_str();
+	ZeroMemory(&wndClass, sizeof(wndClass));
+	wndClass.cbSize = sizeof(wndClass);
+	wndClass.hInstance = hInstance;
+	wndClass.lpfnWndProc = trayChildWndProc;
+	wndClass.lpszClassName = pChildClass.c_str();
 	RegisterClassEx(&wndClass);
 
 	CreateWindowEx( 0, pChildClass.c_str(), NULL,
-		WS_CHILD|WS_DISABLED, 0, 0, 0, 0, parent, NULL, hInstance, NULL);
+					WS_CHILD | WS_DISABLED, 0, 0, 0, 0, parent, NULL, hInstance, NULL);
 	childClasses.push_back(pChildClass);
 }
 
@@ -153,9 +177,390 @@ LRESULT CALLBACK clsSystemTray::trayChildWndProc(HWND hwnd, UINT message, WPARAM
   */
 LRESULT CALLBACK clsSystemTray::trayWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	if (message != WM_COPYDATA)
+	switch (message)
 	{
+	case WM_COPYDATA:
+		break;
+	default:
 		return DefWindowProc(hwnd, message, wParam, lParam);
 	}
+
+	//clsSystemTray *creator = (clsSystemTray *) GetWindowLongPtr(hwnd, 0);
+	clsSystemTray* creator = me;
+
+	if (((COPYDATASTRUCT *)lParam)->dwData != 1)
+		return FALSE;
+	NID_INTERNAL NotifyIconData;
+	NID_VISTAA *ansiNID = NULL;
+	NID_VISTAW *unicodeNID = NULL;
+	DWORD trayCommand;
+
+	trayCommand =  ((SHELLTRAYDATA*)((COPYDATASTRUCT*)lParam)->lpData)->dwMessage;
+	ansiNID    = (NID_VISTAA *) & ((SHELLTRAYDATA*)((COPYDATASTRUCT*)lParam)->lpData)->iconData;
+	if ((ansiNID->cbSize == sizeof(NID_PRE2KW)) || (ansiNID->cbSize >= sizeof(NID_2KW)))
+		unicodeNID = (NID_VISTAW *)ansiNID;
+
+	ZeroMemory(&NotifyIconData, sizeof(NotifyIconData));
+	//Copy always present part, no danger here
+	if (unicodeNID)
+	{
+		NotifyIconData.hWnd = (HWND) unicodeNID->hWnd;
+		NotifyIconData.uID = unicodeNID->uID;
+		NotifyIconData.uFlags = unicodeNID->uFlags;
+		NotifyIconData.uCallbackMessage = unicodeNID->uCallbackMessage;
+		NotifyIconData.hIcon = (HICON) unicodeNID->hIcon;
+	}
+	else
+	{
+		NotifyIconData.hWnd = (HWND) ansiNID->hWnd;
+		NotifyIconData.uID = ansiNID->uID;
+		NotifyIconData.uFlags = ansiNID->uFlags;
+		NotifyIconData.uCallbackMessage = ansiNID->uCallbackMessage;
+		NotifyIconData.hIcon = (HICON) ansiNID->hIcon;
+	}
+
+	if (NotifyIconData.uFlags&NIF_TIP)
+	{
+		if (unicodeNID)
+			lstrcpyW(NotifyIconData.szTip, unicodeNID->szTip);
+		else
+			MultiByteToWideChar(CP_ACP, 0, ansiNID->szTip, -1, NotifyIconData.szTip, 128);
+	}
+
+	if (NotifyIconData.uFlags&NIF_STATE)
+	{
+		if (unicodeNID)
+		{
+			NotifyIconData.dwState = unicodeNID->dwState;
+			NotifyIconData.dwStateMask = unicodeNID->dwStateMask;
+		}
+		else
+		{
+			NotifyIconData.dwState = ansiNID->dwState;
+			NotifyIconData.dwStateMask = ansiNID->dwStateMask;
+		}
+	}
+
+	if (NotifyIconData.uFlags&NIF_INFO)
+	{
+		if (unicodeNID)
+		{
+			NotifyIconData.uTimeout = unicodeNID->uTimeout;
+			NotifyIconData.dwInfoFlags = unicodeNID->dwInfoFlags;
+			lstrcpyW(NotifyIconData.szInfo, unicodeNID->szInfo);
+			lstrcpyW(NotifyIconData.szInfoTitle, unicodeNID->szInfoTitle);
+		}
+		else
+		{
+			NotifyIconData.dwState = ansiNID->dwState;
+			NotifyIconData.dwStateMask = ansiNID->dwStateMask;
+			MultiByteToWideChar(CP_ACP, 0, ansiNID->szInfo, -1, NotifyIconData.szInfo, 256);
+			MultiByteToWideChar(CP_ACP, 0, ansiNID->szInfoTitle, -1, NotifyIconData.szInfoTitle, 64);
+		}
+	}
+
+	if (NotifyIconData.dwInfoFlags&NIIF_LARGE_ICON)
+	{
+		if (unicodeNID)
+			NotifyIconData.hBalloonItem = (HICON) unicodeNID->hBalloonItem;
+		else
+			NotifyIconData.hBalloonItem = (HICON) ansiNID->hBalloonItem;
+	}
+
+	switch (trayCommand)
+	{
+	case NIM_ADD:
+		return creator->AddIcon(NotifyIconData);
+	case NIM_MODIFY:
+		return creator->ModifyIcon(NotifyIconData);
+	case NIM_DELETE:
+		return creator->DeleteIcon(NotifyIconData);
+	case NIM_SETVERSION:
+		return creator->SetIconVersion(NotifyIconData);
+	case NIM_SETFOCUS:
+	default:
+		return DefWindowProc(hwnd, message, wParam, lParam);
+	}
+
 }
+/** @brief lookupIcon
+  *
+  * @todo: document this function
+  */
+clsTrayItem * clsSystemTray::lookupIcon(HWND phWnd, UINT puID)
+{
+	for (list<clsTrayItem *>::iterator i = trayItems.begin();i != trayItems.end();i++)
+	{
+		if (((*i)->hWnd == phWnd) && ((*i)->iconID == puID))
+			return *i;
+	}
+	return NULL;
+}
+
+/** @brief SetIconVersion
+  *
+  * @todo: document this function
+  */
+LRESULT clsSystemTray::SetIconVersion(NID_INTERNAL &pNID)
+{
+	return TRUE;
+	if (IsWindow(pNID.hWnd) == FALSE)
+	{
+		DeleteIcon(pNID);
+		return FALSE;
+	}
+	clsTrayItem *trayItem = lookupIcon(pNID.hWnd, pNID.uID);
+	if (trayItem)
+	{
+		trayItem->version = pNID.uVersion;
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+
+/** @brief DeleteIcon
+  *
+  * @todo: document this function
+  */
+LRESULT clsSystemTray::DeleteIcon(NID_INTERNAL &pNID, bool triggerCallback)
+{
+	//return TRUE;
+	clsTrayItem *trayItem = lookupIcon(pNID.hWnd, pNID.uID);
+	if (trayItem)
+	{
+		size--;
+		visibleSize--;
+		bool wasHidden = trayItem->stateHidden;
+		clearIconData(trayItem);
+		///@todo Maybe something needed here for balloon tooltips
+		trayItems.remove(trayItem);
+		delete trayItem;
+		if (!wasHidden && callbackDeleted && triggerCallback)
+			callbackDeleted();
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+
+/** @brief ModifyIcon
+  *
+  * @todo: document this function
+  */
+LRESULT clsSystemTray::ModifyIcon(NID_INTERNAL &pNID, bool triggerCallback)
+{
+	//return TRUE;
+	if (IsWindow(pNID.hWnd) == FALSE)
+	{
+		DeleteIcon(pNID);
+		return FALSE;
+	}
+	clsTrayItem *trayItem = lookupIcon(pNID.hWnd, pNID.uID);
+	if (trayItem)
+	{
+		bool wasHidden = trayItem->stateHidden;
+		if (pNID.uFlags & NIF_ICON)
+		{
+			///If a shared icon was requested, then we check whether there is an icon to share.
+			///If the requested shared icon is not available, we mark the update as failed.
+			///If the shared icon is valid, or it uses its own icon, we set it up accordingly.
+			if ((pNID.uFlags&NIF_STATE) && (pNID.dwStateMask&pNID.dwState&NIS_SHAREDICON))
+			{
+				bool sharedValid = false;
+				for (list<clsTrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); i++)
+					if (!(*i)->stateShared && (*i)->hIconOrig == pNID.hIcon)
+					{
+						sharedValid = true;
+						trayItem->hIcon = (*i)->hIcon;
+						trayItem->hIconOrig = (*i)->hIconOrig;
+						(*i)->iconRefcount++;
+					}
+				if (!sharedValid)
+					return FALSE;
+			}
+			else
+			{
+				clearIconData(trayItem);
+				trayItem->hIconOrig = pNID.hIcon;
+				trayItem->hIcon = CopyIcon(pNID.hIcon);
+			}
+		}
+
+		if (pNID.uFlags&NIF_TIP)
+			trayItem->tooltip = pNID.szTip;
+
+		if ((pNID.uFlags&NIF_STATE)&&(pNID.dwStateMask&NIS_HIDDEN))
+			trayItem->stateHidden = pNID.dwState&NIS_HIDDEN;
+
+		if (triggerCallback)
+		{
+			if (trayItem->stateHidden)
+			{
+				if (!wasHidden)
+				{
+					visibleSize--;
+					if (callbackDeleted)
+						callbackDeleted();
+				}
+			}
+			else
+			{
+				if (wasHidden)
+				{
+					visibleSize++;
+					if (callbackAdded)
+						callbackAdded();
+				}
+				else
+				{
+					if (callbackModified)
+						callbackModified();
+				}
+			}
+		}
+
+		return TRUE;
+	}
+	else
+	{
+		///The Modify request is converted to an add request if the tray icon does not exist.
+		///The add action will fail if insufficient information is present to create a new tray icon
+		return AddIcon(pNID);
+	}
+}
+
+/** @brief AddIcon
+  *
+  * @todo: document this function
+  */
+LRESULT clsSystemTray::AddIcon(NID_INTERNAL &pNID)
+{
+	//return TRUE;
+
+	clsTrayItem *trayItem = lookupIcon(pNID.hWnd, pNID.uID);
+	if (trayItem)
+		return FALSE;
+	else
+	{
+		trayItem = new clsTrayItem(pNID);
+		//MessageBox(NULL,"Not constructor","Not constructor",MB_OK);
+		if (trayItem->constructionValid())
+		{
+			trayItems.push_back(trayItem);
+			if (TRUE == ModifyIcon(pNID, false))
+			{
+				if (!trayItem->stateHidden)
+				{
+					visibleSize++;
+				if (callbackAdded)
+				{
+					//MessageBox(hTrayWnd,"Add","Supposed callback",MB_OK);
+					callbackAdded();
+				}
+				}
+				//else{MessageBox(hTrayWnd,"But de icon is hidden apparantly","Supposed callback",MB_OK);}
+				size++;
+				//MessageBox(hTrayWnd,"Success","Icon Add request",MB_OK);
+				return TRUE;
+			}
+			else
+			{
+				MessageBox(hTrayWnd,"Failure calling modify","Icon Add request",MB_OK);
+				DeleteIcon(pNID, false);
+				return FALSE;
+			}
+		}
+		else
+		{
+			MessageBox(hTrayWnd,"Failure in constructor","Icon Add request",MB_OK);
+			return FALSE;
+		}
+	}
+}
+
+
+/** @brief clearIconData
+  *
+  * @todo: document this function
+  */
+void clsSystemTray::clearIconData(clsTrayItem *pTrayItem)
+{
+	if (!pTrayItem->stateShared)
+	{
+		if (pTrayItem->iconRefcount != 0)
+		{
+			for (list<clsTrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); i++)
+				if ((*i)->stateShared && (*i)->hIconOrig == pTrayItem->hIconOrig)
+				{
+					clearIconData(*i);
+					pTrayItem->iconRefcount--;
+				}
+		}
+
+		if (pTrayItem->hIcon) DestroyIcon(pTrayItem->hIcon);
+	}
+	pTrayItem->hIcon = NULL;
+	pTrayItem->hIconOrig = NULL;
+	///@todo Do we need to do something with a balloon icon?
+}
+
+/** @brief setCallback
+  *
+  * @todo: document this function
+  */
+void clsSystemTray::setCallback(trayCallbackType pType, void (*pCall)())
+{
+	switch (pType)
+	{
+	case TCALLBACK_ADD:
+		callbackAdded = pCall;
+		//MessageBox(NULL,"Add callbACK","rEGISTERED CALLBACK",MB_OK);
+		break;
+	case TCALLBACK_MOD:
+		callbackModified = pCall;
+		break;
+	case TCALLBACK_DEL:
+		callbackDeleted = pCall;
+		break;
+	}
+}
+
+/** @brief CleanTray
+  *
+  * @todo: document this function
+  */
+void clsSystemTray::CleanTray()
+{
+	for (list<clsTrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); )
+		if (IsWindow((*i)->hWnd) == FALSE)
+	{
+		delete (*i);
+		i=trayItems.erase(i);
+	}
+	else
+		i++;
+}
+/** @brief GetTrayIcon
+  *
+  * @todo: document this function
+  */
+clsTrayItem * clsSystemTray::GetTrayIcon(int num)
+{
+	int index=0;
+	for (list<clsTrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); i++)
+	{
+		if ((*i)->stateHidden==false)
+		{
+			if(index==num)
+				return *i;
+			else
+				index++;
+		}
+	}
+	return NULL;
+}
+
+
+clsSystemTray* clsSystemTray::me = NULL;
 

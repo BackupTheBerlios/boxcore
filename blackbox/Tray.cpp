@@ -37,7 +37,7 @@
 #define INCLUDE_NIDS
 #include "Tray.h"
 
-#include "shellserviceobjects/shellServiceObjects.h"
+//#include "shellserviceobjects/shellServiceObjects.h"
 
 #ifdef _WIN64
 #undef NOTIFYICONDATA
@@ -82,7 +82,7 @@
 */
 
 //===========================================================================
-typedef struct
+/*typedef struct
 {
 	DWORD dwMagic; // e.g. 0x34753423;
 	DWORD dwMessage;
@@ -121,9 +121,9 @@ ST bool tray_on_top;
 ST void RemoveTrayIcon(systemTrayNode *p, bool post);
 
 ST shellServiceObjects SSOManager;
-
+*/
 #define SHARED_NOT_FOUND 0x80
-
+/*
 //===========================================================================
 // API: GetTraySize
 
@@ -571,7 +571,7 @@ ST void LoadShellServiceObjectsAsync()
 
 //===========================================================================
 
-ST void broadcast_tbcreated(void)
+/*ST void broadcast_tbcreated(void)
 {
 	// Noccy: Replaced PostMessage with SendNotifyMessage
 	//PostMessage(HWND_BROADCAST, RegisterWindowMessage("TaskbarCreated"), 0, 0);
@@ -650,7 +650,7 @@ void Tray_Init()
 			Noccy: Remoevd async load. fails to properly start all shell services
 		*/
 
-		clsidRegValues normalKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad");
+/*		clsidRegValues normalKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad");
 		//clsidRegKeys vistaKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\explorer\\ShellServiceObjects");
 		clsidInjected vistaInject(L"{730F6CDC-2C86-11D2-8773-92E220524153}");
 		clsidInjected vistaInject2(L"{7007ACCF-3202-11D1-AAD2-00805FC1270E}");
@@ -683,7 +683,7 @@ void Tray_Exit()
 
 	if (underExplorer)
 		broadcast_tbcreated();
-}
+}*/
 
 //===========================================================================
 /*

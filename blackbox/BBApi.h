@@ -648,7 +648,7 @@ extern "C" {
 
 	/* experimental: */
 	typedef BOOL (*TRAYENUMPROC)(struct systemTray *, LPARAM);
-	API_EXPORT void EnumTray (TRAYENUMPROC lpEnumFunc, LPARAM lParam);
+//	API_EXPORT void EnumTray (TRAYENUMPROC lpEnumFunc, LPARAM lParam);
 
 	/* ------------------------------------ */
 

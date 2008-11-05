@@ -34,16 +34,16 @@
 
 //===========================================================================
 
-void CleanTray(void);
-void Tray_Init(void);
-void Tray_Exit(void);
+//void CleanTray(void);
+//void Tray_Init(void);
+//void Tray_Exit(void);
 
-int GetTraySize();
-systemTray* GetTrayIcon(int idx);
+//int GetTraySize();
+//systemTray* GetTrayIcon(int idx);juhhhhhhhhhhhhhhhh
 
 /* experimental: */
 typedef BOOL (*TRAYENUMPROC)(struct systemTray *, LPARAM);
-API_EXPORT void EnumTray (TRAYENUMPROC lpEnumFunc, LPARAM lParam);
+//API_EXPORT void EnumTray (TRAYENUMPROC lpEnumFunc, LPARAM lParam);
 
 //===========================================================================
 #ifdef INCLUDE_NIDS

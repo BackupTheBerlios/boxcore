@@ -49,6 +49,8 @@
 #include <locale.h>
 
 #include "blackbox.h"
+#include "systemtray/clsSystemTray.h"
+#include "shellserviceobjects/shellServiceObjects.h"
 
 //====================
 
@@ -61,6 +63,8 @@ OSVERSIONINFO osInfo;
 bool usingWin2kXP;
 bool usingNT;
 bool usingx64;
+
+
 
 //====================
 
@@ -91,6 +95,9 @@ bool multimon;
 RECT OldDT;
 bool bbactive = true;
 BOOL save_opaquemove;
+
+clsSystemTray SystemTrayManager(hMainInstance);
+shellServiceObjects SSOManager;
 
 LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -232,6 +239,24 @@ void unregister_shellhook(HWND hwnd)
 void set_opaquemove(void)
 {
 	SystemParametersInfo(SPI_SETDRAGFULLWINDOWS, Settings_opaqueMove, NULL, SPIF_SENDCHANGE);
+}
+
+void broadcastAdd()
+{
+	PostMessage(BBhwnd, BB_TRAYUPDATE, 0, TRAYICON_ADDED);
+	//MessageBox(BBhwnd,"Icon added","BBCallback",MB_OK);
+}
+
+void broadcastRemove()
+{
+	PostMessage(BBhwnd, BB_TRAYUPDATE, 0, TRAYICON_REMOVED);
+	//MessageBox(BBhwnd,"Icon removed","BBCallback",MB_OK);
+}
+
+void broadcastMod()
+{
+	PostMessage(BBhwnd, BB_TRAYUPDATE, 0, TRAYICON_MODIFIED);
+	//MessageBox(BBhwnd,"Icon modified","BBCallback",MB_OK);
 }
 
 //===========================================================================
@@ -478,8 +503,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	MenuMaker_Configure();
 	Workspaces_Init();
 	Desk_Init();
-	Tray_Init();
+	SystemTrayManager.setCallback(TCALLBACK_ADD,broadcastAdd);
+	SystemTrayManager.setCallback(TCALLBACK_DEL,broadcastRemove);
+	SystemTrayManager.setCallback(TCALLBACK_MOD,broadcastMod);
+	SystemTrayManager.initialize();
+	clsidRegValues normalKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad");
+		//clsidRegKeys vistaKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\explorer\\ShellServiceObjects");
+		clsidInjected vistaInject(L"{730F6CDC-2C86-11D2-8773-92E220524153}");
+		clsidInjected vistaInject2(L"{7007ACCF-3202-11D1-AAD2-00805FC1270E}");
 
+		SSOManager.startServiceObjects(normalKey);
+		//SSOManager.startServiceObjects(vistaKey);
+		SSOManager.startServiceObjects(vistaInject);
+		SSOManager.startServiceObjects(vistaInject2);
 	start_plugins();
 
 	if (bRunStartup) SetTimer(BBhwnd, BB_RUNSTARTUP_TIMER, 500, NULL);
@@ -561,7 +597,8 @@ void shutdown_blackbox()
 	WM_ShellHook = (unsigned)-1; // dont accept shell messages anymore
 	Menu_All_Delete();
 	kill_plugins();
-	Tray_Exit();
+	SSOManager.stopServiceObjects();
+	//SystemTrayManager.terminate();
 	Desk_Exit();
 	Workspaces_Exit();
 	MenuMaker_Exit();
@@ -843,7 +880,7 @@ bb_quit:
 		// sent from the systembar on mouse over, if on mouseover
 		// a tray app's window turned out to be not valid anymore
 		case BB_CLEANTRAY:
-			CleanTray();
+			SystemTrayManager.CleanTray();
 			break;
 
 		//====================
@@ -1777,5 +1814,41 @@ void RunStartupStuff(void)
 }
 
 //===========================================================================
+
+int GetTraySize()
+{
+	//return 0;
+	static int n=0;
+	char msg[100];
+	sprintf(msg,"Size : %d",SystemTrayManager.GetTraySize());
+	if (n<SystemTrayManager.GetTraySize())
+	{
+		n=SystemTrayManager.GetTraySize();
+		MessageBox(NULL,msg,"Tray size",MB_OK);
+	}
+	return SystemTrayManager.GetTraySize();
+}
+
+vector<systemTray> apiVector;
+
+systemTray* GetTrayIcon(int idx)
+{
+	//return NULL;
+	clsTrayItem *item = SystemTrayManager.GetTrayIcon(idx);
+	if (item)
+	{
+		if (apiVector.size()<(idx+1))
+			apiVector.resize(idx+1);
+		apiVector[idx].hWnd = item->hWnd;
+		apiVector[idx].uID = item->iconID;
+		apiVector[idx].uCallbackMessage = item->callbackMessage;
+		apiVector[idx].hIcon = item->hIcon;
+		WideCharToMultiByte(CP_ACP, 0, item->tooltip.c_str(), -1, apiVector[idx].szTip, 200, NULL, NULL);
+		apiVector[idx].pBalloon = NULL;
+		return &apiVector[idx];
+	}
+	else
+		return NULL;
+}
 
 

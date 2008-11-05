@@ -5,6 +5,27 @@
 
 using std::wstring;
 
+struct NID_INTERNAL
+	{
+		HWND hWnd;
+		UINT uID;
+		UINT uFlags;
+		UINT uCallbackMessage;
+		HICON hIcon;
+		WCHAR szTip[128];
+		DWORD dwState;
+		DWORD dwStateMask;
+		WCHAR szInfo[256];
+		union{
+		UINT uTimeout;
+		UINT uVersion;
+		};
+		WCHAR szInfoTitle[64];
+		DWORD dwInfoFlags;
+		GUID guidItem;
+		HICON hBalloonItem;
+	};
+
 /**
  * @class clsTrayItem
  *
@@ -13,10 +34,12 @@ using std::wstring;
 class clsTrayItem
 {
 	public:
-		clsTrayItem();
+		clsTrayItem(NID_INTERNAL &pNID);
 		virtual ~clsTrayItem();
-	protected:
-	private:
+
+		bool constructionValid() {return valid;}
+	//protected:
+	//private:
 		///Window which will recieve notifications from this icon
 		HWND hWnd;
 		///Identifier for this icon
@@ -27,12 +50,16 @@ class clsTrayItem
 		UINT callbackMessage;
 		///The icon to display in the tray
 		HICON hIcon;
+		///The original icon handle (Used when icons is shared)
+		HICON hIconOrig;
 		///Tooltip for this icon
 		wstring tooltip;
 		///Should the icon be hidden
 		bool stateHidden;
 		///Is the icon shared
 		bool stateShared;
+		///number of references if shared
+		int iconRefcount;
 		///Text for a balloon tooltip
 		wstring balloonTip;
 		///Timout value for the balloon tooltip @todo Limit to between 10 and 30 seconds
@@ -43,6 +70,10 @@ class clsTrayItem
 		HICON hBalloonIcon;
 		/// Reserved @since Windows Vista
 		GUID itemGuid;
+
+		bool valid;
+
+		friend class clsSystemTray;
 };
 
 #endif // CLSTRAYITEM_H
