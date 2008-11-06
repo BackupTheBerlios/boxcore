@@ -17,3 +17,4 @@ set_target_properties (bbLeanBar PROPERTIES PREFIX ""
 )
 
 install(TARGETS bbLeanBar RUNTIME DESTINATION plugins/bbLeanBar)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/config/bbLeanBar.rc DESTINATION plugins/bbLeanBar)

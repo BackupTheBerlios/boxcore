@@ -29,3 +29,4 @@ set_target_properties (winkeyhook  PROPERTIES PREFIX ""
 
 install(TARGETS bbKeys RUNTIME DESTINATION plugins/bbKeys)
 install(TARGETS winkeyhook RUNTIME DESTINATION plugins/bbKeys)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/config/bbKeys.rc DESTINATION plugins/bbKeys)
