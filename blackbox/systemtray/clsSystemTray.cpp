@@ -65,7 +65,6 @@ clsSystemTray::clsSystemTray(HINSTANCE &phInstance): hInstance(phInstance), tray
 	callbackModified = NULL;
 	callbackDeleted = NULL;
 	me=this;
-	/// @todo Start using ChangeWindowMessageFunction to make sure our message can get through
 }
 
 /**
@@ -77,14 +76,18 @@ clsSystemTray::clsSystemTray(HINSTANCE &phInstance): hInstance(phInstance), tray
  */
 clsSystemTray::~clsSystemTray()
 {
-	//terminate();
+	terminate();
 	if (hUser32)
 		FreeLibrary(hUser32);
 }
 
 /** @brief Performs initalization of the system tray
   *
-  * @todo: document this function
+  * We register a class and create a window to represent the system tray. Some
+  * child windows are also created, as these exist in the real taskbar.
+  * Once alll windows are created, we broadcast the message to announce that the system tray
+  * has been created.
+  * @todo Fix the storage of the class pointer, so we do not require a static data member
   */
 void clsSystemTray::initialize()
 {
@@ -111,7 +114,7 @@ void clsSystemTray::initialize()
 /** @brief Destroys the system tray and then cleans up
   *
   * Destroys the traywindow and all its children. Unregisters all the window classes that were
-  * registered during initialization. Deletes all trayItems currently in the list
+  * registered during initialization. Deletes all trayItems currently in the list after freeing the created icons.
   *
   */
 void clsSystemTray::terminate()
@@ -127,19 +130,28 @@ void clsSystemTray::terminate()
 	}
 
 	for (list<clsTrayItem *>::iterator i = trayItems.begin();i != trayItems.end();i++)
+	{
+		clearIconData(*i);
 		delete *i;
+	}
 }
 
 /** @brief Register a child window class and creates an instance attached to the specified parent
   *
+  * @param[in] pParentClass The clss name of the window which should be used as the parent
+  * @param[in] pChildClass The class name that should be used for the child window
   *
+  * We try to locate a parent window of teh requested class by querying the system. If this fails we
+  * also consult the list of child windows we have. A window class is then registered with the new name
+  * and a window of that class is created.
   */
 void clsSystemTray::createTrayChild(const tstring pParentClass, const tstring pChildClass)
 {
 	HWND parent = FindWindow(pParentClass.c_str(), NULL);
+
 	if (parent==NULL)
 	{
-		for(int i=0;i<childClasses.size();++i)
+		for(unsigned int i=0;i<childClasses.size();++i)
 		{
 			if(childClasses[i]==pParentClass)
 			{
@@ -148,6 +160,7 @@ void clsSystemTray::createTrayChild(const tstring pParentClass, const tstring pC
 			}
 		}
 	}
+
 	WNDCLASSEX wndClass;
 	ZeroMemory(&wndClass, sizeof(wndClass));
 	wndClass.cbSize = sizeof(wndClass);
@@ -163,9 +176,9 @@ void clsSystemTray::createTrayChild(const tstring pParentClass, const tstring pC
 }
 
 
-/** @brief announceSystemTray
+/** @brief Performs any notifications needed to make the presence of the new system tray known
   *
-  * @todo: document this function
+  * Broadcasts the message registered earlier for this purpose to all windows.
   */
 void clsSystemTray::announceSystemTray()
 {
@@ -184,7 +197,8 @@ LRESULT CALLBACK clsSystemTray::trayChildWndProc(HWND hwnd, UINT message, WPARAM
 /** @brief Window procedure for the system tray window
   *
   * Calls DefWindowProc to handle everything except WM_COPYDATA.
-  * @todo: document this function
+  * @todo Document this pproperly
+  * @todo: Fix the storage of the class pointer, so we can get rid of the me static member
   */
 LRESULT CALLBACK clsSystemTray::trayWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -340,8 +354,6 @@ LRESULT clsSystemTray::DeleteIcon(NID_INTERNAL &pNID, bool triggerCallback)
 	clsTrayItem *trayItem = lookupIcon(pNID.hWnd, pNID.uID);
 	if (trayItem)
 	{
-		size--;
-		visibleSize--;
 		bool wasHidden = trayItem->stateHidden;
 		clearIconData(trayItem);
 		///@todo Maybe something needed here for balloon tooltips
@@ -410,7 +422,6 @@ LRESULT clsSystemTray::ModifyIcon(NID_INTERNAL &pNID, bool triggerCallback)
 			{
 				if (!wasHidden)
 				{
-					visibleSize--;
 					if (callbackDeleted)
 						callbackDeleted();
 				}
@@ -419,7 +430,6 @@ LRESULT clsSystemTray::ModifyIcon(NID_INTERNAL &pNID, bool triggerCallback)
 			{
 				if (wasHidden)
 				{
-					visibleSize++;
 					if (callbackAdded)
 						callbackAdded();
 				}
@@ -441,21 +451,25 @@ LRESULT clsSystemTray::ModifyIcon(NID_INTERNAL &pNID, bool triggerCallback)
 	}
 }
 
-/** @brief AddIcon
+/** @brief Function to handle a request to add an icon to the system tray
   *
-  * @todo: document this function
+  * We return false immediately if the icon being requested already exists.
+  * If the icon does not yet exist, a new instance of clsTrayItem is created form the request.
+  * The new tray icon is added to the list. The ModifyIcon fucntion is then called with the
+  * information provided for icon creation. This ensures that we capture all the information from
+  * the request, as the clsTrayItem constructor only copies the minimum information needed for an icon.
+  *
+  * @return FALSE is returned if an icon already exists, or if creation fails during any step
+  * TRUE is returned is creation is succesfull in both the clsTrayItem constructor and ModifyIcon.
   */
 LRESULT clsSystemTray::AddIcon(NID_INTERNAL &pNID)
 {
-	//return TRUE;
-
 	clsTrayItem *trayItem = lookupIcon(pNID.hWnd, pNID.uID);
 	if (trayItem)
 		return FALSE;
 	else
 	{
 		trayItem = new clsTrayItem(pNID);
-		//MessageBox(NULL,"Not constructor","Not constructor",MB_OK);
 		if (trayItem->constructionValid())
 		{
 			trayItems.push_back(trayItem);
@@ -463,28 +477,19 @@ LRESULT clsSystemTray::AddIcon(NID_INTERNAL &pNID)
 			{
 				if (!trayItem->stateHidden)
 				{
-					visibleSize++;
 				if (callbackAdded)
-				{
-					//MessageBox(hTrayWnd,"Add","Supposed callback",MB_OK);
 					callbackAdded();
 				}
-				}
-				//else{MessageBox(hTrayWnd,"But de icon is hidden apparantly","Supposed callback",MB_OK);}
-				size++;
-				//MessageBox(hTrayWnd,"Success","Icon Add request",MB_OK);
 				return TRUE;
 			}
 			else
 			{
-				MessageBox(hTrayWnd,"Failure calling modify","Icon Add request",MB_OK);
 				DeleteIcon(pNID, false);
 				return FALSE;
 			}
 		}
 		else
 		{
-			MessageBox(hTrayWnd,"Failure in constructor","Icon Add request",MB_OK);
 			return FALSE;
 		}
 	}
@@ -572,6 +577,23 @@ clsTrayItem * clsSystemTray::GetTrayIcon(int num)
 	return NULL;
 }
 
+
+/** @brief GetTraySize
+  *
+  * @todo: document this function
+  */
+int clsSystemTray::GetNumVisible()
+{
+	int count=0;
+	for (list<clsTrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); i++)
+	{
+		if ((*i)->stateHidden==false)
+		{
+			count++;
+		}
+	}
+	return count;
+}
 
 clsSystemTray* clsSystemTray::me = NULL;
 

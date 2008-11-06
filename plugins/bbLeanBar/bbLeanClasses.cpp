@@ -687,6 +687,9 @@ public:
 	//-----------------------------
 	void draw()
 	{
+		char msg[100];
+		sprintf(msg,"Drawing to HDC %p",mPI->hdcPaint);
+		//MessageBox(NULL,msg,"Draw debug",MB_OK);
 		StyleItem *pSI = (StyleItem*)GetSettingPtr(m_Style);
 		mPI->pBuff->MakeStyleGradient(mPI->hdcPaint,  &mr, pSI, false);
 		HGDIOBJ oldfont = SelectObject(mPI->hdcPaint, mPI->hFont);
@@ -1200,6 +1203,7 @@ public:
 		int xpos;
 		int clklabel_width, wsplabel_width, winlabel_width, taskzone_width;
 		int clklabel_count, wsplabel_count;
+		static bool countmsgs=0;
 
 		clklabel_count =
 		wsplabel_count =
@@ -1222,8 +1226,8 @@ public:
 		// --- 1st pass ----------------------------------
 		dolist (p, p0)
 		{
-			char *cp; SIZE size;
-
+				char *cp; SIZE size;
+			BOOL checkFuncRet;
 			if (M_NEWLINE == p->item->mtype)
 				break;
 
@@ -1247,7 +1251,7 @@ public:
 
 			case M_WSPL:
 				cp = screenName;
-				GetTextExtentPoint32(mPI->hdcPaint, cp, strlen(cp), &size);
+				checkFuncRet = GetTextExtentPoint32(mPI->hdcPaint, cp, strlen(cp), &size);
 				if (size.cx > wsplabel_width)
 					wsplabel_width = size.cx;
 
@@ -1256,10 +1260,25 @@ public:
 
 			case M_CLCK:
 				cp = mPI->clockTime;
-				GetTextExtentPoint32(mPI->hdcPaint, cp, strlen(cp), &size);
-				if (size.cx > clklabel_width)
+				//if(countmsgs<2)
+				//{
+				//	MessageBox(NULL,cp,"The clock text",MB_OK);
+				//	countmsgs++;
+				//}
+				checkFuncRet = GetTextExtentPoint32(mPI->hdcPaint, cp, strlen(cp), &size);
+				if (size.cx != clklabel_width)
 					clklabel_width = size.cx;
-
+				if (clklabel_width>500)
+				{
+					if(countmsgs<5)
+				{
+					countmsgs++;
+					char msg[100];
+					sprintf(msg,"The wanted clock label size is %d for \"%s\" of length %d, the function returned %d. The error code was %d. The HDC was %p",clklabel_width,cp,strlen(cp),checkFuncRet,GetLastError(),mPI->hdcPaint);
+					MessageBox(NULL,msg,"The clock text",MB_OK);
+				}
+					clklabel_width=500;
+				}
 				clklabel_count ++;
 				break;
 

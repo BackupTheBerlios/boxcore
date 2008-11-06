@@ -1820,13 +1820,13 @@ int GetTraySize()
 	//return 0;
 	static int n=0;
 	char msg[100];
-	sprintf(msg,"Size : %d",SystemTrayManager.GetTraySize());
-	if (n<SystemTrayManager.GetTraySize())
+	sprintf(msg,"Size : %d",SystemTrayManager.GetNumVisible());
+	if (n<SystemTrayManager.GetNumVisible())
 	{
-		n=SystemTrayManager.GetTraySize();
+		n=SystemTrayManager.GetNumVisible();
 		MessageBox(NULL,msg,"Tray size",MB_OK);
 	}
-	return SystemTrayManager.GetTraySize();
+	return SystemTrayManager.GetNumVisible();
 }
 
 vector<systemTray> apiVector;

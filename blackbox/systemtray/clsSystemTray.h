@@ -33,7 +33,7 @@ class clsSystemTray
 		void announceSystemTray();
 		void CleanTray();
 
-		int GetTraySize() {return visibleSize;}
+		int GetNumVisible();
 		clsTrayItem *GetTrayIcon(int num);
 
 		void setCallback(trayCallbackType, void (*)());
@@ -72,9 +72,6 @@ class clsSystemTray
 
 		HMODULE hUser32;
 		BOOL (*ChangeWindowMessageFilter)(UINT message, DWORD dwFlag);
-
-		int size;
-		int visibleSize;
 
 	struct NID_PRE2KA
 	{
