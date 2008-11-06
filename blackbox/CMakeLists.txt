@@ -36,6 +36,15 @@ Menu/Dragsource.cpp
 Menu/Droptarget.cpp
 )
 
+set (BLACKBOX_CONFIG
+config/blackbox.rc
+config/extensions.rc
+config/menu.rc
+config/plugins.rc
+config/shellfolders.rc
+config/stickywindows.ini
+)
+
 if(MINGW)
   # resource compilation for mingw
   ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/resource.o
@@ -58,7 +67,18 @@ set_target_properties (blackbox PROPERTIES
 	COMPILE_FLAGS "-Os -Wall -fno-rtti -fno-exceptions"
 	ENABLE_EXPORTS true)
 
+if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL AMD64)
+set (ARCH amd64)
+else (${CMAKE_SYSTEM_PROCESSOR} STREQUAL AMD64)
+set (ARCH x86)
+endif (${CMAKE_SYSTEM_PROCESSOR} STREQUAL AMD64)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/manifest.in 
+${CMAKE_CURRENT_BINARY_DIR}/blackbox.exe.manifest)
+
 add_subdirectory (shellserviceobjects)
 add_subdirectory (systemtray)
 
 install(TARGETS blackbox RUNTIME DESTINATION .)
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/blackbox.exe.manifest DESTINATION .)
+install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/${BLACKBOX_CONFIG} DESTINATION .)

@@ -6,6 +6,10 @@ doc:
 	$(MAKE) doc -C build32
 	$(MAKE) doc -C build64
 
+package:
+	$(MAKE) package -C build32
+	$(MAKE) package -C build64
+
 clean:
 	$(MAKE) clean -C build32
 	$(MAKE) clean -C build64
