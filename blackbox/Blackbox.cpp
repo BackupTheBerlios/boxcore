@@ -1817,15 +1817,6 @@ void RunStartupStuff(void)
 
 int GetTraySize()
 {
-	//return 0;
-	static int n=0;
-	char msg[100];
-	sprintf(msg,"Size : %d",SystemTrayManager.GetNumVisible());
-	if (n<SystemTrayManager.GetNumVisible())
-	{
-		n=SystemTrayManager.GetNumVisible();
-		MessageBox(NULL,msg,"Tray size",MB_OK);
-	}
 	return SystemTrayManager.GetNumVisible();
 }
 
