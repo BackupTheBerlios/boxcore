@@ -16,3 +16,4 @@ Doxyfile
 *.layout
 *.geany
 *.project
+coreplugins*

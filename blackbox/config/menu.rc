@@ -1,0 +1,34 @@
+# -----------------------------------------------------------------
+# bblean 1.16 - MENU FILE
+# -----------------------------------------------------------------
+
+# Available menu commands are listed in the documentation.
+
+[begin] (Start menu)
+    [exec] (foobar2000) {"C:\Program Files\foobar2000\foobar2000.exe"} <*>
+    [exec] (Firefox) {"C:\Program Files\Mozilla Firefox\firefox.exe"} <*>
+    [exec] (Totalcmd) {"C:\Program Files\totalcmd\Totalcmd.exe"} <*>
+    [separator]
+    [path] (Programs) {PROGRAMS|COMMON_PROGRAMS|DESKTOPDIRECTORY|COMMON_DESKTOPDIRECTORY}
+    [separator]
+    [submenu] (System)
+        [path] (My Computer) {DRIVES}
+        [path] (Controls) {CONTROLS}
+        [path] (Blackbox) {BLACKBOX}
+        # Uncomment this line to check out all available system folders
+        # [include] {shellfolders.rc}
+    [end]
+	[stylesmenu] (Styles) {styles}
+	[include] (menubb.rc)
+    [separator]
+    [submenu] (Shutdown)
+        [logoff] (Logoff)
+        [reboot] (Reboot)
+        [shutdown] (Shutdown)
+        [suspend] (Suspend)
+    [end]
+    [separator]
+    [run]  (Run)
+    [volume]  (Volume)
+[end]
+
