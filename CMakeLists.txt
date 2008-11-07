@@ -12,6 +12,12 @@ set (PACKAGE_ARCH x86)
 endif (${CMAKE_SYSTEM_PROCESSOR} STREQUAL AMD64)
 
 find_package(Doxygen)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY IMMEDIATE)
+add_custom_target(doc ${DOXYGEN_EXECUTABLE})
+
+set (CPACK_ALL_INSTALL_TYPES Full Upgrade)
+
+add_subdirectory (blackbox)
 
 set (CPACK_GENERATOR "ZIP;NSIS")
 set (CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_CURRENT_BINARY_DIR};Blackbox;ALL;/")
@@ -23,28 +29,22 @@ set (CPACK_PACKAGE_VERSION "1.16")
 set (CPACK_PACKAGE_INSTALL_DIRECTORY "Blackbox-${PACKAGE_ARCH}")
 set (CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${PACKAGE_ARCH}")
 set (CPACK_INCLUDE_TOPLEVEL_DIRECTORY False)
-
-set (CPACK_COMPONENTS_ALL core configcore coreplugins)
-set (CPACK_COMPONENT_CORE_DISPLAY_NAME "Blackbox core")
-set (CPACK_COMPONENT_CORE_DESCRIPTION "The main blockbox executable and default configuration files")
-set (CPACK_COMPONENT_CORE_REQUIRED True)
-set (CPACK_COMPONENT_CONFIGCORE_DISPLAY_NAME "Blackbox config")
-set (CPACK_COMPONENT_CONFIGCORE_DESCRIPTION "The config files for blackbox core")
-set (CPACK_COMPONENT_COREPLUGINS_DISPLAY_NAME "Core plugins")
-set (CPACK_COMPONENT_COREPLUGINS_DESCRIPTION "The bbKeys plugin for keyboard shortcuts and bbLeanbar to provide a system bar. Includes config files")
-
-include (CPack)
-
-
-
-set (CORE_BUILD "yes")
-add_subdirectory (blackbox)
+set (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/license.txt")
+set (CPACK_NSIS_DISPLAY_NAME "Blackbox for Windows")
 
 if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/coreplugins/)
-add_subdirectory (coreplugins)
+add_subdirectory (coreplugins/bbKeys)
+add_subdirectory (coreplugins/bbLeanBar)
 endif (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/coreplugins/)
 
+set (CPACK_COMPONENT_GROUP_CORE_DISPLAY_NAME "Blackbox Core")
+set (CPACK_COMPONENT_GROUP_CORE_EXPANDED True)
+set (CPACK_COMPONENT_GROUP_CORE_DESCRIPTION
+	"The main executable and config files")
 
+set (CPACK_COMPONENT_GROUP_COREPLUGINS_DISPLAY_NAME "Core Plugins")
+set (CPACK_COMPONENT_GROUP_COREPLUGINS_EXPANDED True)
+set (CPACK_COMPONENT_GROUP_COREPLUGINS_DESCRIPTION
+	"The main plugins intended for use with the shell")
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY IMMEDIATE)
-add_custom_target(doc ${DOXYGEN_EXECUTABLE})
+include (CPack)

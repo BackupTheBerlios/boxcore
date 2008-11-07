@@ -31,7 +31,7 @@
 ;General
 
   ;Name and file
-  Name "@CPACK_PACKAGE_INSTALL_DIRECTORY@"
+  Name "@CPACK_PACKAGE_NAME@"
   OutFile "@CPACK_TOPLEVEL_DIRECTORY@/@CPACK_OUTPUT_FILE_NAME@"
 
   ;Set compression
@@ -520,12 +520,6 @@ FunctionEnd
   Page custom InstallOptionsPage
   !insertmacro MUI_PAGE_DIRECTORY
   
-  ;Start Menu Folder Page Configuration
-  !define MUI_STARTMENUPAGE_REGISTRY_ROOT "SHCTX" 
-  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" 
-  !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
-  !insertmacro MUI_PAGE_STARTMENU Application $STARTMENU_FOLDER
-
   @CPACK_NSIS_PAGE_COMPONENTS@
 
   !insertmacro MUI_PAGE_INSTFILES
@@ -655,18 +649,8 @@ Section "-Core installation"
   Push "@CPACK_NSIS_CONTACT@"
   Call ConditionalAddToRegisty
   !insertmacro MUI_INSTALLOPTIONS_READ $INSTALL_DESKTOP "NSIS.InstallOptions.ini" "Field 5" "State"
-  !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
   
-  ;Create shortcuts
-  CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-@CPACK_NSIS_CREATE_ICONS@
-@CPACK_NSIS_CREATE_ICONS_EXTRA@
-  CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
-
   ; Write special uninstall registry entries
-  Push "StartMenu"
-  Push "$STARTMENU_FOLDER"
-  Call ConditionalAddToRegisty
   Push "DoNotAddToPath"
   Push "$DO_NOT_ADD_TO_PATH"
   Call ConditionalAddToRegisty
@@ -682,7 +666,6 @@ Section "-Core installation"
 
 @CPACK_NSIS_EXTRA_INSTALL_COMMANDS@
   
-  !insertmacro MUI_STARTMENU_WRITE_END
 
 SectionEnd
 
