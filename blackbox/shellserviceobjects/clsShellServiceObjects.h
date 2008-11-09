@@ -1,7 +1,7 @@
-#ifndef SHELLSERVICEOBJECTS_H
-#define SHELLSERVICEOBJECTS_H
+#ifndef CLSSHELLSERVICEOBJECTS_H
+#define CLSSHELLSERVICEOBJECTS_H
 
-#include "guidSources.h"
+#include "clsClsidSources.h"
 #include <vector>
 
 using std::vector;
@@ -14,7 +14,7 @@ using std::vector;
 #include <docobj.h>
 
 /**
- * @class shellServiceObjects
+ * @class clsShellServiceObjects
  *
  * @brief Start and stops ShellServiceObjects
  *
@@ -23,12 +23,12 @@ using std::vector;
  * , but the entire list can also be stopped on demand. There is currently no support for
  * stopping individual ShellServiceObjects.
  */
-class shellServiceObjects
+class clsShellServiceObjects
 {
 public:
-	shellServiceObjects();
-	~shellServiceObjects();
-	int startServiceObjects(clsidSource &);
+	clsShellServiceObjects();
+	~clsShellServiceObjects();
+	int startServiceObjects(clsClsidSource &);
 	int stopServiceObjects();
 protected:
 private:

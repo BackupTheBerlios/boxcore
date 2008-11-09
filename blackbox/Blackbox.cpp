@@ -49,7 +49,7 @@
 
 #include "blackbox.h"
 #include "systemtray/clsSystemTray.h"
-#include "shellserviceobjects/shellServiceObjects.h"
+#include "shellserviceobjects/clsShellServiceObjects.h"
 #include "clsSystemInfo.h"
 
 //====================
@@ -92,7 +92,7 @@ bool bbactive = true;
 BOOL save_opaquemove;
 
 clsSystemTray SystemTrayManager(hMainInstance);
-shellServiceObjects SSOManager;
+clsShellServiceObjects ShellServiceObjectsManager;
 clsSystemInfo SystemInfo;
 
 LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -489,15 +489,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	if (SystemInfo.isOsVista())
 	{
-		clsidInjected vistaInject(L"{730F6CDC-2C86-11D2-8773-92E220524153}");
-		clsidInjected vistaInject2(L"{7007ACCF-3202-11D1-AAD2-00805FC1270E}");
-		SSOManager.startServiceObjects(vistaInject);
-		SSOManager.startServiceObjects(vistaInject2);
+		clsClsidInjected vistaInject(L"{730F6CDC-2C86-11D2-8773-92E220524153}");
+		clsClsidRegKeys vistaKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\explorer\\ShellServiceObjects");
+		vector<wstring> vistaWhitelist;
+		vistaWhitelist.push_back(L"{7007ACCF-3202-11D1-AAD2-00805FC1270E}");
+		vistaKey.setWhitelist(vistaWhitelist);
+		ShellServiceObjectsManager.startServiceObjects(vistaInject);
+		ShellServiceObjectsManager.startServiceObjects(vistaKey);
 	}
 	else
 	{
-		clsidRegValues normalKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad");
-		SSOManager.startServiceObjects(normalKey);
+		clsClsidRegValues normalKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad");
+		ShellServiceObjectsManager.startServiceObjects(normalKey);
 	}
 
 		//clsidRegKeys vistaKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\explorer\\ShellServiceObjects");
@@ -587,7 +590,7 @@ void shutdown_blackbox()
 	WM_ShellHook = (unsigned)-1; // dont accept shell messages anymore
 	Menu_All_Delete();
 	kill_plugins();
-	SSOManager.stopServiceObjects();
+	ShellServiceObjectsManager.stopServiceObjects();
 	//SystemTrayManager.terminate();
 	Desk_Exit();
 	Workspaces_Exit();

@@ -3,12 +3,12 @@
 #project (BLACKBOX)
 
 set (SSO_SRCS
-guidSources.cpp
-shellServiceObjects.cpp
+clsClsidSources.cpp
+clsShellServiceObjects.cpp
 )
 
 add_library (shellserviceobjects STATIC ${SSO_SRCS})
 
-set_target_properties (shellserviceobjects PROPERTIES 
-	LINK_FLAGS "-mwindows -s" 
+set_target_properties (shellserviceobjects PROPERTIES
+	LINK_FLAGS "-mwindows -s"
 	COMPILE_FLAGS "-Os -Wall -fno-rtti -fno-exceptions")

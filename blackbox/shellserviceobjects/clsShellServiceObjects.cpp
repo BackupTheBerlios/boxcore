@@ -1,15 +1,15 @@
-#include "shellServiceObjects.h"
+#include "clsShellServiceObjects.h"
 
-shellServiceObjects::shellServiceObjects()
+clsShellServiceObjects::clsShellServiceObjects()
 {
 }
 
-shellServiceObjects::~shellServiceObjects()
+clsShellServiceObjects::~clsShellServiceObjects()
 {
 	stopServiceObjects();
 }
 
-int shellServiceObjects::startServiceObjects(clsidSource &pSource)
+int clsShellServiceObjects::startServiceObjects(clsClsidSource &pSource)
 {
 	int numStarted=0;
 	CLSID objectClsid;
@@ -34,7 +34,7 @@ int shellServiceObjects::startServiceObjects(clsidSource &pSource)
 	return numStarted;
 }
 
-int shellServiceObjects::stopServiceObjects()
+int clsShellServiceObjects::stopServiceObjects()
 {
 	int numStopped=0;
 	for(unsigned int i=0;i<serviceObjects.size();i++)
