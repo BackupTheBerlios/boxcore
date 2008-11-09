@@ -85,3 +85,4 @@ SetTaskWorkspace
 GetDesktopInfo
 EnumDesks
 GetToolbarInfo
+TrayIconEvent

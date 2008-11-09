@@ -64,7 +64,6 @@ clsSystemTray::clsSystemTray(HINSTANCE &phInstance): hInstance(phInstance), tray
 	callbackAdded = NULL;
 	callbackModified = NULL;
 	callbackDeleted = NULL;
-	me=this;
 }
 
 /**
@@ -103,10 +102,11 @@ void clsSystemTray::initialize()
 	hTrayWnd = CreateWindowEx( WS_EX_TOOLWINDOW, trayWndName.c_str(), NULL,
 							   WS_POPUP | WS_DISABLED, 0, 0, 0, 0, NULL, NULL, hInstance, NULL);
 	SetClassLongPtr(hTrayWnd, 0, (LONG_PTR)this);
-
 	createTrayChild(trayWndName, TEXT("TrayNotifyWnd"));
 	createTrayChild(TEXT("TrayNotifyWnd"), TEXT("TrayClockWClass"));
 	createTrayChild(TEXT("TrayNotifyWnd"), TEXT("SysPager"));
+
+
 
 	announceSystemTray();
 }
@@ -210,8 +210,7 @@ LRESULT CALLBACK clsSystemTray::trayWndProc(HWND hwnd, UINT message, WPARAM wPar
 		return DefWindowProc(hwnd, message, wParam, lParam);
 	}
 
-	//clsSystemTray *creator = (clsSystemTray *) GetWindowLongPtr(hwnd, 0);
-	clsSystemTray* creator = me;
+	clsSystemTray *creator = (clsSystemTray *) GetClassLongPtr(hwnd, 0);
 
 	if (((COPYDATASTRUCT *)lParam)->dwData != 1)
 		return FALSE;
@@ -284,6 +283,18 @@ LRESULT CALLBACK clsSystemTray::trayWndProc(HWND hwnd, UINT message, WPARAM wPar
 		}
 	}
 
+	if (trayCommand == NIM_SETVERSION)
+	{
+		if (unicodeNID)
+		{
+			NotifyIconData.uVersion = unicodeNID->uVersion;
+		}
+		else
+		{
+			NotifyIconData.uVersion = ansiNID->uVersion;
+		}
+	}
+
 	if (NotifyIconData.dwInfoFlags&NIIF_LARGE_ICON)
 	{
 		if (unicodeNID)
@@ -328,7 +339,7 @@ clsTrayItem * clsSystemTray::lookupIcon(HWND phWnd, UINT puID)
   */
 LRESULT clsSystemTray::SetIconVersion(NID_INTERNAL &pNID)
 {
-	return TRUE;
+	//return TRUE;
 	if (IsWindow(pNID.hWnd) == FALSE)
 	{
 		DeleteIcon(pNID);
@@ -595,5 +606,35 @@ int clsSystemTray::GetNumVisible()
 	return count;
 }
 
-clsSystemTray* clsSystemTray::me = NULL;
+/** @brief TrayIconEvent
+  *
+  * @todo: document this function
+  */
+BOOL clsSystemTray::TrayIconEvent(HWND ownerHwnd, UINT iconID, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	clsTrayItem *trayItem = lookupIcon(ownerHwnd, iconID);
+	if (trayItem)
+	{
+		switch (trayItem->version)
+		{
+			case 4:
+				switch (msg)
+				{
+					case WM_RBUTTONUP:
+						SendNotifyMessage(trayItem->hWnd, trayItem->callbackMessage, MAKEWPARAM(LOWORD(lParam),HIWORD(lParam)), MAKELPARAM(WM_CONTEXTMENU,trayItem->iconID));
+						break;
+					default:
+						SendNotifyMessage(trayItem->hWnd, trayItem->callbackMessage, MAKEWPARAM(LOWORD(lParam),HIWORD(lParam)), MAKELPARAM(msg,trayItem->iconID));
+				}
+				break;
+			default:
+				SendNotifyMessage(trayItem->hWnd, trayItem->callbackMessage, trayItem->iconID, msg);
+		}
+		return TRUE;
+	}
+	else
+	{
+		return FALSE;
+	}
+}
 

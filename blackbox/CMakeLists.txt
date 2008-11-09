@@ -9,7 +9,6 @@ Settings.cpp
 PluginManager.cpp
 MessageManager.cpp
 Workspaces.cpp
-Tray.cpp
 Desk.cpp
 Toolbar.cpp
 DesktopMenu.cpp
@@ -21,6 +20,10 @@ BBRoot.cpp
 BBVWM.cpp
 Pidl.cpp
 VolumeControl.cpp
+)
+
+set (BLACKBOX_NEW_SRCS
+clsSystemInfo.cpp
 )
 
 set (BLACKBOX_MENU_SRCS
@@ -40,6 +43,7 @@ set (BLACKBOX_CONFIG
 config/blackbox.rc
 config/extensions.rc
 config/menu.rc
+config/menubb.rc
 config/plugins.rc
 config/shellfolders.rc
 config/stickywindows.ini
@@ -56,7 +60,7 @@ else(MINGW)
   SET(BLACKBOX_RESOURCES resource.rc)
 endif(MINGW)
 
-add_executable (blackbox ${BLACKBOX_CORE_SRCS} ${BLACKBOX_MENU_SRCS} ${BLACKBOX_RESOURCES})
+add_executable (blackbox ${BLACKBOX_CORE_SRCS} ${BLACKBOX_MENU_SRCS} ${BLACKBOX_NEW_SRCS} ${BLACKBOX_RESOURCES})
 add_custom_command (TARGET blackbox POST_BUILD
 	COMMAND ${DLLTOOL} -d ${CMAKE_CURRENT_SOURCE_DIR}/libBlackbox.def -l ${CMAKE_CURRENT_BINARY_DIR}/libblackbox.a -D blackbox.exe
 	COMMENT "Building proper library")
@@ -67,7 +71,7 @@ set_target_properties (blackbox PROPERTIES
 	COMPILE_FLAGS "-Os -Wall -fno-rtti -fno-exceptions"
 	ENABLE_EXPORTS true)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/manifest.in 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/manifest.in
 ${CMAKE_CURRENT_BINARY_DIR}/blackbox.exe.manifest)
 
 add_subdirectory (shellserviceobjects)
@@ -79,11 +83,11 @@ install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/${BLACKBOX_CONFIG} DESTINATION . COMP
 
 set (CPACK_COMPONENTS_ALL Blackbox BlackboxConfig PARENT_SCOPE)
 set (CPACK_COMPONENT_BLACKBOX_DISPLAY_NAME "Blackbox" PARENT_SCOPE)
-set (CPACK_COMPONENT_BLACKBOX_DESCRIPTION 
+set (CPACK_COMPONENT_BLACKBOX_DESCRIPTION
 	"The main blockbox executable" PARENT_SCOPE)
 set (CPACK_COMPONENT_BLACKBOX_REQUIRED True PARENT_SCOPE)
 set (CPACK_COMPONENT_BLACKBOXCONFIG_DISPLAY_NAME "Blackbox default configuration" PARENT_SCOPE)
-set (CPACK_COMPONENT_BLACKBOXCONFIG_DESCRIPTION 
+set (CPACK_COMPONENT_BLACKBOXCONFIG_DESCRIPTION
 	"The config files for blackbox core" PARENT_SCOPE)
 
 set (CPACK_COMPONENT_BLACKBOX_GROUP "Core" PARENT_SCOPE)

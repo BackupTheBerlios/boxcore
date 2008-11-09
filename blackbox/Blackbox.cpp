@@ -2,8 +2,8 @@
  ============================================================================
 
   This file is part of the bbLean source code
-  Copyright © 2001-2003 The Blackbox for Windows Development Team
-  Copyright © 2004 grischka
+  Copyright Â© 2001-2003 The Blackbox for Windows Development Team
+  Copyright Â© 2004 grischka
 
   http://bb4win.sourceforge.net/bblean
   http://sourceforge.net/projects/bb4win
@@ -33,7 +33,6 @@
 #include "PluginManager.h"
 #include "Workspaces.h"
 #include "Desk.h"
-#include "Tray.h"
 #include "Toolbar.h"
 #include "Menu/MenuMaker.h"
 #include "resource.h"
@@ -51,6 +50,7 @@
 #include "blackbox.h"
 #include "systemtray/clsSystemTray.h"
 #include "shellserviceobjects/shellServiceObjects.h"
+#include "clsSystemInfo.h"
 
 //====================
 
@@ -62,8 +62,6 @@ const char ShellTrayClass   [] = "Shell_TrayWnd";
 OSVERSIONINFO osInfo;
 bool usingWin2kXP;
 bool usingNT;
-bool usingx64;
-
 
 
 //====================
@@ -98,6 +96,7 @@ BOOL save_opaquemove;
 
 clsSystemTray SystemTrayManager(hMainInstance);
 shellServiceObjects SSOManager;
+clsSystemInfo SystemInfo;
 
 LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -264,7 +263,7 @@ void broadcastMod()
 void bb_about(void)
 {
 	BBMessageBox(MB_OK,
-	"%s - © 2003-2005 grischka"
+	"%s - Â© 2003-2005 grischka"
 	"\n%s",
 	GetBBVersion(),
 	NLS2("$BBAbout$",
@@ -368,17 +367,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	GetVersionEx(&osInfo);
 	usingNT         = osInfo.dwPlatformId == VER_PLATFORM_WIN32_NT;
 	usingWin2kXP    = usingNT && osInfo.dwMajorVersion >= 5;
-
-	//64-bit OS test, when running as 32-bit under WoW
-	BOOL bIs64BitOS= FALSE;
-	typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
-	LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(GetModuleHandle("kernel32"),"IsWow64Process");
-	if (NULL != fnIsWow64Process)
-		fnIsWow64Process(GetCurrentProcess(), &bIs64BitOS);
-	usingx64=bIs64BitOS;
-	//64-bit OS test, if compiled as native 64-bit. In case we ever need it.
-	if (!usingx64)
-		usingx64=(sizeof(int)!=sizeof(void*));
 
 	setlocale(LC_TIME, "");
 
@@ -507,15 +495,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SystemTrayManager.setCallback(TCALLBACK_DEL,broadcastRemove);
 	SystemTrayManager.setCallback(TCALLBACK_MOD,broadcastMod);
 	SystemTrayManager.initialize();
-	clsidRegValues normalKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad");
-		//clsidRegKeys vistaKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\explorer\\ShellServiceObjects");
+
+	if (SystemInfo.isOsVista())
+	{
+		clsidRegValues normalKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad");
+		SSOManager.startServiceObjects(normalKey);
+	}
+	else
+	{
 		clsidInjected vistaInject(L"{730F6CDC-2C86-11D2-8773-92E220524153}");
 		clsidInjected vistaInject2(L"{7007ACCF-3202-11D1-AAD2-00805FC1270E}");
-
-		SSOManager.startServiceObjects(normalKey);
-		//SSOManager.startServiceObjects(vistaKey);
 		SSOManager.startServiceObjects(vistaInject);
 		SSOManager.startServiceObjects(vistaInject2);
+	}
+
+		//clsidRegKeys vistaKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\explorer\\ShellServiceObjects");
+
+
+
+		//SSOManager.startServiceObjects(vistaKey);
+
 	start_plugins();
 
 	if (bRunStartup) SetTimer(BBhwnd, BB_RUNSTARTUP_TIMER, 500, NULL);
@@ -1696,7 +1695,7 @@ bool RunEntriesIn (HKEY root_key, LPCSTR subpath, UINT flags)
 	LPFN_WOW64ENABLEREDIR fnEnableRedir;
 
 	sprintf(path, "Software\\Microsoft\\Windows\\CurrentVersion\\%s", subpath);
-	for(int i=0;i<(usingx64?2:1);++i)
+	for(int i=0;i<(SystemInfo.isOs64Bits()?2:1);++i)
 	{
 		if (ERROR_SUCCESS != RegOpenKeyEx(root_key, path, 0, KEY_ALL_ACCESS|(i?KEY_WOW64_64KEY:KEY_WOW64_32KEY), &hKey))
 			return ret;
@@ -1842,4 +1841,7 @@ systemTray* GetTrayIcon(int idx)
 		return NULL;
 }
 
-
+BOOL TrayIconEvent(HWND hWnd, UINT uID, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	return SystemTrayManager.TrayIconEvent(hWnd, uID, msg, wParam, lParam);
+}

@@ -36,12 +36,13 @@ class clsSystemTray
 		int GetNumVisible();
 		clsTrayItem *GetTrayIcon(int num);
 
+		BOOL TrayIconEvent(HWND ownerHwnd, UINT iconID, UINT msg, WPARAM wParam, LPARAM lParam);
+
 		void setCallback(trayCallbackType, void (*)());
 	protected:
 	private:
 		static LRESULT CALLBACK trayWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 		static LRESULT CALLBACK trayChildWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
-		static clsSystemTray * me;
 
 		HINSTANCE &hInstance;
 		const tstring trayWndName;
@@ -59,10 +60,6 @@ class clsSystemTray
 		LRESULT ModifyIcon(NID_INTERNAL &pNID, bool triggerCallback = true);
 		LRESULT DeleteIcon(NID_INTERNAL &pNID, bool triggerCallback = true);
 		LRESULT SetIconVersion(NID_INTERNAL &);
-
-
-
-
 
 		void (*callbackAdded)();
 		void (*callbackModified)();

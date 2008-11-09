@@ -97,11 +97,13 @@
 /* Always includes */
 
 #define __BBCORE__ // enable exports in BBApi.h
-#include "BBApi.h"
+#include "BBApiInternal.h"
 #include "win0x500.h"
 #include "m_alloc.h"
 #include "Tinylist.h"
 #include <assert.h>
+
+#include "clsSystemInfo.h"
 
 #ifndef max
 #define max(a,b) (((a) > (b)) ? (a) : (b))
@@ -127,6 +129,7 @@
 extern OSVERSIONINFO osInfo;
 extern bool         usingNT;
 extern bool         usingWin2kXP;
+extern clsSystemInfo SystemInfo;
 
 extern HINSTANCE    hMainInstance;
 extern HWND         BBhwnd;
