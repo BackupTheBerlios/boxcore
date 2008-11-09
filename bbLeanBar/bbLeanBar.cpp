@@ -28,7 +28,7 @@
 //#define _WIN32_WINNT 0x0500
 //#define _WIN32_IE 0x0500
 
-#include "BBApi.h"
+#include "BBApiInternal.h"
 #include "m_alloc.h"
 #include "../BBPlugin/BBPlugin.h"
 #include "Tinylist.cpp"

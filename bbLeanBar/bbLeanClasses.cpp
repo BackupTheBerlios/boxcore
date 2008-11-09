@@ -654,7 +654,8 @@ public:
 					pAllowSetForegroundWindow(pid);
 				}
 				// Reroute the mouse message to the tray icon's host window...
-				SendNotifyMessage(iconWnd, icon->uCallbackMessage, icon->uID, message);
+				//SendNotifyMessage(iconWnd, icon->uCallbackMessage, icon->uID, message);
+				TrayIconEvent(iconWnd, icon->uID, message, flags, MAKELPARAM(mx,my));
 			}
 			else
 			{
