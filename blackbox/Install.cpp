@@ -154,7 +154,7 @@ bool installBlackbox(bool forceInstall)
 	if (GetShortPathName(szBlackbox, szBlackbox, MAX_PATH))
 	{
 		//strcat(szBlackbox, " -startup");
-		if (usingNT)
+		if (SystemInfo.isOsNT())
 		{
 			int answer;
 			if (forceInstall)
@@ -205,7 +205,7 @@ bool uninstallBlackbox()
 
 	bool result;
 
-	if (usingNT)
+	if (SystemInfo.isOsNT())
 	{
 		result = install_nt(sys_bootOption, szExplorer, NULL, false);
 	}

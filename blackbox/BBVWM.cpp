@@ -181,25 +181,25 @@ void WINAPI EndDeferWindowPosThreadProc(HDWP hWinPosInfo)
 	EndDeferWindowPos(hWinPosInfo);
 }
 
-/// CyberShadow 2007.05.11: EndDeferWindowPos will block the calling thread if any of the specified windows 
+/// CyberShadow 2007.05.11: EndDeferWindowPos will block the calling thread if any of the specified windows
 /// belong to a "hung" thread. This causes bbLean to FREEZE if you try to switch workspaces while there's an
 /// unresponding application. The following function attempts to do EndDeferWindowPos in an asynchronous manner.
 void EndDeferWindowPosAsync(HDWP hWinPosInfo)
 {
-	if(usingNT)
+	if(SystemInfo.isOsNT())
 	{
-		// The kernel-mode part of the Windows USER API has a function called NtUserEndDeferWindowPosEx. 
+		// The kernel-mode part of the Windows USER API has a function called NtUserEndDeferWindowPosEx.
 		// This function takes two parameters - the HDWP (the same one used for *DeferWindowPos functions),
 		// and a boolean parameter which dictates if the function should work asynchronously.
 		// The 2nd parameter is only used internally from Task Manager, so it wouldn't hang while tiling windows.
 		// EndDeferWindowPos in user32.dll is simply a wrapper around the NtUserEndDeferWindowPosEx syscall function,
 		// similar to:
-		// 
+		//
 		// BOOL WINAPI EndDeferWindowPos(HDWP hWinPosInfo)
 		// {
 		//     return NtUserEndDeferWindowPosEx(hWinPosInfo, FALSE);
 		// }
-		// 
+		//
 		// The following code will get the address of NtUserEndDeferWindowPosEx, and call it directly.
 
 		HMODULE user32 = GetModuleHandle("user32.dll");
@@ -209,14 +209,14 @@ void EndDeferWindowPosAsync(HDWP hWinPosInfo)
 			typedef int WINAPI (*NtUserEndDeferWindowPosEx)(HDWP, BOOL);
 
 			// get address of NtUserEndDeferWindowPosEx, from within EndDeferWindowPos's code
-			NtUserEndDeferWindowPosEx func2 = (NtUserEndDeferWindowPosEx) 
-				(func + 
+			NtUserEndDeferWindowPosEx func2 = (NtUserEndDeferWindowPosEx)
+				(func +
 				 15   +    // 10+5 (5 is size of the CALL instruction)
 				 (func[11] <<  0 |     // CALL's argument is an offset relative to the address of the next instruction
 				  func[12] <<  8 |
 				  func[13] << 16 |
 				  func[14] << 24));
-			
+
 			// call it
 			func2(hWinPosInfo, TRUE);
 		}
@@ -227,7 +227,7 @@ void EndDeferWindowPosAsync(HDWP hWinPosInfo)
 	{
 		// the above can't apply to Win9x, try to create a simple thread to wrap around the potentially-blocking call
 		DWORD tid;
-		// this MIGHT be possible to write as CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)EndDeferWindowPos, ...) (that is, 
+		// this MIGHT be possible to write as CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)EndDeferWindowPos, ...) (that is,
 		// create the thread directly with the API), but the way compilers/linkers do DLL bindings could break this
     	CloseHandle(CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)EndDeferWindowPosThreadProc, (LPVOID)hWinPosInfo, 0, &tid));
 	}

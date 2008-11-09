@@ -127,8 +127,6 @@
 /* global variables */
 
 extern OSVERSIONINFO osInfo;
-extern bool         usingNT;
-extern bool         usingWin2kXP;
 extern clsSystemInfo SystemInfo;
 
 extern HINSTANCE    hMainInstance;

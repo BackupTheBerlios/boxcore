@@ -60,9 +60,6 @@ const char szBlackboxClass  [] = "BlackboxClass";
 const char ShellTrayClass   [] = "Shell_TrayWnd";
 
 OSVERSIONINFO osInfo;
-bool usingWin2kXP;
-bool usingNT;
-
 
 //====================
 
@@ -222,7 +219,7 @@ void register_shellhook(HWND hwnd)
 	if (pRegisterShellHook)
 	{
 		pRegisterShellHook(NULL, TRUE);
-		pRegisterShellHook(hwnd, usingNT ? 3 : 1);
+		pRegisterShellHook(hwnd, SystemInfo.isOsNT() ? 3 : 1);
 		WM_ShellHook = RegisterWindowMessage("SHELLHOOK");
 	}
 }
@@ -362,12 +359,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 {
 	hMainInstance = hInstance;
 
-	ZeroMemory(&osInfo, sizeof(osInfo));
-	osInfo.dwOSVersionInfoSize = sizeof(osInfo);
-	GetVersionEx(&osInfo);
-	usingNT         = osInfo.dwPlatformId == VER_PLATFORM_WIN32_NT;
-	usingWin2kXP    = usingNT && osInfo.dwMajorVersion >= 5;
-
 	setlocale(LC_TIME, "");
 
 	BBhwnd = FindWindow(szBlackboxClass, szBlackboxName);
@@ -498,15 +489,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	if (SystemInfo.isOsVista())
 	{
-		clsidRegValues normalKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad");
-		SSOManager.startServiceObjects(normalKey);
-	}
-	else
-	{
 		clsidInjected vistaInject(L"{730F6CDC-2C86-11D2-8773-92E220524153}");
 		clsidInjected vistaInject2(L"{7007ACCF-3202-11D1-AAD2-00805FC1270E}");
 		SSOManager.startServiceObjects(vistaInject);
 		SSOManager.startServiceObjects(vistaInject2);
+	}
+	else
+	{
+		clsidRegValues normalKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad");
+		SSOManager.startServiceObjects(normalKey);
 	}
 
 		//clsidRegKeys vistaKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\explorer\\ShellServiceObjects");
@@ -1607,7 +1598,7 @@ void ShutdownWindows(int mode, int no_msg)
 
 DWORD WINAPI ShutdownThread(void *mode)
 {
-	if (usingNT && BBSD_LOGOFF != (INT_PTR)mode)
+	if (SystemInfo.isOsNT() && BBSD_LOGOFF != (INT_PTR)mode)
 	{
 		// Under WinNT/2k/XP we need to adjust privileges to be able to
 		// shutdown/reboot/hibernate/suspend...

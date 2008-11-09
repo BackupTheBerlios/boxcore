@@ -1,0 +1,8 @@
+#ifndef BBAPIINTERNAL_H
+#define BBAPIINTERNAL_H
+
+#include "BBApi.h"
+
+extern "C" API_EXPORT BOOL TrayIconEvent(HWND, UINT, UINT, WPARAM, LPARAM);
+
+#endif //BBAPIINTERNAL_H
