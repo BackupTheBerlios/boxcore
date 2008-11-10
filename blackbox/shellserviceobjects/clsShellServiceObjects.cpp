@@ -1,14 +1,21 @@
 #include "clsShellServiceObjects.h"
 
-clsShellServiceObjects::clsShellServiceObjects()
-{
-}
-
+/**
+  * @brief Make sure that shell service objects where stopped
+  */
 clsShellServiceObjects::~clsShellServiceObjects()
 {
 	stopServiceObjects();
 }
 
+/**
+  * @brief Starts Shell Service Objects from a list
+  *
+  * Iterates through the list of CLSID's which is provided by the supplied
+  * clsClsidSource. Createa an instance of the OleCommandTarget interface
+  * for each object, and then sends the object a start command via this interface.
+  * The interfaces are then stored to allow the objects to be stopped again later.
+  */
 int clsShellServiceObjects::startServiceObjects(clsClsidSource &pSource)
 {
 	int numStarted=0;
@@ -34,6 +41,14 @@ int clsShellServiceObjects::startServiceObjects(clsClsidSource &pSource)
 	return numStarted;
 }
 
+/**
+  * @brief Stops any running Shell Service Objects
+  *
+  * Iterates through the list of stored interfaces to Shell Service Objects.
+  * Stops eachone through the stored interface and tehn releases the interface.
+  * Empties the list of interfaces on completion, so starting services again
+  * is acceptable.
+  */
 int clsShellServiceObjects::stopServiceObjects()
 {
 	int numStopped=0;

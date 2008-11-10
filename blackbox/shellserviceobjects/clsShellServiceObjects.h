@@ -26,7 +26,6 @@ using std::vector;
 class clsShellServiceObjects
 {
 public:
-	clsShellServiceObjects();
 	~clsShellServiceObjects();
 	int startServiceObjects(clsClsidSource &);
 	int stopServiceObjects();
