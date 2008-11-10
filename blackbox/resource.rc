@@ -99,14 +99,14 @@ BEGIN
 
 			//VALUE "CompanyName", "Blackbox for Windows"
 			VALUE "FileDescription", "Blackbox for Windows"
-			VALUE "FileVersion", "bbLean 1.16 (bbClean SVN, Carsomyr refactoring build)"
+			VALUE "FileVersion", "bbLean 1.16.1 (bbClean SVN, Carsomyr refactoring build)"
 			//VALUE "InternalName", "Blackbox"
 			VALUE "LegalCopyright", "Copyright © 2003-2005 grischka"
 			//VALUE "LegalTrademarks", "none"
 			VALUE "OriginalFilename", "blackbox.exe"
 			//VALUE "PrivateBuild", "none"
 			VALUE "ProductName", "Blackbox for Windows"
-			VALUE "ProductVersion", "bbLean 1.16 (bbClean)"
+			VALUE "ProductVersion", "bbLean 1.16.1 (bbClean)"
 			//VALUE "SpecialBuild", "none"
 		END
 	END

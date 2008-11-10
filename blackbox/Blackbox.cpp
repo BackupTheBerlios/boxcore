@@ -240,19 +240,16 @@ void set_opaquemove(void)
 void broadcastAdd()
 {
 	PostMessage(BBhwnd, BB_TRAYUPDATE, 0, TRAYICON_ADDED);
-	//MessageBox(BBhwnd,"Icon added","BBCallback",MB_OK);
 }
 
 void broadcastRemove()
 {
 	PostMessage(BBhwnd, BB_TRAYUPDATE, 0, TRAYICON_REMOVED);
-	//MessageBox(BBhwnd,"Icon removed","BBCallback",MB_OK);
 }
 
 void broadcastMod()
 {
 	PostMessage(BBhwnd, BB_TRAYUPDATE, 0, TRAYICON_MODIFIED);
-	//MessageBox(BBhwnd,"Icon modified","BBCallback",MB_OK);
 }
 
 //===========================================================================
@@ -466,6 +463,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (hSRE) { SetEvent(hSRE), CloseHandle(hSRE); }
 	hSRE = OpenEvent(EVENT_MODIFY_STATE, FALSE, "msgina: ShellReadyEvent");
 	if (hSRE) { SetEvent(hSRE), CloseHandle(hSRE); }
+	//Terminate the vista welcome screen?
+	hSRE = OpenEvent(EVENT_MODIFY_STATE, FALSE, "ShellDesktopSwitchEvent");
+	if (hSRE) { SetEvent(hSRE), CloseHandle(hSRE); }
 	/*hSRE = CreateEvent(NULL, 0, 0, "ShellReadyEvent");
 	if (hSRE) { SetEvent(hSRE); }*/
 
@@ -502,12 +502,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		clsClsidRegValues normalKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad");
 		ShellServiceObjectsManager.startServiceObjects(normalKey);
 	}
-
-		//clsidRegKeys vistaKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\explorer\\ShellServiceObjects");
-
-
-
-		//SSOManager.startServiceObjects(vistaKey);
 
 	start_plugins();
 

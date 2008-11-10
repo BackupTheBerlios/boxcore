@@ -2376,3 +2376,19 @@ ST void snap_to_edge(struct edges *h, struct edges *v, bool sizing, bool same_le
 }
 
 //===========================================================================
+
+BOOL GetApiExtension(UINT64 pBranch, UINT64 pApiCode, char *pApiName)
+{
+	switch(pApiCode)
+	{
+		case apiTrayIconEvent:
+			if (pBranch == branchCarsomyr)
+			{
+				strcpy(pApiName,"TrayIconEvent");
+				return TRUE;
+			}
+			break;
+		default:
+			return FALSE;
+	}
+}
