@@ -28,7 +28,7 @@
 //#define _WIN32_WINNT 0x0500
 //#define _WIN32_IE 0x0500
 
-#include "BBApiInternal.h"
+#include "BBApi.h"
 #include "m_alloc.h"
 #include "../BBPlugin/BBPlugin.h"
 #include "Tinylist.cpp"
@@ -37,6 +37,8 @@
 #include <time.h>
 #include "bbLeanBar.h"
 #include "bartender.h"
+
+#include "../utils/clsApiLoader.h"
 
 #define ST static
 
@@ -51,6 +53,10 @@ const char szInfoLink    [] = "http://bb4win.sourceforge.net/bblean";
 const char szInfoEmail   [] = "grischka@users.sourceforge.net";
 
 const char aboutmsg[] = "%s - © 2003-2005 grischka@users.sourceforge.net\n";
+
+clsApiLoader ApiLoader;
+typedef BOOL(*fnTrayIconEvent)(HWND, UINT, UINT, WPARAM, LPARAM);
+fnTrayIconEvent TrayIconEvent = NULL;
 
 LPCSTR pluginInfo(int field)
 {
@@ -123,6 +129,11 @@ struct pmenu { const char *displ; const char *msg; char f; void *ptr; };
 
 struct barinfo : plugin_info
 {
+	barinfo()
+	{
+		TrayIconEvent = (fnTrayIconEvent)ApiLoader.requestApiPointer(ApiLoader.requestApiName(1<<10,1));
+	}
+
 	void process_broam(const char *temp, int f);
 	LRESULT wnd_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam, LRESULT *ret);
 	void show_menu(bool);
