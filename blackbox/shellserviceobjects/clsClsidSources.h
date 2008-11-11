@@ -17,30 +17,32 @@ using std::vector;
 
 
 /**
- * @class clsClsidSource
- *
- * @brief Base class for CLSID sources
- *
- * Abstract base class with a single virtual method for retrieving CLSID's
- */
+  * @class clsClsidSource
+  *
+  * @brief Base class for CLSID sources
+  *
+  * Abstract base class with a single virtual method for retrieving CLSID's
+  */
 class clsClsidSource
 {
 public:
 /**
- * Dummy virtual destructor, in case child classes need it.
- */
+  * Dummy virtual destructor, in case child classes need it.
+  */
 	virtual ~clsClsidSource() {}
+
 /**
- * Virtual method for implementation by child classes.
- * Should return CLSID_NULL once all CLSID's have been returned,
- * the source of CLSID's is dependant on the child implementation
- */
+  * Virtual method for implementation by child classes.
+  * Should return CLSID_NULL once all CLSID's have been returned,
+  * the source of CLSID's is dependant on the child implementation
+  */
 	virtual CLSID getNextCLSID()=0;
 
 	void setWhitelist(vector<wstring> &pWhitelist);
 protected:
 	bool inWhitelist(CLSID pClsid);
 private:
+	///Stores the CLSID's of a whitelist. Whitelist is disabled when this is empty
 	vector<CLSID> whiteList;
 };
 

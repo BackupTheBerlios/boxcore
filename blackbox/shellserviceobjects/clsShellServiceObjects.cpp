@@ -12,7 +12,7 @@ clsShellServiceObjects::~clsShellServiceObjects()
   * @brief Starts Shell Service Objects from a list
   *
   * Iterates through the list of CLSID's which is provided by the supplied
-  * clsClsidSource. Createa an instance of the OleCommandTarget interface
+  * clsClsidSource. Creates an instance of the OleCommandTarget interface
   * for each object, and then sends the object a start command via this interface.
   * The interfaces are then stored to allow the objects to be stopped again later.
   */

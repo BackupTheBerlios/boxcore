@@ -30,7 +30,7 @@ SnapWindowToEdge
 SetTransparency
 SetDesktopMargin
 GetBlackboxEditor
-_GetBlackboxPath@8 = GetBlackboxPath@8
+GetBlackboxPath${WINAPI_DECORATOR}
 bbrcPath
 extensionsrcPath
 menuPath
