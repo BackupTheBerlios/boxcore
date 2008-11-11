@@ -162,7 +162,7 @@ void BBKeys_LoadHotkeys(HWND hwnd)
 			return;
 		}
 		// Noccy: This export doesn't work with bbClean.
-		// GetBlackboxPath(rcpath, sizeof(rcpath));
+		GetBlackboxPath(rcpath, sizeof(rcpath));
 	}
 
 	char buffer[1024], keytograb[120], modifier[120], action[1024];

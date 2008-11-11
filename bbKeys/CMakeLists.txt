@@ -12,16 +12,16 @@ winkeyhook.cpp
 add_library(bbKeys SHARED ${BBKEYS_SRCS})
 include_directories(bbKeys  ../../blackbox)
 target_link_libraries(bbKeys  shell32 user32 kernel32 gdi32 comctl32 blackbox)
-set_target_properties (bbKeys  PROPERTIES PREFIX "" 
-	LINK_FLAGS "-mwindows -s" 
+set_target_properties (bbKeys  PROPERTIES PREFIX ""
+	LINK_FLAGS "-mwindows -s"
 	COMPILE_FLAGS "-Wall -Os -fno-rtti -fno-exceptions -fomit-frame-pointer"
 )
 
 add_library(winkeyhook SHARED ${WINKEYHOOK_SRCS})
 include_directories(winkeyhook  ../../blackbox)
-target_link_libraries(winkeyhook  shell32 user32 kernel32 gdi32 comctl32 blackbox)
-set_target_properties (winkeyhook  PROPERTIES PREFIX "" 
-	LINK_FLAGS "-mwindows -s" 
+target_link_libraries(winkeyhook  shell32 user32 kernel32 gdi32 comctl32)
+set_target_properties (winkeyhook  PROPERTIES PREFIX ""
+	LINK_FLAGS "-mwindows -s"
 	COMPILE_FLAGS "-Wall -Os -fno-rtti -fno-exceptions -fomit-frame-pointer"
 )
 
