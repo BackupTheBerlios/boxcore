@@ -1,9 +1,10 @@
+
+
 #ifndef CLSCLSIDSOURCES_H
 #define CLSCLSIDSOURCES_H
 
 #include <string>
 #include <vector>
-#include <windows.h>
 
 #include <shlobj.h>
 #include <shellapi.h>

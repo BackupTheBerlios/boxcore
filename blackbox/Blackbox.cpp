@@ -350,6 +350,28 @@ bool check_options (LPCSTR lpCmdLine)
 	return false;
 }
 
+const wchar_t *atomNames[] = {L"Blackbox",L"Blackbox::hasTrayIconEvent"};
+vector<ATOM> atomList;
+
+/**
+  *
+  */
+void InitApiExtensions()
+{
+	int numAtoms = sizeof(atomNames) / sizeof(wchar_t *);
+	for(int i=0;i<numAtoms;++i)
+		atomList.push_back(GlobalAddAtomW(atomNames[i]));
+}
+
+/**
+  *
+  */
+void RemoveApiExtensions()
+{
+	for(unsigned int i = 0; i < atomList.size(); ++i)
+		GlobalDeleteAtom(atomList[i]);
+}
+
 //===========================================================================
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
@@ -508,13 +530,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (bRunStartup) SetTimer(BBhwnd, BB_RUNSTARTUP_TIMER, 500, NULL);
 
 	Session_UpdateSession();
-
+	InitApiExtensions();
 	/* Message Loop */
 	RetCode = message_loop();
 
 	// ------------------------------------------
 	/* clean up */
-
+	RemoveApiExtensions();
 	DestroyWindow(BBhwnd);
 	UnregisterClass(szBlackboxClass, hMainInstance);
 
