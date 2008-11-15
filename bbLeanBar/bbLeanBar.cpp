@@ -131,7 +131,8 @@ struct barinfo : plugin_info
 {
 	barinfo()
 	{
-		TrayIconEvent = (fnTrayIconEvent)ApiLoader.requestApiPointer(ApiLoader.requestApiName(1<<10,1));
+		if (ApiLoader.requestApiPresence(L"Blackbox::hasTrayIconEvent"));
+			TrayIconEvent = (fnTrayIconEvent)ApiLoader.requestApiPointer("TrayIconEvent");
 	}
 
 	void process_broam(const char *temp, int f);

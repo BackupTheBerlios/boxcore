@@ -3,39 +3,23 @@
 clsApiLoader::clsApiLoader()
 {
 	hBlackbox = NULL;
-	GetApiExtension = NULL;
 }
 
 clsApiLoader::~clsApiLoader()
 {
-	//dtor
+	FreeLibrary(hBlackbox);
 }
 
-const char *clsApiLoader::requestApiName(UINT64 pBranch, UINT64 pApi)
+bool clsApiLoader::requestApiPresence(wstring pIdentifier)
 {
-	if (!hBlackbox)
-	{
-		hBlackbox = GetModuleHandle("blackbox.exe");
-		if (hBlackbox == NULL)
-			return NULL;
-	}
-	if (!GetApiExtension)
-	{
-		GetApiExtension = (fnGetApiExtension)GetProcAddress(hBlackbox, "GetApiExtension");
-		if (GetApiExtension == NULL)
-			return NULL;
-	}
-	if ( GetApiExtension(pBranch, pApi, apiName) == TRUE)
-		return apiName;
-	else
-		return NULL;
+	return GlobalFindAtomW(pIdentifier.c_str());
 }
 
 FARPROC clsApiLoader::requestApiPointer(string pApiName)
 {
 	if (!hBlackbox)
 	{
-		hBlackbox = GetModuleHandle("blackbox.exe");
+		hBlackbox = LoadLibrary("blackbox.exe");
 		if (hBlackbox == NULL)
 			return NULL;
 	}
