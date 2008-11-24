@@ -5,8 +5,10 @@
 clsTrayItemCollection::clsTrayItemCollection(bool pVertical):clsItemCollection(pVertical)
 {
 	fixed = DIM_BOTH;
-	spacingPerp = 1;
-	spacingWith = 2;
+	spacingBorder = 0;
+	spacingItems = 2;
+	vertical = ReadBool(configFile, "boxBar.tray.vertical:", vertical);
+
 	populateTray();
 }
 

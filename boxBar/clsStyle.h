@@ -16,6 +16,9 @@ class clsStyle
 	protected:
 		StyleItem *toolbar;
 		StyleItem *toolbarClock;
+		StyleItem *toolbarLabel;
+		StyleItem *toolbarButton;
+		StyleItem *toolbarButtonPressed;
 		HFONT toolbarClockFont;
 	private:
 };

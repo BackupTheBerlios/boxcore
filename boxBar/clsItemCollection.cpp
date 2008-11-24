@@ -95,7 +95,7 @@ LRESULT clsItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 void clsItemCollection::calculateSizes(bool pSizeGiven)
 {
 	dimType additiveDim, maxDim;
-	fixedItemUsed = spacingWith;
+	fixedItemUsed = spacingBorder;
 	int maxSize = 0;
 	flexibleItemCount = 0;
 	if (vertical)
@@ -116,11 +116,11 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 		if (itemFixed & additiveDim)
 		{
 			int itemSize = (*i)->getSize(additiveDim);
-			fixedItemUsed += itemSize + spacingWith;
+			fixedItemUsed += itemSize + spacingItems;
 		}
 		else
 		{
-			fixedItemUsed += spacingWith;
+			fixedItemUsed += spacingItems;
 			flexibleItemCount++;
 		}
 		if (itemFixed & maxDim)
@@ -130,29 +130,29 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 				maxSize = itemMax;
 		}
 	}
-
-	if (vertical)
-	{
-		minSizeX = maxSize + 2 * spacingPerp;
-	}
-	else
-	{
-		minSizeY = maxSize + 2 * spacingPerp;
-	}
+	fixedItemUsed += spacingBorder - spacingItems;
 
 	if (pSizeGiven && flexibleItemCount)
 	{
-		if (vertical)
 			minSizeY = getSize(DIM_VERTICAL);
-		else
 			minSizeX = getSize(DIM_HORIZONTAL);
+			if (vertical)
+				maxSize = minSizeX - 2*spacingBorder;
+			else
+				maxSize = minSizeY - 2*spacingBorder;
 	}
 	else
 	{
 		if (vertical)
+		{
 			minSizeY = fixedItemUsed;
+			minSizeX = maxSize + 2 * spacingBorder;
+		}
 		else
+		{
 			minSizeX = fixedItemUsed;
+			minSizeY = maxSize + 2 * spacingBorder;
+		}
 	}
 	if (flexibleItemCount)
 	{
@@ -177,11 +177,11 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 	resize(minSizeX, minSizeY);
 	for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end(); ++i)
 	{
-		(*i)->calculateSizes(true);
 		if (vertical)
 			(*i)->resize(maxSize, -1);
 		else
 			(*i)->resize(-1, maxSize);
+		(*i)->calculateSizes(true);
 	}
 	sortItems();
 }
@@ -217,12 +217,12 @@ void clsItemCollection::sortItems()
 	int available;
 	if (vertical)
 	{
-		pos = itemArea.top + spacingWith;
+		pos = itemArea.top + spacingBorder;
 		available = itemArea.right - itemArea.left;
 	}
 	else
 	{
-		pos = itemArea.left + spacingWith;
+		pos = itemArea.left + spacingBorder;
 		available = itemArea.bottom - itemArea.top;
 	}
 	for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end(); ++i)
@@ -231,12 +231,12 @@ void clsItemCollection::sortItems()
 		{
 
 			(*i)->move(itemArea.left + (available - (*i)->getSize(DIM_HORIZONTAL)) / 2 , pos);
-			pos += (*i)->getSize(DIM_VERTICAL) + spacingWith;
+			pos += (*i)->getSize(DIM_VERTICAL) + spacingItems;
 		}
 		else
 		{
 			(*i)->move(pos, itemArea.top + (available - (*i)->getSize(DIM_VERTICAL)) / 2);
-			pos += (*i)->getSize(DIM_HORIZONTAL) + spacingWith;
+			pos += (*i)->getSize(DIM_HORIZONTAL) + spacingItems;
 		}
 	}
 }

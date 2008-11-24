@@ -24,9 +24,13 @@ class clsBar : public clsItemCollection
 		HINSTANCE hInstance;
 		TCHAR className[100];
 		bool moving;
-		UINT barLocation;
+		bool setMargin;
 
-		HWND hBlackboxWnd;
+		int margin;
+		int marginEdge;
+
+		UINT barLocation;
+		int sizePercentage;
 
 		fnSetTaskbarPos SetTaskbarPos;
 };

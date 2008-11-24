@@ -15,8 +15,12 @@ class clsTaskItem : public clsItem
 		virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		virtual void draw(HDC pContext);
 		virtual void calculateSizes(bool pSizeGiven = false);
+		virtual dimType resize(int pX, int pY);
 	protected:
+		HWND taskWnd;
 		TCHAR caption[256];
+
+		int style;
 	private:
 };
 

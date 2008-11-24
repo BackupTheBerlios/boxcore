@@ -22,7 +22,11 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 
 	int x = ReadInt(configFile, "boxBar.x:", 0);
 	int y = ReadInt(configFile, "boxBar.y:", 0);
+	sizePercentage = ReadInt(configFile, "boxBar.percentage:", 80);
+	setMargin = ReadBool(configFile, "boxBar.setMargin:", true);
 	vertical = ReadBool(configFile, "boxBar.vertical:", false);
+
+	margin = 0;
 
 	if (bbApiLoader.requestApiPresence(L"boxCore::hasSetTaskbarPos"))
 		SetTaskbarPos = (fnSetTaskbarPos)bbApiLoader.requestApiPointer("SetTaskbarPos");
@@ -60,8 +64,8 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 			 );
 	ShowWindow(barWnd, SW_SHOWNA);
 
-	spacingWith = 3;
-	spacingPerp = 3;
+	spacingBorder = 3;
+	spacingItems = 2;
 
 	const CHAR * barItems = ReadString(configFile, "boxBar.items:", "tray, clock");
 	CHAR barItem[MAX_PATH];
@@ -125,7 +129,7 @@ LRESULT CALLBACK clsBar::realWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
   */
 LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	static int messages[] = { BB_RECONFIGURE, BB_BROADCAST, BB_TRAYUPDATE, 0};
+	static int messages[] = { BB_RECONFIGURE, BB_BROADCAST, BB_TRAYUPDATE, BB_TASKSUPDATE, 0};
 
 	switch (msg)
 	{
@@ -137,6 +141,8 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_DESTROY:
+		if (margin)
+				SetDesktopMargin(barWnd, 0, 0);
 		RemoveSticky(hWnd);
 		SendMessage(hBlackboxWnd, BB_UNREGISTERMESSAGE, (WPARAM)hWnd, (LPARAM)messages);
 		break;
@@ -292,6 +298,8 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			GetMonitorRect(hWnd, &monRect, GETMON_FROM_WINDOW);
 			int leftthirdX = (monRect.right + 2 * monRect.left) / 3;
 			int rightthirdX = (2 * monRect.right + monRect.left) / 3;
+			//if (margin)
+			//	SetDesktopMargin(barWnd, 0, 0);
 			if ((wp->x > rightthirdX) || ((wp->x + wp->cx) == monRect.right))
 			{
 				barLocation = POS_RIGHT;
@@ -329,6 +337,41 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					barLocation += POS_TOP;
 					WriteInt(configFile, "boxBar.y:", wp->y);
 				}
+			}
+			if (setMargin)
+			{
+				if (vertical)
+				{
+					if (barLocation & POS_RIGHT)
+					{
+						margin = monRect.right - wp->x;
+						marginEdge = BB_DM_RIGHT;
+					}
+					else if (barLocation & POS_LEFT)
+					{
+						margin = wp->x + wp->cx;
+						marginEdge = BB_DM_LEFT;
+					}
+					else
+						margin = 0;
+				}
+				else
+				{
+					if (barLocation & POS_BOTTOM)
+					{
+						margin = monRect.bottom - wp->y;
+						marginEdge = BB_DM_BOTTOM;
+					}
+					else if (barLocation & POS_TOP)
+					{
+						margin = wp->y + wp->cy;
+						marginEdge = BB_DM_TOP;
+					}
+					else
+						margin = 0;
+				}
+				if (margin)
+					SetDesktopMargin(barWnd, marginEdge, margin);
 			}
 			UINT barEdge;
 			if (vertical)
@@ -419,7 +462,13 @@ dimType clsBar::resize(int pX, int pY)
   */
 void clsBar::calculateSizes(bool pSizeGiven)
 {
-	resize(1000,-1);
+	clsItemCollection::calculateSizes(false);
+	RECT monRect;
+			GetMonitorRect(barWnd, &monRect, GETMON_FROM_WINDOW);
+	if (vertical)
+	resize(-1, sizePercentage*(monRect.bottom - monRect.top)/100);
+	else
+		resize(sizePercentage*(monRect.right-monRect.left)/100, -1);
 	clsItemCollection::calculateSizes(true);
 }
 

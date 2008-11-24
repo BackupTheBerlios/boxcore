@@ -42,6 +42,7 @@ class clsItem
 		static clsStyle bbStyle;
 
 		static clsApiLoader bbApiLoader;
+		static HWND hBlackboxWnd;
 
 		static int getTimerID() {static int id=10; return id++;}
 

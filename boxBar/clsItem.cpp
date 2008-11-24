@@ -99,3 +99,4 @@ clsApiLoader clsItem::bbApiLoader;
 HWND clsItem::barWnd = NULL;
 CHAR clsItem::configFile[MAX_PATH] = {'\0'};
 clsStyle clsItem::bbStyle;
+HWND clsItem::hBlackboxWnd = NULL;
