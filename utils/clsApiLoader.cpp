@@ -19,7 +19,7 @@ FARPROC clsApiLoader::requestApiPointer(string pApiName)
 {
 	if (!hBlackbox)
 	{
-		hBlackbox = LoadLibrary("blackbox.exe");
+		hBlackbox = LoadLibrary(TEXT("blackbox.exe"));
 		if (hBlackbox == NULL)
 			return NULL;
 	}

@@ -3,7 +3,7 @@
   This file is part of the bbLeanBar source code.
 
   bbLeanBar is a plugin for BlackBox for Windows
-  Copyright © 2003 grischka
+  Copyright Â© 2003 grischka
 
   grischka@users.sourceforge.net
 
@@ -52,11 +52,15 @@ const char szInfoRelDate [] = __DATE__;
 const char szInfoLink    [] = "http://bb4win.sourceforge.net/bblean";
 const char szInfoEmail   [] = "grischka@users.sourceforge.net";
 
-const char aboutmsg[] = "%s - © 2003-2005 grischka@users.sourceforge.net\n";
+const char aboutmsg[] = "%s - Â© 2003-2005 grischka@users.sourceforge.net\n";
 
 clsApiLoader ApiLoader;
+
 typedef BOOL(*fnTrayIconEvent)(HWND, UINT, UINT, WPARAM, LPARAM);
 fnTrayIconEvent TrayIconEvent = NULL;
+
+typedef void(*fnSetTaskbarPos)(int, int, int, int);
+fnSetTaskbarPos SetTaskbarPos = NULL;
 
 LPCSTR pluginInfo(int field)
 {
@@ -127,12 +131,19 @@ struct plugin_info *g_PI;
 struct config { const char *str; char mode; void *def; void *ptr; };
 struct pmenu { const char *displ; const char *msg; char f; void *ptr; };
 
+LRESULT CALLBACK fakeWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	return DefWindowProc(hwnd,message,wParam, lParam);
+}
+
 struct barinfo : plugin_info
 {
 	barinfo()
 	{
-		if (ApiLoader.requestApiPresence(L"Blackbox::hasTrayIconEvent"));
+		if (ApiLoader.requestApiPresence(L"boxCore::hasTrayIconEvent"));
 			TrayIconEvent = (fnTrayIconEvent)ApiLoader.requestApiPointer("TrayIconEvent");
+		if (ApiLoader.requestApiPresence(L"boxCore::hasSetTaskbarPos"));
+			SetTaskbarPos = (fnSetTaskbarPos)ApiLoader.requestApiPointer("SetTaskbarPos");
 	}
 
 	void process_broam(const char *temp, int f);
@@ -558,6 +569,8 @@ bool check_fullscreen_window(HMONITOR hMon)
 void init_tasks(HWND _LBhwnd, HINSTANCE hInst);
 void exit_tasks(void);
 #endif
+
+
 
 //===========================================================================
 LRESULT barinfo::wnd_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam, LRESULT *ret)

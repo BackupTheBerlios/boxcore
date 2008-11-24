@@ -377,6 +377,7 @@ LRESULT CALLBACK HotkeyProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
 			break;
 
 		case BB_RECONFIGURE:
+			OutputDebugString(TEXT("BBKeys reconfigure"));
 			BBKeys_FreeHotkeys(hwnd);
 			BBKeys_LoadHotkeys(hwnd);
 			break;
