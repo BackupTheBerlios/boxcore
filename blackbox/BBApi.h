@@ -76,7 +76,8 @@
 /*------------------------------------------ */
 /* Better dont use, core doesn't anyway */
 
-#define MAX_LINE_LENGTH 1024
+//Match the original definition
+#define MAX_LINE_LENGTH 4096
 
 /*------------------------------------------ */
 /* BImage definitions */

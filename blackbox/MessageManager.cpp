@@ -70,7 +70,7 @@ void MessageManager_Exit()
 }
 
 //===========================================================================
-#if 0
+#if 1
 static void dbg_msg(const char *id, HWND window, UINT msg)
 {
 	char buffer[256];
@@ -87,7 +87,7 @@ static void AddRemoveMessages(HWND window, UINT* messages, bool add)
 	UINT msg;
 	while (0 != (msg = *messages++))
 	{
-		struct MsgMap *mm = (struct MsgMap *)assoc(msgs, (void*)msg);
+		struct MsgMap *mm = (struct MsgMap *)assoc(msgs, msg);
 		if (mm)
 		{
 			struct wnd_entry *w, **wp;

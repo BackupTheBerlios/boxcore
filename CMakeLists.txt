@@ -38,6 +38,7 @@ set (CPACK_NSIS_DISPLAY_NAME "Blackbox for Windows")
 if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/coreplugins/)
 add_subdirectory (coreplugins/bbKeys)
 add_subdirectory (coreplugins/bbLeanBar)
+add_subdirectory (coreplugins/boxBar)
 endif (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/coreplugins/)
 
 set (CPACK_COMPONENT_GROUP_CORE_DISPLAY_NAME "Blackbox Core")

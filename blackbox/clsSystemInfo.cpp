@@ -16,7 +16,9 @@ clsSystemInfo::clsSystemInfo()
 		fnIsWow64Process(GetCurrentProcess(), &bIs64BitOS);
 	arch64 = bIs64BitOS;
 
-	prog64 = (sizeof(int)==sizeof(void *));
+	prog64 = (sizeof(int)!=sizeof(void *));
+	if (prog64) arch64=true;
+
 }
 
 clsSystemInfo::~clsSystemInfo()

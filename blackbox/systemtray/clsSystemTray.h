@@ -1,5 +1,9 @@
 #ifndef CLSSYSTEMTRAY_H
 #define CLSSYSTEMTRAY_H
+
+#define _WIN32_IE 0x0603
+
+#include <shlwapi.h>
 #include <windows.h>
 #include <string>
 #include <vector>
@@ -37,6 +41,7 @@ class clsSystemTray
 		clsTrayItem *GetTrayIcon(int num);
 
 		BOOL TrayIconEvent(HWND ownerHwnd, UINT iconID, UINT msg, WPARAM wParam, LPARAM lParam);
+		void SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom, UINT pEdge);
 
 		void setCallback(trayCallbackType, void (*)());
 	protected:
@@ -47,7 +52,8 @@ class clsSystemTray
 		HINSTANCE &hInstance;
 		const tstring trayWndName;
 		HWND hTrayWnd;
-		void createTrayChild(const tstring pParentClass, const tstring pChildClass);
+		HWND createTrayChild(const tstring pParentClass, const tstring pChildClass, const tstring pChildName = TEXT(""));
+		HWND createTrayChild(HWND pParent, const tstring pChildClass, const tstring pChildName = TEXT(""));
 
 		UINT trayCreatedMessage;
 
@@ -64,6 +70,9 @@ class clsSystemTray
 		void (*callbackAdded)();
 		void (*callbackModified)();
 		void (*callbackDeleted)();
+
+		static int barLeft, barRight, barTop, barBottom;
+		static UINT barEdge;
 
 		clsTrayItem * lookupIcon(HWND, UINT);
 

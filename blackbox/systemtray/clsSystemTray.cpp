@@ -11,6 +11,9 @@
 #ifndef NIF_INFO
 #define NIF_INFO 0x00000010
 #endif
+#ifndef NIF_SHOWTIP
+#define NIF_SHOWTIP 0x00000080
+#endif
 #ifndef NIIF_LARGE_ICON
 #define NIIF_LARGE_ICON 0x00000020
 #endif
@@ -26,6 +29,70 @@
 #ifndef NIS_SHAREDICON
 #define NIS_SHAREDICON 0x00000002
 #endif
+#ifndef NIN_POPUPOPEN
+#define NIN_POPUPOPEN 0x00000406
+#endif
+#ifndef NIN_POPUPCLOSE
+#define NIN_POPUPCLOSE 0x00000407
+#endif
+
+//Recieved from XP onwards (lParam member is 64 bits)
+struct APPBARDATA_64
+{
+	DWORD cbSize;
+	///Really an HWND, but needed for spacing on 64 bit systems
+	DWORD hWnd;
+	UINT uCallbackMessage;
+	UINT uEdge;
+	RECT rc;
+	LONG64 lParam;
+};
+
+//Recieved form 2k back, lParam member is 32 bits
+struct APPBARDATA_32
+{
+	DWORD cbSize;
+	///Really an HWND, but needed for spacing on 64 bit systems
+	DWORD hWnd;
+	UINT uCallbackMessage;
+	UINT uEdge;
+	RECT rc;
+	LONG32 lParam;
+};
+
+/// Used in XP, Vista as well
+struct APPBARMSG_64
+{
+	APPBARDATA_64 abd;
+
+	DWORD dwMessage;
+	///Really a handle, but needed for correct spacing on 64 bit hosts
+	DWORD hSharedMemory;
+	DWORD dwSourceProcessID;
+};
+
+
+///Used in 2k, and 98se
+struct APPBARMSG_32
+{
+	APPBARDATA_32 abd;
+
+	DWORD dwMessage;
+	///Really a handle, but needed for correct spacing on 64 bit hosts
+	DWORD hSharedMemory;
+	DWORD dwSourceProcessID;
+};
+
+///We use a pointer to the 32 bit version of APPBARDATA, because we only need  the low order bits, and it keeps us safe
+struct INTERNAL_APPBARMSG
+{
+	APPBARDATA_32 *abd;
+
+	DWORD dwMessage;
+	HANDLE hSharedMemory;
+	DWORD dwSourceProcessID;
+};
+
 
 /**
  * @struct SHELLTRAYDATA
@@ -84,9 +151,8 @@ clsSystemTray::~clsSystemTray()
   *
   * We register a class and create a window to represent the system tray. Some
   * child windows are also created, as these exist in the real taskbar.
-  * Once alll windows are created, we broadcast the message to announce that the system tray
+  * Once all windows are created, we broadcast the message to announce that the system tray
   * has been created.
-  * @todo Fix the storage of the class pointer, so we do not require a static data member
   */
 void clsSystemTray::initialize()
 {
@@ -99,14 +165,15 @@ void clsSystemTray::initialize()
 	wndClass.lpszClassName = trayWndName.c_str();
 	RegisterClassEx(&wndClass);
 
-	hTrayWnd = CreateWindowEx( WS_EX_TOOLWINDOW, trayWndName.c_str(), NULL,
-							   WS_POPUP | WS_DISABLED, 0, 0, 0, 0, NULL, NULL, hInstance, NULL);
+	hTrayWnd = CreateWindowEx( WS_EX_TOOLWINDOW | WS_EX_TOPMOST, trayWndName.c_str(), NULL,
+							   WS_POPUP | WS_DISABLED | WS_OVERLAPPED | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
+							   0, 875, 1440, 25, NULL, NULL, hInstance, NULL);
 	SetClassLongPtr(hTrayWnd, 0, (LONG_PTR)this);
 	createTrayChild(trayWndName, TEXT("TrayNotifyWnd"));
 	createTrayChild(TEXT("TrayNotifyWnd"), TEXT("TrayClockWClass"));
-	createTrayChild(TEXT("TrayNotifyWnd"), TEXT("SysPager"));
-
-
+	createTrayChild(createTrayChild(TEXT("TrayNotifyWnd"), TEXT("SysPager")), TEXT("ToolbarWindow32"), TEXT("Notification Area"));
+	createTrayChild(createTrayChild(TEXT("TrayNotifyWnd"), TEXT("SysPager")), TEXT("ToolbarWindow32"), TEXT("System Control Area"));
+	//ShowWindow(hTrayWnd,SW_SHOW);
 
 	announceSystemTray();
 }
@@ -145,15 +212,15 @@ void clsSystemTray::terminate()
   * also consult the list of child windows we have. A window class is then registered with the new name
   * and a window of that class is created.
   */
-void clsSystemTray::createTrayChild(const tstring pParentClass, const tstring pChildClass)
+HWND clsSystemTray::createTrayChild(const tstring pParentClass, const tstring pChildClass, const tstring pChildName)
 {
 	HWND parent = FindWindow(pParentClass.c_str(), NULL);
 
-	if (parent==NULL)
+	if (parent == NULL)
 	{
-		for(unsigned int i=0;i<childClasses.size();++i)
+		for (unsigned int i = 0;i < childClasses.size();++i)
 		{
-			if(childClasses[i]==pParentClass)
+			if (childClasses[i] == pParentClass)
 			{
 				parent = childWindows[i];
 				break;
@@ -169,10 +236,37 @@ void clsSystemTray::createTrayChild(const tstring pParentClass, const tstring pC
 	wndClass.lpszClassName = pChildClass.c_str();
 	RegisterClassEx(&wndClass);
 
-	HWND childWindow = CreateWindowEx( 0, pChildClass.c_str(), NULL,
-					WS_CHILD | WS_DISABLED, 0, 0, 0, 0, parent, NULL, hInstance, NULL);
+	HWND childWindow = CreateWindowEx( 0, pChildClass.c_str(), pChildName.c_str(),
+									   WS_CHILD | WS_DISABLED, 0, 0, 200, 25, parent, NULL, hInstance, NULL);
 	childClasses.push_back(pChildClass);
 	childWindows.push_back(childWindow);
+	return childWindow;
+}
+
+/** @brief Register a child window class and creates an instance attached to the specified parent
+  *
+  * @param[in] pParentClass The clss name of the window which should be used as the parent
+  * @param[in] pChildClass The class name that should be used for the child window
+  *
+  * We try to locate a parent window of teh requested class by querying the system. If this fails we
+  * also consult the list of child windows we have. A window class is then registered with the new name
+  * and a window of that class is created.
+  */
+HWND clsSystemTray::createTrayChild(HWND pParent, const tstring pChildClass, const tstring pChildName)
+{
+	WNDCLASSEX wndClass;
+	ZeroMemory(&wndClass, sizeof(wndClass));
+	wndClass.cbSize = sizeof(wndClass);
+	wndClass.hInstance = hInstance;
+	wndClass.lpfnWndProc = trayChildWndProc;
+	wndClass.lpszClassName = pChildClass.c_str();
+	RegisterClassEx(&wndClass);
+
+	HWND childWindow = CreateWindowEx( 0, pChildClass.c_str(), pChildName.c_str(),
+									   WS_CHILD | WS_DISABLED, 200, 200, 10, 10, pParent, NULL, hInstance, NULL);
+	childClasses.push_back(pChildClass);
+	childWindows.push_back(childWindow);
+	return childWindow;
 }
 
 
@@ -198,7 +292,6 @@ LRESULT CALLBACK clsSystemTray::trayChildWndProc(HWND hwnd, UINT message, WPARAM
   *
   * Calls DefWindowProc to handle everything except WM_COPYDATA.
   * @todo Document this pproperly
-  * @todo: Fix the storage of the class pointer, so we can get rid of the me static member
   */
 LRESULT CALLBACK clsSystemTray::trayWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -212,112 +305,164 @@ LRESULT CALLBACK clsSystemTray::trayWndProc(HWND hwnd, UINT message, WPARAM wPar
 
 	clsSystemTray *creator = (clsSystemTray *) GetClassLongPtr(hwnd, 0);
 
-	if (((COPYDATASTRUCT *)lParam)->dwData != 1)
-		return FALSE;
-	NID_INTERNAL NotifyIconData;
-	NID_VISTAA *ansiNID = NULL;
-	NID_VISTAW *unicodeNID = NULL;
-	DWORD trayCommand;
-
-	trayCommand =  ((SHELLTRAYDATA*)((COPYDATASTRUCT*)lParam)->lpData)->dwMessage;
-	ansiNID    = (NID_VISTAA *) & ((SHELLTRAYDATA*)((COPYDATASTRUCT*)lParam)->lpData)->iconData;
-	if ((ansiNID->cbSize == sizeof(NID_PRE2KW)) || (ansiNID->cbSize >= sizeof(NID_2KW)))
-		unicodeNID = (NID_VISTAW *)ansiNID;
-
-	ZeroMemory(&NotifyIconData, sizeof(NotifyIconData));
-	//Copy always present part, no danger here
-	if (unicodeNID)
+	switch (((COPYDATASTRUCT *)lParam)->dwData)
 	{
-		NotifyIconData.hWnd = (HWND) unicodeNID->hWnd;
-		NotifyIconData.uID = unicodeNID->uID;
-		NotifyIconData.uFlags = unicodeNID->uFlags;
-		NotifyIconData.uCallbackMessage = unicodeNID->uCallbackMessage;
-		NotifyIconData.hIcon = (HICON) unicodeNID->hIcon;
-	}
-	else
+	case 0: //Appbar stuff
 	{
-		NotifyIconData.hWnd = (HWND) ansiNID->hWnd;
-		NotifyIconData.uID = ansiNID->uID;
-		NotifyIconData.uFlags = ansiNID->uFlags;
-		NotifyIconData.uCallbackMessage = ansiNID->uCallbackMessage;
-		NotifyIconData.hIcon = (HICON) ansiNID->hIcon;
-	}
-
-	if (NotifyIconData.uFlags&NIF_TIP)
-	{
-		if (unicodeNID)
-			lstrcpyW(NotifyIconData.szTip, unicodeNID->szTip);
-		else
-			MultiByteToWideChar(CP_ACP, 0, ansiNID->szTip, -1, NotifyIconData.szTip, 128);
-	}
-
-	if (NotifyIconData.uFlags&NIF_STATE)
-	{
-		if (unicodeNID)
+		char msg[100];
+		/*sprintf(msg,"Size of struct %d we got. Size of 32 struct %d, size of 64 struct %d",((COPYDATASTRUCT *)lParam)->cbData, sizeof(APPBARMSGDATA32) ,sizeof(APPBARMSGDATA64));
+		MessageBox(NULL,msg,"Appbar debug",MB_OK);
+		INTERNAL_APPBARDATA myAppbarData;
+		sprintf(msg,"Size of APPBAR %d, 32 is  %d, 64 is %d",((APPBARMSGDATA32*)((COPYDATASTRUCT *)lParam)->lpData)->abd.cbSize,sizeof(SH_APPBARDATA_32),sizeof(SH_APPBARDATA_64));
+		MessageBox(NULL,msg,"Appbar debug",MB_OK);*/
+		INTERNAL_APPBARMSG appbarMsg;
+		//Always cast to 32 bit version for this assignment
+		appbarMsg.abd = &(((APPBARMSG_32 *)((COPYDATASTRUCT *)lParam)->lpData)->abd);
+		switch (((COPYDATASTRUCT *)lParam)->cbData)
 		{
-			NotifyIconData.dwState = unicodeNID->dwState;
-			NotifyIconData.dwStateMask = unicodeNID->dwStateMask;
+		case sizeof(APPBARMSG_64):
+						appbarMsg.dwMessage = ((APPBARMSG_64 *)((COPYDATASTRUCT *)lParam)->lpData)->dwMessage;
+			appbarMsg.hSharedMemory = (HANDLE)((APPBARMSG_64 *)((COPYDATASTRUCT *)lParam)->lpData)->hSharedMemory;
+			appbarMsg.dwSourceProcessID = ((APPBARMSG_64 *)((COPYDATASTRUCT *)lParam)->lpData)->dwSourceProcessID;
+			break;
+		case sizeof(APPBARMSG_32):
+						appbarMsg.dwMessage = ((APPBARMSG_32 *)((COPYDATASTRUCT *)lParam)->lpData)->dwMessage;
+			appbarMsg.hSharedMemory = (HANDLE)((APPBARMSG_32 *)((COPYDATASTRUCT *)lParam)->lpData)->hSharedMemory;
+			appbarMsg.dwSourceProcessID = ((APPBARMSG_32 *)((COPYDATASTRUCT *)lParam)->lpData)->dwSourceProcessID;
+			break;
+		default:
+			return FALSE;
 		}
-		else
-		{
-			NotifyIconData.dwState = ansiNID->dwState;
-			NotifyIconData.dwStateMask = ansiNID->dwStateMask;
+		switch (appbarMsg.dwMessage)
+{
+		case 0:
+			return 1;
+		case 5:
+			appbarMsg.abd = (APPBARDATA_32 *)SHLockShared(appbarMsg.hSharedMemory, appbarMsg.dwSourceProcessID);
+			SetRect(&appbarMsg.abd->rc, barLeft, barTop, barRight, barBottom);
+			appbarMsg.abd->uEdge = barEdge;
+			SHUnlockShared(appbarMsg.abd);
+			//MessageBox(NULL,"Giving out taskbar position","Appbar debug",MB_OK);
+			return 1;
+			break;
+		default:
+			sprintf(msg, "Appbar debug :The message is %d or %d", ((APPBARMSG_32*)((COPYDATASTRUCT *)lParam)->lpData)->dwMessage, ((APPBARMSG_64*)((COPYDATASTRUCT *)lParam)->lpData)->dwMessage);
+			OutputDebugString(msg);
+			return FALSE;
 		}
 	}
-
-	if (NotifyIconData.uFlags&NIF_INFO)
+	return FALSE;
+	case 1:
 	{
+		NID_INTERNAL NotifyIconData;
+		NID_VISTAA *ansiNID = NULL;
+		NID_VISTAW *unicodeNID = NULL;
+		DWORD trayCommand;
+
+		trayCommand =  ((SHELLTRAYDATA*)((COPYDATASTRUCT*)lParam)->lpData)->dwMessage;
+		ansiNID    = (NID_VISTAA *) & ((SHELLTRAYDATA*)((COPYDATASTRUCT*)lParam)->lpData)->iconData;
+		if ((ansiNID->cbSize == sizeof(NID_PRE2KW)) || (ansiNID->cbSize >= sizeof(NID_2KW)))
+			unicodeNID = (NID_VISTAW *)ansiNID;
+
+		ZeroMemory(&NotifyIconData, sizeof(NotifyIconData));
+		//Copy always present part, no danger here
 		if (unicodeNID)
 		{
-			NotifyIconData.uTimeout = unicodeNID->uTimeout;
-			NotifyIconData.dwInfoFlags = unicodeNID->dwInfoFlags;
-			lstrcpyW(NotifyIconData.szInfo, unicodeNID->szInfo);
-			lstrcpyW(NotifyIconData.szInfoTitle, unicodeNID->szInfoTitle);
-		}
-		else
-		{
-			NotifyIconData.dwState = ansiNID->dwState;
-			NotifyIconData.dwStateMask = ansiNID->dwStateMask;
-			MultiByteToWideChar(CP_ACP, 0, ansiNID->szInfo, -1, NotifyIconData.szInfo, 256);
-			MultiByteToWideChar(CP_ACP, 0, ansiNID->szInfoTitle, -1, NotifyIconData.szInfoTitle, 64);
-		}
-	}
-
-	if (trayCommand == NIM_SETVERSION)
-	{
-		if (unicodeNID)
-		{
-			NotifyIconData.uVersion = unicodeNID->uVersion;
+			NotifyIconData.hWnd = (HWND) unicodeNID->hWnd;
+			NotifyIconData.uID = unicodeNID->uID;
+			NotifyIconData.uFlags = unicodeNID->uFlags;
+			NotifyIconData.uCallbackMessage = unicodeNID->uCallbackMessage;
+			NotifyIconData.hIcon = (HICON) unicodeNID->hIcon;
 		}
 		else
 		{
-			NotifyIconData.uVersion = ansiNID->uVersion;
+			NotifyIconData.hWnd = (HWND) ansiNID->hWnd;
+			NotifyIconData.uID = ansiNID->uID;
+			NotifyIconData.uFlags = ansiNID->uFlags;
+			NotifyIconData.uCallbackMessage = ansiNID->uCallbackMessage;
+			NotifyIconData.hIcon = (HICON) ansiNID->hIcon;
+		}
+
+		if (NotifyIconData.uFlags&NIF_TIP)
+		{
+			if (unicodeNID)
+				lstrcpyW(NotifyIconData.szTip, unicodeNID->szTip);
+			else
+				MultiByteToWideChar(CP_ACP, 0, ansiNID->szTip, -1, NotifyIconData.szTip, 128);
+		}
+
+		if (NotifyIconData.uFlags&NIF_STATE)
+		{
+			if (unicodeNID)
+			{
+				NotifyIconData.dwState = unicodeNID->dwState;
+				NotifyIconData.dwStateMask = unicodeNID->dwStateMask;
+			}
+			else
+			{
+				NotifyIconData.dwState = ansiNID->dwState;
+				NotifyIconData.dwStateMask = ansiNID->dwStateMask;
+			}
+		}
+
+		if (NotifyIconData.uFlags&NIF_INFO)
+		{
+			if (unicodeNID)
+			{
+				NotifyIconData.uTimeout = unicodeNID->uTimeout;
+				NotifyIconData.dwInfoFlags = unicodeNID->dwInfoFlags;
+				lstrcpyW(NotifyIconData.szInfo, unicodeNID->szInfo);
+				lstrcpyW(NotifyIconData.szInfoTitle, unicodeNID->szInfoTitle);
+			}
+			else
+			{
+				NotifyIconData.dwState = ansiNID->dwState;
+				NotifyIconData.dwStateMask = ansiNID->dwStateMask;
+				MultiByteToWideChar(CP_ACP, 0, ansiNID->szInfo, -1, NotifyIconData.szInfo, 256);
+				MultiByteToWideChar(CP_ACP, 0, ansiNID->szInfoTitle, -1, NotifyIconData.szInfoTitle, 64);
+			}
+		}
+
+		if (trayCommand == NIM_SETVERSION)
+		{
+			if (unicodeNID)
+			{
+				NotifyIconData.uVersion = unicodeNID->uVersion;
+			}
+			else
+			{
+				NotifyIconData.uVersion = ansiNID->uVersion;
+			}
+		}
+
+		if (NotifyIconData.dwInfoFlags&NIIF_LARGE_ICON)
+		{
+			if (unicodeNID)
+				NotifyIconData.hBalloonItem = (HICON) unicodeNID->hBalloonItem;
+			else
+				NotifyIconData.hBalloonItem = (HICON) ansiNID->hBalloonItem;
+		}
+
+		switch (trayCommand)
+		{
+		case NIM_ADD:
+			return creator->AddIcon(NotifyIconData);
+		case NIM_MODIFY:
+			return creator->ModifyIcon(NotifyIconData);
+		case NIM_DELETE:
+			return creator->DeleteIcon(NotifyIconData);
+		case NIM_SETVERSION:
+			return creator->SetIconVersion(NotifyIconData);
+		case NIM_SETFOCUS:
+		default:
+			return DefWindowProc(hwnd, message, wParam, lParam);
 		}
 	}
-
-	if (NotifyIconData.dwInfoFlags&NIIF_LARGE_ICON)
-	{
-		if (unicodeNID)
-			NotifyIconData.hBalloonItem = (HICON) unicodeNID->hBalloonItem;
-		else
-			NotifyIconData.hBalloonItem = (HICON) ansiNID->hBalloonItem;
-	}
-
-	switch (trayCommand)
-	{
-	case NIM_ADD:
-		return creator->AddIcon(NotifyIconData);
-	case NIM_MODIFY:
-		return creator->ModifyIcon(NotifyIconData);
-	case NIM_DELETE:
-		return creator->DeleteIcon(NotifyIconData);
-	case NIM_SETVERSION:
-		return creator->SetIconVersion(NotifyIconData);
-	case NIM_SETFOCUS:
+	break;
 	default:
-		return DefWindowProc(hwnd, message, wParam, lParam);
-	}
+		return FALSE;
 
+	}
 }
 /** @brief lookupIcon
   *
@@ -349,6 +494,10 @@ LRESULT clsSystemTray::SetIconVersion(NID_INTERNAL &pNID)
 	if (trayItem)
 	{
 		trayItem->version = pNID.uVersion;
+		if (trayItem->version == 4)
+			trayItem->showTooltip = false;
+		else
+			trayItem->showTooltip = true;
 		return TRUE;
 	}
 	else
@@ -424,8 +573,11 @@ LRESULT clsSystemTray::ModifyIcon(NID_INTERNAL &pNID, bool triggerCallback)
 		if (pNID.uFlags&NIF_TIP)
 			trayItem->tooltip = pNID.szTip;
 
-		if ((pNID.uFlags&NIF_STATE)&&(pNID.dwStateMask&NIS_HIDDEN))
-			trayItem->stateHidden = pNID.dwState&NIS_HIDDEN;
+		if (pNID.uFlags&NIF_SHOWTIP)
+			trayItem->showTooltip = true;
+
+		if ((pNID.uFlags&NIF_STATE) && (pNID.dwStateMask&NIS_HIDDEN))
+			trayItem->stateHidden = pNID.dwState & NIS_HIDDEN;
 
 		if (triggerCallback)
 		{
@@ -488,8 +640,8 @@ LRESULT clsSystemTray::AddIcon(NID_INTERNAL &pNID)
 			{
 				if (!trayItem->stateHidden)
 				{
-				if (callbackAdded)
-					callbackAdded();
+					if (callbackAdded)
+						callbackAdded();
 				}
 				return TRUE;
 			}
@@ -561,12 +713,12 @@ void clsSystemTray::CleanTray()
 {
 	for (list<clsTrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); )
 		if (IsWindow((*i)->hWnd) == FALSE)
-	{
-		delete (*i);
-		i=trayItems.erase(i);
-	}
-	else
-		i++;
+		{
+			delete (*i);
+			i = trayItems.erase(i);
+		}
+		else
+			i++;
 }
 /** @brief GetTrayIcon
   *
@@ -574,12 +726,12 @@ void clsSystemTray::CleanTray()
   */
 clsTrayItem * clsSystemTray::GetTrayIcon(int num)
 {
-	int index=0;
+	int index = 0;
 	for (list<clsTrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); i++)
 	{
-		if ((*i)->stateHidden==false)
+		if ((*i)->stateHidden == false)
 		{
-			if(index==num)
+			if (index == num)
 				return *i;
 			else
 				index++;
@@ -595,10 +747,10 @@ clsTrayItem * clsSystemTray::GetTrayIcon(int num)
   */
 int clsSystemTray::GetNumVisible()
 {
-	int count=0;
+	int count = 0;
 	for (list<clsTrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); i++)
 	{
-		if ((*i)->stateHidden==false)
+		if ((*i)->stateHidden == false)
 		{
 			count++;
 		}
@@ -613,22 +765,35 @@ int clsSystemTray::GetNumVisible()
 BOOL clsSystemTray::TrayIconEvent(HWND ownerHwnd, UINT iconID, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	clsTrayItem *trayItem = lookupIcon(ownerHwnd, iconID);
+	DWORD pid;
+	if (WM_MOUSEMOVE != msg
+	//		&& pAllowSetForegroundWindow
+			&& GetWindowThreadProcessId(ownerHwnd, &pid))
+	{
+		AllowSetForegroundWindow(pid);
+	}
 	if (trayItem)
 	{
 		switch (trayItem->version)
 		{
-			case 4:
-				switch (msg)
-				{
-					case WM_RBUTTONUP:
-						SendNotifyMessage(trayItem->hWnd, trayItem->callbackMessage, MAKEWPARAM(LOWORD(lParam),HIWORD(lParam)), MAKELPARAM(WM_CONTEXTMENU,trayItem->iconID));
-						break;
-					default:
-						SendNotifyMessage(trayItem->hWnd, trayItem->callbackMessage, MAKEWPARAM(LOWORD(lParam),HIWORD(lParam)), MAKELPARAM(msg,trayItem->iconID));
-				}
+		case 4:
+			switch (msg)
+			{
+			case WM_RBUTTONUP:
+				SendNotifyMessage(trayItem->hWnd, trayItem->callbackMessage, MAKEWPARAM(LOWORD(lParam), HIWORD(lParam)), MAKELPARAM(WM_CONTEXTMENU, trayItem->iconID));
+				break;
+			case WM_MOUSEMOVE:
+				SendNotifyMessage(trayItem->hWnd, trayItem->callbackMessage, MAKEWPARAM(LOWORD(lParam),HIWORD(lParam)), MAKELPARAM(NIN_POPUPOPEN,trayItem->iconID));
+				break;
+			case WM_MOUSELEAVE:
+				SendNotifyMessage(trayItem->hWnd, trayItem->callbackMessage, MAKEWPARAM(LOWORD(lParam),HIWORD(lParam)), MAKELPARAM(NIN_POPUPCLOSE,trayItem->iconID));
 				break;
 			default:
-				SendNotifyMessage(trayItem->hWnd, trayItem->callbackMessage, trayItem->iconID, msg);
+				SendNotifyMessage(trayItem->hWnd, trayItem->callbackMessage, MAKEWPARAM(LOWORD(lParam), HIWORD(lParam)), MAKELPARAM(msg, trayItem->iconID));
+			}
+			break;
+		default:
+			SendNotifyMessage(trayItem->hWnd, trayItem->callbackMessage, trayItem->iconID, msg);
 		}
 		return TRUE;
 	}
@@ -638,3 +803,23 @@ BOOL clsSystemTray::TrayIconEvent(HWND ownerHwnd, UINT iconID, UINT msg, WPARAM 
 	}
 }
 
+/** @brief SetTaskbarPos
+  *
+  * @todo: document this function
+  */
+void clsSystemTray::SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom, UINT pEdge)
+{
+	barLeft = pLeft;
+	barRight = pRight;
+	barTop = pTop;
+	barBottom = pBottom;
+	barEdge = pEdge;
+	SetWindowPos(hTrayWnd, NULL, barLeft, barTop, barRight - barLeft, barBottom - barTop, SWP_NOZORDER | SWP_NOACTIVATE);
+}
+
+
+int clsSystemTray::barLeft = 0;
+int clsSystemTray::barRight = 1440;
+int clsSystemTray::barTop = 875;
+int clsSystemTray::barBottom = 900;
+UINT clsSystemTray::barEdge = ABE_BOTTOM;

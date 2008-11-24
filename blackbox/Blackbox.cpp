@@ -350,7 +350,7 @@ bool check_options (LPCSTR lpCmdLine)
 	return false;
 }
 
-const wchar_t *atomNames[] = {L"Blackbox",L"Blackbox::hasTrayIconEvent"};
+const wchar_t *atomNames[] = {L"Blackbox",L"boxCore::hasTrayIconEvent",L"boxCore::hasSetTaskbarPos"};
 vector<ATOM> atomList;
 
 /**
@@ -1843,7 +1843,10 @@ systemTray* GetTrayIcon(int idx)
 		apiVector[idx].uID = item->iconID;
 		apiVector[idx].uCallbackMessage = item->callbackMessage;
 		apiVector[idx].hIcon = item->hIcon;
-		WideCharToMultiByte(CP_ACP, 0, item->tooltip.c_str(), -1, apiVector[idx].szTip, 200, NULL, NULL);
+		if (item->showTooltip)
+			WideCharToMultiByte(CP_ACP, 0, item->tooltip.c_str(), -1, apiVector[idx].szTip, 200, NULL, NULL);
+		else
+			apiVector[idx].szTip[0] = '\0';
 		apiVector[idx].pBalloon = NULL;
 		return &apiVector[idx];
 	}
@@ -1851,7 +1854,13 @@ systemTray* GetTrayIcon(int idx)
 		return NULL;
 }
 
+
 BOOL TrayIconEvent(HWND hWnd, UINT uID, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	return SystemTrayManager.TrayIconEvent(hWnd, uID, msg, wParam, lParam);
+}
+
+void SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom, UINT pEdge)
+{
+	SystemTrayManager.SetTaskbarPos(pLeft, pTop, pRight, pBottom, pEdge);
 }
