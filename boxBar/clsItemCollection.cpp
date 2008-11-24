@@ -173,9 +173,6 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 			}
 		}
 	}
-	else
-	{
-	}
 
 	resize(minSizeX, minSizeY);
 	for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end(); ++i)

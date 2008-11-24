@@ -1,6 +1,7 @@
 #include "BBApi.h"
 #include "clsBar.h"
 #include "clsTrayItemCollection.h"
+#include "clsTaskItemCollection.h"
 #include "clsClockItem.h"
 #include "clsFlexiSpacer.h"
 
@@ -78,6 +79,10 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 		else if (!stricmp(barItem, "flexispace"))
 		{
 			addItem(new clsFlexiSpacer(vertical));
+		}
+		else if (!stricmp(barItem, "tasks"))
+		{
+			addItem(new clsTaskItemCollection(vertical));
 		}
 	}
 	while(strlen(barItems));
@@ -414,7 +419,7 @@ dimType clsBar::resize(int pX, int pY)
   */
 void clsBar::calculateSizes(bool pSizeGiven)
 {
-	resize(500,-1);
+	resize(1000,-1);
 	clsItemCollection::calculateSizes(true);
 }
 

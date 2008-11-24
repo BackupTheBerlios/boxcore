@@ -10,6 +10,10 @@ clsBar.cpp
 clsLabelItem.cpp
 clsTrayItem.cpp
 clsTrayItemCollection.cpp
+
+clsTaskItem.cpp
+clsTaskItemCollection.cpp
+
 clsClockItem.cpp
 
 clsFlexiSpacer.cpp

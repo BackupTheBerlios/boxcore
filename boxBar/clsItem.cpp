@@ -4,6 +4,7 @@ clsItem::clsItem(bool pVertical)
 {
 	vertical = pVertical;
 	itemArea.left = itemArea.right = itemArea.top = itemArea.bottom = 0;
+	fixed = DIM_NONE;
 	mouseDown = false;
 	mouseButton = 0;
 	minSizeX = 0;
