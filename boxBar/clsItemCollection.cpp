@@ -135,6 +135,8 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 
 	if (pSizeGiven && (flexibleItemCount || (itemList.size()==0)))
 	{
+		if (itemList.size()==0)
+			dbg_printf("We got nothin");
 			minSizeY = getSize(DIM_VERTICAL);
 			minSizeX = getSize(DIM_HORIZONTAL);
 			if (vertical)

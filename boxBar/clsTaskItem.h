@@ -1,12 +1,14 @@
 #ifndef CLSTASKITEM_H
 #define CLSTASKITEM_H
 
-#include "clsItem.h"
+#include "clsItemCollection.h"
+#include "clsTextItem.h"
+#include "clsIconItem.h"
 #include "BBApi.h"
 #include <tchar.h>
 
 
-class clsTaskItem : public clsItem
+class clsTaskItem : public clsItemCollection
 {
 	public:
 		clsTaskItem(tasklist *pTask, bool pVertical);
@@ -19,6 +21,9 @@ class clsTaskItem : public clsItem
 	protected:
 		HWND taskWnd;
 		TCHAR caption[256];
+
+		clsTextItem *captionItem;
+		clsIconItem *iconItem;
 
 		int style;
 	private:

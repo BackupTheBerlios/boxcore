@@ -51,6 +51,10 @@ void clsItem::move(int pX, int pY)
 dimType clsItem::resize(int pX, int pY)
 {
 	dimType done = DIM_NONE;
+	if (minSizeX < 0)
+		minSizeX = 0;
+	if (minSizeY < 0)
+		minSizeY = 0;
 	if (pX >= minSizeX)
 	{
 		itemArea.right = itemArea.left + pX;

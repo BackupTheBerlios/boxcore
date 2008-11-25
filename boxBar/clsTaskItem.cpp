@@ -1,6 +1,8 @@
 #include "clsTaskItem.h"
+#include "clsTextItem.h"
+#include "clsFlexiSpacer.h"
 
-clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItem(pVertical)
+clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVertical)
 {
 	fixed = DIM_NONE;
 	if (pTask->active)
@@ -13,6 +15,13 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItem(pVertical)
 #else
 	strcpy(caption, pTask->caption);
 #endif
+	iconItem = new clsIconItem(pTask->icon, 16, vertical);
+	addItem(iconItem);
+	captionItem = new clsTextItem(caption, style, vertical);
+	addItem(captionItem);
+	addItem(new clsFlexiSpacer(vertical));
+	spacingBorder = 2;
+	spacingItems = 2;
 }
 
 clsTaskItem::~clsTaskItem()
@@ -24,18 +33,8 @@ void clsTaskItem::draw(HDC pContext)
 {
 	if (RectVisible(pContext, &itemArea))
 	{
-		RECT textArea = itemArea;
-		textArea.left += 2;
-		textArea.top += 2;
-		textArea.bottom -= 2;
-		textArea.right -= 2;
 		MakeStyleGradient(pContext, &itemArea, bbStyle.getStyle(style), bbStyle.getStyleBorder(style));
-		SetBkMode(pContext, TRANSPARENT);
-		HFONT oldFont = (HFONT) SelectObject(pContext, bbStyle.getStyleFont(SN_TOOLBARCLOCK));
-		COLORREF oldColor = SetTextColor(pContext, bbStyle.getStyleTextColor(style));
-		DrawText(pContext, caption, -1, &textArea, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
-		SetTextColor(pContext, oldColor);
-		SelectObject(pContext, oldFont);
+		clsItemCollection::draw(pContext);
 	}
 }
 
@@ -64,6 +63,8 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 #else
 						strcpy(caption, task->caption);
 #endif
+						captionItem->setText(caption);
+						iconItem->setIcon(task->icon);
 						InvalidateRect(barWnd, &itemArea, TRUE);
 						break;
 					}
@@ -76,6 +77,7 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				style = SN_TOOLBARLABEL;
 			else
 				style = SN_TOOLBARBUTTON;
+			captionItem->setStyle(style);
 			InvalidateRect(barWnd, &itemArea, TRUE);
 			return 0;
 		}
@@ -160,12 +162,9 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
   */
 void clsTaskItem::calculateSizes(bool pSizeGiven)
 {
-	if (!pSizeGiven)
-	{
-		minSizeY = 18;
-		minSizeX = 18;
-		resize(minSizeX, minSizeY);
-	}
+	clsItemCollection::calculateSizes(pSizeGiven);
+	minSizeY = 18;
+	resize(-1, minSizeY);
 }
 
 /** @brief resize
@@ -174,17 +173,8 @@ void clsTaskItem::calculateSizes(bool pSizeGiven)
   */
 dimType clsTaskItem::resize(int pX, int pY)
 {
-	dimType done = DIM_NONE;
-	if (pX >= minSizeX)
-	{
-		itemArea.right = itemArea.left + pX;
-		done = DIM_HORIZONTAL;
-	}
-	if ((pY >= minSizeY) && (pY <= 18))
-	{
-		itemArea.bottom = itemArea.top + pY;
-		done = ((done == DIM_HORIZONTAL) ? DIM_BOTH : DIM_VERTICAL);
-	}
-	return done;
+	if (pY > 18)
+		pY = 18;
+	return clsItem::resize(pX, pY);
 }
 
