@@ -448,6 +448,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	mm.iArrange |= ARW_HIDE; /* ARW_HIDE = 8 */
 	/* the shell-hook notification will not work unless this is done: */
 	SystemParametersInfo(SPI_SETMINIMIZEDMETRICS, sizeof(mm), &mm, 0);
+	SystemParametersInfo(SPI_SETDESKWALLPAPER,0, NULL, SPIF_SENDWININICHANGE);
 
 	WPARAM RetCode;
 
