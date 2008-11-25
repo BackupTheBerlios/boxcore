@@ -12,10 +12,6 @@ clsTrayItemCollection::clsTrayItemCollection(bool pVertical):clsItemCollection(p
 	populateTray();
 }
 
-clsTrayItemCollection::~clsTrayItemCollection()
-{
-}
-
 /** @brief wndProc
   *
   * @todo: document this function

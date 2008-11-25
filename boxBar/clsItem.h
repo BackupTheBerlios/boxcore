@@ -19,7 +19,7 @@ class clsItem
 	public:
 		clsItem(bool pVertical);
 		virtual ~clsItem();
-		virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
+		virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		virtual bool hitTest(int pX, int pY);
 		virtual void draw(HDC pContext) = 0;
 		virtual dimType resize(int pX, int pY);

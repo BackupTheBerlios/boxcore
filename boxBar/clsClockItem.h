@@ -12,7 +12,7 @@ class clsClockItem : public clsLabelItem
 
 		virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	protected:
-		int ClockTimer;
+		UINT ClockTimer;
 		TCHAR clockFormat[256];
 	private:
 };

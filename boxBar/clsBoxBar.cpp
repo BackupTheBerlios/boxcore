@@ -35,19 +35,6 @@ int clsBoxBar::beginPluginEx(HINSTANCE hPluginInstance, HWND hSlit)
 		hPlugin = hPluginInstance;
 		hSlitWnd   = hSlit;
 
-		//ReadRCSettings();
-		//GetStyleSettings();
-
-		// ---------------------------------------------------
-		// create the window
-
-
-
-		// ---------------------------------------------------
-		// set window location and properties
-
-		//set_window_modes();
-		//ShowWindow(my.hwnd, SW_SHOWNA);
 		bar = new clsBar(pluginName, hPlugin, true);
 		return 0;
 	}
@@ -70,7 +57,9 @@ void clsBoxBar::endPlugin(HINSTANCE hPluginInstance)
 	{
 		DeleteAtom(FindAtom(pluginName));
 		delete bar;
+		dbg_printf("Bar deleted");
 	}
+	dbg_printf("End of endplugin");
 }
 
 

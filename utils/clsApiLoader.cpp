@@ -7,7 +7,7 @@ clsApiLoader::clsApiLoader()
 
 clsApiLoader::~clsApiLoader()
 {
-	FreeLibrary(hBlackbox);
+
 }
 
 bool clsApiLoader::requestApiPresence(wstring pIdentifier)
@@ -25,3 +25,14 @@ FARPROC clsApiLoader::requestApiPointer(string pApiName)
 	}
 	return GetProcAddress(hBlackbox, pApiName.c_str());
 }
+
+/** @brief freeLibrary
+  *
+  * @todo: document this function
+  */
+void clsApiLoader::freeLibrary()
+{
+	FreeLibrary(hBlackbox);
+	hBlackbox = NULL;
+}
+

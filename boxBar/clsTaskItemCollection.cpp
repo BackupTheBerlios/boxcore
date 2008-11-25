@@ -12,11 +12,6 @@ clsTaskItemCollection::clsTaskItemCollection(bool pVertical):clsItemCollection(p
 	populateTasks();
 }
 
-clsTaskItemCollection::~clsTaskItemCollection()
-{
-	//dtor
-}
-
 /** @brief wndProc
   *
   * @todo: document this function
@@ -50,7 +45,8 @@ void clsTaskItemCollection::populateTasks()
 	}
 	itemList.clear();
 	tasklist *task = GetTaskListPtr();
-	for(int i=0; i< GetTaskListSize(); ++i)
+	dbg_printf("Tasklist size : %d", GetTaskListSize());
+	for(int i=0; i < GetTaskListSize(); ++i)
 	{
 		addItem(new clsTaskItem(task, vertical));
 		task = task->next;

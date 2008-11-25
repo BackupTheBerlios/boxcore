@@ -1,7 +1,7 @@
 #include "clsTrayItem.h"
 
 
-clsTrayItem::clsTrayItem(systemTray *trayItem, bool pVertical): clsItem(pVertical)
+clsTrayItem::clsTrayItem(systemTray *trayItem, bool pVertical): clsIconItem(trayItem->hIcon, 16, pVertical)
 {
 	if (TrayIconEvent == NULL)
 	{
@@ -11,7 +11,6 @@ clsTrayItem::clsTrayItem(systemTray *trayItem, bool pVertical): clsItem(pVertica
 	iconWnd = trayItem->hWnd;
 	iconID = trayItem->uID;
 	iconCallback = trayItem->uCallbackMessage;
-	iconIcon = trayItem->hIcon;
 	popupVisible = false;
 	fixed = DIM_BOTH;
 	iconSize = ReadInt(configFile, "boxBar.tray.iconsize:", 16);
@@ -20,29 +19,6 @@ clsTrayItem::clsTrayItem(systemTray *trayItem, bool pVertical): clsItem(pVertica
 clsTrayItem::~clsTrayItem()
 {
 	//dtor
-}
-
-/** @brief calculateSizes
-  *
-  * @todo: document this function
-  */
-void clsTrayItem::calculateSizes(bool pSizeGiven)
-{
-	minSizeX = iconSize;
-	minSizeY = iconSize;
-	resize(minSizeX, minSizeY);
-}
-
-/** @brief draw
-  *
-  * @todo: document this function
-  */
-void clsTrayItem::draw(HDC pContext)
-{
-	if (RectVisible(pContext, &itemArea))
-	{
-		DrawIconEx(pContext, itemArea.left, itemArea.top, iconIcon, iconSize, iconSize, NULL, NULL, DI_NORMAL);
-	}
 }
 
 /** @brief wndProc
@@ -86,7 +62,7 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				systemTray *trayItem = GetTrayIcon(i);
 				if ((trayItem->hWnd == iconWnd) && (trayItem->uID == iconID))
 				{
-					iconIcon = trayItem->hIcon;
+					icon = trayItem->hIcon;
 					InvalidateRect(hWnd, &itemArea, TRUE);
 					return 0;
 				}

@@ -11,6 +11,8 @@ class clsApiLoader
 	public:
 		clsApiLoader();
 		virtual ~clsApiLoader();
+
+		void freeLibrary();
 		bool requestApiPresence(wstring);
 		FARPROC requestApiPointer(string);
 	protected:

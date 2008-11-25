@@ -8,7 +8,6 @@ class clsTrayItemCollection : public clsItemCollection
 {
 	public:
 		clsTrayItemCollection(bool pVertical);
-		virtual ~clsTrayItemCollection();
 
 		virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	protected:

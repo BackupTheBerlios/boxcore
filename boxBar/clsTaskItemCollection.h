@@ -8,7 +8,6 @@ class clsTaskItemCollection : public clsItemCollection
 {
 	public:
 		clsTaskItemCollection(bool pVertical);
-		virtual ~clsTaskItemCollection();
 
 		virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	protected:

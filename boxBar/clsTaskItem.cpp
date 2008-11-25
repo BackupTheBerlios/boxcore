@@ -48,11 +48,9 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 	case BB_TASKSUPDATE:
-		OutputDebugString(TEXT("Taskupdate"));
 		switch (lParam)
 		{
 		case TASKITEM_MODIFIED:
-			OutputDebugString(TEXT("Modified"));
 			if ((HWND)wParam == taskWnd)
 			{
 				tasklist *task = GetTaskListPtr();

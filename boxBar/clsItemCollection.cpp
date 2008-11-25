@@ -14,6 +14,7 @@ clsItemCollection::~clsItemCollection()
 {
 	for (list<clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
 		delete (*i);
+	itemList.clear();
 }
 
 /** @brief draw
@@ -85,7 +86,7 @@ LRESULT clsItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 		return 0;
 	}
 
-	return DefWindowProc(hWnd, msg, wParam, lParam);;
+	return clsItem::wndProc(hWnd, msg, wParam, lParam);;
 }
 
 /** @brief calculateSizes
@@ -132,7 +133,7 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 	}
 	fixedItemUsed += spacingBorder - spacingItems;
 
-	if (pSizeGiven && flexibleItemCount)
+	if (pSizeGiven && (flexibleItemCount || (itemList.size()==0)))
 	{
 			minSizeY = getSize(DIM_VERTICAL);
 			minSizeX = getSize(DIM_HORIZONTAL);
@@ -156,10 +157,12 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 	}
 	if (flexibleItemCount)
 	{
+
 		if (vertical)
 			flexibleItemSize = (minSizeY - fixedItemUsed) / flexibleItemCount;
 		else
 			flexibleItemSize = (minSizeX - fixedItemUsed) / flexibleItemCount;
+		dbg_printf("Felxible items %d Flexible item size %d",flexibleItemCount, flexibleItemSize);
 		for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end(); ++i)
 		{
 			(*i)->calculateSizes();

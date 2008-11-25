@@ -95,6 +95,15 @@ void clsItem::calculateSizes(bool pSizeGiven)
 	}
 }
 
+/** @brief wndProc
+  *
+  * @todo: document this function
+  */
+LRESULT clsItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	return DefWindowProc(hWnd, msg, wParam, lParam);
+}
+
 clsApiLoader clsItem::bbApiLoader;
 HWND clsItem::barWnd = NULL;
 CHAR clsItem::configFile[MAX_PATH] = {'\0'};

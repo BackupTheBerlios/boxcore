@@ -96,8 +96,14 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 
 clsBar::~clsBar()
 {
+	for (list<clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+		delete (*i);
+	itemList.clear();
+	bbApiLoader.freeLibrary();
 	DestroyWindow(barWnd);
+	dbg_printf("Window destroyed");
 	UnregisterClass(className, hInstance);
+	dbg_printf("Class unregistered");
 	//dtor
 }
 
@@ -119,7 +125,10 @@ LRESULT CALLBACK clsBar::realWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 		realClass = (clsBar *)GetClassLongPtr(hWnd, 0);
 		break;
 	}
-	return realClass->wndProc(hWnd, msg, wParam, lParam);
+	if (realClass)
+		return realClass->wndProc(hWnd, msg, wParam, lParam);
+	else
+		return DefWindowProc(hWnd, msg, wParam, lParam);
 
 }
 
@@ -138,14 +147,14 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		SendMessage(hBlackboxWnd, BB_REGISTERMESSAGE, (WPARAM)hWnd, (LPARAM)messages);
 		// Make the window appear on all workspaces
 		MakeSticky(hWnd);
-		break;
+		return 0;
 
 	case WM_DESTROY:
-		if (margin)
-				SetDesktopMargin(barWnd, 0, 0);
+		//if (margin)
+		//		SetDesktopMargin(hWnd, 0, 0);
 		RemoveSticky(hWnd);
 		SendMessage(hBlackboxWnd, BB_UNREGISTERMESSAGE, (WPARAM)hWnd, (LPARAM)messages);
-		break;
+		return 0;
 
 		// ----------------------------------------------------------
 		// Blackbox sends a "BB_RECONFIGURE" message on style changes etc.
@@ -370,8 +379,8 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					else
 						margin = 0;
 				}
-				if (margin)
-					SetDesktopMargin(barWnd, marginEdge, margin);
+				//if (margin)
+				//	SetDesktopMargin(barWnd, marginEdge, margin);
 			}
 			UINT barEdge;
 			if (vertical)

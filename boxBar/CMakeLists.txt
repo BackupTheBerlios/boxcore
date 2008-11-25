@@ -6,6 +6,10 @@ boxBar.cpp
 clsBoxBar.cpp
 clsItem.cpp
 clsItemCollection.cpp
+
+clsIconItem.cpp
+clsTextItem.cpp
+
 clsBar.cpp
 clsLabelItem.cpp
 clsTrayItem.cpp
@@ -40,8 +44,8 @@ include_directories(boxBar ../../blackbox)
 target_link_libraries(boxBar blackbox)
 set_target_properties (boxBar PROPERTIES
 	PREFIX ""
-	LINK_FLAGS "-mwindows -s"
-	COMPILE_FLAGS "-Wall -Os -fno-rtti -fno-exceptions -fomit-frame-pointer"
+	LINK_FLAGS "-s -mwindows"
+	COMPILE_FLAGS "-g -Wall -Os -fno-rtti -fno-exceptions -fomit-frame-pointer"
 	COMPILE_DEFINITIONS "UNICODE;_UNICODE"
 	VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
 )
