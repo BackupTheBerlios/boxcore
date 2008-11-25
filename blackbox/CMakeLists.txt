@@ -67,7 +67,7 @@ add_custom_command (TARGET blackbox POST_BUILD
 target_link_libraries (blackbox shellserviceobjects systemtray shlwapi version ole32 uuid comctl32 comdlg32 shell32 advapi32 winmm gdi32)
 set_target_properties (blackbox PROPERTIES
 	IMPORT_SUFFIX .a
-	LINK_FLAGS "-mwindows -s -Wl,--output-def,/home/shaun/test.def"
+	LINK_FLAGS "-mwindows -s"
 	COMPILE_FLAGS "-Os -Wall -fno-rtti -fno-exceptions"
 	ENABLE_EXPORTS true)
 

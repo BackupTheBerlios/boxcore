@@ -346,7 +346,7 @@ LRESULT CALLBACK clsSystemTray::trayWndProc(HWND hwnd, UINT message, WPARAM wPar
 			return 1;
 			break;
 		default:
-			sprintf(msg, "Appbar debug :The message is %d or %d", ((APPBARMSG_32*)((COPYDATASTRUCT *)lParam)->lpData)->dwMessage, ((APPBARMSG_64*)((COPYDATASTRUCT *)lParam)->lpData)->dwMessage);
+			sprintf(msg, "Appbar debug :The message is %ld or %ld", ((APPBARMSG_32*)((COPYDATASTRUCT *)lParam)->lpData)->dwMessage, ((APPBARMSG_64*)((COPYDATASTRUCT *)lParam)->lpData)->dwMessage);
 			OutputDebugString(msg);
 			return FALSE;
 		}
@@ -764,6 +764,8 @@ int clsSystemTray::GetNumVisible()
   */
 BOOL clsSystemTray::TrayIconEvent(HWND ownerHwnd, UINT iconID, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	if (IsWindow(ownerHwnd))
+	{
 	clsTrayItem *trayItem = lookupIcon(ownerHwnd, iconID);
 	DWORD pid;
 	if (WM_MOUSEMOVE != msg
@@ -799,6 +801,12 @@ BOOL clsSystemTray::TrayIconEvent(HWND ownerHwnd, UINT iconID, UINT msg, WPARAM 
 	}
 	else
 	{
+		return FALSE;
+	}
+	}
+	else
+	{
+		CleanTray();
 		return FALSE;
 	}
 }
