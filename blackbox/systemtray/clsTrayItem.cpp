@@ -8,6 +8,7 @@ using std::list;
 clsTrayItem::clsTrayItem(NID_INTERNAL &pNID)
 {
 	valid = true;
+	showTooltip = true;
 	if (pNID.uFlags&(NIF_MESSAGE|NIF_ICON))
 	{
 		hWnd = pNID.hWnd;
