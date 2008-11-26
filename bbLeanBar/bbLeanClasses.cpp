@@ -655,7 +655,13 @@ public:
 				}
 				// Reroute the mouse message to the tray icon's host window...
 				//SendNotifyMessage(iconWnd, icon->uCallbackMessage, icon->uID, message);
-				TrayIconEvent(iconWnd, icon->uID, message, flags, MAKELPARAM(mx,my));
+				if (message != WM_MOUSEMOVE)
+				{
+				if (TrayIconEvent)
+					TrayIconEvent(iconWnd, icon->uID, message, flags, MAKELPARAM(mx,my));
+				else
+					SendNotifyMessage(iconWnd, icon->uCallbackMessage, icon->uID, message);
+				}
 			}
 			else
 			{
