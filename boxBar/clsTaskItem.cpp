@@ -4,7 +4,8 @@
 
 clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVertical)
 {
-	fixed = DIM_NONE;
+	fixed = DIM_VERTICAL;
+	vertical = false;
 	if (pTask->active)
 		style = SN_TOOLBARLABEL;
 	else
@@ -16,10 +17,9 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVe
 	strcpy(caption, pTask->caption);
 #endif
 	iconItem = new clsIconItem(pTask->icon, 16, vertical);
-	addItem(iconItem);
 	captionItem = new clsTextItem(caption, style, vertical);
+	addItem(iconItem);
 	addItem(captionItem);
-	addItem(new clsFlexiSpacer(vertical));
 	spacingBorder = 2;
 	spacingItems = 2;
 }
@@ -154,27 +154,5 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 	return 0;
-}
-
-/** @brief calculateSizes
-  *
-  * @todo: document this function
-  */
-void clsTaskItem::calculateSizes(bool pSizeGiven)
-{
-	clsItemCollection::calculateSizes(pSizeGiven);
-	minSizeY = 18;
-	resize(-1, minSizeY);
-}
-
-/** @brief resize
-  *
-  * @todo: document this function
-  */
-dimType clsTaskItem::resize(int pX, int pY)
-{
-	if (pY > 18)
-		pY = 18;
-	return clsItem::resize(pX, pY);
 }
 

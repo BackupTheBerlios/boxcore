@@ -41,7 +41,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/version.h.in ${CMAKE_CURRENT_SOURCE_
 
 add_library(boxBar MODULE ${BOXBAR_SRCS})
 include_directories(boxBar ../../blackbox)
-target_link_libraries(boxBar blackbox)
+target_link_libraries(boxBar blackbox comctl32)
 set_target_properties (boxBar PROPERTIES
 	PREFIX ""
 	LINK_FLAGS "-s -mwindows"

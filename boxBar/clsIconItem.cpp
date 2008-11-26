@@ -4,6 +4,7 @@ clsIconItem::clsIconItem(HICON pIcon, int pSize, bool pVertical):clsItem(pVertic
 {
 	icon = pIcon;
 	iconSize = pSize;
+	fixed = DIM_BOTH;
 }
 
 clsIconItem::~clsIconItem()

@@ -135,8 +135,6 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 
 	if (pSizeGiven && (flexibleItemCount || (itemList.size()==0)))
 	{
-		if (itemList.size()==0)
-			dbg_printf("We got nothin");
 			minSizeY = getSize(DIM_VERTICAL);
 			minSizeX = getSize(DIM_HORIZONTAL);
 			if (vertical)
@@ -164,7 +162,6 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 			flexibleItemSize = (minSizeY - fixedItemUsed) / flexibleItemCount;
 		else
 			flexibleItemSize = (minSizeX - fixedItemUsed) / flexibleItemCount;
-		dbg_printf("Felxible items %d Flexible item size %d",flexibleItemCount, flexibleItemSize);
 		for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end(); ++i)
 		{
 			(*i)->calculateSizes();

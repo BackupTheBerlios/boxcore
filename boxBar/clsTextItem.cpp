@@ -3,7 +3,7 @@
 
 clsTextItem::clsTextItem(TCHAR *pText, UINT pStyle, bool pVertical): clsItem(pVertical)
 {
-	fixed = DIM_BOTH;
+	fixed = DIM_VERTICAL;
 	fontStyle = pStyle;
 	_tcscpy(text,pText);
 }
@@ -24,7 +24,7 @@ void clsTextItem::draw(HDC pContext)
 		SetBkMode(pContext, TRANSPARENT);
 		HFONT oldFont = (HFONT) SelectObject(pContext, bbStyle.getStyleFont(fontStyle));
 		COLORREF oldColor = SetTextColor(pContext, bbStyle.getStyleTextColor(fontStyle));
-		DrawText(pContext, text, -1, &itemArea, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
+		DrawText(pContext, text, -1, &itemArea, bbStyle.getStyleTextJustify(fontStyle) | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
 		SetTextColor(pContext, oldColor);
 		SelectObject(pContext, oldFont);
 	}
@@ -38,7 +38,7 @@ void clsTextItem::draw(HDC pContext)
   */
 void clsTextItem::calculateSizes(bool pSizeGiven)
 {
-	if (pSizeGiven)
+	if (!pSizeGiven)
 	{
 	SIZE textSize;
 	HDC tempDC = CreateCompatibleDC(NULL);

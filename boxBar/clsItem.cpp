@@ -1,4 +1,5 @@
 #include "clsItem.h"
+#include "commctrl.h"
 
 clsItem::clsItem(bool pVertical)
 {
@@ -9,6 +10,7 @@ clsItem::clsItem(bool pVertical)
 	mouseButton = 0;
 	minSizeX = 0;
 	minSizeY = 0;
+	tipText = NULL;
 }
 
 clsItem::~clsItem()
@@ -41,6 +43,8 @@ void clsItem::move(int pX, int pY)
 	itemArea.right = pX + sizeX;
 	itemArea.top = pY;
 	itemArea.bottom = pY + sizeY;
+	if (tipText)
+		setTooltip(tipText);
 	InvalidateRect(barWnd, &itemArea, TRUE);
 }
 
@@ -55,12 +59,12 @@ dimType clsItem::resize(int pX, int pY)
 		minSizeX = 0;
 	if (minSizeY < 0)
 		minSizeY = 0;
-	if (pX >= minSizeX)
+	if (pX >= 0)
 	{
 		itemArea.right = itemArea.left + pX;
 		done = DIM_HORIZONTAL;
 	}
-	if (pY >= minSizeY)
+	if (pY >= 0)
 	{
 		itemArea.bottom = itemArea.top + pY;
 		done = ((done == DIM_HORIZONTAL) ? DIM_BOTH : DIM_VERTICAL);
@@ -108,8 +112,69 @@ LRESULT clsItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
+/** @brief setTooltip
+  *
+  * @todo: document this function
+  */
+void clsItem::setTooltip(TCHAR *pText)
+{
+	if (!tooltipWnd)
+		initTooltips();
+	dbg_printf("Area : l %d r %d t %d b %d",itemArea.left, itemArea.right, itemArea.top, itemArea.bottom);
+	TOOLINFO toolInfo;
+	ZeroMemory(&toolInfo, sizeof(toolInfo));
+	toolInfo.cbSize = sizeof(toolInfo);
+	toolInfo.uFlags = TTF_SUBCLASS;
+	toolInfo.hwnd = barWnd;
+	toolInfo.uId = (UINT_PTR)this;
+	toolInfo.rect = itemArea;
+	toolInfo.hinst = hInstance;
+	toolInfo.lpszText = pText;
+	SendMessage(tooltipWnd, TTM_ADDTOOL, 0, (LPARAM)(LPTOOLINFO)&toolInfo);
+	SendMessage(tooltipWnd, TTM_ACTIVATE, TRUE, 0);
+}
+
+/** @brief initTooltips
+  * Copied from bbLeanbar
+  * @todo: document this function
+  */
+void clsItem::initTooltips()
+{
+	INITCOMMONCONTROLSEX ic;
+	ic.dwSize = sizeof(INITCOMMONCONTROLSEX);
+	ic.dwICC = ICC_BAR_CLASSES;
+
+	InitCommonControlsEx(&ic);
+
+	tooltipWnd = CreateWindowEx(
+		WS_EX_TOPMOST,
+		TOOLTIPS_CLASS,
+		NULL,
+		WS_POPUP | TTS_ALWAYSTIP | TTS_NOPREFIX,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		barWnd,
+		NULL,
+		hInstance,
+		NULL);
+
+	SetWindowPos(tooltipWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+
+	SendMessage(tooltipWnd, TTM_SETMAXTIPWIDTH, 0, 300);
+	SendMessage(tooltipWnd, TTM_SETDELAYTIME, TTDT_AUTOMATIC, 300);
+	SendMessage(tooltipWnd, TTM_SETDELAYTIME, TTDT_AUTOPOP, 5000);
+	SendMessage(tooltipWnd, TTM_SETDELAYTIME, TTDT_INITIAL,  120);
+	SendMessage(tooltipWnd, TTM_SETDELAYTIME, TTDT_RESHOW,    60);
+}
+
+
+
 clsApiLoader clsItem::bbApiLoader;
 HWND clsItem::barWnd = NULL;
+HWND clsItem::tooltipWnd = NULL;
 CHAR clsItem::configFile[MAX_PATH] = {'\0'};
 clsStyle clsItem::bbStyle;
 HWND clsItem::hBlackboxWnd = NULL;
+HINSTANCE clsItem::hInstance = NULL;

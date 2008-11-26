@@ -13,13 +13,14 @@ class clsStyle
 		bool getStyleBorder(int pStyle);
 		HFONT getStyleFont(int pStyle);
 		COLORREF getStyleTextColor(int pStyle);
+		int getStyleTextJustify(int pStyle);
 	protected:
 		StyleItem *toolbar;
 		StyleItem *toolbarClock;
 		StyleItem *toolbarLabel;
 		StyleItem *toolbarButton;
 		StyleItem *toolbarButtonPressed;
-		HFONT toolbarClockFont;
+		HFONT toolbarFont;
 	private:
 };
 

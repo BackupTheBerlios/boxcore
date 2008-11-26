@@ -44,6 +44,7 @@ LRESULT clsTrayItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
   */
 void clsTrayItemCollection::populateTray()
 {
+	lastMouse = NULL;
 	for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end(); ++i)
 	{
 		delete (*i);

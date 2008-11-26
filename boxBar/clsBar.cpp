@@ -150,8 +150,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		return 0;
 
 	case WM_DESTROY:
-		//if (margin)
-		//		SetDesktopMargin(hWnd, 0, 0);
+		SetDesktopMargin(hWnd, 0, 0);
 		RemoveSticky(hWnd);
 		SendMessage(hBlackboxWnd, BB_UNREGISTERMESSAGE, (WPARAM)hWnd, (LPARAM)messages);
 		return 0;
@@ -290,6 +289,8 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	case WM_EXITSIZEMOVE:
 		moving = false;
+		if (margin)
+			SetDesktopMargin(barWnd, marginEdge, margin);
 		break;
 
 	case WM_WINDOWPOSCHANGING:
@@ -479,6 +480,8 @@ void clsBar::calculateSizes(bool pSizeGiven)
 	else
 		resize(sizePercentage*(monRect.right-monRect.left)/100, -1);
 	clsItemCollection::calculateSizes(true);
+	if (margin)
+		SetDesktopMargin(barWnd, marginEdge, margin);
 }
 
 

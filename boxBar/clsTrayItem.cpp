@@ -1,6 +1,5 @@
 #include "clsTrayItem.h"
 
-
 clsTrayItem::clsTrayItem(systemTray *trayItem, bool pVertical): clsIconItem(trayItem->hIcon, 16, pVertical)
 {
 	if (TrayIconEvent == NULL)
@@ -11,6 +10,12 @@ clsTrayItem::clsTrayItem(systemTray *trayItem, bool pVertical): clsIconItem(tray
 	iconWnd = trayItem->hWnd;
 	iconID = trayItem->uID;
 	iconCallback = trayItem->uCallbackMessage;
+	if (strlen(trayItem->szTip))
+	{
+		dbg_printf("We have a tip");
+	tipText = new TCHAR[strlen(trayItem->szTip)+1];
+	MultiByteToWideChar(CP_ACP, 0, trayItem->szTip, -1, tipText, strlen(trayItem->szTip)+1);
+	}
 	popupVisible = false;
 	fixed = DIM_BOTH;
 	iconSize = ReadInt(configFile, "boxBar.tray.iconsize:", 16);
@@ -63,6 +68,12 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				if ((trayItem->hWnd == iconWnd) && (trayItem->uID == iconID))
 				{
 					icon = trayItem->hIcon;
+					//if (strlen(trayItem->szTip))
+					//{
+					//TCHAR mytip[256];
+					//MultiByteToWideChar(CP_ACP, 0, trayItem->szTip, -1, mytip, 256);
+					//setTooltip(mytip);
+					//}
 					InvalidateRect(hWnd, &itemArea, TRUE);
 					return 0;
 				}

@@ -7,7 +7,7 @@ clsStyle::clsStyle()
 	toolbarLabel = (StyleItem *)GetSettingPtr(SN_TOOLBARLABEL);
 	toolbarButton = (StyleItem *)GetSettingPtr(SN_TOOLBARBUTTON);
 	toolbarButtonPressed = (StyleItem *)GetSettingPtr(SN_TOOLBARBUTTONP);
-	toolbarClockFont = CreateStyleFont(toolbar);
+	toolbarFont = CreateStyleFont(toolbar);
 }
 
 clsStyle::~clsStyle()
@@ -23,10 +23,15 @@ HFONT clsStyle::getStyleFont(int pStyle)
 {
 	switch (pStyle)
 	{
+	case SN_TOOLBAR:
+	case SN_TOOLBARBUTTON:
+	case SN_TOOLBARBUTTONP:
 	case SN_TOOLBARCLOCK:
-		return toolbarClockFont;
+	case SN_TOOLBARLABEL:
+	case SN_TOOLBARWINDOWLABEL:
+		return toolbarFont;
 	}
-	return toolbarClockFont;
+	return toolbarFont;
 }
 
 /** @brief getStyleBorder
@@ -71,6 +76,25 @@ COLORREF clsStyle::getStyleTextColor(int pStyle)
 		return toolbarButtonPressed->TextColor;
 	}
 	return toolbar->TextColor;
+}
+
+/** @brief getStyleBorder
+  *
+  * @todo: document this function
+  */
+int clsStyle::getStyleTextJustify(int pStyle)
+{
+	switch (pStyle)
+	{
+	case SN_TOOLBAR:
+	case SN_TOOLBARBUTTON:
+	case SN_TOOLBARBUTTONP:
+	case SN_TOOLBARCLOCK:
+	case SN_TOOLBARLABEL:
+	case SN_TOOLBARWINDOWLABEL:
+		return toolbar->Justify;
+	}
+	return toolbar->Justify;
 }
 
 /** @brief getStyle

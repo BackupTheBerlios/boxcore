@@ -37,15 +37,20 @@ class clsItem
 		bool mouseDown;
 		int mouseButton;
 
+		static HWND tooltipWnd;
+
 		static HWND barWnd;
 		static CHAR configFile[MAX_PATH];
 		static clsStyle bbStyle;
 
 		static clsApiLoader bbApiLoader;
 		static HWND hBlackboxWnd;
+		static HINSTANCE hInstance;
 
 		static int getTimerID() {static int id=10; return id++;}
-
+		void initTooltips();
+		void setTooltip(TCHAR *pText);
+		TCHAR *tipText;
 	private:
 };
 

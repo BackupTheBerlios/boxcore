@@ -21,7 +21,6 @@ class clsBar : public clsItemCollection
 		virtual dimType resize(int pX, int pY);
 	protected:
 	private:
-		HINSTANCE hInstance;
 		TCHAR className[100];
 		bool moving;
 		bool setMargin;

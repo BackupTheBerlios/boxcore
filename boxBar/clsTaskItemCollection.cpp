@@ -1,7 +1,7 @@
 #include "BBApi.h"
 #include "clsTaskItemCollection.h"
 #include "clsTaskItem.h"
-#include "clsLabelItem.h"
+#include "clsFlexiSpacer.h"
 
 clsTaskItemCollection::clsTaskItemCollection(bool pVertical):clsItemCollection(pVertical)
 {
@@ -39,6 +39,7 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
   */
 void clsTaskItemCollection::populateTasks()
 {
+	lastMouse = NULL;
 	for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end(); ++i)
 	{
 		delete (*i);
@@ -51,6 +52,8 @@ void clsTaskItemCollection::populateTasks()
 		addItem(new clsTaskItem(task, vertical));
 		task = task->next;
 	}
+	if (vertical)
+		addItem(new clsFlexiSpacer(vertical));
 	calculateSizes(true);
 	InvalidateRect(barWnd, &itemArea, TRUE);
 }
