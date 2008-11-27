@@ -11,6 +11,7 @@ class clsTaskItemCollection : public clsItemCollection
 
 		virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	protected:
+		bool stretchTaskarea;
 		void populateTasks();
 	private:
 };

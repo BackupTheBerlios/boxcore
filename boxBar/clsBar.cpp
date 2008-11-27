@@ -10,6 +10,7 @@
 
 clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemCollection(pVertical)
 {
+	trackMouse = false;
 	hInstance = pInstance;
 	_tcscpy(className, pClassName);
 	WNDCLASS wc;
@@ -25,6 +26,8 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 	sizePercentage = ReadInt(configFile, "boxBar.percentage:", 80);
 	setMargin = ReadBool(configFile, "boxBar.setMargin:", true);
 	vertical = ReadBool(configFile, "boxBar.vertical:", false);
+
+	fixed = (vertical ? DIM_HORIZONTAL : DIM_VERTICAL);
 
 	margin = 0;
 
@@ -67,6 +70,7 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 	spacingBorder = 3;
 	spacingItems = 2;
 
+
 	const CHAR * barItems = ReadString(configFile, "boxBar.items:", "tray, clock");
 	CHAR barItem[MAX_PATH];
 	do
@@ -89,7 +93,7 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 			addItem(new clsTaskItemCollection(vertical));
 		}
 	}
-	while(strlen(barItems));
+	while (strlen(barItems));
 
 	calculateSizes();
 }
@@ -412,7 +416,21 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			PostMessage(hWnd, WM_SYSCOMMAND, SC_MOVE | 2, 0);
 			return 0;
 		}
-
+	case WM_MOUSELEAVE:
+		trackMouse = false;
+		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
+	case WM_MOUSEMOVE:
+		if (!trackMouse)
+		{
+			TRACKMOUSEEVENT mouseTrack;
+			ZeroMemory(&mouseTrack, sizeof(mouseTrack));
+			mouseTrack.cbSize = sizeof(mouseTrack);
+			mouseTrack.dwFlags = TME_LEAVE;
+			mouseTrack.hwndTrack = barWnd;
+			TrackMouseEvent(&mouseTrack);
+			trackMouse = true;
+		}
+		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
 	default:
 		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
 	}
@@ -442,8 +460,8 @@ dimType clsBar::resize(int pX, int pY)
 	int newY = barRect.top;
 	if (pX < minSizeX)
 		pX = minSizeX;
-		int dX = getSize(DIM_HORIZONTAL) - pX;
-		if (barLocation&POS_LEFT)
+	int dX = getSize(DIM_HORIZONTAL) - pX;
+	if (barLocation&POS_LEFT)
 		newX = barRect.left;
 	else if (barLocation&POS_CENTER)
 		newX = barRect.left + dX / 2;
@@ -474,11 +492,11 @@ void clsBar::calculateSizes(bool pSizeGiven)
 {
 	clsItemCollection::calculateSizes(false);
 	RECT monRect;
-			GetMonitorRect(barWnd, &monRect, GETMON_FROM_WINDOW);
+	GetMonitorRect(barWnd, &monRect, GETMON_FROM_WINDOW);
 	if (vertical)
-	resize(-1, sizePercentage*(monRect.bottom - monRect.top)/100);
+		resize(-1, sizePercentage*(monRect.bottom - monRect.top) / 100);
 	else
-		resize(sizePercentage*(monRect.right-monRect.left)/100, -1);
+		resize(sizePercentage*(monRect.right - monRect.left) / 100, -1);
 	clsItemCollection::calculateSizes(true);
 	if (margin)
 		SetDesktopMargin(barWnd, marginEdge, margin);

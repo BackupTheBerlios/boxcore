@@ -3,12 +3,16 @@
 #include "clsTaskItem.h"
 #include "clsFlexiSpacer.h"
 
-clsTaskItemCollection::clsTaskItemCollection(bool pVertical):clsItemCollection(pVertical)
+clsTaskItemCollection::clsTaskItemCollection(bool pVertical): clsItemCollection(pVertical)
 {
-	//ctor
-
 	spacingBorder = 0;
 	spacingItems = 2;
+
+	stretchTaskarea = ReadBool(configFile, "boxBar.stretchTaskarea:", true);
+	if (stretchTaskarea)
+		fixed = (vertical ? DIM_HORIZONTAL : DIM_VERTICAL);
+	else
+		fixed = DIM_BOTH;
 	populateTasks();
 }
 
@@ -18,17 +22,17 @@ clsTaskItemCollection::clsTaskItemCollection(bool pVertical):clsItemCollection(p
   */
 LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	switch(msg)
+	switch (msg)
 	{
-		case BB_TASKSUPDATE:
-			switch(lParam)
-			{
-				case TASKITEM_REMOVED:
-				case TASKITEM_ADDED:
-					populateTasks();
-					break;
-			}
+	case BB_TASKSUPDATE:
+		switch (lParam)
+		{
+		case TASKITEM_REMOVED:
+		case TASKITEM_ADDED:
+			populateTasks();
 			break;
+		}
+		break;
 	}
 	return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
 }
@@ -47,15 +51,18 @@ void clsTaskItemCollection::populateTasks()
 	itemList.clear();
 	tasklist *task = GetTaskListPtr();
 	dbg_printf("Tasklist size : %d", GetTaskListSize());
-	for(int i=0; i < GetTaskListSize(); ++i)
+	for (int i = 0; i < GetTaskListSize(); ++i)
 	{
 		addItem(new clsTaskItem(task, vertical));
 		task = task->next;
 	}
-	if (vertical)
+	if (vertical && stretchTaskarea)
 		addItem(new clsFlexiSpacer(vertical));
 	calculateSizes(true);
-	InvalidateRect(barWnd, &itemArea, TRUE);
+	if (!stretchTaskarea)
+		SendMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+	else
+		InvalidateRect(barWnd, &itemArea, TRUE);
 }
 
 

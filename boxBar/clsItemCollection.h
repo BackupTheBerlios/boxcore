@@ -28,6 +28,7 @@ class clsItemCollection : public clsItem
 		int flexibleItemCount;
 		int fixedItemUsed;
 		int flexibleItemSize;
+
 	private:
 };
 

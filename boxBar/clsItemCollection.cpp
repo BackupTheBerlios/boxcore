@@ -3,11 +3,10 @@
 
 clsItemCollection::clsItemCollection(bool pVertical): clsItem(pVertical)
 {
-	if (vertical)
-		fixed = DIM_HORIZONTAL;
-	else
-		fixed = DIM_VERTICAL;
+	fixed = DIM_BOTH;
 	lastMouse = NULL;
+	spacingBorder = 0;
+	spacingItems = 2;
 }
 
 clsItemCollection::~clsItemCollection()
@@ -137,10 +136,11 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 	{
 			minSizeY = getSize(DIM_VERTICAL);
 			minSizeX = getSize(DIM_HORIZONTAL);
-			if (vertical)
-				maxSize = minSizeX - 2*spacingBorder;
-			else
+			if(vertical)
+					maxSize = minSizeX - 2*spacingBorder;
+					else
 				maxSize = minSizeY - 2*spacingBorder;
+
 	}
 	else
 	{
@@ -242,6 +242,3 @@ void clsItemCollection::sortItems()
 		}
 	}
 }
-
-
-

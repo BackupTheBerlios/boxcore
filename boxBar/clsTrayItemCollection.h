@@ -12,6 +12,8 @@ class clsTrayItemCollection : public clsItemCollection
 		virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	protected:
 		virtual void populateTray();
+
+		int numRowCols;
 	private:
 };
 

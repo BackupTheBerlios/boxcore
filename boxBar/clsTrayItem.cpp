@@ -12,9 +12,8 @@ clsTrayItem::clsTrayItem(systemTray *trayItem, bool pVertical): clsIconItem(tray
 	iconCallback = trayItem->uCallbackMessage;
 	if (strlen(trayItem->szTip))
 	{
-		dbg_printf("We have a tip");
-	tipText = new TCHAR[strlen(trayItem->szTip)+1];
-	MultiByteToWideChar(CP_ACP, 0, trayItem->szTip, -1, tipText, strlen(trayItem->szTip)+1);
+		tipText = new TCHAR[strlen(trayItem->szTip)+1];
+		MultiByteToWideChar(CP_ACP, 0, trayItem->szTip, -1, tipText, strlen(trayItem->szTip) + 1);
 	}
 	popupVisible = false;
 	fixed = DIM_BOTH;
@@ -23,7 +22,7 @@ clsTrayItem::clsTrayItem(systemTray *trayItem, bool pVertical): clsIconItem(tray
 
 clsTrayItem::~clsTrayItem()
 {
-	//dtor
+	setTooltip(NULL);
 }
 
 /** @brief wndProc
@@ -34,10 +33,10 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
-		case WM_MOUSEMOVE:
-			if (popupVisible)
-				break;
-			popupVisible = true;
+	case WM_MOUSEMOVE:
+		if (popupVisible)
+			break;
+		popupVisible = true;
 	case WM_LBUTTONDOWN:
 	case WM_LBUTTONUP:
 	case WM_RBUTTONDOWN:
@@ -48,16 +47,16 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_RBUTTONDBLCLK:
 	case WM_MBUTTONDBLCLK:
 	case WM_MOUSELEAVE:
-	{
-		if (msg == WM_MOUSELEAVE)
-			popupVisible = false;
-		POINT mousePos;
-		mousePos.x = LOWORD(lParam);
-		mousePos.y = HIWORD(lParam);
-		ClientToScreen(hWnd, &mousePos);
-		LPARAM lParamNew = MAKELPARAM(mousePos.x, mousePos.y);
-		return TrayIconEvent(iconWnd, iconID, msg, wParam, lParamNew);
-	}
+		{
+			if (msg == WM_MOUSELEAVE)
+				popupVisible = false;
+			POINT mousePos;
+			mousePos.x = LOWORD(lParam);
+			mousePos.y = HIWORD(lParam);
+			ClientToScreen(hWnd, &mousePos);
+			LPARAM lParamNew = MAKELPARAM(mousePos.x, mousePos.y);
+			return TrayIconEvent(iconWnd, iconID, msg, wParam, lParamNew);
+		}
 	case BB_TRAYUPDATE:
 		switch (lParam)
 		{
@@ -68,12 +67,16 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				if ((trayItem->hWnd == iconWnd) && (trayItem->uID == iconID))
 				{
 					icon = trayItem->hIcon;
-					//if (strlen(trayItem->szTip))
-					//{
-					//TCHAR mytip[256];
-					//MultiByteToWideChar(CP_ACP, 0, trayItem->szTip, -1, mytip, 256);
-					//setTooltip(mytip);
-					//}
+					if (tipText)
+							delete tipText;
+					if (strlen(trayItem->szTip))
+					{
+						tipText = new TCHAR[strlen(trayItem->szTip)+1];
+						MultiByteToWideChar(CP_ACP, 0, trayItem->szTip, -1, tipText, strlen(trayItem->szTip) + 1);
+					}
+					else
+						tipText = NULL;
+					setTooltip(tipText);
 					InvalidateRect(hWnd, &itemArea, TRUE);
 					return 0;
 				}

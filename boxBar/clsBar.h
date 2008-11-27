@@ -23,6 +23,7 @@ class clsBar : public clsItemCollection
 	private:
 		TCHAR className[100];
 		bool moving;
+		bool trackMouse;
 		bool setMargin;
 
 		int margin;

@@ -120,7 +120,6 @@ void clsItem::setTooltip(TCHAR *pText)
 {
 	if (!tooltipWnd)
 		initTooltips();
-	dbg_printf("Area : l %d r %d t %d b %d",itemArea.left, itemArea.right, itemArea.top, itemArea.bottom);
 	TOOLINFO toolInfo;
 	ZeroMemory(&toolInfo, sizeof(toolInfo));
 	toolInfo.cbSize = sizeof(toolInfo);
@@ -130,8 +129,13 @@ void clsItem::setTooltip(TCHAR *pText)
 	toolInfo.rect = itemArea;
 	toolInfo.hinst = hInstance;
 	toolInfo.lpszText = pText;
-	SendMessage(tooltipWnd, TTM_ADDTOOL, 0, (LPARAM)(LPTOOLINFO)&toolInfo);
-	SendMessage(tooltipWnd, TTM_ACTIVATE, TRUE, 0);
+	if (pText)
+	{
+		SendMessage(tooltipWnd, TTM_DELTOOL, 0, (LPARAM)&toolInfo);
+		SendMessage(tooltipWnd, TTM_ADDTOOL, 0, (LPARAM)&toolInfo);
+	}
+	else
+		SendMessage(tooltipWnd, TTM_DELTOOL, 0, (LPARAM)&toolInfo);
 }
 
 /** @brief initTooltips
