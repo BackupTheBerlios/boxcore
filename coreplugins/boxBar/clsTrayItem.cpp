@@ -55,7 +55,13 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			mousePos.y = HIWORD(lParam);
 			ClientToScreen(hWnd, &mousePos);
 			LPARAM lParamNew = MAKELPARAM(mousePos.x, mousePos.y);
-			return TrayIconEvent(iconWnd, iconID, msg, wParam, lParamNew);
+			if (TrayIconEvent)
+				return TrayIconEvent(iconWnd, iconID, msg, wParam, lParamNew);
+			else
+			{
+				dbg_printf("No TrayIconEvent");
+				return 0;
+			}
 		}
 	case BB_TRAYUPDATE:
 		switch (lParam)

@@ -306,14 +306,11 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	case WM_WINDOWPOSCHANGED:
 		{
-			//moving = false;
 			WINDOWPOS* wp = (WINDOWPOS*)lParam;
 			RECT monRect;
 			GetMonitorRect(hWnd, &monRect, GETMON_FROM_WINDOW);
 			int leftthirdX = (monRect.right + 2 * monRect.left) / 3;
 			int rightthirdX = (2 * monRect.right + monRect.left) / 3;
-			//if (margin)
-			//	SetDesktopMargin(barWnd, 0, 0);
 			if ((wp->x > rightthirdX) || ((wp->x + wp->cx) == monRect.right))
 			{
 				barLocation = POS_RIGHT;
@@ -406,6 +403,8 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 			if (SetTaskbarPos)
 				SetTaskbarPos(wp->x, wp->y, wp->x + wp->cx, wp->y + wp->cy, barEdge);
+			else
+				dbg_printf("No SetTaskbarPos");
 		}
 		break;
 	case WM_LBUTTONDOWN:
