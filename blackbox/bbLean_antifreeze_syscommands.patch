@@ -1,0 +1,99 @@
+--- C:/Soft/bblean/src/bbLean_mod_test_070426/src/blackbox/Workspaces.cpp	Sat Jan 13 00:05:20 2007
++++ C:/Soft/bblean/src/my/blackbox/Workspaces.cpp	Fri May 25 12:04:09 2007
+@@ -240,6 +240,12 @@
+     return dwResult;
+ }
+ 
++// CyberShadow 2007.05.25: the result isn't required in most cases; post the message instead of sending it, to prevent temporary lock-ups
++ST void post_syscommand(HWND hwnd, UINT SC_XXX)
++{
++    PostMessage(hwnd, WM_SYSCOMMAND, SC_XXX, 0);
++}
++
+ void Workspaces_Command(UINT msg, WPARAM wParam, LPARAM lParam)
+ {
+     HWND hwnd = (HWND)lParam;
+@@ -387,7 +393,7 @@
+             {
+                 case BB_WINDOWMINIMIZE:
+                     if (0 == (WS_MINIMIZEBOX & style)) break;
+-                    send_syscommand(hwnd, SC_MINIMIZE);
++                    post_syscommand(hwnd, SC_MINIMIZE);
+                     focus_top_window_beside(hwnd);
+                     break;
+ 
+@@ -396,7 +402,7 @@
+                     break;
+ 
+                 case BB_WINDOWCLOSE:
+-                    send_syscommand(hwnd, SC_CLOSE);
++                    post_syscommand(hwnd, SC_CLOSE);
+                     focus_top_window_beside(hwnd);
+                     break;
+ 
+@@ -430,11 +436,11 @@
+ 
+                 case BB_WINDOWSIZE:
+                     if (0 == (WS_SIZEBOX & style)) break;
+-                    send_syscommand(hwnd, SC_SIZE);
++                    post_syscommand(hwnd, SC_SIZE);
+                     break;
+ 
+                 case BB_WINDOWMOVE:
+-                    send_syscommand(hwnd, SC_MOVE);
++                    post_syscommand(hwnd, SC_MOVE);
+                     break;
+             }
+         }
+@@ -545,7 +551,7 @@
+     {
+         return false;
+     }
+-    send_syscommand(hwnd, SC_RESTORE);
++    post_syscommand(hwnd, SC_RESTORE);
+ 
+     // restore the default maxPos (necessary when it was V-max'd or H-max'd)
+     WINDOWPLACEMENT wp;
+@@ -562,7 +568,7 @@
+     if (check_for_restore(hwnd)) return;
+     RECT r; get_rect(hwnd, &r);
+     LockWindowUpdate(hwnd);
+-    send_syscommand(hwnd, SC_MAXIMIZE);
++    post_syscommand(hwnd, SC_MAXIMIZE);
+     RECT r2; get_rect(hwnd, &r2);
+     if (v) r.top = r2.top, r.bottom = r2.bottom;
+     else r.left = r2.left, r.right = r2.right;
+@@ -583,13 +589,13 @@
+ ST void WS_MaximizeWindow(HWND hwnd)
+ {
+     if (check_for_restore(hwnd)) return;
+-    send_syscommand(hwnd, SC_MAXIMIZE);
++    post_syscommand(hwnd, SC_MAXIMIZE);
+ }
+ 
+ ST void WS_RestoreWindow(HWND hwnd)
+ {
+     if (check_for_restore(hwnd)) return;
+-    send_syscommand(hwnd, SC_RESTORE);
++    post_syscommand(hwnd, SC_RESTORE);
+ }
+ 
+ //===========================================================================
+@@ -704,7 +710,7 @@
+         HWND hwnd = (HWND)p->v;
+         if ((cmd == SC_MINIMIZE) == (FALSE == IsIconic(hwnd)))
+         {
+-            send_syscommand(hwnd, cmd);
++            post_syscommand(hwnd, cmd);
+             if (SC_RESTORE == cmd) SwitchToWindow(hwnd);
+         }
+     }
+@@ -751,7 +757,7 @@
+     }
+     else
+     {
+-        if (IsIconic(hwnd)) send_syscommand(hwnd, SC_RESTORE);
++        if (IsIconic(hwnd)) post_syscommand(hwnd, SC_RESTORE);
+         SetForegroundWindow(hwnd);
+     }
+ 

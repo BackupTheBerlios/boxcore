@@ -1,0 +1,93 @@
+#include <iostream>
+#include <stdio.h>
+#include <windows.h>
+
+using std::cout;
+using std::cin;
+using std::endl;
+
+bool master=false;
+
+int main(int argc, char *argv[])
+{
+	if (argc==1)
+	{
+		cout<<"We are the master"<<endl;
+		master=true;
+	}
+	else
+		cout<<"We are the slave"<<endl;
+	if(master)
+	{
+		char args[100];
+		STARTUPINFO si;
+    		PROCESS_INFORMATION pi;
+		SECURITY_ATTRIBUTES secAttr;
+		int bReturn;
+		HANDLE hRdMaster,hWrSlave,hDuplRdMaster,hWrMaster,hRdSlave,hDuplWrMaster;
+
+		ZeroMemory( &secAttr, sizeof(secAttr) );
+    		secAttr.nLength = sizeof(secAttr);
+		secAttr.bInheritHandle=TRUE;
+    		ZeroMemory( &si, sizeof(si) );
+    		si.cb = sizeof(si);
+    		ZeroMemory( &pi, sizeof(pi) );
+		
+		bReturn = CreatePipe(&hRdMaster,&hWrSlave,&secAttr,512);
+		DuplicateHandle(GetCurrentProcess(),
+                	hRdMaster,
+                	GetCurrentProcess(),
+                	&hDuplRdMaster,
+                	DUPLICATE_SAME_ACCESS,
+                	FALSE,
+                	DUPLICATE_SAME_ACCESS
+      		);
+
+		// Closing inheritable handle to the read end to pipe1.
+
+		CloseHandle(hRdMaster);
+
+		// creation of pipe2.
+
+		bReturn = CreatePipe(&hRdSlave,&hWrMaster,&secAttr,512);
+		DuplicateHandle(GetCurrentProcess(),
+                	hWrMaster,
+                	GetCurrentProcess(),
+                	&hDuplWrMaster,
+                	DUPLICATE_SAME_ACCESS,
+                	FALSE,
+                	DUPLICATE_SAME_ACCESS
+      		);
+
+		// Closing inheritable handle to the write end to pipe2.
+
+		CloseHandle(hWrMaster);
+		sprintf(args,"anonpipetest %i %i",(int)hWrSlave,(int)hRdSlave);
+		cout<<"Creating our slave"<<endl;
+		cout<<"The slave shall read from "<<hRdSlave<<" and write to "<<hWrSlave<<endl;
+		CreateProcess(NULL,args,NULL,NULL,TRUE,0,NULL,NULL,&si,&pi);
+		DWORD numWritten;
+		char message[100]="Moo";
+		WriteFile(hDuplWrMaster,"You shall obey",strlen("You shall obey")+1,&numWritten,NULL);
+		cout<<"Our slave created"<<endl;
+		cout<<"Wrote "<<numWritten<<" bytes to slave"<<endl;
+		
+		ReadFile(hDuplRdMaster,&message,100,&numWritten,NULL) ;
+		cout<<"Our slave replies : \""<<message<<"\""<<endl;
+		cout<<"Master dies"<<endl;
+	}
+	else
+	{
+		HANDLE hRdSlave,hWrSlave;
+		hWrSlave=(HANDLE)atoi(argv[1]);
+		hRdSlave=(HANDLE)atoi(argv[2]);
+		cout<<"Slave reads from "<<hRdSlave<<" and writes to "<<hWrSlave<<endl;
+		DWORD numWritten;
+		char message[100]="Moo";
+		ReadFile(hRdSlave,&message,100,&numWritten,NULL) ;
+		cout<<"Our master says : \""<<message<<"\""<<endl;
+		WriteFile(hWrSlave,"And so we shall",strlen("And so we shall")+1,&numWritten,NULL);
+		cout<<"Slave dies"<<endl;
+	}
+  return 0;
+}

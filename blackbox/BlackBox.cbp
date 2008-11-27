@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="BlackBox" />
+		<Option makefile="makefile" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin\Debug\BlackBox.exe" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Debug\" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin\Release\BlackBox.exe" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Release\" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-march=pentium3" />
+					<Add option="-Os" />
+					<Add option="-Wall" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="..\..\..\lib\libversion.a" />
+					<Add library="..\..\..\lib\libole32.a" />
+					<Add library="..\..\..\lib\libuuid.a" />
+					<Add library="..\..\..\lib\libcomctl32.a" />
+					<Add library="..\..\..\lib\libcomdlg32.a" />
+					<Add library="..\..\..\lib\libshell32.a" />
+					<Add library="..\..\..\lib\libadvapi32.a" />
+					<Add library="..\..\..\lib\libwinmm.a" />
+					<Add library="..\..\..\lib\libstdc++.a" />
+					<Add library="..\..\..\lib\libgdi32.a" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="BB.h" />
+		<Unit filename="BBApi.cpp" />
+		<Unit filename="BBApi.h" />
+		<Unit filename="BBRoot.cpp" />
+		<Unit filename="BBSendData.h" />
+		<Unit filename="BBVWM.cpp" />
+		<Unit filename="BBVWM.h" />
+		<Unit filename="BImage.cpp" />
+		<Unit filename="BImage.h" />
+		<Unit filename="Blackbox.cpp" />
+		<Unit filename="ConfigMenu.cpp" />
+		<Unit filename="Desk.cpp" />
+		<Unit filename="Desk.h" />
+		<Unit filename="DesktopMenu.cpp" />
+		<Unit filename="Install.cpp" />
+		<Unit filename="Menu\CommandItem.cpp" />
+		<Unit filename="Menu\Contextmenu.cpp" />
+		<Unit filename="Menu\Dragsource.cpp" />
+		<Unit filename="Menu\DrawIco.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Menu\Droptarget.cpp" />
+		<Unit filename="Menu\FolderItem.cpp" />
+		<Unit filename="Menu\Menu.cpp" />
+		<Unit filename="Menu\Menu.h" />
+		<Unit filename="Menu\MenuItem.cpp" />
+		<Unit filename="Menu\MenuMaker.cpp" />
+		<Unit filename="Menu\MenuMaker.h" />
+		<Unit filename="Menu\SpecialFolder.cpp" />
+		<Unit filename="Menu\TitleItem.cpp" />
+		<Unit filename="MessageManager.cpp" />
+		<Unit filename="MessageManager.h" />
+		<Unit filename="Pidl.cpp" />
+		<Unit filename="Pidl.h" />
+		<Unit filename="PluginManager.cpp" />
+		<Unit filename="PluginManager.h" />
+		<Unit filename="Settings.cpp" />
+		<Unit filename="Settings.h" />
+		<Unit filename="Stylestruct.h" />
+		<Unit filename="Tinylist.cpp" />
+		<Unit filename="Tinylist.h" />
+		<Unit filename="Toolbar.cpp" />
+		<Unit filename="Toolbar.h" />
+		<Unit filename="Tray.cpp" />
+		<Unit filename="Tray.h" />
+		<Unit filename="Utils.cpp" />
+		<Unit filename="VolumeControl.cpp" />
+		<Unit filename="VolumeControl.h" />
+		<Unit filename="Workspaces.cpp" />
+		<Unit filename="Workspaces.h" />
+		<Unit filename="blackbox.h" />
+		<Unit filename="m_alloc.cpp" />
+		<Unit filename="m_alloc.h" />
+		<Unit filename="resource.h" />
+		<Unit filename="resource.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Unit filename="win0x500.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

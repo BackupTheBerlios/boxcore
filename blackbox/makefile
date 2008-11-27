@@ -1,0 +1,111 @@
+# --------------------------------------------------------------------
+# makefile for blackbox.exe - gcc (mingw)
+
+BIN     = blackbox.exe
+RES     = resource.res
+DEF     = libBlackbox.def
+LIB     = libBlackbox.a
+EXP     = libBlackbox.o
+# INSTDIR = c:\bblean
+RM      = rm
+CP	= cp
+DEFINES =
+
+COREOBJ=\
+Blackbox.o \
+BBApi.o \
+Utils.o \
+BImage.o \
+Settings.o \
+PluginManager.o \
+MessageManager.o \
+Workspaces.o \
+Tray.o \
+Desk.o \
+Toolbar.o \
+DesktopMenu.o \
+ConfigMenu.o \
+\
+m_alloc.o \
+Tinylist.o \
+Install.o \
+BBRoot.o \
+BBVWM.o \
+Pidl.o \
+VolumeControl.o \
+
+MENUOBJ=\
+Menu/MenuMaker.o \
+Menu/MenuItem.o \
+Menu/Menu.o \
+Menu/TitleItem.o \
+Menu/FolderItem.o \
+Menu/CommandItem.o \
+Menu/SpecialFolder.o \
+Menu/Contextmenu.o \
+Menu/Dragsource.o \
+Menu/Droptarget.o
+
+OBJ = $(COREOBJ) $(MENUOBJ)
+
+# --------------------------------------------------------------------
+
+ifdef INSTDIR
+all: $(INSTDIR)\$(BIN)
+else
+all: $(BIN)
+endif
+
+$(INSTDIR)\$(BIN): $(BIN)
+	$(CP) $(BIN) $(INSTDIR)
+
+clean:
+	$(RM) -f $(OBJ) $(RES) $(BIN) $(EXP)
+
+$(EXP): $(DEF)
+	$(DLLTOOL) -d $(DEF) -e $(EXP) -l libBlackbox.a -D blackbox.exe
+
+# --------------------------------------------------------------------
+ifndef VERSION
+VERSION = native
+endif
+
+ifeq ($(VERSION),native)
+CC      = gcc.exe
+CP      = g++.exe
+WINDRES = windres.exe -J rc -O coff --include-dir $(<D)
+DLLTOOL = dlltool.exe
+endif
+ifeq ($(VERSION),cross_x64)
+CC      = x86_64-pc-mingw32-gcc
+CP      = x86_64-pc-mingw32-g++
+WINDRES = x86_64-pc-mingw32-windres -J rc -O coff --include-dir $(<D)
+DLLTOOL = x86_64-pc-mingw32-dlltool
+endif
+
+CFLAGS  = -Os -Wall -fno-rtti -fno-exceptions -c $(DEFINES)
+LFLAGS  = -mwindows -s
+LIBS    = -lversion -lole32 -luuid -lcomctl32 -lcomdlg32 -lshell32 \
+	-ladvapi32 -lwinmm #-lstdc++
+
+# --------------------------------------------------------------------
+
+$(BIN): $(OBJ) $(RES) $(EXP) makefile
+	$(CC) $(LFLAGS) $(OBJ) $(EXP) $(RES) $(LIBS) -o $(BIN)
+	ls -al $(BIN)
+
+depend.txt: $(patsubst %.o,%.cpp,$(OBJ))
+	$(CC) -MM $^ >$@
+
+# --------------------------------------------------------------------
+
+%.o: %.c
+	$(CC) $(CFLAGS) $< -o $@
+
+%.o: %.cpp
+	$(CP) $(CFLAGS) $< -o $@
+
+%.res: %.rc
+	$(WINDRES) -i $< -o $@
+
+# --------------------------------------------------------------------
