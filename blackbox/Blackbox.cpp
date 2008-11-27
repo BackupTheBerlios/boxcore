@@ -529,12 +529,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		ShellServiceObjectsManager.startServiceObjects(normalKey);
 	}
 
+	InitApiExtensions();
+
 	start_plugins();
 
 	if (bRunStartup) SetTimer(BBhwnd, BB_RUNSTARTUP_TIMER, 500, NULL);
 
 	Session_UpdateSession();
-	InitApiExtensions();
+
 	/* Message Loop */
 	RetCode = message_loop();
 
