@@ -1,6 +1,7 @@
 #ifndef CLSITEM_H
 #define CLSITEM_H
 
+#define WINVER 0x502
 #include <windows.h>
 
 #include "clsStyle.h"
@@ -13,6 +14,9 @@ enum dimType {DIM_NONE = 0, DIM_HORIZONTAL = 1, DIM_VERTICAL = 2, DIM_BOTH = 3};
 #define BOXBAR_REMOVEITEM WM_USER + 1
 #define BOXBAR_UPDATESIZE WM_USER + 2
 
+class clsItem;
+
+typedef void (*mouseFunction)(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
 
 class clsItem
 {
@@ -21,7 +25,7 @@ class clsItem
 		virtual ~clsItem();
 		virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		virtual bool hitTest(int pX, int pY);
-		virtual void draw(HDC pContext) = 0;
+		virtual void draw(HDC pContext);
 		virtual dimType resize(int pX, int pY);
 		virtual void move(int pX, int pY);
 		virtual dimType getFixed() {return fixed;}
@@ -34,8 +38,16 @@ class clsItem
 		int minSizeX;
 		int minSizeY;
 
+		UINT style;
+
 		bool mouseDown;
 		int mouseButton;
+
+		mouseFunction rightClick;
+		mouseFunction leftClick;
+		mouseFunction midClick;
+		mouseFunction X1Click;
+		mouseFunction X2Click;
 
 		static HWND tooltipWnd;
 

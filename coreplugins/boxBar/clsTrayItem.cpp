@@ -1,6 +1,6 @@
 #include "clsTrayItem.h"
 
-clsTrayItem::clsTrayItem(systemTray *trayItem, bool pVertical): clsIconItem(trayItem->hIcon, 16, pVertical)
+clsTrayItem::clsTrayItem(systemTray *trayItem, UINT pIconSize, bool pVertical): clsIconItem(trayItem->hIcon, pIconSize, pVertical)
 {
 	if (TrayIconEvent == NULL)
 	{
@@ -16,13 +16,6 @@ clsTrayItem::clsTrayItem(systemTray *trayItem, bool pVertical): clsIconItem(tray
 		MultiByteToWideChar(CP_ACP, 0, trayItem->szTip, -1, tipText, strlen(trayItem->szTip) + 1);
 	}
 	popupVisible = false;
-	fixed = DIM_BOTH;
-	iconSize = ReadInt(configFile, "boxBar.tray.iconsize:", 16);
-}
-
-clsTrayItem::~clsTrayItem()
-{
-	setTooltip(NULL);
 }
 
 /** @brief wndProc

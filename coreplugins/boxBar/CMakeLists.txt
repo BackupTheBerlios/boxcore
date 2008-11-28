@@ -7,22 +7,27 @@ clsBoxBar.cpp
 clsItem.cpp
 clsItemCollection.cpp
 
+clsTaskItem.cpp
+clsTaskItemCollection.cpp
+
+clsLabelItem.cpp
+
 clsIconItem.cpp
 clsTextItem.cpp
 
-clsBar.cpp
-clsLabelItem.cpp
+
 clsTrayItem.cpp
 clsTrayItemCollection.cpp
 
-clsTaskItem.cpp
-clsTaskItemCollection.cpp
+
 
 clsClockItem.cpp
 
 clsFlexiSpacer.cpp
 
 clsStyle.cpp
+
+clsBar.cpp
 
 ../utils/clsApiLoader.cpp
 )

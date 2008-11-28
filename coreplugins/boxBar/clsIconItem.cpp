@@ -1,15 +1,10 @@
 #include "clsIconItem.h"
 
-clsIconItem::clsIconItem(HICON pIcon, int pSize, bool pVertical):clsItem(pVertical)
+clsIconItem::clsIconItem(HICON pIcon, UINT pSize, bool pVertical):clsItem(pVertical)
 {
 	icon = pIcon;
 	iconSize = pSize;
 	fixed = DIM_BOTH;
-}
-
-clsIconItem::~clsIconItem()
-{
-	//dtor
 }
 
 /** @brief calculateSizes

@@ -4,6 +4,7 @@
 clsItem::clsItem(bool pVertical)
 {
 	vertical = pVertical;
+	style = 0;
 	itemArea.left = itemArea.right = itemArea.top = itemArea.bottom = 0;
 	fixed = DIM_NONE;
 	mouseDown = false;
@@ -11,11 +12,18 @@ clsItem::clsItem(bool pVertical)
 	minSizeX = 0;
 	minSizeY = 0;
 	tipText = NULL;
+
+	leftClick = NULL;
+	rightClick = NULL;
+	midClick = NULL;
+	X1Click = NULL;
+	X2Click = NULL;
 }
 
 clsItem::~clsItem()
 {
-	//dtor
+	if (tipText)
+		setTooltip(NULL);
 }
 
 /** @brief hitTest
@@ -78,14 +86,14 @@ dimType clsItem::resize(int pX, int pY)
   */
 int clsItem::getSize(dimType pDim)
 {
-	switch(pDim)
+	switch (pDim)
 	{
-		case DIM_HORIZONTAL:
-			return itemArea.right - itemArea.left;
-		case DIM_VERTICAL:
-			return itemArea.bottom - itemArea.top;
-		default:
-			return -1;
+	case DIM_HORIZONTAL:
+		return itemArea.right - itemArea.left;
+	case DIM_VERTICAL:
+		return itemArea.bottom - itemArea.top;
+	default:
+		return -1;
 	}
 }
 
@@ -99,7 +107,7 @@ void clsItem::calculateSizes(bool pSizeGiven)
 	{
 		minSizeX = 0;
 		minSizeY = 0;
-		resize(minSizeX,minSizeY);
+		resize(minSizeX, minSizeY);
 	}
 }
 
@@ -109,6 +117,83 @@ void clsItem::calculateSizes(bool pSizeGiven)
   */
 LRESULT clsItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	switch (msg)
+	{
+	case WM_LBUTTONDOWN:
+		mouseDown = true;
+		mouseButton |= MK_LBUTTON;
+		break;
+	case WM_RBUTTONDOWN:
+		mouseDown = true;
+		mouseButton |= MK_RBUTTON;
+		break;
+	case WM_MBUTTONDOWN:
+		mouseDown = true;
+		mouseButton |= MK_MBUTTON;
+		break;
+	case WM_XBUTTONDOWN:
+		mouseDown = true;
+		switch (HIWORD(wParam))
+		{
+		case XBUTTON1:
+			mouseButton |= MK_XBUTTON1;
+			break;
+		case XBUTTON2:
+			mouseButton |= MK_XBUTTON2;
+			break;
+		}
+		break;
+	case WM_LBUTTONUP:
+		if (mouseDown && (mouseButton & MK_LBUTTON))
+		{
+			mouseButton = 0;
+			mouseDown = false;
+			if (leftClick)
+				leftClick(this, msg, wParam, lParam);
+		}
+		break;
+	case WM_RBUTTONUP:
+		if (mouseDown && (mouseButton & MK_RBUTTON))
+		{
+			mouseButton = 0;
+			mouseDown = false;
+			if (rightClick)
+				rightClick(this, msg, wParam, lParam);
+		}
+		break;
+	case WM_MBUTTONUP:
+		if (mouseDown && (mouseButton & MK_MBUTTON))
+		{
+			mouseButton = 0;
+			mouseDown = false;
+			if (midClick)
+				midClick(this, msg, wParam, lParam);
+		}
+		break;
+	case WM_XBUTTONUP:
+		switch (HIWORD(wParam))
+		{
+		case XBUTTON1:
+			if (mouseDown && (mouseButton & MK_XBUTTON1))
+			{
+				mouseButton = 0;
+				mouseDown = false;
+				if (X1Click)
+					X1Click(this, msg, wParam, lParam);
+			}
+			break;
+		case XBUTTON2:
+			if (mouseDown && (mouseButton & MK_XBUTTON2))
+			{
+				mouseButton = 0;
+				mouseDown = false;
+				if (X2Click)
+					X2Click(this, msg, wParam, lParam);
+			}
+			break;
+		}
+		break;
+	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
@@ -151,18 +236,18 @@ void clsItem::initTooltips()
 	InitCommonControlsEx(&ic);
 
 	tooltipWnd = CreateWindowEx(
-		WS_EX_TOPMOST,
-		TOOLTIPS_CLASS,
-		NULL,
-		WS_POPUP | TTS_ALWAYSTIP | TTS_NOPREFIX,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		barWnd,
-		NULL,
-		hInstance,
-		NULL);
+					 WS_EX_TOPMOST,
+					 TOOLTIPS_CLASS,
+					 NULL,
+					 WS_POPUP | TTS_ALWAYSTIP | TTS_NOPREFIX,
+					 CW_USEDEFAULT,
+					 CW_USEDEFAULT,
+					 CW_USEDEFAULT,
+					 CW_USEDEFAULT,
+					 barWnd,
+					 NULL,
+					 hInstance,
+					 NULL);
 
 	SetWindowPos(tooltipWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 
@@ -171,6 +256,17 @@ void clsItem::initTooltips()
 	SendMessage(tooltipWnd, TTM_SETDELAYTIME, TTDT_AUTOPOP, 5000);
 	SendMessage(tooltipWnd, TTM_SETDELAYTIME, TTDT_INITIAL,  120);
 	SendMessage(tooltipWnd, TTM_SETDELAYTIME, TTDT_RESHOW,    60);
+}
+
+/** draw
+  *@todo document
+  */
+void clsItem::draw(HDC pContext)
+{
+	if (style && RectVisible(pContext, &itemArea))
+	{
+		MakeStyleGradient(pContext, &itemArea, bbStyle.getStyle(style), bbStyle.getStyleBorder(style));
+	}
 }
 
 

@@ -9,8 +9,7 @@ typedef BOOL(*fnTrayIconEvent)(HWND, UINT, UINT, WPARAM, LPARAM);
 class clsTrayItem : public clsIconItem
 {
 	public:
-		clsTrayItem(systemTray *trayItem, bool pVertical);
-		virtual ~clsTrayItem();
+		clsTrayItem(systemTray *trayItem, UINT pIconSize, bool pVertical);
 
 		virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	protected:

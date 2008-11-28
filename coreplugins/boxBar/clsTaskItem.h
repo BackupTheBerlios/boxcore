@@ -12,19 +12,16 @@ class clsTaskItem : public clsItemCollection
 {
 	public:
 		clsTaskItem(tasklist *pTask, bool pVertical);
-		virtual ~clsTaskItem();
 
 		virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-		virtual void draw(HDC pContext);
 	protected:
 		HWND taskWnd;
 		TCHAR caption[256];
 
 		clsTextItem *captionItem;
 		clsIconItem *iconItem;
-
-		int style;
 	private:
+		static void activateTask(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
 };
 
 #endif // CLSTASKITEM_H

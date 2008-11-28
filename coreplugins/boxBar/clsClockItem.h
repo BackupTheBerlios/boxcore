@@ -15,6 +15,7 @@ class clsClockItem : public clsLabelItem
 		UINT ClockTimer;
 		TCHAR clockFormat[256];
 	private:
+		static void showMenu(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
 };
 
 #endif // CLSCLOCKITEM_H

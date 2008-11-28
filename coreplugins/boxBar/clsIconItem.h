@@ -7,8 +7,7 @@
 class clsIconItem : public clsItem
 {
 	public:
-		clsIconItem(HICON pIcon, int pSize, bool pVertical);
-		virtual ~clsIconItem();
+		clsIconItem(HICON pIcon, UINT pSize, bool pVertical);
 
 		void setIcon(HICON pIcon);
 
@@ -16,7 +15,7 @@ class clsIconItem : public clsItem
 		virtual void calculateSizes(bool pSizeGiven = false);
 	protected:
 		HICON icon;
-		int iconSize;
+		UINT iconSize;
 	private:
 };
 

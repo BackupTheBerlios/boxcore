@@ -1,11 +1,15 @@
 #include "BBApi.h"
 #include "clsTextItem.h"
+#include <tchar.h>
 
 clsTextItem::clsTextItem(TCHAR *pText, UINT pStyle, bool pVertical): clsItem(pVertical)
 {
 	fixed = DIM_VERTICAL;
 	fontStyle = pStyle;
-	_tcscpy(text,pText);
+	if (pText)
+		_tcscpy(text,pText);
+	else
+		text[0] = TEXT('\0');
 }
 
 clsTextItem::~clsTextItem()
@@ -19,6 +23,7 @@ clsTextItem::~clsTextItem()
   */
 void clsTextItem::draw(HDC pContext)
 {
+	clsItem::draw(pContext);
 	if (RectVisible(pContext, &itemArea))
 	{
 		SetBkMode(pContext, TRANSPARENT);

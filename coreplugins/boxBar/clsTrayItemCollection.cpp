@@ -8,6 +8,7 @@ clsTrayItemCollection::clsTrayItemCollection(bool pVertical):clsItemCollection(p
 	spacingBorder = 0;
 	spacingItems = 2;
 	vertical = ReadBool(configFile, "boxBar.tray.vertical:", vertical);
+	iconSize = ReadInt(configFile, "boxBar.tray.iconsize:", 16);
 	numRowCols = 4;
 
 	populateTray();
@@ -62,13 +63,13 @@ void clsTrayItemCollection::populateTray()
 		systemTray *trayItem = GetTrayIcon(i);
 		if (numRowCols > 0)
 		{
-			((clsItemCollection*)(*column))->addItem(new clsTrayItem(trayItem, vertical));
+			((clsItemCollection*)(*column))->addItem(new clsTrayItem(trayItem, iconSize, vertical));
 			column++;
 			if (column == itemList.end())
 				column = itemList.begin();
 		}
 		else
-			addItem(new clsTrayItem(trayItem, vertical));
+			addItem(new clsTrayItem(trayItem, iconSize, vertical));
 	}
 	if (numRowCols > 0)
 	{

@@ -14,7 +14,6 @@ class clsBar : public clsItemCollection
 		clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical = false);
 		virtual ~clsBar();
 		virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-		virtual void draw(HDC pContext);
 		static LRESULT CALLBACK realWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		virtual void calculateSizes(bool pSizeGiven = true);
 

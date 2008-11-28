@@ -22,6 +22,7 @@ clsItemCollection::~clsItemCollection()
   */
 void clsItemCollection::draw(HDC pContext)
 {
+	clsItem::draw(pContext);
 	if (RectVisible(pContext, &itemArea))
 		for (list< clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
 		{

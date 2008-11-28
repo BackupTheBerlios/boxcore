@@ -13,6 +13,7 @@ class clsTrayItemCollection : public clsItemCollection
 	protected:
 		virtual void populateTray();
 
+		UINT iconSize;
 		int numRowCols;
 	private:
 };

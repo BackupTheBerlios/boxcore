@@ -51,66 +51,43 @@ LPCSTR szInfoRelDate    =  __DATE__ ;
 LPCSTR szInfoLink       = PLUGININFO_URL;
 LPCSTR szInfoEmail      = PLUGININFO_EMAIL;
 
-// ----------------------------------
-// The About MessageBox
-
-
-//*****************************************************************************
-// utilities
-//===========================================================================
-
-//===========================================================================
-// The startup interface
-
 int beginSlitPlugin(HINSTANCE hPluginInstance, HWND hSlit)
 {
 	return boxBar.beginPluginEx(hPluginInstance, hSlit);
 }
-
-//===========================================================================
-// xoblite type slit interface
 
 int beginPluginEx(HINSTANCE hPluginInstance, HWND hSlit)
 {
 	return boxBar.beginPluginEx(hPluginInstance, hSlit);
 }
 
-// no-slit interface
 int beginPlugin(HINSTANCE hPluginInstance)
 {
 	return boxBar.beginPluginEx(hPluginInstance, NULL);
 }
 
-//===========================================================================
-// on unload...
-
 void endPlugin(HINSTANCE hPluginInstance)
 {
 	boxBar.endPlugin(hPluginInstance);
-	dbg_printf("Real end of endplugin");
 }
-
-//===========================================================================
-// pluginInfo is used by Blackbox for Windows to fetch information about
-// a particular plugin.
 
 LPCSTR pluginInfo(int field)
 {
 	switch (field)
 	{
 	case PLUGIN_NAME:
-		return szAppName;       // Plugin name
+		return szAppName;
 	case PLUGIN_VERSION:
-		return szInfoVersion;   // Plugin version
+		return szInfoVersion;
 	case PLUGIN_AUTHOR:
-		return szInfoAuthor;    // Author
+		return szInfoAuthor;
 	case PLUGIN_RELEASE:
-		return szInfoRelDate;   // Release date, preferably in yyyy-mm-dd format
+		return szInfoRelDate;
 	case PLUGIN_LINK:
-		return szInfoLink;      // Link to author's website
+		return szInfoLink;
 	case PLUGIN_EMAIL:
-		return szInfoEmail;     // Author's email
+		return szInfoEmail;
 	default:
-		return szVersion;       // Fallback: Plugin name + version, e.g. "MyPlugin 1.0"
+		return szVersion;
 	}
 }

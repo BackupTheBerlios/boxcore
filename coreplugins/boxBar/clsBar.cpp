@@ -1,8 +1,8 @@
 #include "BBApi.h"
 #include "clsBar.h"
+#include "clsClockItem.h"
 #include "clsTrayItemCollection.h"
 #include "clsTaskItemCollection.h"
-#include "clsClockItem.h"
 #include "clsFlexiSpacer.h"
 
 #include <shellapi.h>
@@ -13,6 +13,7 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 	trackMouse = false;
 	hInstance = pInstance;
 	_tcscpy(className, pClassName);
+	style = SN_TOOLBAR;
 	WNDCLASS wc;
 	ZeroMemory(&wc, sizeof wc);
 
@@ -435,16 +436,6 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 
 	return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
-}
-
-/** @brief draw
-  *
-  * @todo: document this function
-  */
-void clsBar::draw(HDC pContext)
-{
-	MakeStyleGradient(pContext, &itemArea, bbStyle.getStyle(SN_TOOLBAR), true);//bbStyle.getStyleBorder(SN_TOOLBAR));
-	clsItemCollection::draw(pContext);
 }
 
 /** @brief resize

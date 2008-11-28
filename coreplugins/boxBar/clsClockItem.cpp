@@ -11,6 +11,7 @@ clsClockItem::clsClockItem(bool pVertical): clsLabelItem(pVertical)
 #else
 	strcpy(clockFormat, tempClockFormat);
 #endif
+	rightClick = showMenu;
 	time_t systemTime;
 	time(&systemTime);
 	struct tm *ltp = localtime(&systemTime);
@@ -61,10 +62,16 @@ LRESULT clsClockItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			calculateSizes();
 			return 0;
 		}
-	default:
-		return clsLabelItem::wndProc(hWnd, msg, wParam, lParam);
 	}
 
 	return clsLabelItem::wndProc(hWnd, msg, wParam, lParam);
 }
 
+/** @brief showMenu
+  *
+  * @todo: document this function
+  */
+void clsClockItem::showMenu(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	PostMessage(hBlackboxWnd, BB_BROADCAST, 0, (LPARAM)"@bbCore.ShowMenu");
+}
