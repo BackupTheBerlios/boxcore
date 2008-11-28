@@ -1,4 +1,6 @@
 #include "clsSystemTray.h"
+#include "../../dynwinapi/clsShlwapi.h"
+#include "../../dynwinapi/clsUser32.h"
 
 #ifndef MSGFLT_ADD
 #define MSGFLT_ADD 1
@@ -35,6 +37,9 @@
 #ifndef NIN_POPUPCLOSE
 #define NIN_POPUPCLOSE 0x00000407
 #endif
+
+clsShlwapi shlwapi;
+clsUser32 user32;
 
 //Recieved from XP onwards (lParam member is 64 bits)
 struct APPBARDATA_64
@@ -338,10 +343,12 @@ LRESULT CALLBACK clsSystemTray::trayWndProc(HWND hwnd, UINT message, WPARAM wPar
 		case 0:
 			return 1;
 		case 5:
-			appbarMsg.abd = (APPBARDATA_32 *)SHLockShared(appbarMsg.hSharedMemory, appbarMsg.dwSourceProcessID);
+			if (shlwapi.SHLockShared)
+			appbarMsg.abd = (APPBARDATA_32 *)shlwapi.SHLockShared(appbarMsg.hSharedMemory, appbarMsg.dwSourceProcessID);
 			SetRect(&appbarMsg.abd->rc, barLeft, barTop, barRight, barBottom);
 			appbarMsg.abd->uEdge = barEdge;
-			SHUnlockShared(appbarMsg.abd);
+			if (shlwapi.SHUnlockShared)
+			shlwapi.SHUnlockShared(appbarMsg.abd);
 			//MessageBox(NULL,"Giving out taskbar position","Appbar debug",MB_OK);
 			return 1;
 			break;
@@ -769,10 +776,10 @@ BOOL clsSystemTray::TrayIconEvent(HWND ownerHwnd, UINT iconID, UINT msg, WPARAM 
 	clsTrayItem *trayItem = lookupIcon(ownerHwnd, iconID);
 	DWORD pid;
 	if (WM_MOUSEMOVE != msg
-	//		&& pAllowSetForegroundWindow
+			&& user32.AllowSetForegroundWindow
 			&& GetWindowThreadProcessId(ownerHwnd, &pid))
 	{
-		AllowSetForegroundWindow(pid);
+		user32.AllowSetForegroundWindow(pid);
 	}
 	if (trayItem)
 	{

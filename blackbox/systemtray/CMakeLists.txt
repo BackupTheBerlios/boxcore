@@ -5,6 +5,9 @@
 set (SYSTEMTRAY_SRCS
 clsSystemTray.cpp
 clsTrayItem.cpp
+
+../../dynwinapi/clsShlwapi.cpp
+../../dynwinapi/clsUser32.cpp
 )
 
 add_library (systemtray STATIC ${SYSTEMTRAY_SRCS})
