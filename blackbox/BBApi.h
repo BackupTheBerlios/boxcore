@@ -36,9 +36,6 @@
 
 #ifdef __GNUC__
   #define _WIN32_IE 0x0501
-  #ifndef __BBCORE__
-	//#define GetBlackboxPath _GetBlackboxPath
-  #endif
 #endif
 
 #ifdef __BORLANDC__
@@ -55,7 +52,7 @@
 /*------------------------------------------ */
 
 #define WIN32_LEAN_AND_MEAN
-#define WINVER 0x0500
+#define WINVER 0x0502
 #include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
