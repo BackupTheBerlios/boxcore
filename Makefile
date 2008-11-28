@@ -1,9 +1,9 @@
 all:
-#	$(MAKE) -C build32
+	$(MAKE) -C build32
 	$(MAKE) -C build64
 
 cmake:
-#	cmake build32
+	cmake build32
 	cmake build64
 
 doc:
