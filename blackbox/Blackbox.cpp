@@ -257,7 +257,7 @@ void broadcastMod()
 void bb_about(void)
 {
 	BBMessageBox(MB_OK,
-	"%s - © 2003-2005 grischka"
+	"%s - © 2003-2005 grischka, © 2008 carsomyr"
 	"\n%s",
 	GetBBVersion(),
 	NLS2("$BBAbout$",

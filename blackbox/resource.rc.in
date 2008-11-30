@@ -75,8 +75,8 @@ IDC_MOVEMENU CURSOR DISCARDABLE "Menu/MoveMenu.cur"
 //
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION 0,1,16,0
-PRODUCTVERSION 0,1,16,0
+FILEVERSION ${VERSION_MAJOR},${VERSION_MINOR},${VERSION_PATCH},${VERSION_BUILD}
+PRODUCTVERSION ${VERSION_MAJOR},${VERSION_MINOR},${VERSION_PATCH},${VERSION_BUILD}
 FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
 FILEFLAGS 0x1L
@@ -99,14 +99,14 @@ BEGIN
 
 			//VALUE "CompanyName", "Blackbox for Windows"
 			VALUE "FileDescription", "Blackbox for Windows"
-			VALUE "FileVersion", "bbLean 1.16.1 (bbClean SVN, Carsomyr refactoring build)"
+			VALUE "FileVersion", "bbLean ${VERSION}"
 			//VALUE "InternalName", "Blackbox"
-			VALUE "LegalCopyright", "Copyright © 2003-2005 grischka"
+			VALUE "LegalCopyright", "Copyright © 2003-2005 grischka, © 2008 carsomyr"
 			//VALUE "LegalTrademarks", "none"
 			VALUE "OriginalFilename", "blackbox.exe"
 			//VALUE "PrivateBuild", "none"
 			VALUE "ProductName", "Blackbox for Windows"
-			VALUE "ProductVersion", "bbLean 1.16.1 (bbClean)"
+			VALUE "ProductVersion", "bbLean ${VERSION}"
 			//VALUE "SpecialBuild", "none"
 		END
 	END

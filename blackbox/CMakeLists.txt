@@ -49,15 +49,29 @@ config/shellfolders.rc
 config/stickywindows.ini
 )
 
+set (VERSION_MAJOR 0)
+set (VERSION_MINOR 1)
+set (VERSION_PATCH 0)
+set (VERSION_BUILD 0)
+
+set (PLUGININFO_NAME ${PROJECT_NAME})
+set (VERSION "(boxCore ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})")
+set (PLUGININFO_AUTHOR Carsomyr)
+set (PLUGININFO_URL http://developer.berlios.de/projects/boxcore/)
+set (PLUGININFO_EMAIL "carsomyr@users.berlios.de")
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resource.rc.in
+${CMAKE_CURRENT_BINARY_DIR}/resource.rc)
+
 if(MINGW)
   # resource compilation for mingw
   ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/resource.o
                      COMMAND ${WINDRES} -I${CMAKE_CURRENT_SOURCE_DIR}
-                                         -i${CMAKE_CURRENT_SOURCE_DIR}/resource.rc
+                                         -i${CMAKE_CURRENT_BINARY_DIR}/resource.rc
                                          -o ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
   SET(BLACKBOX_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
 else(MINGW)
-  SET(BLACKBOX_RESOURCES resource.rc)
+  SET(BLACKBOX_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/resource.rc)
 endif(MINGW)
 
 add_executable (blackbox ${BLACKBOX_CORE_SRCS} ${BLACKBOX_MENU_SRCS} ${BLACKBOX_NEW_SRCS} ${BLACKBOX_RESOURCES})
