@@ -18,3 +18,4 @@ Doxyfile
 *.project
 *.svn*
 */version.h
+*/resource.rc
