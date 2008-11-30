@@ -14,6 +14,10 @@ package:
 	$(MAKE) package -C build32
 	$(MAKE) package -C build64
 
+package_source:
+#	$(MAKE) package_source -C build32
+	$(MAKE) package_source -C build64
+
 clean:
-#	$(MAKE) clean -C build32
+	$(MAKE) clean -C build32
 	$(MAKE) clean -C build64
