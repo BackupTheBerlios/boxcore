@@ -50,4 +50,4 @@ session.imageDither:                    true
 
 # - menu & style -
 session.menufile:                       menu.rc
-session.styleFile:                      C:\Blackbox64\styles\0505 all blue\!my
+session.styleFile:                      styles\dark-ego

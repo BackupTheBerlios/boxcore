@@ -1,5 +1,5 @@
 # ---------------------------------------------
-# bblean 1.16 - plugin.rc - the plugins to load
+# boxCore 0.1.0 - plugin.rc - the plugins to load
 
 # - Items may be added, enabled or disabled from
 # - the config menu as needed. Removal is left to
@@ -9,8 +9,8 @@
 plugins\bbKeys\bbKeys.dll
 
 # - integrated toolbar with tasks and tray
-plugins\bbLeanBar\bbLeanBar.dll
+! plugins\bbLeanBar\bbLeanBar.dll
+plugins\boxBar\boxBar.dll
 
 # - Lean window skinner
-! plugins\bbLeanSkin\bbLeanSkin.dll
-! plugins\bbDeskMinimize\bbDeskMinimize.dll
+#! plugins\bbLeanSkin\bbLeanSkin.dll
