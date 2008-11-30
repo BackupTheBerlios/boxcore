@@ -1,6 +1,12 @@
 #include "clsItem.h"
 #include "commctrl.h"
 
+/** @brief Base constructor
+  *
+  * @param[in] pVertical Sets if this item is vertical or not
+  *
+  * Initializes all members to safe values, and sets an items vertical state as requested
+  */
 clsItem::clsItem(bool pVertical)
 {
 	vertical = pVertical;
@@ -20,15 +26,19 @@ clsItem::clsItem(bool pVertical)
 	X2Click = NULL;
 }
 
+/** @brief Base destructor
+  *
+  * Removes the tooltip, if it was set.
+  */
 clsItem::~clsItem()
 {
 	if (tipText)
 		setTooltip(NULL);
 }
 
-/** @brief hitTest
+/** @brief Test if point is within the item
   *
-  * @todo: document this function
+  * For use on mouse events, when it is neccesary to determine if an item was clicked
   */
 bool clsItem::hitTest(int pX, int pY)
 {
@@ -38,13 +48,13 @@ bool clsItem::hitTest(int pX, int pY)
 		return false;
 }
 
-/** @brief move
+/** @brief Base moving function for items
   *
-  * @todo: document this function
+  * Moves the item without any checks. Also moves the tootip location if one is set.
+  * @todo This currently triggers a redraw at the new item area. Is this really needed?
   */
 void clsItem::move(int pX, int pY)
 {
-	//OutputDebugString(TEXT("Moved"));
 	int sizeX = itemArea.right - itemArea.left;
 	int sizeY = itemArea.bottom - itemArea.top;
 	itemArea.left = pX;
@@ -56,17 +66,18 @@ void clsItem::move(int pX, int pY)
 	InvalidateRect(barWnd, &itemArea, TRUE);
 }
 
-/** @brief resize
+/** @brief Base resizing funtion for items
   *
-  * @todo: document this function
+  * @param[in] pX The desired horizontal size
+  * @param[in] pY The desired vertical size
+  * @return Return the direcctions in which resizing actually occurred
+  *
+  * Resizes the item if the requested size is not negative.This allows a negative size
+  * to be used to indicate that the old  size should be kept for that dimension.
   */
 dimType clsItem::resize(int pX, int pY)
 {
 	dimType done = DIM_NONE;
-	if (minSizeX < 0)
-		minSizeX = 0;
-	if (minSizeY < 0)
-		minSizeY = 0;
 	if (pX >= 0)
 	{
 		itemArea.right = itemArea.left + pX;
@@ -80,9 +91,11 @@ dimType clsItem::resize(int pX, int pY)
 	return done;
 }
 
-/** @brief getSize
+/** @brief Retrieve the size of an item
   *
-  * @todo: document this function
+  * @param[in] pDim The dimension of the size to return
+  *
+  * Returns the vertical or horizontal size of the item, as requested.
   */
 int clsItem::getSize(dimType pDim)
 {
@@ -97,9 +110,13 @@ int clsItem::getSize(dimType pDim)
 	}
 }
 
-/** @brief calculateSizes
+/** @brief Base sizing funtion for items
   *
-  * @todo: document this function
+  * @param[in] pSizegiven Indicates whether the size of the item has been set externally
+  *
+  * This base implementation sets the minimum size to 0 in both dimensions and then resizes
+  * the item to that size. Calculations and sizing are only performed when the size
+  * was not set externally.
   */
 void clsItem::calculateSizes(bool pSizeGiven)
 {
@@ -258,8 +275,10 @@ void clsItem::initTooltips()
 	SendMessage(tooltipWnd, TTM_SETDELAYTIME, TTDT_RESHOW,    60);
 }
 
-/** draw
-  *@todo document
+/** @brief Base drawing function for items
+  *
+  * If the item has a style set, draws the stylegradient in the item area. Drawing is only performed
+  * if the item area falls within the update area.
   */
 void clsItem::draw(HDC pContext)
 {
