@@ -1,10 +1,6 @@
 #ifndef CLSAPILOADER_H
 #define CLSAPILOADER_H
 #include <windows.h>
-#include <string>
-
-using std::string;
-using std::wstring;
 
 class clsApiLoader
 {
@@ -13,8 +9,8 @@ class clsApiLoader
 		virtual ~clsApiLoader();
 
 		void freeLibrary();
-		bool requestApiPresence(wstring);
-		FARPROC requestApiPointer(string);
+		bool requestApiPresence(TCHAR *pIdentifier);
+		FARPROC requestApiPointer(CHAR *pApiName);
 	protected:
 	private:
 		HMODULE hBlackbox;

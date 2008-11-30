@@ -140,9 +140,9 @@ struct barinfo : plugin_info
 {
 	barinfo()
 	{
-		if (ApiLoader.requestApiPresence(L"boxCore::hasTrayIconEvent"));
+		if (ApiLoader.requestApiPresence(TEXT("boxCore::hasTrayIconEvent")));
 			TrayIconEvent = (fnTrayIconEvent)ApiLoader.requestApiPointer("TrayIconEvent");
-		if (ApiLoader.requestApiPresence(L"boxCore::hasSetTaskbarPos"));
+		if (ApiLoader.requestApiPresence(TEXT("boxCore::hasSetTaskbarPos")));
 			SetTaskbarPos = (fnSetTaskbarPos)ApiLoader.requestApiPointer("SetTaskbarPos");
 	}
 

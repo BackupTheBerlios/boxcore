@@ -10,12 +10,12 @@ clsApiLoader::~clsApiLoader()
 
 }
 
-bool clsApiLoader::requestApiPresence(wstring pIdentifier)
+bool clsApiLoader::requestApiPresence(TCHAR *pIdentifier)
 {
-	return GlobalFindAtomW(pIdentifier.c_str());
+	return GlobalFindAtom(pIdentifier);
 }
 
-FARPROC clsApiLoader::requestApiPointer(string pApiName)
+FARPROC clsApiLoader::requestApiPointer(CHAR *pApiName)
 {
 	if (!hBlackbox)
 	{
@@ -23,7 +23,7 @@ FARPROC clsApiLoader::requestApiPointer(string pApiName)
 		if (hBlackbox == NULL)
 			return NULL;
 	}
-	return GetProcAddress(hBlackbox, pApiName.c_str());
+	return GetProcAddress(hBlackbox, pApiName);
 }
 
 /** @brief freeLibrary
