@@ -53,7 +53,7 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 	}
 
 	barWnd = CreateWindowEx(
-				 WS_EX_TOOLWINDOW,   // window ex-style
+				 WS_EX_TOOLWINDOW | WS_EX_TOPMOST,   // window ex-style
 				 pClassName,          // window class name
 				 NULL,               // window caption text
 				 WS_POPUP | WS_OVERLAPPED, // window style
@@ -71,32 +71,8 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 	spacingBorder = 3;
 	spacingItems = 2;
 
+	populateBar();
 
-	const CHAR * barItems = ReadString(configFile, "boxBar.items:", "tray, clock");
-	CHAR barItem[MAX_PATH];
-	do
-	{
-		barItems = Tokenize(barItems, barItem, ",");
-		if (!stricmp(barItem, "tray"))
-		{
-			addItem(new clsTrayItemCollection(vertical));
-		}
-		else if (!stricmp(barItem, "clock"))
-		{
-			addItem(new clsClockItem(vertical));
-		}
-		else if (!stricmp(barItem, "flexispace"))
-		{
-			addItem(new clsFlexiSpacer(vertical));
-		}
-		else if (!stricmp(barItem, "tasks"))
-		{
-			addItem(new clsTaskItemCollection(vertical));
-		}
-	}
-	while (strlen(barItems));
-
-	calculateSizes();
 }
 
 clsBar::~clsBar()
@@ -185,7 +161,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case BOXBAR_UPDATESIZE:
 		calculateSizes();
 		break;
-		/*
+
 
 			// ----------------------------------------------------------
 			// Blackbox sends Broams to all windows...
@@ -193,9 +169,23 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case BB_BROADCAST:
 		{
 			const char *msg_string = (LPCSTR)lParam;
-
+			dbg_printf(msg_string);
+			if (!strnicmp(msg_string, "@boxBar.percentage", strlen("@boxBar.percentage")))
+			{
+				sizePercentage = atoi(msg_string+strlen("@boxBar.percentage"));
+				WriteInt(configFile, "boxBar.percentage:", sizePercentage);
+				calculateSizes();
+			}
+			else if (!strnicmp(msg_string, "@boxBar.vertical", strlen("@boxBar.vertical")))
+			{
+				vertical = !vertical;
+				WriteBool(configFile, "boxBar.vertical:", vertical);
+				populateBar();
+			}
+			break;
+		}
 			// check general broams
-			if (!stricmp(msg_string, "@BBShowPlugins"))
+			/*if (!stricmp(msg_string, "@BBShowPlugins"))
 			{
 				if (my.is_hidden)
 				{
@@ -416,6 +406,16 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			PostMessage(hWnd, WM_SYSCOMMAND, SC_MOVE | 2, 0);
 			return 0;
 		}
+		break;
+	case WM_RBUTTONDOWN:
+		if (wParam & MK_CONTROL)
+		{
+			dbg_printf("Config menu");
+			configMenu();
+			return 0;
+		}
+		dbg_printf("Pass on click");
+		break;
 	case WM_MOUSELEAVE:
 		trackMouse = false;
 		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
@@ -491,6 +491,61 @@ void clsBar::calculateSizes(bool pSizeGiven)
 	if (margin)
 		SetDesktopMargin(barWnd, marginEdge, margin);
 }
+
+/** @brief populateBar
+  *
+  * @todo: document this function
+  */
+void clsBar::populateBar()
+{
+	lastMouse = NULL;
+	for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+	{
+		delete (*i);
+	}
+	itemList.clear();
+
+const CHAR * barItems = ReadString(configFile, "boxBar.items:", "tasks,tray, clock");
+	CHAR barItem[MAX_PATH];
+	do
+	{
+		barItems = Tokenize(barItems, barItem, ",");
+		if (!stricmp(barItem, "tray"))
+		{
+			addItem(new clsTrayItemCollection(vertical));
+		}
+		else if (!stricmp(barItem, "clock"))
+		{
+			addItem(new clsClockItem(vertical));
+		}
+		else if (!stricmp(barItem, "flexispace"))
+		{
+			addItem(new clsFlexiSpacer(vertical));
+		}
+		else if (!stricmp(barItem, "tasks"))
+		{
+			addItem(new clsTaskItemCollection(vertical));
+		}
+	}
+	while (strlen(barItems));
+
+	calculateSizes();
+}
+
+/** @brief configMenu
+  *
+  * @todo: document this function
+  */
+void clsBar::configMenu()
+{
+	Menu *mainMenu = MakeNamedMenu("boxBar", "boxBar", true);
+	Menu *subMenu = MakeNamedMenu("Bar", "Bar", true);
+	MakeSubmenu(mainMenu, subMenu, "Bar");
+	MakeMenuItemInt(subMenu, "Percentage Size", "@boxBar.percentage", sizePercentage, 0, 100);
+	MakeMenuItem(subMenu, "Vertical", "@boxBar.vertical", vertical);
+	ShowMenu(mainMenu);
+}
+
 
 
 

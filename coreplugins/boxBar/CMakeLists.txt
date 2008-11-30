@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.6)
-project ("boxBar")
+project (boxBar)
 
 set (BOXBAR_SRCS
 boxBar.cpp
@@ -39,8 +39,8 @@ set (VERSION_PATCH 0)
 set (PLUGININFO_NAME ${PROJECT_NAME})
 set (PLUGININFO_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 set (PLUGININFO_AUTHOR Carsomyr)
-set (PLUGININFO_URL http://nonsense)
-set (PLUGININFO_EMAIL "carsomyr@users.sourceforge.net")
+set (PLUGININFO_URL http://developer.berlios.de/projects/boxcore/)
+set (PLUGININFO_EMAIL "carsomyr@users.berlios.de")
 
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/version.h)
 
@@ -56,6 +56,6 @@ set_target_properties (boxBar PROPERTIES
 )
 
 install(TARGETS boxBar LIBRARY DESTINATION plugins/${PROJECT_NAME} COMPONENT ${PROJECT_NAME})
-#install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/config/bbLeanBar.rc DESTINATION plugins/${PROJECT_NAME} COMPONENT ${PROJECT_NAME}Config)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/config/boxBar.rc DESTINATION plugins/${PROJECT_NAME} COMPONENT ${PROJECT_NAME}Config)
 
 set (CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_CURRENT_BINARY_DIR};${PROJECT_NAME};ALL;/" PARENT_SCOPE)

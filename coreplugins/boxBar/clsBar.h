@@ -19,6 +19,8 @@ class clsBar : public clsItemCollection
 
 		virtual dimType resize(int pX, int pY);
 	protected:
+		void populateBar();
+		void configMenu();
 	private:
 		TCHAR className[100];
 		bool moving;

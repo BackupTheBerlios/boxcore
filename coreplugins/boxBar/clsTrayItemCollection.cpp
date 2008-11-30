@@ -9,7 +9,10 @@ clsTrayItemCollection::clsTrayItemCollection(bool pVertical):clsItemCollection(p
 	spacingItems = 2;
 	vertical = ReadBool(configFile, "boxBar.tray.vertical:", vertical);
 	iconSize = ReadInt(configFile, "boxBar.tray.iconsize:", 16);
-	numRowCols = 4;
+	if (vertical)
+		numRowCols = ReadInt(configFile, "boxBar.tray.maxRows:", 0);
+	else
+		numRowCols = ReadInt(configFile, "boxBar.tray.maxCols:", 0);
 
 	populateTray();
 }
