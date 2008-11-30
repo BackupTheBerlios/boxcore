@@ -1,0 +1,8 @@
+boxBar.x: 0
+boxBar.y: 0
+boxBar.vertical: true
+boxBar.items: tasks,tray,clock
+boxBar.percentage: 100
+
+boxBar.tray.vertical: false
+boxBar.tray.maxCols: 5
