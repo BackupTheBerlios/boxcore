@@ -128,9 +128,10 @@ void clsItem::calculateSizes(bool pSizeGiven)
 	}
 }
 
-/** @brief wndProc
+/** @brief Base window procedure for items
   *
-  * @todo: document this function
+  * Handles mouse button messages and runs handlers if installed when
+  * a click is detected. Passes all other message to DefWindowProc
   */
 LRESULT clsItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -214,9 +215,12 @@ LRESULT clsItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-/** @brief setTooltip
+/** @brief Sets a tooltip for this item
   *
-  * @todo: document this function
+  * Tooltip is set so it is triggered anywhere in the item area. We use the @b this pointer
+  * as id, so we don't need extra storage to know which tooltip is ours. When called for the first time
+  * in a plugin we call initTooltips to create a tooltip window to handle requests.
+  * @todo: Fix this so we don't pass in our own member each time ;)
   */
 void clsItem::setTooltip(TCHAR *pText)
 {
@@ -240,9 +244,11 @@ void clsItem::setTooltip(TCHAR *pText)
 		SendMessage(tooltipWnd, TTM_DELTOOL, 0, (LPARAM)&toolInfo);
 }
 
-/** @brief initTooltips
-  * Copied from bbLeanbar
-  * @todo: document this function
+/** @brief Create a tooltip control for use by items
+  *
+  * This function creates a tooltip control window and then sets the parameter for that
+  * window to values that are suitable for our use.
+  * @note This is copied verbatim from bbLeanBars tooltip initalisation
   */
 void clsItem::initTooltips()
 {
