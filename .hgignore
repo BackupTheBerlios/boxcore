@@ -19,3 +19,4 @@ Doxyfile
 *.svn*
 */version.h
 */resource.rc
+packages/*

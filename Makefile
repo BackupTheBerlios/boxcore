@@ -14,6 +14,11 @@ package:
 	$(MAKE) package -C build32
 	$(MAKE) package -C build64
 
+boxbar-package:
+	mkdir -p packages
+	cd packages; cpack --config ../build32/coreplugins/boxBar/CPackConfig.cmake
+	cd packages; cpack --config ../build64/coreplugins/boxBar/CPackConfig.cmake
+
 package_source:
 #	$(MAKE) package_source -C build32
 	$(MAKE) package_source -C build64
