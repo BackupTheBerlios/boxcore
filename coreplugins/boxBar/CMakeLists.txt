@@ -34,7 +34,7 @@ clsBar.cpp
 
 set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
-set (VERSION_PATCH 0)
+set (VERSION_PATCH 1)
 
 set (AUTHOR Carsomyr)
 
@@ -46,7 +46,6 @@ set (PLUGININFO_EMAIL "carsomyr@users.berlios.de")
 
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/version.h)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/CPackConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/CPackConfig.cmake)
-#configure_file (${CMAKE_CURRENT_SOURCE_DIR}/CPackSourceConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/CPackSourceConfig.cmake)
 
 add_library(boxBar MODULE ${BOXBAR_SRCS})
 include_directories(boxBar ../../blackbox)
