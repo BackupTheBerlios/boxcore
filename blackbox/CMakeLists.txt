@@ -96,7 +96,7 @@ add_subdirectory (shellserviceobjects)
 add_subdirectory (systemtray)
 
 install(TARGETS blackbox RUNTIME DESTINATION . COMPONENT Blackbox)
-install (FILES ${CMAKE_CURRENT_BINARY_DIR}/blackbox.exe.manifest DESTINATION . COMPONENT Blackbox)
+#install (FILES ${CMAKE_CURRENT_BINARY_DIR}/blackbox.exe.manifest DESTINATION . COMPONENT Blackbox)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/${BLACKBOX_CONFIG} DESTINATION . COMPONENT BlackboxConfig)
 
 set (CPACK_COMPONENTS_ALL Blackbox BlackboxConfig PARENT_SCOPE)

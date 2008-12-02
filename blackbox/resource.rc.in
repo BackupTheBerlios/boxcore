@@ -35,6 +35,10 @@
 
 #define IDI_BLACKBOX 101
 #define IDC_MOVEMENU 102
+#define RT_MANIFEST 24
+#define APP_MANIFEST 1
+
+APP_MANIFEST RT_MANIFEST blackbox.exe.manifest
 
 /////////////////////////////////////////////////////////////////////////////
 //
