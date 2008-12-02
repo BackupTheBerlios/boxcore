@@ -8,11 +8,7 @@ clsTaskItemCollection::clsTaskItemCollection(bool pVertical): clsItemCollection(
 	spacingBorder = 0;
 	spacingItems = 2;
 
-	stretchTaskarea = ReadBool(configFile, "boxBar.stretchTaskarea:", true);
-	if (stretchTaskarea)
-		fixed = (vertical ? DIM_HORIZONTAL : DIM_VERTICAL);
-	else
-		fixed = DIM_BOTH;
+	readSettings();
 	populateTasks();
 }
 
@@ -24,6 +20,10 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 {
 	switch (msg)
 	{
+		case BB_RECONFIGURE:
+			readSettings();
+			populateTasks();
+			break;
 	case BB_TASKSUPDATE:
 		switch (lParam)
 		{
@@ -65,5 +65,19 @@ void clsTaskItemCollection::populateTasks()
 		InvalidateRect(barWnd, &itemArea, TRUE);
 }
 
+
+/** @brief readSettings
+  *
+  * @todo: document this function
+  */
+void clsTaskItemCollection::readSettings()
+{
+	stretchTaskarea = ReadBool(configFile, "boxBar.tasks.stretcharea:", true);
+
+	if (stretchTaskarea)
+		fixed = (vertical ? DIM_HORIZONTAL : DIM_VERTICAL);
+	else
+		fixed = DIM_BOTH;
+}
 
 

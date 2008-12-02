@@ -22,13 +22,7 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 	const CHAR *configFileName = ConfigFileExists("plugins/boxBar/boxBar.rc", NULL);
 	strcpy(configFile, configFileName);
 
-	int x = ReadInt(configFile, "boxBar.x:", 0);
-	int y = ReadInt(configFile, "boxBar.y:", 0);
-	sizePercentage = ReadInt(configFile, "boxBar.percentage:", 80);
-	setMargin = ReadBool(configFile, "boxBar.setMargin:", true);
-	vertical = ReadBool(configFile, "boxBar.vertical:", false);
-
-	fixed = (vertical ? DIM_HORIZONTAL : DIM_VERTICAL);
+	readSettings();
 
 	margin = 0;
 
@@ -51,6 +45,9 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 				   MB_OK | MB_ICONERROR | MB_TOPMOST);
 		return;
 	}
+
+	int x = ReadInt(configFile, "boxBar.x:", 0);
+	int y = ReadInt(configFile, "boxBar.y:", 0);
 
 	barWnd = CreateWindowEx(
 				 WS_EX_TOOLWINDOW | WS_EX_TOPMOST,   // window ex-style
@@ -140,10 +137,8 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		// Blackbox sends a "BB_RECONFIGURE" message on style changes etc.
 
 	case BB_RECONFIGURE:
-		//ReadRCSettings();
-		//GetStyleSettings();
-		//set_window_modes();
-		InvalidateRect(barWnd, &itemArea, TRUE);
+		readSettings();
+		populateBar();
 		break;
 
 		// ----------------------------------------------------------
@@ -546,6 +541,16 @@ void clsBar::configMenu()
 	ShowMenu(mainMenu);
 }
 
+/** @brief readSettings
+  *
+  * @todo: document this function
+  */
+void clsBar::readSettings()
+{
+	sizePercentage = ReadInt(configFile, "boxBar.percentage:", 80);
+	setMargin = ReadBool(configFile, "boxBar.setMargin:", true);
+	vertical = ReadBool(configFile, "boxBar.vertical:", false);
 
-
+	fixed = (vertical ? DIM_HORIZONTAL : DIM_VERTICAL);
+}
 

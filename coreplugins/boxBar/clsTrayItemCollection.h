@@ -10,6 +10,7 @@ class clsTrayItemCollection : public clsItemCollection
 		clsTrayItemCollection(bool pVertical);
 
 		virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+		virtual void readSettings();
 	protected:
 		virtual void populateTray();
 

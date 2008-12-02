@@ -63,7 +63,7 @@ void clsItem::move(int pX, int pY)
 	itemArea.bottom = pY + sizeY;
 	if (tipText)
 		setTooltip(tipText);
-	InvalidateRect(barWnd, &itemArea, TRUE);
+	//InvalidateRect(barWnd, &itemArea, TRUE);
 }
 
 /** @brief Base resizing funtion for items
@@ -295,6 +295,14 @@ void clsItem::draw(HDC pContext)
 }
 
 
+/** @brief Reads settings from the RC file
+  *
+  * This base implementation does nothing.
+  */
+void clsItem::readSettings()
+{
+
+}
 
 clsApiLoader clsItem::bbApiLoader;
 HWND clsItem::barWnd = NULL;

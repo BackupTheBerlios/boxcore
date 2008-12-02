@@ -7,12 +7,7 @@ clsTrayItemCollection::clsTrayItemCollection(bool pVertical):clsItemCollection(p
 	fixed = DIM_BOTH;
 	spacingBorder = 0;
 	spacingItems = 2;
-	vertical = ReadBool(configFile, "boxBar.tray.vertical:", vertical);
-	iconSize = ReadInt(configFile, "boxBar.tray.iconsize:", 16);
-	if (vertical)
-		numRowCols = ReadInt(configFile, "boxBar.tray.maxRows:", 0);
-	else
-		numRowCols = ReadInt(configFile, "boxBar.tray.maxCols:", 0);
+	readSettings();
 
 	populateTray();
 }
@@ -25,6 +20,10 @@ LRESULT clsTrayItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 {
 	switch (msg)
 	{
+		case BB_RECONFIGURE:
+		readSettings();
+		PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+		break;
 		case BB_TRAYUPDATE:
 			switch(lParam)
 			{
@@ -78,12 +77,27 @@ void clsTrayItemCollection::populateTray()
 	{
 	for(int i=GetTraySize(); (i % numRowCols) != 0; ++i)
 	{
-		((clsItemCollection*)(*column))->addItem(new clsIconItem(NULL, 16, vertical));
+		((clsItemCollection*)(*column))->addItem(new clsIconItem(NULL, iconSize, vertical));
 			column++;
 			if (column == itemList.end())
 				column = itemList.begin();
 	}
 	}
+}
+
+/** @brief Reads settings from the RC file
+  *
+  * Reads the tray icon size, tray orientation, max number of rows and max number of columns
+  */
+void clsTrayItemCollection::readSettings()
+{
+	vertical = ReadBool(configFile, "boxBar.tray.vertical:", vertical);
+	iconSize = ReadInt(configFile, "boxBar.tray.iconsize:", 16);
+	if (vertical)
+		numRowCols = ReadInt(configFile, "boxBar.tray.maxRows:", 0);
+	else
+		numRowCols = ReadInt(configFile, "boxBar.tray.maxCols:", 0);
+	populateTray();
 }
 
 

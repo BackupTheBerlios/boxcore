@@ -16,7 +16,11 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVe
 #else
 	strcpy(caption, pTask->caption);
 #endif
-	iconItem = new clsIconItem(pTask->icon, 16, vertical);
+	readSettings();
+	if (iconSize > 16)
+		iconItem = new clsIconItem(pTask->icon_big, iconSize, vertical);
+	else
+		iconItem = new clsIconItem(pTask->icon, iconSize, vertical);
 	captionItem = new clsTextItem(caption, style, vertical);
 	addItem(iconItem);
 	addItem(captionItem);
@@ -81,6 +85,15 @@ void clsTaskItem::activateTask(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM l
 {
 	clsTaskItem *realItem = static_cast<clsTaskItem *>(pItem);
 	PostMessage(hBlackboxWnd, BB_BRINGTOFRONT, 0,  (LPARAM)realItem->taskWnd);
+}
+
+/** @brief readSettings
+  *
+  * @todo: document this function
+  */
+void clsTaskItem::readSettings()
+{
+	iconSize = ReadInt(configFile, "boxBar.tasks.iconsize:", 16);
 }
 
 

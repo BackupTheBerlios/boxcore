@@ -10,6 +10,7 @@ class clsTaskItemCollection : public clsItemCollection
 		clsTaskItemCollection(bool pVertical);
 
 		virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+		virtual void readSettings();
 	protected:
 		bool stretchTaskarea;
 		void populateTasks();

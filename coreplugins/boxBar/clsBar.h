@@ -18,6 +18,7 @@ class clsBar : public clsItemCollection
 		virtual void calculateSizes(bool pSizeGiven = true);
 
 		virtual dimType resize(int pX, int pY);
+		virtual void readSettings();
 	protected:
 		void populateBar();
 		void configMenu();

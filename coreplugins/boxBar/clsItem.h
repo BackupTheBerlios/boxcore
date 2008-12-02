@@ -51,6 +51,7 @@ public:
 	virtual dimType getFixed() {
 		return fixed;
 	}
+	virtual void readSettings();
 
 	virtual void calculateSizes(bool pSizeGiven = false);
 
