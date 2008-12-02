@@ -55,6 +55,9 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						strcpy(caption, task->caption);
 #endif
 						captionItem->setText(caption);
+						if (iconSize > 16)
+						iconItem->setIcon(task->icon_big);
+						else
 						iconItem->setIcon(task->icon);
 						InvalidateRect(barWnd, &itemArea, TRUE);
 						break;
