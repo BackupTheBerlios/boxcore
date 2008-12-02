@@ -74,11 +74,12 @@ else(MINGW)
   SET(BLACKBOX_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/resource.rc)
 endif(MINGW)
 
-add_executable (blackbox ${BLACKBOX_CORE_SRCS} ${BLACKBOX_MENU_SRCS} ${BLACKBOX_NEW_SRCS} ${BLACKBOX_RESOURCES})
+add_executable (blackbox ${BLACKBOX_CORE_SRCS} ${BLACKBOX_MENU_SRCS} ${BLACKBOX_NEW_SRCS} ${BLACKBOX_RESOURCES} )
 add_custom_command (TARGET blackbox POST_BUILD
 	COMMAND ${DLLTOOL} -d ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def -l ${CMAKE_CURRENT_BINARY_DIR}/libblackbox.a -D blackbox.exe
 	COMMENT "Building proper library")
-target_link_libraries (blackbox shellserviceobjects systemtray shlwapi version ole32 uuid comctl32 comdlg32 shell32 advapi32 winmm gdi32)
+target_link_libraries (blackbox ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def
+	shellserviceobjects systemtray shlwapi version ole32 uuid comctl32 comdlg32 shell32 advapi32 winmm gdi32)
 set_target_properties (blackbox PROPERTIES
 	IMPORT_SUFFIX .a
 	LINK_FLAGS "-mwindows -s"

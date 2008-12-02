@@ -1,4 +1,3 @@
-LIBRARY BLACKBOX.EXE
 EXPORTS
 ReadBool
 ReadInt
@@ -30,7 +29,6 @@ SnapWindowToEdge
 SetTransparency
 SetDesktopMargin
 GetBlackboxEditor
-GetBlackboxPath${WINAPI_DECORATOR}
 _GetBlackboxPath${WINAPI_DECORATOR} = GetBlackboxPath${WINAPI_DECORATOR}
 bbrcPath
 extensionsrcPath
@@ -73,7 +71,6 @@ MakeMenu
 DelMenu
 GetTraySize
 GetTrayIcon
-EnumTray
 GetTaskListSize
 GetTask
 GetActiveTask

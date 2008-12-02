@@ -520,7 +520,6 @@ extern "C" {
 	/* Get paths */
 	API_EXPORT void GetBlackboxEditor(LPSTR editor);
 	API_EXPORT LPSTR WINAPI GetBlackboxPath(LPSTR path, int maxLength); /* with trailing backslash */
-	API_EXPORT LPSTR WINAPI _GetBlackboxPath(LPSTR path, int maxLength); /* with trailing backslash */
 
 	API_EXPORT LPCSTR bbrcPath(LPCSTR bbrcFileName ISNULL);
 	API_EXPORT LPCSTR extensionsrcPath(LPCSTR extensionsrcFileName ISNULL);
