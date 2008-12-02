@@ -155,6 +155,11 @@ LPSTR WINAPI GetBlackboxPath(LPSTR pszPath, int nMaxLen)
 	return pszPath;
 }
 
+LPSTR WINAPI _GetBlackboxPath(LPSTR pszPath, int nMaxLen)
+{
+	return GetBlackboxPath(pszPath, nMaxLen);
+}
+
 //===========================================================================
 // Function: NextToken
 // Purpose: Copy the first token of 'string' seperated by the delim to 'buf'
