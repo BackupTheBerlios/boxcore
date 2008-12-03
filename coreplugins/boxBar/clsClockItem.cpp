@@ -5,6 +5,7 @@
 clsClockItem::clsClockItem(bool pVertical): clsLabelItem(pVertical)
 {
 	const CHAR *tempClockFormat;
+	style = SN_TOOLBARCLOCK;
 	tempClockFormat = ReadString(configFile, "boxBar.clock.format:", "%#H:%M");
 #ifdef UNICODE
 	MultiByteToWideChar(CP_ACP, 0, tempClockFormat, -1, clockFormat, 256);
@@ -40,7 +41,7 @@ LRESULT clsClockItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			time(&systemTime);
 			struct tm *ltp = localtime(&systemTime);
 			_tcsftime(text, 256, clockFormat, ltp);
-			InvalidateRect(barWnd, &itemArea, TRUE);
+			drawNow();
 			SYSTEMTIME lt;
 			GetLocalTime(&lt);
 			bool seconds = _tcsstr(clockFormat, TEXT("%S")) || _tcsstr(clockFormat, TEXT("%#S"));

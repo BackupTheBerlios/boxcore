@@ -20,10 +20,10 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 {
 	switch (msg)
 	{
-		case BB_RECONFIGURE:
-			readSettings();
-			populateTasks();
-			break;
+	case BB_RECONFIGURE:
+		readSettings();
+		populateTasks();
+		break;
 	case BB_TASKSUPDATE:
 		switch (lParam)
 		{
@@ -93,7 +93,7 @@ void clsTaskItemCollection::configMenu(Menu *pMenu)
 {
 	Menu *subMenu = MakeNamedMenu("boxBar.tasks", "boxBar.tasks", true);
 	MakeSubmenu(pMenu, subMenu, "Tasks Configuration");
-	MakeMenuItemInt(subMenu, "Icon size", "@boxBar.tasks.iconsize", ReadInt(configFile, "boxBar.tasks.iconsize:",16), 0, 256);
+	MakeMenuItemInt(subMenu, "Icon size", "@boxBar.tasks.iconsize", ReadInt(configFile, "boxBar.tasks.iconsize:", 16), 0, 256);
 	MakeMenuItem(subMenu, "Vertical", "@boxBar.vertical", vertical);
 }
 

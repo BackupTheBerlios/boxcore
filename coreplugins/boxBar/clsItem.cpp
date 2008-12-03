@@ -321,6 +321,20 @@ void clsItem::configMenu(Menu *pMenu)
 {
 }
 
+/** @brief Draws item immediately
+  *
+  * Retrieves a DC for the bar window and then draws the item to it. Use this
+  * when an item updates, but does not move or change size.
+  */
+void clsItem::drawNow()
+{
+	HDC barDC = GetDC(barWnd);
+	draw(barDC);
+	ReleaseDC(barWnd, barDC);
+}
+
+
+
 clsApiLoader clsItem::bbApiLoader;
 HWND clsItem::barWnd = NULL;
 HWND clsItem::tooltipWnd = NULL;

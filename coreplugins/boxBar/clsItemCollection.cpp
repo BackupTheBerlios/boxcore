@@ -69,6 +69,7 @@ LRESULT clsItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 			lastMouse = NULL;
 		}
 		break;
+	case BOXBAR_NEEDTIP:
 	case WM_TIMER:
 		for (list< clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
 		{

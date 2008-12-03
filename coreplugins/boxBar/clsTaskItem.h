@@ -12,6 +12,7 @@ class clsTaskItem : public clsItemCollection
 {
 	public:
 		clsTaskItem(tasklist *pTask, bool pVertical);
+		~clsTaskItem();
 
 		virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		virtual void readSettings();

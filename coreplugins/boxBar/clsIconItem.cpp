@@ -37,7 +37,7 @@ void clsIconItem::draw(HDC pContext)
 void clsIconItem::setIcon(HICON pIcon)
 {
 	icon = pIcon;
-	InvalidateRect(barWnd, &itemArea, TRUE);
+	drawNow();
 }
 
 

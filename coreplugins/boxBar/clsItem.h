@@ -23,6 +23,7 @@ enum dimType {DIM_NONE = 0, DIM_HORIZONTAL = 1, DIM_VERTICAL = 2, DIM_BOTH = 3};
 
 #define BOXBAR_REMOVEITEM WM_USER + 1
 #define BOXBAR_UPDATESIZE WM_USER + 2
+#define BOXBAR_NEEDTIP WM_USER + 3
 
 class clsItem;
 
@@ -46,6 +47,7 @@ public:
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	virtual void draw(HDC pContext);
+	void drawNow();
 	virtual dimType resize(int pX, int pY);
 	virtual void move(int pX, int pY);
 	virtual dimType getFixed() {

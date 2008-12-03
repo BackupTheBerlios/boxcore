@@ -2,8 +2,8 @@
 # bbkeys.rc - bblean 1.16
 
 # Invoke menu:
-KeyToGrab(LWIN),        WithModifier(),         WithAction(ExecCommand), DoThis(@BBCore.ShowMenu)
-KeyToGrab(RWIN),        WithModifier(),         WithAction(ExecCommand), DoThis(@BBCore.ShowMenu root)
+KeyToGrab(LWIN),        WithModifier(),         WithAction(ShowMenu), DoThis(@BBCore.ShowMenu)
+KeyToGrab(RWIN),        WithModifier(),         WithAction(ShowMenu), DoThis(@BBCore.ShowMenu root)
 
 # previously, alternativ:
 KeyToGrab(M),           WithModifier(Win+Ctrl), WithAction(ExecCommand), DoThis(@BBCore.ShowMenu root)

@@ -29,6 +29,22 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVe
 	leftClick = activateTask;
 }
 
+/** @brief TaskItem destructor
+  *
+  * Cleans up the tooltip, instead of letting it get handled by the base destructor. This
+  * is needed because out tipText is not dynamically allocated.
+  */
+clsTaskItem::~clsTaskItem()
+{
+	if (tipText)
+	{
+		tipText = NULL;
+		setTooltip();
+	}
+}
+
+
+
 /** @brief wndProc
   *
   * @todo: document this function
@@ -56,10 +72,10 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 #endif
 						captionItem->setText(caption);
 						if (iconSize > 16)
-						iconItem->setIcon(task->icon_big);
+							iconItem->setIcon(task->icon_big);
 						else
-						iconItem->setIcon(task->icon);
-						InvalidateRect(barWnd, &itemArea, TRUE);
+							iconItem->setIcon(task->icon);
+						drawNow();
 						break;
 					}
 					task = task->next;
@@ -72,8 +88,18 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			else
 				style = SN_TOOLBARBUTTON;
 			captionItem->setStyle(style);
-			InvalidateRect(barWnd, &itemArea, TRUE);
+			drawNow();
 			return 0;
+		}
+		break;
+	case BOXBAR_NEEDTIP:
+		if ((clsTextItem *)lParam == captionItem)
+		{
+			if (wParam)
+				tipText = caption;
+			else
+				tipText = NULL;
+			setTooltip();
 		}
 		break;
 	}

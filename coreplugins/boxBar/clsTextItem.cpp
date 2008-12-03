@@ -29,6 +29,12 @@ void clsTextItem::draw(HDC pContext)
 		SetBkMode(pContext, TRANSPARENT);
 		HFONT oldFont = (HFONT) SelectObject(pContext, bbStyle.getStyleFont(fontStyle));
 		COLORREF oldColor = SetTextColor(pContext, bbStyle.getStyleTextColor(fontStyle));
+		RECT testRect = itemArea;
+		DrawText(pContext, text, -1, &testRect, bbStyle.getStyleTextJustify(fontStyle) | DT_CALCRECT);
+		if (testRect.right > itemArea.right)
+			PostMessage(barWnd, BOXBAR_NEEDTIP, (WPARAM)text, (LPARAM)this);
+		else
+			PostMessage(barWnd, BOXBAR_NEEDTIP, NULL, (LPARAM)this);
 		DrawText(pContext, text, -1, &itemArea, bbStyle.getStyleTextJustify(fontStyle) | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
 		SetTextColor(pContext, oldColor);
 		SelectObject(pContext, oldFont);

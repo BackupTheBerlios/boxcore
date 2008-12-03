@@ -5,7 +5,7 @@
 clsLabelItem::clsLabelItem(bool pVertical) : clsTextItem(NULL, SN_TOOLBARCLOCK, pVertical)
 {
 	fixed = DIM_BOTH;
-	style = SN_TOOLBARCLOCK;
+	style = SN_TOOLBARLABEL;
 	_tcscpy(text,TEXT("Label"));
 }
 

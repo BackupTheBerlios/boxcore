@@ -4,7 +4,7 @@ clsTrayItem::clsTrayItem(systemTray *trayItem, UINT pIconSize, bool pVertical): 
 {
 	if (TrayIconEvent == NULL)
 	{
-		if (bbApiLoader.requestApiPresence(L"boxCore::hasTrayIconEvent"))
+		if (bbApiLoader.requestApiPresence(TEXT("boxCore::hasTrayIconEvent")))
 			TrayIconEvent = (fnTrayIconEvent)bbApiLoader.requestApiPointer("TrayIconEvent");
 	}
 	iconWnd = trayItem->hWnd;
@@ -77,7 +77,7 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					else
 						tipText = NULL;
 					setTooltip();
-					InvalidateRect(hWnd, &itemArea, TRUE);
+					drawNow();
 					return 0;
 				}
 			}
