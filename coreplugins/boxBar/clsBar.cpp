@@ -79,10 +79,7 @@ clsBar::~clsBar()
 	itemList.clear();
 	bbApiLoader.freeLibrary();
 	DestroyWindow(barWnd);
-	dbg_printf("Window destroyed");
 	UnregisterClass(className, hInstance);
-	dbg_printf("Class unregistered");
-	//dtor
 }
 
 /** @brief realWndProc
@@ -175,6 +172,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				vertical = !vertical;
 				WriteBool(configFile, "boxBar.vertical:", vertical);
+				resize(1,1);
 				populateBar();
 			}
 			break;
@@ -406,7 +404,11 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if (wParam & MK_CONTROL)
 		{
 			dbg_printf("Config menu");
-			configMenu();
+			Menu *mainMenu = MakeNamedMenu("boxBar", "boxBar", true);
+			configMenu(mainMenu);
+			for(list<clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+				(*i)->configMenu(mainMenu);
+			ShowMenu(mainMenu);
 			return 0;
 		}
 		dbg_printf("Pass on click");
@@ -443,8 +445,8 @@ dimType clsBar::resize(int pX, int pY)
 	GetWindowRect(barWnd, &barRect);
 	int newX = barRect.left;
 	int newY = barRect.top;
-	if (pX < minSizeX)
-		pX = minSizeX;
+	if (pX < 0)
+		pX = 0;
 	int dX = getSize(DIM_HORIZONTAL) - pX;
 	if (barLocation&POS_LEFT)
 		newX = barRect.left;
@@ -453,8 +455,8 @@ dimType clsBar::resize(int pX, int pY)
 	else
 		newX = barRect.left + dX;
 
-	if (pY < minSizeY)
-		pY = minSizeY;
+	if (pY < 0)
+		pY = 0;
 	int dY = getSize(DIM_VERTICAL) - pY;
 	if (barLocation&POS_TOP)
 		newY = barRect.top;
@@ -475,7 +477,6 @@ dimType clsBar::resize(int pX, int pY)
   */
 void clsBar::calculateSizes(bool pSizeGiven)
 {
-	clsItemCollection::calculateSizes(false);
 	RECT monRect;
 	GetMonitorRect(barWnd, &monRect, GETMON_FROM_WINDOW);
 	if (vertical)
@@ -527,18 +528,16 @@ const CHAR * barItems = ReadString(configFile, "boxBar.items:", "tasks,tray, clo
 	calculateSizes();
 }
 
-/** @brief configMenu
+/** @brief Adds bar settings to the config menu
   *
-  * @todo: document this function
+  * This function adds a submenu for configuration of the main bar.
   */
-void clsBar::configMenu()
+void clsBar::configMenu(Menu *pMenu)
 {
-	Menu *mainMenu = MakeNamedMenu("boxBar", "boxBar", true);
 	Menu *subMenu = MakeNamedMenu("Bar", "Bar", true);
-	MakeSubmenu(mainMenu, subMenu, "Bar");
+	MakeSubmenu(pMenu, subMenu, "Bar Configuration");
 	MakeMenuItemInt(subMenu, "Percentage Size", "@boxBar.percentage", sizePercentage, 0, 100);
 	MakeMenuItem(subMenu, "Vertical", "@boxBar.vertical", vertical);
-	ShowMenu(mainMenu);
 }
 
 /** @brief readSettings

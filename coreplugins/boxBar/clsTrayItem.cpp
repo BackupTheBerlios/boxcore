@@ -76,7 +76,7 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					}
 					else
 						tipText = NULL;
-					setTooltip(tipText);
+					setTooltip();
 					InvalidateRect(hWnd, &itemArea, TRUE);
 					return 0;
 				}

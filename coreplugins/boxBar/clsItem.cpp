@@ -33,7 +33,11 @@ clsItem::clsItem(bool pVertical)
 clsItem::~clsItem()
 {
 	if (tipText)
-		setTooltip(NULL);
+	{
+		delete tipText;
+		tipText = NULL;
+		setTooltip();
+	}
 }
 
 /** @brief Test if point is within the item
@@ -62,7 +66,7 @@ void clsItem::move(int pX, int pY)
 	itemArea.top = pY;
 	itemArea.bottom = pY + sizeY;
 	if (tipText)
-		setTooltip(tipText);
+		setTooltip();
 	//InvalidateRect(barWnd, &itemArea, TRUE);
 }
 
@@ -220,9 +224,8 @@ LRESULT clsItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
   * Tooltip is set so it is triggered anywhere in the item area. We use the @b this pointer
   * as id, so we don't need extra storage to know which tooltip is ours. When called for the first time
   * in a plugin we call initTooltips to create a tooltip window to handle requests.
-  * @todo: Fix this so we don't pass in our own member each time ;)
   */
-void clsItem::setTooltip(TCHAR *pText)
+void clsItem::setTooltip()
 {
 	if (!tooltipWnd)
 		initTooltips();
@@ -234,8 +237,8 @@ void clsItem::setTooltip(TCHAR *pText)
 	toolInfo.uId = (UINT_PTR)this;
 	toolInfo.rect = itemArea;
 	toolInfo.hinst = hInstance;
-	toolInfo.lpszText = pText;
-	if (pText)
+	toolInfo.lpszText = tipText;
+	if (tipText)
 	{
 		SendMessage(tooltipWnd, TTM_DELTOOL, 0, (LPARAM)&toolInfo);
 		SendMessage(tooltipWnd, TTM_ADDTOOL, 0, (LPARAM)&toolInfo);
@@ -283,6 +286,8 @@ void clsItem::initTooltips()
 
 /** @brief Base drawing function for items
   *
+  * @param[in,out] pContext The drawing context to use, passed on from the WM_PAINT message
+  *
   * If the item has a style set, draws the stylegradient in the item area. Drawing is only performed
   * if the item area falls within the update area.
   */
@@ -295,13 +300,25 @@ void clsItem::draw(HDC pContext)
 }
 
 
-/** @brief Reads settings from the RC file
+/** @brief Stub for reading settings from the RC file
   *
-  * This base implementation does nothing.
+  * Items should implement this if they need settings from the RC file. This stub does nothing,
+  * and is present so that items can ignore this function if they do not need it.
   */
 void clsItem::readSettings()
 {
+}
 
+/** @brief Stub for config menu addition
+  *
+  * @param[in,out] pMenu Menu pointer to which items can be added
+  *
+  * This function should be implemented when an item wants to add something to the config menu.
+  * Each item should handle message which these items will generate itself. This stub does nothing,
+  * and is present so that items can ignore this function if they do not need it.
+  */
+void clsItem::configMenu(Menu *pMenu)
+{
 }
 
 clsApiLoader clsItem::bbApiLoader;

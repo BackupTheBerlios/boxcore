@@ -40,7 +40,7 @@ add_subdirectory (blackbox)
 install (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/styles DESTINATION . COMPONENT Styles)
 
 set (CPACK_SOURCE_GENERATOR "ZIP")
-set (CPACK_SOURCE_IGNORE_FILES ".hg/;build*;styles/*;config/*;.hgtags;.hgignore;bb4win64.cbp;bb4win64.layout")
+set (CPACK_SOURCE_IGNORE_FILES ".hg/;build*;styles/*;config/*;.hgtags;.hgignore;bb4win64.cbp;bb4win64.layout;packages/*")
 set (CPACK_GENERATOR "ZIP")
 set (CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_CURRENT_BINARY_DIR};boxCore-package;ALL;/;${CMAKE_CURRENT_BINARY_DIR};Blackbox;ALL;/")
 set (CPACK_PACKAGE_NAME ${PROJECT_NAME})

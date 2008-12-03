@@ -66,9 +66,10 @@ void clsTaskItemCollection::populateTasks()
 }
 
 
-/** @brief readSettings
+/** @brief Reads task area settings from RC file
   *
-  * @todo: document this function
+  * This function reads settings related to the general task area, such as whether
+  * it should stretch verticcally or not. Detailed setting are read by clsTaskItem itself
   */
 void clsTaskItemCollection::readSettings()
 {
@@ -78,6 +79,22 @@ void clsTaskItemCollection::readSettings()
 		fixed = (vertical ? DIM_HORIZONTAL : DIM_VERTICAL);
 	else
 		fixed = DIM_BOTH;
+}
+
+/** @brief Add submenu for tasks configuration
+  *
+  * @param[in,out] pMenu Menu pointer to which items can be added
+  *
+  * This adds the submenu for general task properties (as read from the RC file by clsTaskItemCollection)
+  * as well as specific task properties (as read by clsTaskItem). The messages generated will be
+  * handled seperately by these two classes
+  */
+void clsTaskItemCollection::configMenu(Menu *pMenu)
+{
+	Menu *subMenu = MakeNamedMenu("boxBar.tasks", "boxBar.tasks", true);
+	MakeSubmenu(pMenu, subMenu, "Tasks Configuration");
+	MakeMenuItemInt(subMenu, "Icon size", "@boxBar.tasks.iconsize", ReadInt(configFile, "boxBar.tasks.iconsize:",16), 0, 256);
+	MakeMenuItem(subMenu, "Vertical", "@boxBar.vertical", vertical);
 }
 
 

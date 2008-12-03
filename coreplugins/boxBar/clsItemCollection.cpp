@@ -133,14 +133,24 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 	}
 	fixedItemUsed += spacingBorder - spacingItems;
 
-	if (pSizeGiven && (flexibleItemCount || (itemList.size()==0)))
+	if (pSizeGiven && (flexibleItemCount || (itemList.size() == 0)))
 	{
-			minSizeY = getSize(DIM_VERTICAL);
-			minSizeX = getSize(DIM_HORIZONTAL);
-			if(vertical)
-					maxSize = minSizeX - 2*spacingBorder;
-					else
-				maxSize = minSizeY - 2*spacingBorder;
+		minSizeY = getSize(DIM_VERTICAL);
+		minSizeX = getSize(DIM_HORIZONTAL);
+		if (vertical)
+		{
+			if (maxSize < (minSizeX - 2 * spacingBorder))
+				maxSize = minSizeX - 2 * spacingBorder;
+			else
+				minSizeX = maxSize + 2 * spacingBorder;
+		}
+		else
+		{
+			if (maxSize < (minSizeY - 2 * spacingBorder))
+				maxSize = minSizeY - 2 * spacingBorder;
+			else
+				minSizeY = maxSize + 2 * spacingBorder;
+		}
 
 	}
 	else

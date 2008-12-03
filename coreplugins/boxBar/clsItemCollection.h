@@ -22,8 +22,8 @@ class clsItemCollection : public clsItem
 		list<clsItem *> itemList;
 		clsItem *lastMouse;
 
-		UINT spacingBorder;
-		UINT spacingItems;
+		INT spacingBorder;
+		INT spacingItems;
 
 		int flexibleItemCount;
 		int fixedItemUsed;

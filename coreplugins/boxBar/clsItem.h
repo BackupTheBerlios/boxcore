@@ -55,6 +55,8 @@ public:
 
 	virtual void calculateSizes(bool pSizeGiven = false);
 
+	virtual void configMenu(Menu *pMenu);
+
 	int getSize(dimType pDim);
 	bool hitTest(int pX, int pY);
 protected:
@@ -142,7 +144,7 @@ protected:
 		return id++;
 	}
 	void initTooltips();
-	void setTooltip(TCHAR *pText);
+	void setTooltip();
 	TCHAR *tipText;
 private:
 };
