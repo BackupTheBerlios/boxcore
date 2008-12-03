@@ -145,10 +145,26 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			PAINTSTRUCT ps;
 			HDC hdc = BeginPaint(hWnd, &ps);
-			draw(hdc);
+			HDC buffer = CreateCompatibleDC(hdc);
+			HBITMAP bufferBitmap = CreateCompatibleBitmap(hdc, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top);
+			HBITMAP otherBitmap = (HBITMAP)SelectObject(buffer, bufferBitmap);
+			draw(buffer);
+			BitBlt(hdc, itemArea.left, itemArea.top,
+				itemArea.right - itemArea.left, itemArea.bottom-itemArea.top,
+				buffer, itemArea.left, itemArea.top, SRCCOPY);
+			SelectObject(buffer, otherBitmap);
+			DeleteObject(bufferBitmap);
+			DeleteDC(buffer);
 			EndPaint(hWnd, &ps);
 			break;
 		}
+
+	case WM_ERASEBKGND:
+		return 1;
+
+	//Taken from bbleanbar
+	case WM_MOUSEACTIVATE:
+			return MA_NOACTIVATE;
 
 	case BOXBAR_UPDATESIZE:
 		calculateSizes();
