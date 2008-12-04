@@ -451,9 +451,15 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
 }
 
-/** @brief resize
+/** @brief Resizes the item and the window
   *
-  * @todo: document this function
+  * @param[in] pX The desired horizontal size
+  * @param[in] pY The desired vertical size
+  * @return Return the directions in which resizing actually occurred
+  *
+  * This function resizes the bar item using the base function, but also adjusts the size of the bar window.
+  * The bar window adjustment is dependant on the current alignemtn of the bar so that right aligned bars
+  * grow to the left, left aligned bars grow to the right etc.
   */
 dimType clsBar::resize(int pX, int pY)
 {
@@ -462,7 +468,7 @@ dimType clsBar::resize(int pX, int pY)
 	int newX = barRect.left;
 	int newY = barRect.top;
 	if (pX < 0)
-		pX = 0;
+		pX = getSize(DIM_HORIZONTAL);
 	int dX = getSize(DIM_HORIZONTAL) - pX;
 	if (barLocation&POS_LEFT)
 		newX = barRect.left;
@@ -472,7 +478,7 @@ dimType clsBar::resize(int pX, int pY)
 		newX = barRect.left + dX;
 
 	if (pY < 0)
-		pY = 0;
+		pY = getSize(DIM_VERTICAL);
 	int dY = getSize(DIM_VERTICAL) - pY;
 	if (barLocation&POS_TOP)
 		newY = barRect.top;

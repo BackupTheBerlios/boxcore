@@ -642,7 +642,7 @@ extern "C" {
 	} systemTrayBalloon;
 
 	API_EXPORT int GetTraySize(void);
-	API_EXPORT systemTray* GetTrayIcon(int pointer);
+	API_EXPORT systemTray* GetTrayIcon(UINT pointer);
 
 	/* experimental: */
 	typedef BOOL (*TRAYENUMPROC)(struct systemTray *, LPARAM);

@@ -4,7 +4,7 @@
   * @brief Contains definition for clsItem and supporting structures
   */
 
-#define WINVER 0x502
+#include "BBApi.h"
 #include <windows.h>
 
 #include "clsStyle.h"

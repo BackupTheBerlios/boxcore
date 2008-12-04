@@ -16,18 +16,19 @@ clsItemCollection::~clsItemCollection()
 	itemList.clear();
 }
 
-/** @brief draw
+/** @brief Base deaw function for collections fo items
   *
-  * @todo: document this function
+  * @param[in,out] pContext The drawing context to use, passed on from the WM_PAINT message
+  *
+  * Calls the clsItem::draw in case a style was set, then calls draw for each item in the list, passing on the DC.
   */
 void clsItemCollection::draw(HDC pContext)
 {
 	clsItem::draw(pContext);
-	if (RectVisible(pContext, &itemArea))
-		for (list< clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
-		{
-			(*i)->draw(pContext);
-		}
+	for (list< clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+	{
+		(*i)->draw(pContext);
+	}
 }
 
 /** @brief wndProc

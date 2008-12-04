@@ -9,8 +9,8 @@ class clsApiLoader
 		virtual ~clsApiLoader();
 
 		void freeLibrary();
-		bool requestApiPresence(TCHAR *pIdentifier);
-		FARPROC requestApiPointer(CHAR *pApiName);
+		bool requestApiPresence(CONST TCHAR *pIdentifier);
+		FARPROC requestApiPointer(CONST CHAR *pApiName);
 	protected:
 	private:
 		HMODULE hBlackbox;

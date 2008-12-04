@@ -1,7 +1,7 @@
 #ifndef CLSSYSTEMTRAY_H
 #define CLSSYSTEMTRAY_H
 
-#define _WIN32_IE 0x0603
+#define _WIN32_IE 0x0501
 
 #include <shlwapi.h>
 #include <windows.h>
@@ -65,6 +65,7 @@ class clsSystemTray
 		LRESULT AddIcon(NID_INTERNAL &);
 		LRESULT ModifyIcon(NID_INTERNAL &pNID, bool triggerCallback = true);
 		LRESULT DeleteIcon(NID_INTERNAL &pNID, bool triggerCallback = true);
+		LRESULT DeleteIcon(HWND pHwnd, UINT pID, bool triggerCallback = true);
 		LRESULT SetIconVersion(NID_INTERNAL &);
 
 		void (*callbackAdded)();

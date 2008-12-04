@@ -1708,7 +1708,7 @@ bool RunEntriesIn (HKEY root_key, LPCSTR subpath, UINT flags)
 {
 	int index; HKEY hKey; bool ret = false; char path[100];
 	typedef BOOL (WINAPI *LPFN_WOW64ENABLEREDIR)(BOOL);
-	LPFN_WOW64ENABLEREDIR fnEnableRedir;
+	LPFN_WOW64ENABLEREDIR fnEnableRedir = NULL;
 
 	sprintf(path, "Software\\Microsoft\\Windows\\CurrentVersion\\%s", subpath);
 	for(int i=0;i<(SystemInfo.isOs64Bits()?2:1);++i)
@@ -1837,7 +1837,7 @@ int GetTraySize()
 
 vector<systemTray> apiVector;
 
-systemTray* GetTrayIcon(int idx)
+systemTray* GetTrayIcon(UINT idx)
 {
 	//return NULL;
 	clsTrayItem *item = SystemTrayManager.GetTrayIcon(idx);

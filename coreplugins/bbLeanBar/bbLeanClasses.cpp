@@ -1275,17 +1275,6 @@ public:
 				checkFuncRet = GetTextExtentPoint32(mPI->hdcPaint, cp, strlen(cp), &size);
 				if (size.cx != clklabel_width)
 					clklabel_width = size.cx;
-				if (clklabel_width>500)
-				{
-					if(countmsgs<5)
-				{
-					countmsgs++;
-					char msg[100];
-					sprintf(msg,"The wanted clock label size is %d for \"%s\" of length %d, the function returned %d. The error code was %d. The HDC was %p",clklabel_width,cp,strlen(cp),checkFuncRet,GetLastError(),mPI->hdcPaint);
-					MessageBox(NULL,msg,"The clock text",MB_OK);
-				}
-					clklabel_width=500;
-				}
 				clklabel_count ++;
 				break;
 

@@ -530,6 +530,28 @@ LRESULT clsSystemTray::DeleteIcon(NID_INTERNAL &pNID, bool triggerCallback)
 		return FALSE;
 }
 
+/** @brief DeleteIcon
+  *
+  * @todo: document this function
+  */
+LRESULT clsSystemTray::DeleteIcon(HWND pHwnd, UINT pID, bool triggerCallback)
+{
+	clsTrayItem *trayItem = lookupIcon(pHwnd, pID);
+	if (trayItem)
+	{
+		bool wasHidden = trayItem->stateHidden;
+		clearIconData(trayItem);
+		///@todo Maybe something needed here for balloon tooltips
+		trayItems.remove(trayItem);
+		delete trayItem;
+		if (!wasHidden && callbackDeleted && triggerCallback)
+			callbackDeleted();
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+
 /** @brief ModifyIcon
   *
   * @todo: document this function
@@ -807,7 +829,7 @@ BOOL clsSystemTray::TrayIconEvent(HWND ownerHwnd, UINT iconID, UINT msg, WPARAM 
 	}
 	else
 	{
-		CleanTray();
+		DeleteIcon(ownerHwnd, iconID);
 		return FALSE;
 	}
 }

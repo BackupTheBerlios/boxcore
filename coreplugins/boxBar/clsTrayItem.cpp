@@ -77,7 +77,7 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					else
 						tipText = NULL;
 					setTooltip();
-					drawNow();
+					RedrawWindow(barWnd, &itemArea, NULL, RDW_INTERNALPAINT | RDW_UPDATENOW);
 					return 0;
 				}
 			}

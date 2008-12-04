@@ -55,7 +55,6 @@ bool clsItem::hitTest(int pX, int pY)
 /** @brief Base moving function for items
   *
   * Moves the item without any checks. Also moves the tootip location if one is set.
-  * @todo This currently triggers a redraw at the new item area. Is this really needed?
   */
 void clsItem::move(int pX, int pY)
 {
@@ -67,14 +66,13 @@ void clsItem::move(int pX, int pY)
 	itemArea.bottom = pY + sizeY;
 	if (tipText)
 		setTooltip();
-	//InvalidateRect(barWnd, &itemArea, TRUE);
 }
 
 /** @brief Base resizing funtion for items
   *
   * @param[in] pX The desired horizontal size
   * @param[in] pY The desired vertical size
-  * @return Return the direcctions in which resizing actually occurred
+  * @return Return the directions in which resizing actually occurred
   *
   * Resizes the item if the requested size is not negative.This allows a negative size
   * to be used to indicate that the old  size should be kept for that dimension.
@@ -288,12 +286,11 @@ void clsItem::initTooltips()
   *
   * @param[in,out] pContext The drawing context to use, passed on from the WM_PAINT message
   *
-  * If the item has a style set, draws the stylegradient in the item area. Drawing is only performed
-  * if the item area falls within the update area.
+  * If the item has a style set, draws the stylegradient in the item area.
   */
 void clsItem::draw(HDC pContext)
 {
-	if (style && RectVisible(pContext, &itemArea))
+	if (style)
 	{
 		MakeStyleGradient(pContext, &itemArea, bbStyle.getStyle(style), bbStyle.getStyleBorder(style));
 	}

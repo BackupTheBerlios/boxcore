@@ -10,12 +10,12 @@ clsApiLoader::~clsApiLoader()
 
 }
 
-bool clsApiLoader::requestApiPresence(TCHAR *pIdentifier)
+bool clsApiLoader::requestApiPresence(CONST TCHAR *pIdentifier)
 {
 	return GlobalFindAtom(pIdentifier);
 }
 
-FARPROC clsApiLoader::requestApiPointer(CHAR *pApiName)
+FARPROC clsApiLoader::requestApiPointer(CONST CHAR *pApiName)
 {
 	if (!hBlackbox)
 	{
