@@ -6,6 +6,7 @@ clsUser32::clsUser32()
 	if (hModule)
 	{
 		AllowSetForegroundWindow = (fnAllowSetForegroundWindow)GetProcAddress(hModule, "AllowSetForegroundWindow");
+		TrackMouseEvent = (fnTrackMouseEvent)GetProcAddress(hModule, "TrackMouseEvent");
 	}
 	else
 	{

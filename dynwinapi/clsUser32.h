@@ -4,15 +4,17 @@
 #include <windows.h>
 
 typedef BOOL (*fnAllowSetForegroundWindow)(DWORD dwProcessId);
+typedef BOOL (*fnTrackMouseEvent)(LPTRACKMOUSEEVENT lpEventTrack);
 
 
 class clsUser32
 {
 	public:
 		clsUser32();
-		virtual ~clsUser32();
+		~clsUser32();
 
 	fnAllowSetForegroundWindow AllowSetForegroundWindow;
+	fnTrackMouseEvent TrackMouseEvent;
 
 	protected:
 		HMODULE hModule;
