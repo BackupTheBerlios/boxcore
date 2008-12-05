@@ -7,15 +7,19 @@ bbLeanBar.cpp
 ../utils/clsApiLoader.cpp
 )
 
-add_library(bbLeanBar SHARED ${BBLEANBAR_SRCS})
+add_library(bbLeanBar MODULE ${BBLEANBAR_SRCS})
 include_directories(bbLeanBar ../../blackbox)
 target_link_libraries(bbLeanBar shell32 user32 kernel32 gdi32 comctl32 ole32 uuid blackbox)
-set_target_properties (bbLeanBar PROPERTIES PREFIX ""
+set_target_properties (bbLeanBar PROPERTIES PREFIX "")
+
+if (MINGW)
+set_target_properties (bbLeanBar PROPERTIES
 	LINK_FLAGS "-mwindows -s"
 	COMPILE_FLAGS "-Wall -Os -fno-rtti -fno-exceptions -fomit-frame-pointer"
 )
+endif (MINGW)
 
-install(TARGETS bbLeanBar RUNTIME DESTINATION plugins/bbLeanBar COMPONENT bbLeanBar)
+install(TARGETS bbLeanBar LIBRARY DESTINATION plugins/bbLeanBar COMPONENT bbLeanBar)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/config/bbLeanBar.rc DESTINATION plugins/bbLeanBar COMPONENT bbLeanBarConfig)
 
 set (CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_CURRENT_BINARY_DIR};bbLeanBar;ALL;/" PARENT_SCOPE)
