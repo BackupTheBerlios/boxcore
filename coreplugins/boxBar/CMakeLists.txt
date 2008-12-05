@@ -30,6 +30,7 @@ clsStyle.cpp
 clsBar.cpp
 
 ../utils/clsApiLoader.cpp
+../../dynwinapi/clsUser32.cpp
 )
 
 set (VERSION_MAJOR 0)
@@ -52,11 +53,15 @@ include_directories(boxBar ../../blackbox)
 target_link_libraries(boxBar blackbox comctl32)
 set_target_properties (boxBar PROPERTIES
 	PREFIX ""
-	LINK_FLAGS "-s -mwindows"
-	COMPILE_FLAGS "-g -Wall -Os -fno-rtti -fno-exceptions -fomit-frame-pointer"
 	COMPILE_DEFINITIONS "UNICODE;_UNICODE"
 	VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
 )
+if (MINGW)
+set_target_properties (boxBar PROPERTIES
+	LINK_FLAGS "-s -mwindows"
+	COMPILE_FLAGS "-g -Wall -Os -fno-rtti -fno-exceptions -fomit-frame-pointer"
+)
+endif (MINGW)
 
 install(TARGETS boxBar LIBRARY DESTINATION plugins/${PROJECT_NAME} COMPONENT ${PROJECT_NAME})
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/config/boxBar.rc DESTINATION plugins/${PROJECT_NAME} COMPONENT ${PROJECT_NAME}Config)

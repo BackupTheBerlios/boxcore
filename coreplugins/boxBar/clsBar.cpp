@@ -7,6 +7,9 @@
 
 #include <shellapi.h>
 
+#include "../../dynwinapi/clsUser32.h"
+
+clsUser32 user32;
 
 clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemCollection(pVertical)
 {
@@ -433,14 +436,14 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		trackMouse = false;
 		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
 	case WM_MOUSEMOVE:
-		if (!trackMouse)
+		if (user32.TrackMouseEvent && !trackMouse)
 		{
 			TRACKMOUSEEVENT mouseTrack;
 			ZeroMemory(&mouseTrack, sizeof(mouseTrack));
 			mouseTrack.cbSize = sizeof(mouseTrack);
 			mouseTrack.dwFlags = TME_LEAVE;
 			mouseTrack.hwndTrack = barWnd;
-			TrackMouseEvent(&mouseTrack);
+			user32.TrackMouseEvent(&mouseTrack);
 			trackMouse = true;
 		}
 		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
