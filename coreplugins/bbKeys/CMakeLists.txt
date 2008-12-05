@@ -9,24 +9,32 @@ set (WINKEYHOOK_SRCS
 winkeyhook.cpp
 )
 
-add_library(bbKeys SHARED ${BBKEYS_SRCS})
+add_library(bbKeys MODULE ${BBKEYS_SRCS})
 include_directories(bbKeys  ../../blackbox)
 target_link_libraries(bbKeys  shell32 user32 kernel32 gdi32 comctl32 blackbox)
-set_target_properties (bbKeys  PROPERTIES PREFIX ""
+set_target_properties (bbKeys  PROPERTIES PREFIX "")
+
+if (MINGW)
+set_target_properties (bbKeys  PROPERTIES
 	LINK_FLAGS "-mwindows -s"
 	COMPILE_FLAGS "-Wall -Os -fno-rtti -fno-exceptions -fomit-frame-pointer"
 )
+endif (MINGW)
 
-add_library(winkeyhook SHARED ${WINKEYHOOK_SRCS})
+add_library(winkeyhook MODULE ${WINKEYHOOK_SRCS})
 include_directories(winkeyhook  ../../blackbox)
 target_link_libraries(winkeyhook  shell32 user32 kernel32 gdi32 comctl32)
-set_target_properties (winkeyhook  PROPERTIES PREFIX ""
+set_target_properties (winkeyhook  PROPERTIES PREFIX "")
+
+if (MINGW)
+set_target_properties (winkeyhook  PROPERTIES
 	LINK_FLAGS "-mwindows -s"
 	COMPILE_FLAGS "-Wall -Os -fno-rtti -fno-exceptions -fomit-frame-pointer"
 )
+endif (MINGW)
 
-install(TARGETS bbKeys RUNTIME DESTINATION plugins/bbKeys COMPONENT bbKeys)
-install(TARGETS winkeyhook RUNTIME DESTINATION plugins/bbKeys COMPONENT bbKeys)
+install(TARGETS bbKeys LIBRARY DESTINATION plugins/bbKeys COMPONENT bbKeys)
+install(TARGETS winkeyhook LIBRARY DESTINATION plugins/bbKeys COMPONENT bbKeys)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/config/bbKeys.rc DESTINATION plugins/bbKeys COMPONENT bbKeysConfig)
 
 set (CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_CURRENT_BINARY_DIR};bbKeys;ALL;/" PARENT_SCOPE)
