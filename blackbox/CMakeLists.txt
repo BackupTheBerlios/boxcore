@@ -1,5 +1,9 @@
 project (Blackbox)
 
+if (NOT WINDRES)
+set (WINDRES windres.exe)
+endif (NOT WINDRES)
+
 set (BLACKBOX_CORE_SRCS
 Blackbox.cpp
 BBApi.cpp
@@ -75,16 +79,22 @@ else(MINGW)
 endif(MINGW)
 
 add_executable (blackbox ${BLACKBOX_CORE_SRCS} ${BLACKBOX_MENU_SRCS} ${BLACKBOX_NEW_SRCS} ${BLACKBOX_RESOURCES} )
-add_custom_command (TARGET blackbox POST_BUILD
-	COMMAND ${DLLTOOL} -d ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def -l ${CMAKE_CURRENT_BINARY_DIR}/libblackbox.a -D blackbox.exe
-	COMMENT "Building proper library")
+#add_custom_command (TARGET blackbox POST_BUILD
+#	COMMAND ${DLLTOOL} -d ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def -l ${CMAKE_CURRENT_BINARY_DIR}/libblackbox.a -D blackbox.exe
+#	COMMENT "Building proper library")
 target_link_libraries (blackbox ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def
 	shellserviceobjects systemtray shlwapi version ole32 uuid comctl32 comdlg32 shell32 advapi32 winmm gdi32)
 set_target_properties (blackbox PROPERTIES
 	IMPORT_SUFFIX .a
+	ENABLE_EXPORTS true
+)
+
+if (MINGW)
+set_target_properties (blackbox PROPERTIES
 	LINK_FLAGS "-mwindows -s"
 	COMPILE_FLAGS "-Os -Wall -fno-rtti -fno-exceptions"
-	ENABLE_EXPORTS true)
+)
+endif (MINGW)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/manifest.in
 ${CMAKE_CURRENT_BINARY_DIR}/blackbox.exe.manifest)
