@@ -11,6 +11,7 @@ clsUser32::clsUser32()
 	else
 	{
 		AllowSetForegroundWindow = NULL;
+		TrackMouseEvent = NULL;
 	}
 }
 
