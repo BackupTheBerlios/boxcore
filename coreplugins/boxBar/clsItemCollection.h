@@ -29,6 +29,7 @@ class clsItemCollection : public clsItem
 		int fixedItemUsed;
 		int flexibleItemSize;
 
+		bool isBar;
 	private:
 };
 

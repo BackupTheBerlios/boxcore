@@ -5,9 +5,6 @@
 
 clsTaskItemCollection::clsTaskItemCollection(bool pVertical): clsItemCollection(pVertical)
 {
-	spacingBorder = 0;
-	spacingItems = 2;
-
 	readSettings();
 	populateTasks();
 }
@@ -74,6 +71,8 @@ void clsTaskItemCollection::populateTasks()
 void clsTaskItemCollection::readSettings()
 {
 	stretchTaskarea = ReadBool(configFile, "boxBar.tasks.stretcharea:", true);
+	spacingBorder = ReadInt(configFile, "boxBar.tasks.spacingBorder:", 0);
+	spacingItems = ReadInt(configFile, "boxBar.tasks.spacingItems:", 2);
 
 	if (stretchTaskarea)
 		fixed = (vertical ? DIM_HORIZONTAL : DIM_VERTICAL);

@@ -24,8 +24,6 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVe
 	captionItem = new clsTextItem(caption, style, vertical);
 	addItem(iconItem);
 	addItem(captionItem);
-	spacingBorder = 2;
-	spacingItems = 2;
 	leftClick = activateTask;
 }
 
@@ -123,6 +121,8 @@ void clsTaskItem::activateTask(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM l
 void clsTaskItem::readSettings()
 {
 	iconSize = ReadInt(configFile, "boxBar.tasks.iconsize:", 16);
+	spacingBorder = ReadInt(configFile, "boxBar.tasks.task.spacingBorder:", 2);
+	spacingItems = ReadInt(configFile, "boxBar.tasks.task.spacingItems:", 2);
 }
 
 

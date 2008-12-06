@@ -5,10 +5,11 @@
 clsClockItem::clsClockItem(bool pVertical): clsLabelItem(pVertical)
 {
 	style = SN_TOOLBARCLOCK;
-	readSettings();
-	rightClick = showMenu;
+
 	ClockTimer = getTimerID();
-	SetTimer(barWnd, ClockTimer, 1000, NULL);
+	readSettings();
+
+	rightClick = showMenu;
 }
 
 clsClockItem::~clsClockItem()
@@ -79,13 +80,13 @@ void clsClockItem::readSettings()
 #else
 	strcpy(clockFormat, tempClockFormat);
 #endif
-	tempClockFormat = ReadString(configFile, "boxBar.clock.tipformat:", "%A %d");
+	tempClockFormat = ReadString(configFile, "boxBar.clock.tipformat:", "%A %d %B %Y");
 #ifdef UNICODE
 	MultiByteToWideChar(CP_ACP, 0, tempClockFormat, -1, clockTipFormat, 256);
 #else
 	strcpy(clockTipFormat, tempClockFormat);
 #endif
-	SetTimer(barWnd, ClockTimer, 1000, NULL);
+	SetTimer(barWnd, ClockTimer, 1, NULL);
 }
 
 

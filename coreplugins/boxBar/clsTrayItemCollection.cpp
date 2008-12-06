@@ -5,8 +5,6 @@
 clsTrayItemCollection::clsTrayItemCollection(bool pVertical):clsItemCollection(pVertical)
 {
 	fixed = DIM_BOTH;
-	spacingBorder = 0;
-	spacingItems = 2;
 	readSettings();
 
 	populateTray();
@@ -97,6 +95,8 @@ void clsTrayItemCollection::readSettings()
 		numRowCols = ReadInt(configFile, "boxBar.tray.maxRows:", 0);
 	else
 		numRowCols = ReadInt(configFile, "boxBar.tray.maxCols:", 0);
+	spacingBorder = ReadInt(configFile, "boxBar.tray.spacingBorder:", 0);
+	spacingItems = ReadInt(configFile, "boxBar.tray.spacingItems:", 2);
 	populateTray();
 }
 

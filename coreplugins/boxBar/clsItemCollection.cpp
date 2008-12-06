@@ -7,6 +7,7 @@ clsItemCollection::clsItemCollection(bool pVertical): clsItem(pVertical)
 	lastMouse = NULL;
 	spacingBorder = 0;
 	spacingItems = 2;
+	isBar = false;
 }
 
 clsItemCollection::~clsItemCollection()
@@ -16,7 +17,7 @@ clsItemCollection::~clsItemCollection()
 	itemList.clear();
 }
 
-/** @brief Base deaw function for collections fo items
+/** @brief Base draw function for collections fo items
   *
   * @param[in,out] pContext The drawing context to use, passed on from the WM_PAINT message
   *
@@ -40,7 +41,6 @@ LRESULT clsItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 	switch (msg)
 	{
 	case WM_MOUSEMOVE:
-//		dbg_printf("WM_MOUSEMOVE in collection");
 	case WM_MOUSELEAVE:
 	case WM_LBUTTONDOWN:
 	case WM_LBUTTONUP:
@@ -88,8 +88,7 @@ LRESULT clsItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 		}
 		return 0;
 	}
-//	dbg_printf("Collection now calling item wndProc");
-	return clsItem::wndProc(hWnd, msg, wParam, lParam);;
+	return clsItem::wndProc(hWnd, msg, wParam, lParam);
 }
 
 /** @brief calculateSizes
@@ -136,7 +135,7 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 	}
 	fixedItemUsed += spacingBorder - spacingItems;
 
-	if (pSizeGiven && (flexibleItemCount || (itemList.size() == 0)))
+	if (pSizeGiven && ((flexibleItemCount || (itemList.size() == 0)) || !isBar))
 	{
 		minSizeY = getSize(DIM_VERTICAL);
 		minSizeX = getSize(DIM_HORIZONTAL);
@@ -256,3 +255,4 @@ void clsItemCollection::sortItems()
 		}
 	}
 }
+

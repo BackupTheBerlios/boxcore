@@ -15,6 +15,7 @@ clsUser32 user32;
 clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemCollection(pVertical)
 {
 	trackMouse = false;
+	isBar = true;
 	hInstance = pInstance;
 	_tcscpy(className, pClassName);
 	style = SN_TOOLBAR;
@@ -83,8 +84,7 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 			 );
 	ShowWindow(barWnd, SW_SHOWNA);
 
-	spacingBorder = 3;
-	spacingItems = 2;
+
 
 	populateBar();
 
@@ -594,6 +594,8 @@ void clsBar::readSettings()
 	sizePercentage = ReadInt(configFile, "boxBar.percentage:", 80);
 	setMargin = ReadBool(configFile, "boxBar.setMargin:", true);
 	vertical = ReadBool(configFile, "boxBar.vertical:", false);
+	spacingBorder = ReadInt(configFile, "boxBar.spacingBorder:", 3);
+	spacingItems = ReadInt(configFile, "boxBar.spacingItems:", 2);
 
 	fixed = (vertical ? DIM_HORIZONTAL : DIM_VERTICAL);
 }
