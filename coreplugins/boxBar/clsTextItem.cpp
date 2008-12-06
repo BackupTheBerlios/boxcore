@@ -35,7 +35,7 @@ void clsTextItem::draw(HDC pContext)
 			PostMessage(barWnd, BOXBAR_NEEDTIP, (WPARAM)text, (LPARAM)this);
 		else
 			PostMessage(barWnd, BOXBAR_NEEDTIP, NULL, (LPARAM)this);
-		DrawText(pContext, text, -1, &itemArea, bbStyle.getStyleTextJustify(fontStyle) | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS);
+		DrawText(pContext, text, -1, &itemArea, bbStyle.getStyleTextJustify(fontStyle) | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS | DT_NOPREFIX);
 		SetTextColor(pContext, oldColor);
 		SelectObject(pContext, oldFont);
 	}

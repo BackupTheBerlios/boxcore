@@ -18,7 +18,10 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVe
 #endif
 	readSettings();
 	if (iconSize > 16)
+		if(pTask->icon_big)
 		iconItem = new clsIconItem(pTask->icon_big, iconSize, vertical);
+		else
+		iconItem = new clsIconItem(pTask->icon, iconSize, vertical);
 	else
 		iconItem = new clsIconItem(pTask->icon, iconSize, vertical);
 	captionItem = new clsTextItem(caption, style, vertical);
@@ -70,7 +73,7 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 #endif
 						captionItem->setText(caption);
 						if (iconSize > 16)
-							iconItem->setIcon(task->icon_big);
+							iconItem->setIcon(task->icon);
 						else
 							iconItem->setIcon(task->icon);
 						drawNow();
