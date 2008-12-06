@@ -9,3 +9,6 @@ boxBar.tasks.iconsize: 16
 boxBar.tray.vertical: false
 boxBar.tray.iconsize: 16
 boxBar.tray.maxCols: 5
+
+boxBar.clock.format %H:%M
+boxBar.clock.tipFormat: %A %d %B %Y
