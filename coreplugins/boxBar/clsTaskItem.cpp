@@ -18,7 +18,7 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVe
 #endif
 	readSettings();
 	if (iconSize > 16)
-		if (GlobalFindAtom(TEXT("Blackbox")))
+		if (GlobalFindAtom(TEXT("boxCore::running")))
 			iconItem = new clsIconItem(pTask->icon_big, iconSize, vertical);
 		else
 			iconItem = new clsIconItem(pTask->icon, iconSize, vertical);
@@ -73,7 +73,7 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 #endif
 						captionItem->setText(caption);
 						if (iconSize > 16)
-							if (GlobalFindAtom(TEXT("Blackbox")))
+							if (GlobalFindAtom(TEXT("boxCore::running")))
 								iconItem->setIcon(task->icon_big);
 							else
 								iconItem->setIcon(task->icon);

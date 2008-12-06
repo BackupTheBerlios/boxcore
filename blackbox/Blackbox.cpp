@@ -350,7 +350,7 @@ bool check_options (LPCSTR lpCmdLine)
 	return false;
 }
 
-const wchar_t *atomNames[] = {L"Blackbox",L"boxCore::hasTrayIconEvent",L"boxCore::hasSetTaskbarPos"};
+const wchar_t *atomNames[] = {L"boxCore::running",L"boxCore::hasTrayIconEvent",L"boxCore::hasSetTaskbarPos"};
 vector<ATOM> atomList;
 
 /**
