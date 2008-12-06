@@ -28,6 +28,8 @@ class clsBar : public clsItemCollection
 		bool trackMouse;
 		bool setMargin;
 
+		bool hasTray;
+
 		int margin;
 		int marginEdge;
 

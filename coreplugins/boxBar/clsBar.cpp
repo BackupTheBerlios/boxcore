@@ -26,17 +26,17 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 	char rcname[100];
 	char pluginpath[MAX_PATH];
 #ifdef UNICODE
-	WideCharToMultiByte(CP_ACP, 0 ,pClassName, -1, rcname, 95, NULL, NULL);
+	WideCharToMultiByte(CP_ACP, 0 , pClassName, -1, rcname, 95, NULL, NULL);
 #else
 	strcpy(rcname, pClassName);
 #endif
-	strcat(rcname,".rc");
+	strcat(rcname, ".rc");
 	GetModuleFileNameA(hInstance, pluginpath, MAX_PATH);
-	if(strrchr(pluginpath, '\\'))
-		(*(strrchr(pluginpath, '\\')+1))='\0';
+	if (strrchr(pluginpath, '\\'))
+		(*(strrchr(pluginpath, '\\') + 1)) = '\0';
 	const CHAR *configFileName = ConfigFileExists(rcname, pluginpath);
 	strcpy(configFile, configFileName);
-	if (strlen(configFile)==0)
+	if (strlen(configFile) == 0)
 	{
 		strcpy(configFile, pluginpath);
 		strcat(configFile, rcname);
@@ -168,8 +168,8 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			HBITMAP otherBitmap = (HBITMAP)SelectObject(buffer, bufferBitmap);
 			draw(buffer);
 			BitBlt(hdc, itemArea.left, itemArea.top,
-				itemArea.right - itemArea.left, itemArea.bottom-itemArea.top,
-				buffer, itemArea.left, itemArea.top, SRCCOPY);
+				   itemArea.right - itemArea.left, itemArea.bottom - itemArea.top,
+				   buffer, itemArea.left, itemArea.top, SRCCOPY);
 			SelectObject(buffer, otherBitmap);
 			DeleteObject(bufferBitmap);
 			DeleteDC(buffer);
@@ -180,25 +180,25 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_ERASEBKGND:
 		return 1;
 
-	//Taken from bbleanbar
+		//Taken from bbleanbar
 	case WM_MOUSEACTIVATE:
-			return MA_NOACTIVATE;
+		return MA_NOACTIVATE;
 
 	case BOXBAR_UPDATESIZE:
 		calculateSizes();
 		break;
 
 
-			// ----------------------------------------------------------
-			// Blackbox sends Broams to all windows...
+		// ----------------------------------------------------------
+		// Blackbox sends Broams to all windows...
 
-		case BB_BROADCAST:
+	case BB_BROADCAST:
 		{
 			const char *msg_string = (LPCSTR)lParam;
 //			dbg_printf(msg_string);
 			if (!strnicmp(msg_string, "@boxBar.percentage", strlen("@boxBar.percentage")))
 			{
-				sizePercentage = atoi(msg_string+strlen("@boxBar.percentage"));
+				sizePercentage = atoi(msg_string + strlen("@boxBar.percentage"));
 				WriteInt(configFile, "boxBar.percentage:", sizePercentage);
 				calculateSizes();
 			}
@@ -206,101 +206,101 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				vertical = !vertical;
 				WriteBool(configFile, "boxBar.vertical:", vertical);
-				resize(1,1);
+				resize(1, 1);
 				populateBar();
 			}
 			break;
 		}
-			// check general broams
-			/*if (!stricmp(msg_string, "@BBShowPlugins"))
+		// check general broams
+		/*if (!stricmp(msg_string, "@BBShowPlugins"))
+		{
+			if (my.is_hidden)
 			{
-				if (my.is_hidden)
-				{
-					my.is_hidden = false;
-					ShowWindow(hwnd, SW_SHOWNA);
-				}
-				break;
-			}
-
-			if (!stricmp(msg_string, "@BBHidePlugins"))
-			{
-				if (my.pluginToggle && NULL == my.hSlit)
-				{
-					my.is_hidden = true;
-					ShowWindow(hwnd, SW_HIDE);
-				}
-				break;
-			}
-
-			// Our broadcast message prefix:
-			const char broam_prefix[] = "@bbSDK.";
-			const int broam_prefix_len = sizeof broam_prefix - 1; // minus terminating \0
-
-			// check broams sent from our own menu
-			if (!memicmp(msg_string, broam_prefix, broam_prefix_len))
-			{
-				msg_string += broam_prefix_len;
-				if (!stricmp(msg_string, "useSlit"))
-				{
-					eval_menu_cmd(M_BOL, &my.useSlit, msg_string);
-					break;
-				}
-
-				if (!stricmp(msg_string, "alwaysOnTop"))
-				{
-					eval_menu_cmd(M_BOL, &my.alwaysOnTop, msg_string);
-					break;
-				}
-
-				if (!stricmp(msg_string, "drawBorder"))
-				{
-					eval_menu_cmd(M_BOL, &my.drawBorder, msg_string);
-					break;
-				}
-
-				if (!stricmp(msg_string, "snapWindow"))
-				{
-					eval_menu_cmd(M_BOL, &my.snapWindow, msg_string);
-					break;
-				}
-
-				if (!stricmp(msg_string, "alphaEnabled"))
-				{
-					eval_menu_cmd(M_BOL, &my.alphaEnabled, msg_string);
-					break;
-				}
-
-				if (!my_substr_icmp(msg_string, "alphaValue"))
-				{
-					eval_menu_cmd(M_INT, &my.alphaValue, msg_string);
-					break;
-				}
-
-				if (!stricmp(msg_string, "pluginToggle"))
-				{
-					eval_menu_cmd(M_BOL, &my.pluginToggle, msg_string);
-					break;
-				}
-
-				if (!my_substr_icmp(msg_string, "windowText"))
-				{
-					eval_menu_cmd(M_STR, &my.window_text, msg_string);
-					break;
-				}
-
-				if (!stricmp(msg_string, "editRC"))
-				{
-					SendMessage(BBhwnd, BB_EDITFILE, (WPARAM) - 1, (LPARAM)rcpath);
-					break;
-				}
-
-				if (!stricmp(msg_string, "About"))
-				{
-					about_box();
-					break;
-				}
+				my.is_hidden = false;
+				ShowWindow(hwnd, SW_SHOWNA);
 			}
 			break;
+		}
+
+		if (!stricmp(msg_string, "@BBHidePlugins"))
+		{
+			if (my.pluginToggle && NULL == my.hSlit)
+			{
+				my.is_hidden = true;
+				ShowWindow(hwnd, SW_HIDE);
+			}
+			break;
+		}
+
+		// Our broadcast message prefix:
+		const char broam_prefix[] = "@bbSDK.";
+		const int broam_prefix_len = sizeof broam_prefix - 1; // minus terminating \0
+
+		// check broams sent from our own menu
+		if (!memicmp(msg_string, broam_prefix, broam_prefix_len))
+		{
+			msg_string += broam_prefix_len;
+			if (!stricmp(msg_string, "useSlit"))
+			{
+				eval_menu_cmd(M_BOL, &my.useSlit, msg_string);
+				break;
+			}
+
+			if (!stricmp(msg_string, "alwaysOnTop"))
+			{
+				eval_menu_cmd(M_BOL, &my.alwaysOnTop, msg_string);
+				break;
+			}
+
+			if (!stricmp(msg_string, "drawBorder"))
+			{
+				eval_menu_cmd(M_BOL, &my.drawBorder, msg_string);
+				break;
+			}
+
+			if (!stricmp(msg_string, "snapWindow"))
+			{
+				eval_menu_cmd(M_BOL, &my.snapWindow, msg_string);
+				break;
+			}
+
+			if (!stricmp(msg_string, "alphaEnabled"))
+			{
+				eval_menu_cmd(M_BOL, &my.alphaEnabled, msg_string);
+				break;
+			}
+
+			if (!my_substr_icmp(msg_string, "alphaValue"))
+			{
+				eval_menu_cmd(M_INT, &my.alphaValue, msg_string);
+				break;
+			}
+
+			if (!stricmp(msg_string, "pluginToggle"))
+			{
+				eval_menu_cmd(M_BOL, &my.pluginToggle, msg_string);
+				break;
+			}
+
+			if (!my_substr_icmp(msg_string, "windowText"))
+			{
+				eval_menu_cmd(M_STR, &my.window_text, msg_string);
+				break;
+			}
+
+			if (!stricmp(msg_string, "editRC"))
+			{
+				SendMessage(BBhwnd, BB_EDITFILE, (WPARAM) - 1, (LPARAM)rcpath);
+				break;
+			}
+
+			if (!stricmp(msg_string, "About"))
+			{
+				about_box();
+				break;
+			}
+		}
+		break;
 		}
 		*/
 		// ----------------------------------------------------------
@@ -419,7 +419,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				else
 					barEdge = ABE_TOP;
 			}
-			if (SetTaskbarPos)
+			if (hasTray && SetTaskbarPos)
 				SetTaskbarPos(wp->x, wp->y, wp->x + wp->cx, wp->y + wp->cy, barEdge);
 //			else
 //				dbg_printf("No SetTaskbarPos");
@@ -439,7 +439,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			Menu *mainMenu = MakeNamedMenu("boxBar", "boxBar", true);
 			configMenu(mainMenu);
-			for(list<clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+			for (list<clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
 				(*i)->configMenu(mainMenu);
 			ShowMenu(mainMenu);
 			return 0;
@@ -535,6 +535,7 @@ void clsBar::calculateSizes(bool pSizeGiven)
   */
 void clsBar::populateBar()
 {
+	hasTray = false;
 	lastMouse = NULL;
 	for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end(); ++i)
 	{
@@ -542,7 +543,7 @@ void clsBar::populateBar()
 	}
 	itemList.clear();
 
-const CHAR * barItems = ReadString(configFile, "boxBar.items:", "tasks,tray, clock");
+	const CHAR * barItems = ReadString(configFile, "boxBar.items:", "tasks,tray, clock");
 	CHAR barItem[MAX_PATH];
 	do
 	{
@@ -550,6 +551,7 @@ const CHAR * barItems = ReadString(configFile, "boxBar.items:", "tasks,tray, clo
 		if (!stricmp(barItem, "tray"))
 		{
 			addItem(new clsTrayItemCollection(vertical));
+			hasTray = true;
 		}
 		else if (!stricmp(barItem, "clock"))
 		{
