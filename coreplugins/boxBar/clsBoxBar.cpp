@@ -57,9 +57,7 @@ void clsBoxBar::endPlugin(HINSTANCE hPluginInstance)
 	{
 		DeleteAtom(FindAtom(pluginName));
 		delete bar;
-		dbg_printf("Bar deleted");
 	}
-	dbg_printf("End of endplugin");
 }
 
 

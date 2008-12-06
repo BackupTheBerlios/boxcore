@@ -7,13 +7,15 @@ clsBoxBar.cpp
 clsItem.cpp
 clsItemCollection.cpp
 
+clsIconItem.cpp
+clsTextItem.cpp
+
 clsTaskItem.cpp
 clsTaskItemCollection.cpp
 
 clsLabelItem.cpp
 
-clsIconItem.cpp
-clsTextItem.cpp
+clsWorkspaceLabel.cpp
 
 
 clsTrayItem.cpp

@@ -18,6 +18,7 @@ class clsStyle
 		StyleItem *toolbar;
 		StyleItem *toolbarClock;
 		StyleItem *toolbarLabel;
+		StyleItem *toolbarWindowLabel;
 		StyleItem *toolbarButton;
 		StyleItem *toolbarButtonPressed;
 		HFONT toolbarFont;

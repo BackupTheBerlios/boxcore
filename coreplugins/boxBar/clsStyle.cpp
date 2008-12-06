@@ -7,6 +7,7 @@ clsStyle::clsStyle()
 	toolbarLabel = (StyleItem *)GetSettingPtr(SN_TOOLBARLABEL);
 	toolbarButton = (StyleItem *)GetSettingPtr(SN_TOOLBARBUTTON);
 	toolbarButtonPressed = (StyleItem *)GetSettingPtr(SN_TOOLBARBUTTONP);
+	toolbarWindowLabel = (StyleItem *)GetSettingPtr(SN_TOOLBARWINDOWLABEL);
 	toolbarFont = CreateStyleFont(toolbar);
 }
 
@@ -48,6 +49,8 @@ bool clsStyle::getStyleBorder(int pStyle)
 		return toolbarClock->bordered;
 	case SN_TOOLBARLABEL:
 		return toolbarLabel->bordered;
+	case SN_TOOLBARWINDOWLABEL:
+		return toolbarWindowLabel->bordered;
 	case SN_TOOLBARBUTTON:
 		return toolbarButton->bordered;
 	case SN_TOOLBARBUTTONP:
@@ -70,6 +73,8 @@ COLORREF clsStyle::getStyleTextColor(int pStyle)
 		return toolbarClock->TextColor;
 	case SN_TOOLBARLABEL:
 		return toolbarLabel->TextColor;
+	case SN_TOOLBARWINDOWLABEL:
+		return toolbarWindowLabel->TextColor;
 	case SN_TOOLBARBUTTON:
 		return toolbarButton->TextColor;
 	case SN_TOOLBARBUTTONP:
@@ -111,6 +116,8 @@ StyleItem * clsStyle::getStyle(int pStyle)
 		return toolbarClock;
 	case SN_TOOLBARLABEL:
 		return toolbarLabel;
+	case SN_TOOLBARWINDOWLABEL:
+		return toolbarWindowLabel;
 	case SN_TOOLBARBUTTON:
 		return toolbarButton;
 	case SN_TOOLBARBUTTONP:

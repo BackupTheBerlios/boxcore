@@ -53,7 +53,7 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			else
 			{
 				SendNotifyMessage(iconWnd, iconCallback, iconID, msg);
-				dbg_printf("No TrayIconEvent");
+//				dbg_printf("No TrayIconEvent");
 				return 0;
 			}
 		}

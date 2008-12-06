@@ -4,26 +4,17 @@
 
 clsClockItem::clsClockItem(bool pVertical): clsLabelItem(pVertical)
 {
-	const CHAR *tempClockFormat;
 	style = SN_TOOLBARCLOCK;
-	tempClockFormat = ReadString(configFile, "boxBar.clock.format:", "%#H:%M");
-#ifdef UNICODE
-	MultiByteToWideChar(CP_ACP, 0, tempClockFormat, -1, clockFormat, 256);
-#else
-	strcpy(clockFormat, tempClockFormat);
-#endif
+	readSettings();
 	rightClick = showMenu;
-	time_t systemTime;
-	time(&systemTime);
-	struct tm *ltp = localtime(&systemTime);
-	_tcsftime(text, 256, clockFormat, ltp);
 	ClockTimer = getTimerID();
 	SetTimer(barWnd, ClockTimer, 1000, NULL);
 }
 
 clsClockItem::~clsClockItem()
 {
-	//dtor
+	tipText = NULL;
+	setTooltip();
 }
 
 /** @brief wndProc
@@ -42,6 +33,11 @@ LRESULT clsClockItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			struct tm *ltp = localtime(&systemTime);
 			_tcsftime(text, 256, clockFormat, ltp);
 			drawNow();
+			if (tipText)
+				delete[] tipText;
+			tipText = new TCHAR[256];
+			_tcsftime(tipText, 256, clockTipFormat, ltp);
+			setTooltip();
 			SYSTEMTIME lt;
 			GetLocalTime(&lt);
 			bool seconds = _tcsstr(clockFormat, TEXT("%S")) || _tcsstr(clockFormat, TEXT("%#S"));
@@ -52,14 +48,7 @@ LRESULT clsClockItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		break;
 	case BB_RECONFIGURE:
 		{
-			const CHAR *tempClockFormat;
-			tempClockFormat = ReadString(configFile, "boxBar.clock.format:", "%#H:%M");
-#ifdef UNICODE
-			MultiByteToWideChar(CP_ACP, 0, tempClockFormat, -1, clockFormat, 256);
-#else
-			strcpy(clockFormat, tempClockFormat);
-#endif
-			SetTimer(barWnd, ClockTimer, 1000, NULL);
+			readSettings();
 			calculateSizes();
 			return 0;
 		}
@@ -76,3 +65,27 @@ void clsClockItem::showMenu(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lPar
 {
 	PostMessage(hBlackboxWnd, BB_BROADCAST, 0, (LPARAM)"@bbCore.ShowMenu");
 }
+
+/** @brief readSettings
+  *
+  * @todo: document this function
+  */
+void clsClockItem::readSettings()
+{
+	const CHAR *tempClockFormat;
+	tempClockFormat = ReadString(configFile, "boxBar.clock.format:", "%#H:%M");
+#ifdef UNICODE
+	MultiByteToWideChar(CP_ACP, 0, tempClockFormat, -1, clockFormat, 256);
+#else
+	strcpy(clockFormat, tempClockFormat);
+#endif
+	tempClockFormat = ReadString(configFile, "boxBar.clock.tipformat:", "%A %d");
+#ifdef UNICODE
+	MultiByteToWideChar(CP_ACP, 0, tempClockFormat, -1, clockTipFormat, 256);
+#else
+	strcpy(clockTipFormat, tempClockFormat);
+#endif
+	SetTimer(barWnd, ClockTimer, 1000, NULL);
+}
+
+

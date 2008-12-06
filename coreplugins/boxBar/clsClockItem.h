@@ -11,9 +11,11 @@ class clsClockItem : public clsLabelItem
 		virtual ~clsClockItem();
 
 		virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+		virtual void readSettings();
 	protected:
 		UINT ClockTimer;
 		TCHAR clockFormat[256];
+		TCHAR clockTipFormat[256];
 	private:
 		static void showMenu(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
 };

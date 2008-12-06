@@ -40,6 +40,7 @@ LRESULT clsItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 	switch (msg)
 	{
 	case WM_MOUSEMOVE:
+//		dbg_printf("WM_MOUSEMOVE in collection");
 	case WM_MOUSELEAVE:
 	case WM_LBUTTONDOWN:
 	case WM_LBUTTONUP:
@@ -87,7 +88,7 @@ LRESULT clsItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 		}
 		return 0;
 	}
-
+//	dbg_printf("Collection now calling item wndProc");
 	return clsItem::wndProc(hWnd, msg, wParam, lParam);;
 }
 

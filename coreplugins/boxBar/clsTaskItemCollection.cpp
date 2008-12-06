@@ -50,7 +50,7 @@ void clsTaskItemCollection::populateTasks()
 	}
 	itemList.clear();
 	tasklist *task = GetTaskListPtr();
-	dbg_printf("Tasklist size : %d", GetTaskListSize());
+	//dbg_printf("Tasklist size : %d", GetTaskListSize());
 	for (int i = 0; i < GetTaskListSize(); ++i)
 	{
 		addItem(new clsTaskItem(task, vertical));

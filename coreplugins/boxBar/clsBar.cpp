@@ -4,6 +4,7 @@
 #include "clsTrayItemCollection.h"
 #include "clsTaskItemCollection.h"
 #include "clsFlexiSpacer.h"
+#include "clsWorkspaceLabel.h"
 
 #include <shellapi.h>
 
@@ -21,10 +22,24 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 	ZeroMemory(&wc, sizeof wc);
 
 	hBlackboxWnd = GetBBWnd();
-
-	const CHAR *configFileName = ConfigFileExists("plugins/boxBar/boxBar.rc", NULL);
+	char rcname[100];
+	char pluginpath[MAX_PATH];
+#ifdef UNICODE
+	WideCharToMultiByte(CP_ACP, 0 ,pClassName, -1, rcname, 95, NULL, NULL);
+#else
+	strcpy(rcname, pClassName);
+#endif
+	strcat(rcname,".rc");
+	GetModuleFileNameA(hInstance, pluginpath, MAX_PATH);
+	if(strrchr(pluginpath, '\\'))
+		(*(strrchr(pluginpath, '\\')+1))='\0';
+	const CHAR *configFileName = ConfigFileExists(rcname, pluginpath);
 	strcpy(configFile, configFileName);
-
+	if (strlen(configFile)==0)
+	{
+		strcpy(configFile, pluginpath);
+		strcat(configFile, rcname);
+	}
 	readSettings();
 
 	margin = 0;
@@ -180,7 +195,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case BB_BROADCAST:
 		{
 			const char *msg_string = (LPCSTR)lParam;
-			dbg_printf(msg_string);
+//			dbg_printf(msg_string);
 			if (!strnicmp(msg_string, "@boxBar.percentage", strlen("@boxBar.percentage")))
 			{
 				sizePercentage = atoi(msg_string+strlen("@boxBar.percentage"));
@@ -406,8 +421,8 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 			if (SetTaskbarPos)
 				SetTaskbarPos(wp->x, wp->y, wp->x + wp->cx, wp->y + wp->cy, barEdge);
-			else
-				dbg_printf("No SetTaskbarPos");
+//			else
+//				dbg_printf("No SetTaskbarPos");
 		}
 		break;
 	case WM_LBUTTONDOWN:
@@ -422,7 +437,6 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_RBUTTONDOWN:
 		if (wParam & MK_CONTROL)
 		{
-			dbg_printf("Config menu");
 			Menu *mainMenu = MakeNamedMenu("boxBar", "boxBar", true);
 			configMenu(mainMenu);
 			for(list<clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
@@ -430,7 +444,6 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			ShowMenu(mainMenu);
 			return 0;
 		}
-		dbg_printf("Pass on click");
 		break;
 	case WM_MOUSELEAVE:
 		trackMouse = false;
@@ -438,13 +451,16 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEMOVE:
 		if (user32.TrackMouseEvent && !trackMouse)
 		{
-			TRACKMOUSEEVENT mouseTrack;
+			//dbg_printf("Start mouse tracking %p",user32.TrackMouseEvent);
+			static TRACKMOUSEEVENT mouseTrack;
 			ZeroMemory(&mouseTrack, sizeof(mouseTrack));
 			mouseTrack.cbSize = sizeof(mouseTrack);
 			mouseTrack.dwFlags = TME_LEAVE;
 			mouseTrack.hwndTrack = barWnd;
-			user32.TrackMouseEvent(&mouseTrack);
+			//user32.TrackMouseEvent(&mouseTrack);
 			trackMouse = true;
+			//dbg_printf("Mouse tracking started");
+
 		}
 		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
 	default:
@@ -546,6 +562,10 @@ const CHAR * barItems = ReadString(configFile, "boxBar.items:", "tasks,tray, clo
 		else if (!stricmp(barItem, "tasks"))
 		{
 			addItem(new clsTaskItemCollection(vertical));
+		}
+		else if (!stricmp(barItem, "wslabel"))
+		{
+			addItem(new clsWorkspaceLabel(vertical));
 		}
 	}
 	while (strlen(barItems));

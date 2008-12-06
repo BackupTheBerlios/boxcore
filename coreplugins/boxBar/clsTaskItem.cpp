@@ -7,9 +7,9 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVe
 	fixed = DIM_VERTICAL;
 	vertical = false;
 	if (pTask->active)
-		style = SN_TOOLBARLABEL;
+		style = SN_TOOLBARWINDOWLABEL;
 	else
-		style = SN_TOOLBARBUTTON;
+		style = SN_TOOLBAR;
 	taskWnd = pTask->hwnd;
 #ifdef UNICODE
 	MultiByteToWideChar(CP_ACP, 0, pTask->caption, -1, caption, 256);
@@ -84,9 +84,9 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			return 0;
 		case TASKITEM_ACTIVATED:
 			if (taskWnd == (HWND)wParam)
-				style = SN_TOOLBARLABEL;
+				style = SN_TOOLBARWINDOWLABEL;
 			else
-				style = SN_TOOLBARBUTTON;
+				style = SN_TOOLBAR;
 			captionItem->setStyle(style);
 			drawNow();
 			return 0;
