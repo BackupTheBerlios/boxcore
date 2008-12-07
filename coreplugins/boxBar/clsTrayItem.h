@@ -6,6 +6,9 @@
 
 typedef BOOL(*fnTrayIconEvent)(HWND, UINT, UINT, WPARAM, LPARAM);
 
+/** @class clsTrayItem
+  * @brief Represents a single tray item in the bar
+  */
 class clsTrayItem : public clsIconItem
 {
 	public:
