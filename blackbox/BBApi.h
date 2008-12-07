@@ -1,31 +1,32 @@
-/*
- ============================================================================
-
-  This file is part of the bbLean source code
-  Copyright © 2001-2003 The Blackbox for Windows Development Team
-  Copyright © 2004 grischka
-
-  http://bb4win.sourceforge.net/bblean
-  http://sourceforge.net/projects/bb4win
-
- ============================================================================
-
-  bbLean and bb4win are free software, released under the GNU General
-  Public License (GPL version 2 or later), with an extension that allows
-  linking of proprietary modules under a controlled interface. This means
-  that plugins etc. are allowed to be released under any license the author
-  wishes. For details see:
-
-  http://www.fsf.org/licenses/gpl.html
-  http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
-
-  This program is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-  or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-  for more details.
-
- ============================================================================
-*/
+/** @file BBApi.h
+  * @brief Contains the defintions for use by plugins
+  *
+  * This file is part of the boxCore source code @n
+  * <!-- Copyright © 2001-2003 The Blackbox for Windows Development Team -->
+  * <!-- Copyright © 2004-2007 grischka -->
+  * <!-- Copyright © 2008 Carsomyr -->
+  * Copyright &copy; 2001-2003 The Blackbox for Windows Development Team @n
+  * Copyright &copy; 2004-2007 grischka @n
+  * Copyright &copy; 2008 Carsomyr
+  * @par links
+  * http://developer.berlios.de/projects/boxcore @n
+  * http://bb4win.sourceforge.net/bblean @n
+  * http://sourceforge.net/projects/bb4win @n
+  * @par License
+  * boxCore, bbLean and bb4win are free software, released under the GNU General
+  * Public License (GPL version 2 or later), with an extension that allows
+  * linking of proprietary modules under a controlled interface. This means
+  * that plugins etc. are allowed to be released under any license the author
+  * wishes. For details see:
+  * @par
+  * http://www.fsf.org/licenses/gpl.html @n
+  * http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
+  * @par
+  * This program is distributed in the hope that it will be useful, but
+  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+  * for more details.
+  */
 
 #ifndef __BBAPI_H_
 #define __BBAPI_H_
@@ -56,19 +57,6 @@
 #include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
-
-/*------------------------------------------ */
-/* plain C support */
-
-#ifndef __cplusplus
-  typedef char bool;
-  #define false 0
-  #define true 1
-  #define ISNULL
-  #define class struct
-#else
-  #define ISNULL =NULL
-#endif
 
 /*------------------------------------------ */
 /* Better dont use, core doesn't anyway */
