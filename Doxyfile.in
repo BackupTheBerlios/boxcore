@@ -156,7 +156,7 @@ FILE_PATTERNS          = *.c \
 RECURSIVE              = yes
 EXCLUDE                =
 EXCLUDE_SYMLINKS       = NO
-EXCLUDE_PATTERNS       = */build* */.hg* */.svn*
+EXCLUDE_PATTERNS       = */build* */.hg* */.svn* */coreplugins/* */plugins/*
 EXCLUDE_SYMBOLS        =
 EXAMPLE_PATH           =
 EXAMPLE_PATTERNS       = *
@@ -287,7 +287,8 @@ PERL_PATH              = /usr/bin/perl
 CLASS_DIAGRAMS         = YES
 MSCGEN_PATH            =
 HIDE_UNDOC_RELATIONS   = YES
-HAVE_DOT               = @USE_DOT@
+HAVE_DOT				= NO
+#HAVE_DOT               = @USE_DOT@
 DOT_FONTNAME           = FreeSans
 DOT_FONTPATH           =
 CLASS_GRAPH            = YES
@@ -313,4 +314,4 @@ DOT_CLEANUP            = YES
 #---------------------------------------------------------------------------
 # Configuration::additions related to the search engine
 #---------------------------------------------------------------------------
-SEARCHENGINE           = NO
+SEARCHENGINE           = YES
