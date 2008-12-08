@@ -42,7 +42,6 @@ typedef struct
 	StyleItem MenuTitle;
 	StyleItem MenuFrame;
 	StyleItem MenuHilite;
-	StyleItem MenuVolume;
 
 	StyleItem windowTitleFocus;
 	StyleItem windowLabelFocus;
@@ -75,6 +74,7 @@ typedef struct
 	bool metricsUnix;
 
 	int MenuSepMargin;
+	StyleItem MenuVolume;
 	COLORREF MenuSepColor;
 
 } StyleStruct;
