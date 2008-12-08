@@ -7,11 +7,13 @@ clsUser32::clsUser32()
 	{
 		AllowSetForegroundWindow = (fnAllowSetForegroundWindow)GetProcAddress(hModule, "AllowSetForegroundWindow");
 		TrackMouseEvent = (fnTrackMouseEvent)GetProcAddress(hModule, "TrackMouseEvent");
+		UpdateLayeredWindow = (fnUpdateLayeredWindow)GetProcAddress(hModule, "UpdateLayeredWindow");
 	}
 	else
 	{
 		AllowSetForegroundWindow = NULL;
 		TrackMouseEvent = NULL;
+		UpdateLayeredWindow = NULL;
 	}
 }
 
