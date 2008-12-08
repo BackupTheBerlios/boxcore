@@ -1,31 +1,32 @@
-/*
- ============================================================================
-
-  This file is part of the bbLean source code
-  Copyright © 2001-2003 The Blackbox for Windows Development Team
-  Copyright © 2004 grischka
-
-  http://bb4win.sourceforge.net/bblean
-  http://sourceforge.net/projects/bb4win
-
- ============================================================================
-
-  bbLean and bb4win are free software, released under the GNU General
-  Public License (GPL version 2 or later), with an extension that allows
-  linking of proprietary modules under a controlled interface. This means
-  that plugins etc. are allowed to be released under any license the author
-  wishes. For details see:
-
-  http://www.fsf.org/licenses/gpl.html
-  http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
-
-  This program is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-  or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-  for more details.
-
- ============================================================================
-*/
+/** @file BBApi.cpp
+  * @brief Contains the implementations for some plugin API functions and helpers
+  *
+  * This file is part of the boxCore source code @n
+  * <!-- Copyright © 2001-2003 The Blackbox for Windows Development Team -->
+  * <!-- Copyright © 2004-2007 grischka -->
+  * <!-- Copyright © 2008 Carsomyr -->
+  * Copyright &copy; 2001-2003 The Blackbox for Windows Development Team @n
+  * Copyright &copy; 2004-2007 grischka @n
+  * Copyright &copy; 2008 Carsomyr
+  * @par links
+  * http://developer.berlios.de/projects/boxcore @n
+  * http://bb4win.sourceforge.net/bblean @n
+  * http://sourceforge.net/projects/bb4win @n
+  * @par License
+  * boxCore, bbLean and bb4win are free software, released under the GNU General
+  * Public License (GPL version 2 or later), with an extension that allows
+  * linking of proprietary modules under a controlled interface. This means
+  * that plugins etc. are allowed to be released under any license the author
+  * wishes. For details see:
+  * @par
+  * http://www.fsf.org/licenses/gpl.html @n
+  * http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
+  * @par
+  * This program is distributed in the hope that it will be useful, but
+  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+  * for more details.
+  */
 
 #include "BB.h"
 #include "Settings.h"
@@ -65,7 +66,7 @@ unsigned long getfileversion(const char *path, char *buffer)
 	{
 		if (VerQueryValue(info_buffer,
 			// change to whatever version encoding used (currently language neutral)
-			"\\StringFileInfo\\000004b0\\FileVersion",
+			TEXT("\\StringFileInfo\\000004b0\\FileVersion"),
 			&value, &bytes))
 		{
 			strcpy(buffer, (const char*)value);
@@ -86,13 +87,9 @@ unsigned long getfileversion(const char *path, char *buffer)
 	return result;
 }
 
-//===========================================================================
-// API: GetBBVersion
-// Purpose: Returns the current version
-// In: None
-// Out: LPCSTR = Formatted Version String
-//===========================================================================
-
+/** @brief Returns the current version
+  * @return Fomratted version string
+  */
 LPCSTR GetBBVersion(void)
 {
 	static char bb_version [40];
@@ -100,13 +97,9 @@ LPCSTR GetBBVersion(void)
 	return bb_version;
 }
 
-//===========================================================================
-// API: GetBBWnd
-// Purpose: Returns the handle to the main Blackbox window
-// In: None
-// Out: HWND = Handle to the Blackbox window
-//===========================================================================
-
+/** @brief Returns the handle to the main Blackbox window
+  * @return Handle to the Blackbox window
+  */
 HWND GetBBWnd()
 {
 	return BBhwnd;
@@ -140,14 +133,11 @@ LPCSTR GetOSInfo(void)
 	return osinfo_buf;
 }
 
-//===========================================================================
-// API: GetBlackboxPath
-// Purpose: Copies the path of the Blackbox executable to the specified buffer
-// In: LPSTR pszPath = Location of the buffer for the path
-// In: int nMaxLen = Maximum length for the buffer
-// Out: bool = Returns status of completion
-//===========================================================================
-
+/** @brief Copies the path of the Blackbox executable to the specified buffer
+  * @param[in] pszPath Location of he buffer for the path
+  * @param[in] nMaxLen Maximum length for the buffer
+  * @return Returns status of completion
+  */
 LPSTR WINAPI GetBlackboxPath(LPSTR pszPath, int nMaxLen)
 {
 	GetModuleFileName(NULL, pszPath, nMaxLen);
@@ -686,29 +676,26 @@ ST struct fil_list *read_file(const char *filename)
 	return fl;
 }
 
-//===========================================================================
-// API: FoundLastValue
-// Purpose: Was the last read value actually in the rc-file?
-// returns: 0=no 1=yes 2=wildcard matched
-//===========================================================================
-
 ST int found_last_value;
 
+/** @brief Was the last read value actually in the rc-file?
+  * @return Returns 0 if no, 1 if an exact match was found and 2 if a match was found to a wildcard item
+  * @version All except xoblite
+  */
 int FoundLastValue(void)
 {
 	return found_last_value;
 }
 
-//===========================================================================
-// API: ReadValue
-// Purpose: Searches the given file for the supplied keyword and returns a
-// pointer to the value - string
-// In: LPCSTR path = String containing the name of the file to be opened
-// In: LPCSTR szKey = String containing the keyword to be looked for
-// In: LONG ptr: optional: an index into the file to start search.
-// Out: LPSTR = Pointer to the value string of the keyword
-//===========================================================================
-
+/** @brief Searches the given file for the supplied keyword and returns a pointer to the value - string
+  * @param[in] path String containing the name of the file to be opened
+  * @param[in] szKey String containing the keyword to be searched for
+  * @param[in,out] ptr Optional: an index into the file to start search
+  * return Pointer to the value string of the keyword
+  * @note The value stored in ptr is updated when this function is called, based on where the string was found.
+  * Under bbLean and friends, passing this directly back will locate the next instance if it exists. Under xoblite
+  * increment the value by 1 first.
+  */
 LPCSTR ReadValue(LPCSTR path, LPCSTR szKey, LONG *ptr)
 {
 	//static int rcc; dbg_printf("read %d %s", ++rcc, szKey);
@@ -865,26 +852,42 @@ bool RenameSetting(LPCSTR path, LPCSTR szKey, LPCSTR new_keyword)
 
 //===========================================================================
 
-// API: WriteString
+/** @brief Create or update a string key to a RC file
+  * @param[in] fileName The name of the RC file to update
+  * @param[in] szKey The name of the key to update
+  * @param[in] value The string value to write
+  */
 void WriteString(LPCSTR fileName, LPCSTR szKey, LPCSTR value)
 {
 	WriteValue(fileName, szKey, value);
 }
 
-// API: WriteBool
+/** @brief Create or update a boolean key to a RC file
+  * @param[in] fileName The name of the RC file to update
+  * @param[in] szKey The name of the key to update
+  * @param[in] value The key value (true or false)
+  */
 void WriteBool(LPCSTR fileName, LPCSTR szKey, bool value)
 {
 	WriteValue(fileName, szKey, value ? "true" : "false");
 }
 
-// API: WriteInt
+/** @brief Create or update an integer key to a RC file
+  * @param[in] fileName The name of the RC file to update
+  * @param[in] szKey The name of the key to update
+  * @param[in] value The integer to write
+  */
 void WriteInt(LPCSTR fileName, LPCSTR szKey, int value)
 {
 	char buff[32];
 	WriteValue(fileName, szKey, itoa(value, buff, 10));
 }
 
-// API: WriteColor
+/** @brief Create or update a color key to a RC file
+  * @param[in] fileName The name of the RC file to update
+  * @param[in] szKey The name of the key to update
+  * @param[in] value The color value to write
+  */
 void WriteColor(LPCSTR fileName, LPCSTR szKey, COLORREF value)
 {
 	char buff[32];
@@ -895,7 +898,13 @@ void WriteColor(LPCSTR fileName, LPCSTR szKey, COLORREF value)
 
 //===========================================================================
 
-// API: ReadBool
+/** @brief Read a boolean value from a RC file
+  * @param[in] fileName The name of the RC file to read
+  * @param[in] szKey The name of the key to read
+  * @param[in] bDefault A default value for the key
+  * @return The value read from the RC file if found
+  * otherwise the default value given.
+  */
 bool ReadBool(LPCSTR fileName, LPCSTR szKey, bool bDefault)
 {
 	LPCSTR szValue = ReadValue(fileName, szKey);
@@ -907,21 +916,39 @@ bool ReadBool(LPCSTR fileName, LPCSTR szKey, bool bDefault)
 	return bDefault;
 }
 
-// API: ReadInt
+/** @brief Read an integer value from a RC file
+  * @param[in] fileName The name of the RC file to read
+  * @param[in] szKey The name of the key to read
+  * @param[in] bDefault A default value for the key
+  * @return The value read from the RC file if found
+  * otherwise the default value given.
+  */
 int ReadInt(LPCSTR fileName, LPCSTR szKey, int nDefault)
 {
 	LPCSTR szValue = ReadValue(fileName, szKey);
 	return szValue ? atoi(szValue) : nDefault;
 }
 
-// API: ReadString
+/** @brief Read a string value from a RC file
+  * @param[in] fileName The name of the RC file to read
+  * @param[in] szKey The name of the key to read
+  * @param[in] bDefault A default value for the key
+  * @return The value read from the RC file if found
+  * otherwise the default value given.
+  */
 LPCSTR ReadString(LPCSTR fileName, LPCSTR szKey, LPCSTR szDefault)
 {
 	LPCSTR szValue = ReadValue(fileName, szKey);
 	return szValue ? szValue : szDefault;
 }
 
-// API: ReadColor
+/** @brief Read a color value from a RC file
+  * @param[in] fileName The name of the RC file to read
+  * @param[in] szKey The name of the key to read
+  * @param[in] bDefault A default value for the key
+  * @return The value read from the RC file if found
+  * otherwise the default value given.
+  */
 COLORREF ReadColor(LPCSTR fileName, LPCSTR szKey, LPCSTR defaultString)
 {
 	LPCSTR szValue = szKey[0] ? ReadValue(fileName, szKey) : NULL;

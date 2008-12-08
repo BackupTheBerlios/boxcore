@@ -267,7 +267,7 @@ void table_fn(unsigned char *p, int length, bool invert)
 		c[0] = from_blue  + diff_blue  * i / length;
 		c[1] = from_green + diff_green * i / length;
 		c[2] = from_red   + diff_red   * i / length;
-		c[3] = 0;
+		c[3] = 255;
 		c += 4; i += d;
 	}
 }
@@ -291,7 +291,7 @@ void table_fn_mirror(unsigned char *p, int length, bool invert)
 		c[0] = from_blue  + diff_blue  * v / length;
 		c[1] = from_green + diff_green * v / length;
 		c[2] = from_red   + diff_red   * v / length;
-		c[3] = 0;
+		c[3] = 255;
 		c += 4; i += d;
 	}
 }
@@ -309,7 +309,7 @@ void table_fn_split(unsigned char *p, int length, bool invert)
 		c[0] = (i>=(e/2))?(from_blue):(from_blue + diff_blue);
 		c[1] = (i>=(e/2))?(from_green):(from_green + diff_green);
 		c[2] = (i>=(e/2))?(from_red):(from_red + diff_red);
-		c[3] = 0;
+		c[3] = 255;
 		c += 4; i += d;
 	}
 }
@@ -321,7 +321,7 @@ inline void diag_fn(unsigned char *c, int x, int y)
 	c[0] = ((unsigned)xp[0] + (unsigned)yp[0]) >> 1;
 	c[1] = ((unsigned)xp[1] + (unsigned)yp[1]) >> 1;
 	c[2] = ((unsigned)xp[2] + (unsigned)yp[2]) >> 1;
-	c[3] = 0;
+	c[3] = 255;
 }
 
 inline void rect_fn(unsigned char *c, int x, int y)

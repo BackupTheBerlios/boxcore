@@ -36,16 +36,16 @@
 /*------------------------------------------ */
 
 #ifdef __GNUC__
-  #define _WIN32_IE 0x0501
+#define _WIN32_IE 0x0501
 #endif
 
 #ifdef __BORLANDC__
-  #define DLL_EXPORT /* .def file required to work around underscores */
-  #define _RWSTD_NO_EXCEPTIONS 1
+#define DLL_EXPORT /* .def file required to work around underscores */
+#define _RWSTD_NO_EXCEPTIONS 1
 #endif
 
 #ifndef DLL_EXPORT
-  #define DLL_EXPORT __declspec(dllexport)
+#define DLL_EXPORT __declspec(dllexport)
 #endif
 
 /*------------------------------------------ */
@@ -58,24 +58,51 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-/*------------------------------------------ */
-/* Better dont use, core doesn't anyway */
+#define ISNULL = NULL
 
-//Match the original definition
+/** @defgroup bbapi Plugin API
+  * @{
+  */
+
+/** @brief Maximum buffer size to use
+  *
+  * This define was used for the sizes of buffers. It is better
+  * to avoid this and size your buffer appropriately because the value for this may
+  * differ between branches or forks. Use MAX_PATH instead
+  * for paths, and choose a reasonable size for other buffers.
+  * @note The bbLean core (and derivatives) do not use this definition at all internally
+  */
 #define MAX_LINE_LENGTH 4096
 
-/*------------------------------------------ */
-/* BImage definitions */
-
-/* Gradient types + solid */
+/** @defgroup BImageDefs BImage definitions
+  * @{
+  */
+/** @brief A gradient from the left edge to the right
+  */
 #define B_HORIZONTAL 0
+/** @brief A gradient from the top edge to the bottom
+  */
 #define B_VERTICAL   1
+/** @brief A gradient from the top left corner to the bottom right corner
+  */
 #define B_DIAGONAL   2
+/** @brief A gradient from the top right corner to the bottom left corner
+  */
 #define B_CROSSDIAGONAL 3
+/** @brief Gradient that starts at the corners and changes towards the center of the rectangle and sides
+  */
 #define B_PIPECROSS  4
+/** @brief Gradient that starts in the center and changes towards the edges in an elliptic shape
+  */
 #define B_ELLIPTIC   5
+/** @brief Gradient that starts in the center and changes towards the edges in a rectangular
+  */
 #define B_RECTANGLE  6
+/** @brief Gradient that starts at the corners and changes towards the center of the rectangle
+  */
 #define B_PYRAMID    7
+/** @brief A single solid color
+  */
 #define B_SOLID      8
 #define B_SPLITVERTICAL 9
 #define B_MIRRORHORIZONTAL 10
@@ -87,6 +114,8 @@
 #define BEVEL_SUNKEN 2
 #define BEVEL1 1
 #define BEVEL2 2
+
+/// @}
 
 /*=========================================================================== */
 /* Blackbox messages */
@@ -100,16 +129,16 @@
 #define BB_RECONFIGURE          10103
 #define BB_SETSTYLE             10104 /* lParam: const char* stylefile */
 #define BB_EXITTYPE             10105 /* lParam: 0=Shutdown/Reboot/Logoff 1=Quit 2=Restart */
-  #define B_SHUTDOWN 0
-  #define B_QUIT 1
-  #define B_RESTART 2
+#define B_SHUTDOWN 0
+#define B_QUIT 1
+#define B_RESTART 2
 #define BB_TOOLBARUPDATE        10106
 #define BB_SETTHEME             10107 /* xoblite */
 
 /* ----------------------------------- */
 #define BB_EDITFILE             10201
-  /* wParam: 0=CurrentStyle, 1=menu.rc, 2=plugins.rc 3=extensions.rc 4=blackbox.rc
-	-1=filename in (LPCSTR)lParam */
+/* wParam: 0=CurrentStyle, 1=menu.rc, 2=plugins.rc 3=extensions.rc 4=blackbox.rc
+  -1=filename in (LPCSTR)lParam */
 
 #define BB_EXECUTE              10202 /* Send a command or broam for execution (in lParam) */
 #define BB_ABOUTSTYLE           10203
@@ -117,15 +146,15 @@
 
 /* ----------------------------------- */
 #define BB_MENU                 10301
-  /* wParam: 0=Main menu, 1=Workspaces menu, 2=Toolbar menu */
-  #define BB_MENU_ROOT        0
-  #define BB_MENU_TASKS       1
-  #define BB_MENU_TOOLBAR     2
-  #define BB_MENU_ICONS       3
-  #define BB_MENU_PLUGIN      4
-  #define BB_MENU_CONTEXT     5
-  #define BB_MENU_BYBROAM     6
-  #define BB_MENU_BYBROAM_KBD 7
+/* wParam: 0=Main menu, 1=Workspaces menu, 2=Toolbar menu */
+#define BB_MENU_ROOT        0
+#define BB_MENU_TASKS       1
+#define BB_MENU_TOOLBAR     2
+#define BB_MENU_ICONS       3
+#define BB_MENU_PLUGIN      4
+#define BB_MENU_CONTEXT     5
+#define BB_MENU_BYBROAM     6
+#define BB_MENU_BYBROAM_KBD 7
 
 #define BB_HIDEMENU             10302
 #define BB_TOGGLETRAY           10303   /* toggls system bar's etc. */
@@ -145,52 +174,52 @@
 #define BB_LISTDESKTOPS         10502
 #define BB_SWITCHTON            10503
 #define BB_BRINGTOFRONT         10504   /* lParam: Window to activate */
-  /* wParam flag: Zoom window into current workspace and activate: */
-  #define BBBTF_CURRENT 4
+/* wParam flag: Zoom window into current workspace and activate: */
+#define BBBTF_CURRENT 4
 
 /* ----------------------------------- */
 #define BB_WORKSPACE            10505
-  /* wParam values: */
-  #define BBWS_DESKLEFT         0
-  #define BBWS_DESKRIGHT        1
-  #define BBWS_ADDDESKTOP       2
-  #define BBWS_DELDESKTOP       3
-  #define BBWS_SWITCHTODESK     4  /* lParam: workspace to switch to. */
-  #define BBWS_GATHERWINDOWS    5
-  #define BBWS_MOVEWINDOWLEFT   6  /* lParam: hwnd or NULL for foregroundwindow */
-  #define BBWS_MOVEWINDOWRIGHT  7  /* lParam: hwnd or NULL for foregroundwindow */
-  #define BBWS_PREVWINDOW       8  /* lParam: 0=current / 1=all workspaces */
-  #define BBWS_NEXTWINDOW       9  /* lParam: 0=current / 1=all workspaces */
-  #define BBWS_LASTDESK         10
+/* wParam values: */
+#define BBWS_DESKLEFT         0
+#define BBWS_DESKRIGHT        1
+#define BBWS_ADDDESKTOP       2
+#define BBWS_DELDESKTOP       3
+#define BBWS_SWITCHTODESK     4  /* lParam: workspace to switch to. */
+#define BBWS_GATHERWINDOWS    5
+#define BBWS_MOVEWINDOWLEFT   6  /* lParam: hwnd or NULL for foregroundwindow */
+#define BBWS_MOVEWINDOWRIGHT  7  /* lParam: hwnd or NULL for foregroundwindow */
+#define BBWS_PREVWINDOW       8  /* lParam: 0=current / 1=all workspaces */
+#define BBWS_NEXTWINDOW       9  /* lParam: 0=current / 1=all workspaces */
+#define BBWS_LASTDESK         10
 
-  #define BBWS_TOGGLESTICKY     12 /* lParam: hwnd or NULL for foregroundwindow */
-  #define BBWS_EDITNAME         13
-  #define BBWS_MAKESTICKY       14 /* lParam: hwnd or NULL for foregroundwindow */
-  #define BBWS_CLEARSTICKY      15 /* lParam: hwnd or NULL for foregroundwindow */
+#define BBWS_TOGGLESTICKY     12 /* lParam: hwnd or NULL for foregroundwindow */
+#define BBWS_EDITNAME         13
+#define BBWS_MAKESTICKY       14 /* lParam: hwnd or NULL for foregroundwindow */
+#define BBWS_CLEARSTICKY      15 /* lParam: hwnd or NULL for foregroundwindow */
 
-  #define BBWS_MINIMIZEALL      20
-  #define BBWS_RESTOREALL       21
-  #define BBWS_TILEVERTICAL     22
-  #define BBWS_TILEHORIZONTAL   23
-  #define BBWS_CASCADE          24
+#define BBWS_MINIMIZEALL      20
+#define BBWS_RESTOREALL       21
+#define BBWS_TILEVERTICAL     22
+#define BBWS_TILEHORIZONTAL   23
+#define BBWS_CASCADE          24
 
-  #define BBWS_MOVEWINDOWTOWS   25  /* lParam: desktop number, bool follow */
+#define BBWS_MOVEWINDOWTOWS   25  /* lParam: desktop number, bool follow */
 
 /*------------------------------------------ */
 #define BB_TASKSUPDATE          10506
-  /* lParam for BB_TASKSUPDATE: */
-  #define TASKITEM_ADDED 0        /*  wParam: hwnd */
-  #define TASKITEM_MODIFIED 1     /*  wParam: hwnd */
-  #define TASKITEM_ACTIVATED 2    /*  wParam: hwnd */
-  #define TASKITEM_REMOVED 3      /*  wParam: hwnd */
-  #define TASKITEM_REFRESH 4      /*  wParam: NULL, sent on workspace change of one or more tasks */
-  #define TASKITEM_FLASHED 5      /*  wParam: hwnd */
+/* lParam for BB_TASKSUPDATE: */
+#define TASKITEM_ADDED 0        /*  wParam: hwnd */
+#define TASKITEM_MODIFIED 1     /*  wParam: hwnd */
+#define TASKITEM_ACTIVATED 2    /*  wParam: hwnd */
+#define TASKITEM_REMOVED 3      /*  wParam: hwnd */
+#define TASKITEM_REFRESH 4      /*  wParam: NULL, sent on workspace change of one or more tasks */
+#define TASKITEM_FLASHED 5      /*  wParam: hwnd */
 
 #define BB_TRAYUPDATE           10507
-  /* lParam for BB_TRAYUPDATE: */
-  #define TRAYICON_ADDED 0
-  #define TRAYICON_MODIFIED 1
-  #define TRAYICON_REMOVED 2
+/* lParam for BB_TRAYUPDATE: */
+#define TRAYICON_ADDED 0
+#define TRAYICON_MODIFIED 1
+#define TRAYICON_REMOVED 2
 
 #define BB_CLEANTRAY            10508
 #define BB_DRAGTODESKTOP        10510 /* wParam 0:execute drop  1:test if accepted */
@@ -246,14 +275,14 @@
 /* for bbStylemaker & bbLeanSkin */
 #define BB_REDRAWGUI            10881
 /* wParam bitflags: */
-  #define BBRG_TOOLBAR (1<<0)
-  #define BBRG_MENU    (1<<1)
-  #define BBRG_WINDOW  (1<<2)
-  #define BBRG_DESK    (1<<3)
-  #define BBRG_FOCUS   (1<<4)
-  #define BBRG_PRESSED (1<<5)
-  #define BBRG_STICKY  (1<<6)
-  #define BBRG_FOLDER  (1<<7)
+#define BBRG_TOOLBAR (1<<0)
+#define BBRG_MENU    (1<<1)
+#define BBRG_WINDOW  (1<<2)
+#define BBRG_DESK    (1<<3)
+#define BBRG_FOCUS   (1<<4)
+#define BBRG_PRESSED (1<<5)
+#define BBRG_STICKY  (1<<6)
+#define BBRG_FOLDER  (1<<7)
 
 #define BB_EXECUTEASYNC         10882   /* Post a command or broam for execution (in lParam), like BB_EXECUTE, but returns immediately */
 #define BB_DESKCLICK            10884   /* desktop clicked (lParam: 0=leftdown 1=left, 2=right, 3=mid, 4=x1, 5=x2, 6=x3) */
@@ -286,13 +315,31 @@
 /*=========================================================================== */
 /* extended Style-info for convenience and other purposes (backwards compatible) */
 
+/** @brief Contains data for a single style item
+  */
 typedef struct StyleItem
 {
 	/* 0.0.80 */
+	/** @brief Style of the border on item
+	  * @version Since bb4win 0.0.80
+	  */
 	int bevelstyle;
+	/** @brief Style of the border on item
+	  * @version Since bb4win 0.0.80
+	  */
 	int bevelposition;
+	/** @brief Gradient type
+	  * @version Since bb4win 0.0.80
+	  */
 	int type;
+	/** @brief Indicates that only the border should be drawn when true
+	  * @version Since bb4win 0.0.80
+	  */
 	bool parentRelative;
+	/** @brief Inidcates if this item should be drawn interlaced
+	  * @todo Get better description
+	  * @version Since bb4win 0.0.80
+	  */
 	bool interlaced;
 
 	/* 0.0.90 */
@@ -317,7 +364,10 @@ typedef struct StyleItem
 	bool FontShadow; /* xoblite */
 	union
 	{
-		struct { char ShadowX; char ShadowY; };
+		struct {
+			char ShadowX;
+			char ShadowY;
+		};
 		unsigned short ShadowXY;
 	};
 	COLORREF ShadowColor;
@@ -354,25 +404,65 @@ typedef struct StyleItem
 typedef class Menu Menu;
 typedef class MenuItem MenuItem;
 
-/*=========================================================================== */
-/* constants for GetSettingPtr(int index) -> returns: */
-enum {
-
-	SN_STYLESTRUCT      = 0     , /* StyleStruct* */
-
-	SN_TOOLBAR          = 1     , /* StyleItem* */
-	SN_TOOLBARBUTTON            , /* StyleItem* */
-	SN_TOOLBARBUTTONP           , /* StyleItem* */
-	SN_TOOLBARLABEL             , /* StyleItem* */
-	SN_TOOLBARWINDOWLABEL       , /* StyleItem* */
-	SN_TOOLBARCLOCK             , /* StyleItem* */
-	SN_MENUTITLE                , /* StyleItem* */
-	SN_MENUFRAME                , /* StyleItem* */
-	SN_MENUHILITE               , /* StyleItem* */
+/** @brief Constants for use with GetSettingPtr.
+  */
+enum eSettings
+{
+	/** @brief Fetch the internal style structure
+	  * @par GetSettingPtr will return
+	  * StyleStruct *
+	  * @warning This is an internal structure and is not defined in the API
+	  */
+	SN_STYLESTRUCT,
+	/** @brief Fetch the toolbar style
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  */
+	SN_TOOLBAR,
+	/** @brief Fetch the unpressed toolbar button style
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  */
+	SN_TOOLBARBUTTON,
+	/** @brief Fetch the pressed toolbar button style
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  */
+	SN_TOOLBARBUTTONP,
+	/** @brief Fetch the unpressed toolbar label style
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  */
+	SN_TOOLBARLABEL,
+	/** @brief Fetch the toolbar windowlabel style
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  */
+	SN_TOOLBARWINDOWLABEL,
+	/** @brief Fetch the toolbar clock style
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  */
+	SN_TOOLBARCLOCK,
+	/** @brief Fetch the menu title style
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  */
+	SN_MENUTITLE,
+	/** @brief Fetch the menu frame style (This is most of the menu)
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  */
+	SN_MENUFRAME,
+	/** @brief Fetch the menu highlight style
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  */
+	SN_MENUHILITE,
 
 	SN_MENUBULLET               , /* char* */
 	SN_MENUBULLETPOS              /* char* */
-								,
+	,
 	SN_BORDERWIDTH              , /* int* */
 	SN_BORDERCOLOR              , /* COLORREF* */
 	SN_BEVELWIDTH               , /* int* */
@@ -384,27 +474,110 @@ enum {
 	SN_TOOLBARALPHA             , /* int* */
 	SN_METRICSUNIX              , /* bool* */
 	SN_BULLETUNIX               , /* bool* */
-
-	SN_WINFOCUS_TITLE           , /* StyleItem* */
-	SN_WINFOCUS_LABEL           , /* StyleItem* */
-	SN_WINFOCUS_HANDLE          , /* StyleItem* */
-	SN_WINFOCUS_GRIP            , /* StyleItem* */
-	SN_WINFOCUS_BUTTON          , /* StyleItem* */
-	SN_WINFOCUS_BUTTONP           /* StyleItem* */
-								,
-	SN_WINUNFOCUS_TITLE         , /* StyleItem* */
-	SN_WINUNFOCUS_LABEL         , /* StyleItem* */
-	SN_WINUNFOCUS_HANDLE        , /* StyleItem* */
-	SN_WINUNFOCUS_GRIP          , /* StyleItem* */
-	SN_WINUNFOCUS_BUTTON        , /* StyleItem* */
-
-	SN_WINFOCUS_FRAME_COLOR     , /* COLORREF* */
-	SN_WINUNFOCUS_FRAME_COLOR   , /* COLORREF* */
-
-	SN_NEWMETRICS               , /* bool (not a ptr) */
-
-    SN_MENUVOLUME               , /* StyleItem* */
-
+	/** @brief Fetch the title style for focused windows
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  */
+	SN_WINFOCUS_TITLE,
+	/** @brief Fetch the label style for focused windows
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  * @version Defined under all releases except normal bb4win
+	  */
+	SN_WINFOCUS_LABEL,
+	/** @brief Fetch the handle style for focused windows
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  * @version Defined under all releases except normal bb4win
+	  */
+	SN_WINFOCUS_HANDLE,
+	/** @brief Fetch the grip style for focused windows
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  * @version Defined under all releases except normal bb4win
+	  */
+	SN_WINFOCUS_GRIP,
+	/** @brief Fetch the unpressed button style for focused windows
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  * @version Defined under all releases except normal bb4win
+	  */
+	SN_WINFOCUS_BUTTON,
+	/** @brief Fetch the pressed button style for focused windows
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  * @version Defined under all releases except normal bb4win
+	  */
+	SN_WINFOCUS_BUTTONP,
+	/** @brief Fetch the title style for unfocused windows
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  * @version Defined under all releases except normal bb4win
+	  */
+	SN_WINUNFOCUS_TITLE,
+	/** @brief Fetch the label style for unfocused windows
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  * @version Defined under all releases except normal bb4win
+	  */
+	SN_WINUNFOCUS_LABEL,
+	/** @brief Fetch the handle style for focused windows
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  * @version Defined under all releases except normal bb4win
+	  */
+	SN_WINUNFOCUS_HANDLE,
+	/** @brief Fetch the grip style for ufocused windows
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  * @version Defined under all releases except normal bb4win
+	  */
+	SN_WINUNFOCUS_GRIP,
+	/** @brief Fetch the unpressed button style for unfocused windows
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  * @version Defined under all releases except normal bb4win
+	  * @note Unfocused windows only have an unpressed button style. Once you
+	  * press the button the window will be focused.
+	  */
+	SN_WINUNFOCUS_BUTTON,
+	/** @brief Fetch the frame color for focused windows
+	  * @par GetSettingPtr will return
+	  * COLORREF *
+	  * @version Defined under all releases except normal bb4win
+	  */
+	SN_WINFOCUS_FRAME_COLOR,
+	/** @brief Fetch the frame color for unfocused windows
+	  * @par GetSettingPtr will return
+	  * COLORREF *
+	  * @version Defined under all releases except normal bb4win
+	  */
+	SN_WINUNFOCUS_FRAME_COLOR,
+	/** @brief Is the core/style using new metrics?
+	  * @par GetSettingPtr will return
+	  * bool
+	  * @version Defined under all releases except normal bb4win
+	  */
+	SN_NEWMETRICS,
+	/** @brief Fetch the menu seperator style
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  * @version Only present in recent bbleanmod, bb4win_mod.
+	  * Defined by boxCore header but not implemented.
+	  */
+	SN_MENUSEPARATOR,
+	/** @brief Fetch the menu volume slider style
+	  * @par GetSettingPtr will return
+	  * StyleItem *
+	  * @version
+	  * Present in recent bbleanmod, bb4win_mod and boxCore releases.
+	  * Also present in bbClean releases but has a different value
+	  */
+	SN_MENUVOLUME,
+	/** @brief One greater than the last valid constant
+		  * @par GetSettingPtr will return
+		  * Nothing
+		  */
 	SN_LAST
 };
 
@@ -476,18 +649,18 @@ extern "C" {
 
 	API_EXPORT HMONITOR GetMonitorRect(void *from, RECT *r, int Flags);
 	/* Flags: */
-	#define GETMON_FROM_WINDOW 1    /* 'from' is HWND */
-	#define GETMON_FROM_POINT 2     /* 'from' is POINT* */
-	#define GETMON_FROM_MONITOR 4   /* 'from' is HMONITOR */
-	#define GETMON_WORKAREA 16      /* get working area rather than full screen */
+#define GETMON_FROM_WINDOW 1    /* 'from' is HWND */
+#define GETMON_FROM_POINT 2     /* 'from' is POINT* */
+#define GETMON_FROM_MONITOR 4   /* 'from' is HMONITOR */
+#define GETMON_WORKAREA 16      /* get working area rather than full screen */
 
 	API_EXPORT void SnapWindowToEdge(WINDOWPOS* windowPosition, LPARAM nDist_or_pContent, UINT Flags);
 	/* Flags: */
-	#define SNAP_FULLSCREEN 1  /* use full screen rather than workarea */
-	#define SNAP_NOPLUGINS  2  /* dont snap to other plugins */
-	#define SNAP_CONTENT    4  /* the "nDist_or_pContent" parameter points to a SIZE struct */
-	#define SNAP_NOPARENT   8  /* dont snap to parent window edges */
-	#define SNAP_SIZING    16  /* window is resized (bottom-right sizing only) */
+#define SNAP_FULLSCREEN 1  /* use full screen rather than workarea */
+#define SNAP_NOPLUGINS  2  /* dont snap to other plugins */
+#define SNAP_CONTENT    4  /* the "nDist_or_pContent" parameter points to a SIZE struct */
+#define SNAP_NOPARENT   8  /* dont snap to parent window edges */
+#define SNAP_SIZING    16  /* window is resized (bottom-right sizing only) */
 
 	API_EXPORT bool SetTransparency(HWND hwnd, BYTE alpha);
 	/* alpha: 0-255, 255=transparency off */
@@ -681,9 +854,9 @@ extern "C" {
 	/* set workspace and/or position for window */
 	API_EXPORT bool SetTaskLocation(HWND, struct taskinfo *pti, UINT flags);
 	/* where flags are: */
-	#define BBTI_SETDESK    1 /* move window to desk as specified */
-	#define BBTI_SETPOS     2 /* move window to x/ypos as spec'd */
-	#define BBTI_SWITCHTO   4 /* switch workspace after move */
+#define BBTI_SETDESK    1 /* move window to desk as specified */
+#define BBTI_SETPOS     2 /* move window to x/ypos as spec'd */
+#define BBTI_SWITCHTO   4 /* switch workspace after move */
 
 	/* experimental: */
 	typedef BOOL (*TASKENUMPROC)(struct tasklist *, LPARAM);
@@ -700,7 +873,10 @@ extern "C" {
 
 	/* ------------------------------------ */
 	/* Desktop Information: */
-	typedef struct string_node { struct string_node *next; char str[1]; } string_node;
+	typedef struct string_node {
+		struct string_node *next;
+		char str[1];
+	} string_node;
 
 	typedef struct DesktopInfo
 	{
@@ -752,19 +928,20 @@ extern "C" {
 		bool    bbsb_linkedToToolbar;
 		bool    bbsb_reverseTasks;
 		bool    bbsb_currentOnly;
-	 } ToolbarInfo;
+	} ToolbarInfo;
 
 	/* retrieve a pointer to core's static ToolbarInfo */
 	API_EXPORT ToolbarInfo *GetToolbarInfo(void);
 
 	/* Toolbar placements */
-	#define PLACEMENT_TOP_LEFT 0
-	#define PLACEMENT_TOP_CENTER 1
-	#define PLACEMENT_TOP_RIGHT 2
-	#define PLACEMENT_BOTTOM_LEFT 3
-	#define PLACEMENT_BOTTOM_CENTER 4
-	#define PLACEMENT_BOTTOM_RIGHT 5
+#define PLACEMENT_TOP_LEFT 0
+#define PLACEMENT_TOP_CENTER 1
+#define PLACEMENT_TOP_RIGHT 2
+#define PLACEMENT_BOTTOM_LEFT 3
+#define PLACEMENT_BOTTOM_CENTER 4
+#define PLACEMENT_BOTTOM_RIGHT 5
 
+/// @}
 	/* ------------------------------------ */
 	/* plugin interface declarations */
 
