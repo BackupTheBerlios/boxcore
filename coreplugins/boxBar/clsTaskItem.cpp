@@ -6,10 +6,7 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVe
 {
 	fixed = DIM_VERTICAL;
 	vertical = false;
-	if (pTask->active)
-		style = SN_TOOLBARWINDOWLABEL;
-	else
-		style = SN_TOOLBAR;
+
 	taskWnd = pTask->hwnd;
 #ifdef UNICODE
 	MultiByteToWideChar(CP_ACP, 0, pTask->caption, -1, caption, 256);
@@ -28,6 +25,17 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVe
 	addItem(iconItem);
 	addItem(captionItem);
 	leftClick = activateTask;
+
+	if (pTask->active)
+	{
+		style = activeStyle;
+		itemAlpha = activeAlpha;
+	}
+	else
+	{
+		style = inactiveStyle;
+		itemAlpha = inactiveAlpha;
+	}
 }
 
 /** @brief TaskItem destructor
@@ -79,7 +87,7 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 								iconItem->setIcon(task->icon);
 						else
 							iconItem->setIcon(task->icon);
-						drawNow();
+						PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 						break;
 					}
 					task = task->next;
@@ -88,11 +96,17 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			return 0;
 		case TASKITEM_ACTIVATED:
 			if (taskWnd == (HWND)wParam)
-				style = SN_TOOLBARWINDOWLABEL;
+			{
+				style = activeStyle;
+				itemAlpha = activeAlpha;
+			}
 			else
-				style = SN_TOOLBAR;
+			{
+				style = inactiveStyle;
+				itemAlpha = inactiveAlpha;
+			}
 			captionItem->setStyle(style);
-			drawNow();
+			PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 			return 0;
 		}
 		break;
@@ -129,6 +143,14 @@ void clsTaskItem::readSettings()
 	iconSize = ReadInt(configFile, "boxBar.tasks.iconsize:", 16);
 	spacingBorder = ReadInt(configFile, "boxBar.tasks.task.spacingBorder:", 2);
 	spacingItems = ReadInt(configFile, "boxBar.tasks.task.spacingItems:", 2);
+
+	activeAlpha = ReadInt(configFile, "boxBar.tasks.active.alpha:", 255);
+	inactiveAlpha = ReadInt(configFile, "boxBar.tasks.inactive.alpha:", 255);
+	activeStyle = ReadBool(configFile, "boxBar.tasks.active.background:", true) ? SN_TOOLBARWINDOWLABEL : 0;
+	inactiveStyle = ReadBool(configFile, "boxBar.tasks.inactive.background:", true) ? SN_TOOLBAR : 0;
 }
 
-
+int clsTaskItem::inactiveStyle = SN_TOOLBAR;
+int clsTaskItem::activeStyle = SN_TOOLBARWINDOWLABEL;
+int clsTaskItem::inactiveAlpha = 255;
+int clsTaskItem::activeAlpha = 255;

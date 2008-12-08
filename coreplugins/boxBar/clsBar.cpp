@@ -18,9 +18,6 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 	isBar = true;
 	hInstance = pInstance;
 	_tcscpy(className, pClassName);
-	style = SN_TOOLBAR;
-	WNDCLASS wc;
-	ZeroMemory(&wc, sizeof wc);
 
 	hBlackboxWnd = GetBBWnd();
 	char rcname[100];
@@ -50,6 +47,8 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 	else
 		SetTaskbarPos = NULL;
 
+	WNDCLASS wc;
+	ZeroMemory(&wc, sizeof wc);
 	wc.lpfnWndProc      = realWndProc;
 	wc.cbClsExtra = sizeof(this);
 	wc.hInstance        = pInstance;
@@ -69,7 +68,7 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 	int y = ReadInt(configFile, "boxBar.y:", 0);
 
 	barWnd = CreateWindowEx(
-				 WS_EX_TOOLWINDOW | WS_EX_TOPMOST,   // window ex-style
+				 WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_LAYERED,   // window ex-style
 				 pClassName,          // window class name
 				 NULL,               // window caption text
 				 WS_POPUP | WS_OVERLAPPED, // window style
@@ -84,8 +83,20 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 			 );
 	ShowWindow(barWnd, SW_SHOWNA);
 
+	buffer = CreateCompatibleDC(NULL);
+	ZeroMemory(&bufferInfo, sizeof(bufferInfo));
+			bufferInfo.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
+			bufferInfo.bmiHeader.biWidth = 1;
+			bufferInfo.bmiHeader.biHeight = 1;
+			bufferInfo.bmiHeader.biPlanes = 1;
+			bufferInfo.bmiHeader.biBitCount = 32;
+	brushBitmap = CreateDIBSection(buffer, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
+	eraseBrush = CreatePatternBrush(brushBitmap);
 
-
+	bufferInfo.bmiHeader.biWidth = itemArea.right - itemArea.left;
+			bufferInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
+	bufferBitmap = CreateDIBSection(buffer, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
+	origBitmap = (HBITMAP)SelectObject(buffer, bufferBitmap);
 	populateBar();
 
 }
@@ -96,6 +107,11 @@ clsBar::~clsBar()
 		delete (*i);
 	itemList.clear();
 	bbApiLoader.freeLibrary();
+	SelectObject(buffer, origBitmap);
+	DeleteObject(bufferBitmap);
+	DeleteObject(eraseBrush);
+	DeleteObject(brushBitmap);
+	DeleteDC(buffer);
 	DestroyWindow(barWnd);
 	UnregisterClass(className, hInstance);
 }
@@ -140,6 +156,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		SendMessage(hBlackboxWnd, BB_REGISTERMESSAGE, (WPARAM)hWnd, (LPARAM)messages);
 		// Make the window appear on all workspaces
 		MakeSticky(hWnd);
+		//SetLayeredWindowAttributes(hWnd, RGB(255,0,255), 255, LWA_COLORKEY);
 		return 0;
 
 	case WM_DESTROY:
@@ -158,27 +175,51 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		// ----------------------------------------------------------
 		// Painting with a cached double-buffer.
-
+	case BOXBAR_REDRAW:
 	case WM_PAINT:
 		{
 			PAINTSTRUCT ps;
 			HDC hdc = BeginPaint(hWnd, &ps);
-			HDC buffer = CreateCompatibleDC(hdc);
-			HBITMAP bufferBitmap = CreateCompatibleBitmap(hdc, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top);
-			HBITMAP otherBitmap = (HBITMAP)SelectObject(buffer, bufferBitmap);
+			//static HBITMAP bufferBitmap = CreateCompatibleBitmap(hdc, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top);
+
+			if (!style)
+			{
+			bufferInfo.bmiHeader.biWidth = 1;
+			bufferInfo.bmiHeader.biHeight = 1;
+			HBITMAP brushBitmap = CreateDIBSection(hdc, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
+			HBRUSH eraseBrush = CreatePatternBrush(brushBitmap);
+			FillRect(buffer, &itemArea, eraseBrush);
+			DeleteObject(eraseBrush);
+			DeleteObject(brushBitmap);
+			}
+
 			draw(buffer);
-			BitBlt(hdc, itemArea.left, itemArea.top,
-				   itemArea.right - itemArea.left, itemArea.bottom - itemArea.top,
-				   buffer, itemArea.left, itemArea.top, SRCCOPY);
-			SelectObject(buffer, otherBitmap);
-			DeleteObject(bufferBitmap);
-			DeleteDC(buffer);
+			POINT dcPoint;
+			dcPoint.x = 0;
+			dcPoint.y = 0;
+			BLENDFUNCTION blend;
+			ZeroMemory(&blend, sizeof(blend));
+			blend.BlendOp = AC_SRC_OVER;
+			blend.SourceConstantAlpha = 255;
+			blend.AlphaFormat = AC_SRC_ALPHA;
+			RECT windowRect;
+			GetWindowRect(barWnd, &windowRect);
+			POINT drawPoint;
+			drawPoint.x= windowRect.left;
+			drawPoint.y = windowRect.top;
+			SIZE drawSize;
+			drawSize.cx=windowRect.right - windowRect.left;
+			drawSize.cy = windowRect.bottom - windowRect.top;
+			user32.UpdateLayeredWindow(hWnd, GetDC(NULL), &drawPoint, &drawSize, buffer, &dcPoint, RGB(255,0,255), &blend, alphaDraw?ULW_ALPHA:ULW_OPAQUE);
+			//BitBlt(hdc, itemArea.left, itemArea.top,
+			//	   itemArea.right - itemArea.left, itemArea.bottom - itemArea.top,
+			//	   buffer, itemArea.left, itemArea.top, SRCCOPY);
+			//SelectObject(buffer, otherBitmap);
+			//DeleteObject(bufferBitmap);
+			//DeleteDC(buffer);
 			EndPaint(hWnd, &ps);
 			break;
 		}
-
-	case WM_ERASEBKGND:
-		return 1;
 
 		//Taken from bbleanbar
 	case WM_MOUSEACTIVATE:
@@ -208,6 +249,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				WriteBool(configFile, "boxBar.vertical:", vertical);
 				resize(1, 1);
 				populateBar();
+				PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 			}
 			break;
 		}
@@ -507,8 +549,14 @@ dimType clsBar::resize(int pX, int pY)
 		newY = barRect.top + dY;
 
 	SetWindowPos(barWnd, NULL, newX, newY, pX, pY, SWP_NOACTIVATE | SWP_NOZORDER);
+	bufferInfo.bmiHeader.biWidth = itemArea.right - itemArea.left;
+			bufferInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
+	SelectObject(buffer, origBitmap);
+	DeleteObject(bufferBitmap);
+	bufferBitmap = CreateDIBSection(buffer, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
+	origBitmap = (HBITMAP)SelectObject(buffer, bufferBitmap);
 	dimType tempReturn = clsItemCollection::resize(pX, pY);
-	InvalidateRect(barWnd, &itemArea, TRUE);
+	PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 	return tempReturn;
 }
 
@@ -598,6 +646,14 @@ void clsBar::readSettings()
 	vertical = ReadBool(configFile, "boxBar.vertical:", false);
 	spacingBorder = ReadInt(configFile, "boxBar.spacingBorder:", 3);
 	spacingItems = ReadInt(configFile, "boxBar.spacingItems:", 2);
+	if (user32.UpdateLayeredWindow)
+		style = ReadBool(configFile, "boxBar.drawBackground:", true) ? SN_TOOLBAR : 0;
+	else
+		style = SN_TOOLBAR;
+	if (style)
+		alphaDraw = ReadBool(configFile, "boxBar.useAlphaBlend:", false);
+	else
+		alphaDraw = true;
 
 	fixed = (vertical ? DIM_HORIZONTAL : DIM_VERTICAL);
 }

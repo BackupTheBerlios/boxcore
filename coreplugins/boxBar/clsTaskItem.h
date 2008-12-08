@@ -24,6 +24,11 @@ class clsTaskItem : public clsItemCollection
 
 		clsTextItem *captionItem;
 		clsIconItem *iconItem;
+
+		static int inactiveStyle;
+		static int activeStyle;
+		static int activeAlpha;
+		static int inactiveAlpha;
 	private:
 		static void activateTask(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
 };

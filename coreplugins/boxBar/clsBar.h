@@ -23,6 +23,14 @@ class clsBar : public clsItemCollection
 	protected:
 		void populateBar();
 	private:
+		HDC buffer;
+		HBITMAP bufferBitmap;
+		HBITMAP origBitmap;
+		BITMAPINFO bufferInfo;
+
+		HBITMAP brushBitmap;
+		HBRUSH eraseBrush;
+
 		TCHAR className[100];
 		bool moving;
 		bool trackMouse;

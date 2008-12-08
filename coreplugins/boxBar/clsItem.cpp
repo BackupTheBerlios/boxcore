@@ -24,6 +24,8 @@ clsItem::clsItem(bool pVertical)
 	midClick = NULL;
 	X1Click = NULL;
 	X2Click = NULL;
+
+	itemAlpha = 255;
 }
 
 /** @brief Base destructor
@@ -142,6 +144,7 @@ LRESULT clsItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONDOWN:
 		mouseDown = true;
 		mouseButton |= MK_LBUTTON;
+		dbg_printf("Left down");
 		break;
 	case WM_RBUTTONDOWN:
 		mouseDown = true;
@@ -291,9 +294,44 @@ void clsItem::initTooltips()
   */
 void clsItem::draw(HDC pContext)
 {
+	//bool alphaDraw = false;
 	if (style)
 	{
-		MakeStyleGradient(pContext, &itemArea, bbStyle.getStyle(style), bbStyle.getStyleBorder(style));
+		HDC internalDC;
+		HBITMAP internalBitmap, origBitmap;
+		if (alphaDraw)
+		{
+			BITMAPINFO bufferInfo;
+			ZeroMemory(&bufferInfo, sizeof(bufferInfo));
+			bufferInfo.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
+			bufferInfo.bmiHeader.biWidth = itemArea.right - itemArea.left;
+			bufferInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
+			bufferInfo.bmiHeader.biPlanes = 1;
+			bufferInfo.bmiHeader.biBitCount = 32;
+			internalDC = CreateCompatibleDC(pContext);
+			internalBitmap = CreateDIBSection(internalDC, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
+			origBitmap = (HBITMAP) SelectObject(internalDC, internalBitmap);
+			RECT tempArea;
+			tempArea.left = tempArea.top = 0;
+			tempArea.right = itemArea.right - itemArea.left;
+			tempArea.bottom = itemArea.bottom -itemArea.top;
+			MakeStyleGradient(internalDC, &tempArea, bbStyle.getStyle(style), bbStyle.getStyleBorder(style));
+			BLENDFUNCTION blendFunc;
+		blendFunc.BlendOp = AC_SRC_OVER;
+		blendFunc.BlendFlags = 0;
+		blendFunc.SourceConstantAlpha = itemAlpha;
+		blendFunc.AlphaFormat = AC_SRC_ALPHA;
+		AlphaBlend(pContext, itemArea.left, itemArea.top, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top, internalDC,
+				   0, 0, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top, blendFunc);
+			SelectObject(internalDC, origBitmap);
+			DeleteObject(internalBitmap);
+			DeleteDC(internalDC);
+		}
+		else
+		{
+			MakeStyleGradient(pContext, &itemArea, bbStyle.getStyle(style), bbStyle.getStyleBorder(style));
+		}
+
 	}
 }
 
@@ -340,3 +378,4 @@ CHAR clsItem::configFile[MAX_PATH] = {'\0'};
 clsStyle clsItem::bbStyle;
 HWND clsItem::hBlackboxWnd = NULL;
 HINSTANCE clsItem::hInstance = NULL;
+bool clsItem::alphaDraw = true;

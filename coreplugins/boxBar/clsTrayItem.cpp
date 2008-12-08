@@ -16,6 +16,7 @@ clsTrayItem::clsTrayItem(systemTray *trayItem, UINT pIconSize, bool pVertical): 
 		MultiByteToWideChar(CP_ACP, 0, trayItem->szTip, -1, tipText, strlen(trayItem->szTip) + 1);
 	}
 	popupVisible = false;
+	itemAlpha = 150;
 }
 
 /** @brief wndProc
@@ -78,7 +79,7 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						tipText = NULL;
 					setTooltip();
 					//RedrawWindow(barWnd, &itemArea, NULL, RDW_INTERNALPAINT | RDW_UPDATENOW);
-					InvalidateRect(barWnd, &itemArea, TRUE);
+					PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 					return 0;
 				}
 			}

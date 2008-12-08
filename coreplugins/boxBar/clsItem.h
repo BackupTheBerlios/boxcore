@@ -24,6 +24,7 @@ enum dimType {DIM_NONE = 0, DIM_HORIZONTAL = 1, DIM_VERTICAL = 2, DIM_BOTH = 3};
 #define BOXBAR_REMOVEITEM WM_USER + 1
 #define BOXBAR_UPDATESIZE WM_USER + 2
 #define BOXBAR_NEEDTIP WM_USER + 3
+#define BOXBAR_REDRAW WM_USER + 4
 
 class clsItem;
 
@@ -91,7 +92,9 @@ protected:
 	  * based on the current style.
 	  */
 	UINT style;
+	static bool alphaDraw;
 
+	BYTE itemAlpha;
 
 	bool mouseDown;
 	int mouseButton;
