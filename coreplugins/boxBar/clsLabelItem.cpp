@@ -36,6 +36,7 @@ void clsLabelItem::calculateSizes(bool pSizeGiven)
 	{
 	resize(minSizeX, minSizeY);
 	PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+	InvalidateRect(barWnd, &itemArea, TRUE);
 	PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 	}
 }

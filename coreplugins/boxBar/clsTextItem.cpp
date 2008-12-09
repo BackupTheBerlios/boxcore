@@ -124,6 +124,7 @@ void clsTextItem::calculateSizes(bool pSizeGiven)
 void clsTextItem::setText(TCHAR *pText)
 {
 	_tcscpy(text, pText);
+	InvalidateRect(barWnd, &itemArea, TRUE);
 	PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 }
 
@@ -135,6 +136,7 @@ void clsTextItem::setText(TCHAR *pText)
 void clsTextItem::setStyle(UINT pStyle)
 {
 	fontStyle = pStyle;
+	InvalidateRect(barWnd, &itemArea, TRUE);
 	PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 }
 

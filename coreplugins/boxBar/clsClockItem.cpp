@@ -44,6 +44,7 @@ LRESULT clsClockItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			bool seconds = _tcsstr(clockFormat, TEXT("%S")) || _tcsstr(clockFormat, TEXT("%#S"));
 			SetTimer(barWnd, ClockTimer, seconds ? 1100 - lt.wMilliseconds : 61000 - lt.wSecond * 1000, NULL);
 			calculateSizes();
+			InvalidateRect(barWnd, &itemArea, TRUE);
 			PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 			return 0;
 		}

@@ -27,6 +27,7 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 		case TASKITEM_ACTIVATED:
 		case TASKITEM_MODIFIED:
 			clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
+			InvalidateRect(barWnd, &itemArea, TRUE);
 			PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 		case TASKITEM_REMOVED:
 		case TASKITEM_ADDED:

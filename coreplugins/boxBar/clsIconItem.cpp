@@ -80,7 +80,11 @@ void clsIconItem::setIcon(HICON pIcon)
 {
 	icon = pIcon;
 	if (icon)
+	{
+		InvalidateRect(barWnd, &itemArea, TRUE);
 		PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
+	}
+
 }
 
 

@@ -73,7 +73,7 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 	int y = ReadInt(configFile, "boxBar.y:", 0);
 
 	barWnd = CreateWindowEx(
-				 WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_LAYERED,   // window ex-style
+				 WS_EX_TOOLWINDOW | WS_EX_TOPMOST | (enableTransparency ? WS_EX_LAYERED : 0),   // window ex-style
 				 pClassName,          // window class name
 				 NULL,               // window caption text
 				 WS_POPUP | WS_OVERLAPPED, // window style
@@ -247,6 +247,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				WriteBool(configFile, "boxBar.vertical:", vertical);
 				resize(1, 1);
 				populateBar();
+				InvalidateRect(barWnd, &itemArea, TRUE);
 				PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 			}
 			break;
@@ -554,6 +555,7 @@ dimType clsBar::resize(int pX, int pY)
 	bufferBitmap = CreateDIBSection(buffer, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
 	origBitmap = (HBITMAP)SelectObject(buffer, bufferBitmap);
 	dimType tempReturn = clsItemCollection::resize(pX, pY);
+	InvalidateRect(barWnd, &itemArea, TRUE);
 	PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 	return tempReturn;
 }
