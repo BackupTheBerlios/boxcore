@@ -54,7 +54,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/CPackConfig.cmake.in ${CMAKE_CURRENT
 
 add_library(boxBar MODULE ${BOXBAR_SRCS})
 include_directories(boxBar ../../blackbox)
-target_link_libraries(boxBar blackbox comctl32 msimg32)
+target_link_libraries(boxBar ${UNICOWSLIB} blackbox comctl32 msimg32)
 set_target_properties (boxBar PROPERTIES
 	PREFIX ""
 	COMPILE_DEFINITIONS "UNICODE;_UNICODE"

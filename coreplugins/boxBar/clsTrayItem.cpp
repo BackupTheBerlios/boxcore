@@ -13,7 +13,11 @@ clsTrayItem::clsTrayItem(systemTray *trayItem, UINT pIconSize, bool pVertical): 
 	if (strlen(trayItem->szTip))
 	{
 		tipText = new TCHAR[strlen(trayItem->szTip)+1];
+#ifdef UNICODE
 		MultiByteToWideChar(CP_ACP, 0, trayItem->szTip, -1, tipText, strlen(trayItem->szTip) + 1);
+#else
+		strcpy(tipText, trayItem->szTip);
+#endif
 	}
 	popupVisible = false;
 	itemAlpha = 150;
@@ -73,7 +77,12 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					if (strlen(trayItem->szTip))
 					{
 						tipText = new TCHAR[strlen(trayItem->szTip)+1];
+#ifdef UNICODE
 						MultiByteToWideChar(CP_ACP, 0, trayItem->szTip, -1, tipText, strlen(trayItem->szTip) + 1);
+#else
+						strcpy(tipText, trayItem->szTip);
+#endif
+
 					}
 					else
 						tipText = NULL;

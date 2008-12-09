@@ -42,7 +42,7 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 
 	margin = 0;
 
-	if (bbApiLoader.requestApiPresence(L"boxCore::hasSetTaskbarPos"))
+	if (bbApiLoader.requestApiPresence(TEXT("boxCore::hasSetTaskbarPos")))
 		SetTaskbarPos = (fnSetTaskbarPos)bbApiLoader.requestApiPointer("SetTaskbarPos");
 	else
 		SetTaskbarPos = NULL;
