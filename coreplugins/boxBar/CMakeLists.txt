@@ -33,6 +33,7 @@ clsBar.cpp
 
 ../utils/clsApiLoader.cpp
 ../../dynwinapi/clsUser32.cpp
+../../dynwinapi/clsMsimg32.cpp
 )
 
 set (VERSION_MAJOR 0)
@@ -54,7 +55,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/CPackConfig.cmake.in ${CMAKE_CURRENT
 
 add_library(boxBar MODULE ${BOXBAR_SRCS})
 include_directories(boxBar ../../blackbox)
-target_link_libraries(boxBar ${UNICOWSLIB} blackbox comctl32 msimg32)
+target_link_libraries(boxBar ${UNICOWSLIB} blackbox comctl32 gdi32)
 set_target_properties (boxBar PROPERTIES
 	PREFIX ""
 	COMPILE_DEFINITIONS "UNICODE;_UNICODE"
@@ -62,8 +63,8 @@ set_target_properties (boxBar PROPERTIES
 )
 if (MINGW)
 set_target_properties (boxBar PROPERTIES
-	LINK_FLAGS "-s -mwindows"
-	COMPILE_FLAGS "-g -Wall -Os -fno-rtti -fno-exceptions -fomit-frame-pointer"
+	LINK_FLAGS "-s"
+	COMPILE_FLAGS "-Wall -Os -fno-rtti -fno-exceptions"
 )
 endif (MINGW)
 

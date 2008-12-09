@@ -9,6 +9,9 @@
 
 #include "clsStyle.h"
 #include "../utils/clsApiLoader.h"
+#include "../../dynwinapi/clsMsimg32.h"
+
+extern clsMsimg32 msimg32;
 
 /** @enum dimType
   * @brief Dimentions for use in boxBar

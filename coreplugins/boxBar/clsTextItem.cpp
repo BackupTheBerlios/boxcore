@@ -87,7 +87,7 @@ void clsTextItem::draw(HDC pContext)
 		blendFunc.BlendFlags = 0;
 		blendFunc.SourceConstantAlpha = itemAlpha;
 		blendFunc.AlphaFormat = AC_SRC_ALPHA;
-		AlphaBlend(pContext, itemArea.left, itemArea.top, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top, internalDC,
+		msimg32.AlphaBlend(pContext, itemArea.left, itemArea.top, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top, internalDC,
 				   0, 0, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top, blendFunc);
 		SelectObject(internalDC, oldBitmap);
 		DeleteObject(alphaBitmap);

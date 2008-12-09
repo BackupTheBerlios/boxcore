@@ -11,6 +11,7 @@
 #include "../../dynwinapi/clsUser32.h"
 
 clsUser32 user32;
+clsMsimg32 msimg32;
 
 clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemCollection(pVertical)
 {
@@ -210,10 +211,12 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			SIZE drawSize;
 			drawSize.cx=windowRect.right - windowRect.left;
 			drawSize.cy = windowRect.bottom - windowRect.top;
+			if (user32.UpdateLayeredWindow)
 			user32.UpdateLayeredWindow(hWnd, GetDC(NULL), &drawPoint, &drawSize, buffer, &dcPoint, RGB(255,0,255), &blend, alphaDraw?ULW_ALPHA:ULW_OPAQUE);
-			//BitBlt(hdc, itemArea.left, itemArea.top,
-			//	   itemArea.right - itemArea.left, itemArea.bottom - itemArea.top,
-			//	   buffer, itemArea.left, itemArea.top, SRCCOPY);
+			else
+			BitBlt(hdc, itemArea.left, itemArea.top,
+				   itemArea.right - itemArea.left, itemArea.bottom - itemArea.top,
+				   buffer, itemArea.left, itemArea.top, SRCCOPY);
 			//SelectObject(buffer, otherBitmap);
 			//DeleteObject(bufferBitmap);
 			//DeleteDC(buffer);
@@ -499,7 +502,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			mouseTrack.cbSize = sizeof(mouseTrack);
 			mouseTrack.dwFlags = TME_LEAVE;
 			mouseTrack.hwndTrack = barWnd;
-			//user32.TrackMouseEvent(&mouseTrack);
+			user32.TrackMouseEvent(&mouseTrack);
 			trackMouse = true;
 			//dbg_printf("Mouse tracking started");
 
@@ -646,6 +649,8 @@ void clsBar::readSettings()
 	vertical = ReadBool(configFile, "boxBar.vertical:", false);
 	spacingBorder = ReadInt(configFile, "boxBar.spacingBorder:", 3);
 	spacingItems = ReadInt(configFile, "boxBar.spacingItems:", 2);
+	if (msimg32.AlphaBlend)
+	{
 	if (user32.UpdateLayeredWindow)
 		style = ReadBool(configFile, "boxBar.drawBackground:", true) ? SN_TOOLBAR : 0;
 	else
@@ -654,6 +659,12 @@ void clsBar::readSettings()
 		alphaDraw = ReadBool(configFile, "boxBar.useAlphaBlend:", false);
 	else
 		alphaDraw = true;
+	}
+	else
+	{
+		style = SN_TOOLBAR;
+		alphaDraw = false;
+	}
 
 	fixed = (vertical ? DIM_HORIZONTAL : DIM_VERTICAL);
 }
