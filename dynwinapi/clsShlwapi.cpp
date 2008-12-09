@@ -17,5 +17,6 @@ clsShlwapi::clsShlwapi()
 
 clsShlwapi::~clsShlwapi()
 {
-	//dtor
+	if (hModule)
+		FreeLibrary(hModule);
 }
