@@ -12,6 +12,9 @@ clsTrayItem.cpp
 
 add_library (systemtray STATIC ${SYSTEMTRAY_SRCS})
 target_link_libraries (systemtray shlwapi)
+
+if (MINGW)
 set_target_properties (systemtray PROPERTIES
 	LINK_FLAGS "-mwindows -s"
 	COMPILE_FLAGS "-Os -Wall -fno-rtti -fno-exceptions")
+endif (MINGW)
