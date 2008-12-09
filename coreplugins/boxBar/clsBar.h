@@ -36,6 +36,10 @@ class clsBar : public clsItemCollection
 		bool trackMouse;
 		bool setMargin;
 
+		bool enableTransparency;
+		bool userPerPixel;
+		BLENDFUNCTION barBlend;
+
 		bool hasTray;
 
 		int margin;

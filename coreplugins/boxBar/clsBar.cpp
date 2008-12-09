@@ -17,6 +17,10 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 {
 	trackMouse = false;
 	isBar = true;
+	ZeroMemory(&barBlend, sizeof(barBlend));
+	barBlend.BlendOp = AC_SRC_OVER;
+	brushBitmap = NULL;
+	eraseBrush = NULL;
 	hInstance = pInstance;
 	_tcscpy(className, pClassName);
 
@@ -86,16 +90,16 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 
 	buffer = CreateCompatibleDC(NULL);
 	ZeroMemory(&bufferInfo, sizeof(bufferInfo));
-			bufferInfo.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
-			bufferInfo.bmiHeader.biWidth = 1;
-			bufferInfo.bmiHeader.biHeight = 1;
-			bufferInfo.bmiHeader.biPlanes = 1;
-			bufferInfo.bmiHeader.biBitCount = 32;
+	bufferInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bufferInfo.bmiHeader.biWidth = 1;
+	bufferInfo.bmiHeader.biHeight = 1;
+	bufferInfo.bmiHeader.biPlanes = 1;
+	bufferInfo.bmiHeader.biBitCount = 32;
 	brushBitmap = CreateDIBSection(buffer, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
 	eraseBrush = CreatePatternBrush(brushBitmap);
 
 	bufferInfo.bmiHeader.biWidth = itemArea.right - itemArea.left;
-			bufferInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
+	bufferInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
 	bufferBitmap = CreateDIBSection(buffer, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
 	origBitmap = (HBITMAP)SelectObject(buffer, bufferBitmap);
 	populateBar();
@@ -108,6 +112,10 @@ clsBar::~clsBar()
 		delete (*i);
 	itemList.clear();
 	bbApiLoader.freeLibrary();
+	if (eraseBrush)
+		DeleteObject(eraseBrush);
+	if (brushBitmap)
+		DeleteObject(brushBitmap);
 	SelectObject(buffer, origBitmap);
 	DeleteObject(bufferBitmap);
 	DeleteObject(eraseBrush);
@@ -157,7 +165,6 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		SendMessage(hBlackboxWnd, BB_REGISTERMESSAGE, (WPARAM)hWnd, (LPARAM)messages);
 		// Make the window appear on all workspaces
 		MakeSticky(hWnd);
-		//SetLayeredWindowAttributes(hWnd, RGB(255,0,255), 255, LWA_COLORKEY);
 		return 0;
 
 	case WM_DESTROY:
@@ -181,45 +188,33 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			PAINTSTRUCT ps;
 			HDC hdc = BeginPaint(hWnd, &ps);
-			//static HBITMAP bufferBitmap = CreateCompatibleBitmap(hdc, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top);
 
 			if (!style)
 			{
-			bufferInfo.bmiHeader.biWidth = 1;
-			bufferInfo.bmiHeader.biHeight = 1;
-			HBITMAP brushBitmap = CreateDIBSection(hdc, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
-			HBRUSH eraseBrush = CreatePatternBrush(brushBitmap);
-			FillRect(buffer, &itemArea, eraseBrush);
-			DeleteObject(eraseBrush);
-			DeleteObject(brushBitmap);
+				FillRect(buffer, &itemArea, eraseBrush);
 			}
 
 			draw(buffer);
 			POINT dcPoint;
 			dcPoint.x = 0;
 			dcPoint.y = 0;
-			BLENDFUNCTION blend;
-			ZeroMemory(&blend, sizeof(blend));
-			blend.BlendOp = AC_SRC_OVER;
-			blend.SourceConstantAlpha = 255;
-			blend.AlphaFormat = AC_SRC_ALPHA;
 			RECT windowRect;
 			GetWindowRect(barWnd, &windowRect);
 			POINT drawPoint;
-			drawPoint.x= windowRect.left;
+			drawPoint.x = windowRect.left;
 			drawPoint.y = windowRect.top;
 			SIZE drawSize;
-			drawSize.cx=windowRect.right - windowRect.left;
+			drawSize.cx = windowRect.right - windowRect.left;
 			drawSize.cy = windowRect.bottom - windowRect.top;
-			if (user32.UpdateLayeredWindow)
-			user32.UpdateLayeredWindow(hWnd, GetDC(NULL), &drawPoint, &drawSize, buffer, &dcPoint, RGB(255,0,255), &blend, alphaDraw?ULW_ALPHA:ULW_OPAQUE);
+			if (user32.UpdateLayeredWindow && enableTransparency)
+			{
+				if (!user32.UpdateLayeredWindow(hWnd, GetDC(NULL), &drawPoint, &drawSize, buffer, &dcPoint, RGB(255, 0, 255), &barBlend, alphaDraw ? ULW_ALPHA : ULW_OPAQUE))
+					enableTransparency = false;
+			}
 			else
-			BitBlt(hdc, itemArea.left, itemArea.top,
-				   itemArea.right - itemArea.left, itemArea.bottom - itemArea.top,
-				   buffer, itemArea.left, itemArea.top, SRCCOPY);
-			//SelectObject(buffer, otherBitmap);
-			//DeleteObject(bufferBitmap);
-			//DeleteDC(buffer);
+				BitBlt(hdc, itemArea.left, itemArea.top,
+					   itemArea.right - itemArea.left, itemArea.bottom - itemArea.top,
+					   buffer, itemArea.left, itemArea.top, SRCCOPY);
 			EndPaint(hWnd, &ps);
 			break;
 		}
@@ -553,7 +548,7 @@ dimType clsBar::resize(int pX, int pY)
 
 	SetWindowPos(barWnd, NULL, newX, newY, pX, pY, SWP_NOACTIVATE | SWP_NOZORDER);
 	bufferInfo.bmiHeader.biWidth = itemArea.right - itemArea.left;
-			bufferInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
+	bufferInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
 	SelectObject(buffer, origBitmap);
 	DeleteObject(bufferBitmap);
 	bufferBitmap = CreateDIBSection(buffer, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
@@ -651,20 +646,36 @@ void clsBar::readSettings()
 	spacingItems = ReadInt(configFile, "boxBar.spacingItems:", 2);
 	if (msimg32.AlphaBlend)
 	{
-	if (user32.UpdateLayeredWindow)
-		style = ReadBool(configFile, "boxBar.drawBackground:", true) ? SN_TOOLBAR : 0;
-	else
-		style = SN_TOOLBAR;
-	if (style)
-		alphaDraw = ReadBool(configFile, "boxBar.useAlphaBlend:", false);
-	else
-		alphaDraw = true;
+		if (user32.UpdateLayeredWindow)
+			style = ReadBool(configFile, "boxBar.drawBackground:", true) ? SN_TOOLBAR : 0;
+		else
+			style = SN_TOOLBAR;
+
+		if (style)
+		{
+			enableTransparency = ReadBool(configFile, "boxBar.enableTransparency:", false);
+			alphaDraw = ReadBool(configFile, "boxBar.useAlphaBlend:", false);
+		}
+		else
+		{
+			alphaDraw = true;
+			if (!eraseBrush)
+			{
+				bufferInfo.bmiHeader.biWidth = 1;
+				bufferInfo.bmiHeader.biHeight = 1;
+				brushBitmap = CreateDIBSection(NULL, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
+				eraseBrush = CreatePatternBrush(brushBitmap);
+			}
+		}
 	}
 	else
 	{
 		style = SN_TOOLBAR;
 		alphaDraw = false;
 	}
+
+	barBlend.SourceConstantAlpha = 255;
+	barBlend.AlphaFormat = enableTransparency ? AC_SRC_ALPHA : 0;
 
 	fixed = (vertical ? DIM_HORIZONTAL : DIM_VERTICAL);
 }

@@ -87,7 +87,6 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 								iconItem->setIcon(task->icon);
 						else
 							iconItem->setIcon(task->icon);
-						PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 						break;
 					}
 					task = task->next;
@@ -106,7 +105,6 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				itemAlpha = inactiveAlpha;
 			}
 			captionItem->setStyle(style);
-			PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 			return 0;
 		}
 		break;
