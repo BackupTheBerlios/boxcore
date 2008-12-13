@@ -24,6 +24,7 @@
 #include "m_alloc.h"
 #endif
 #include "BBPlugin.h"
+#include <stdlib.h>
 
 #define ST static
 
