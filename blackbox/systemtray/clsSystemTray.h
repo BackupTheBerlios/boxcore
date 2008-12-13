@@ -16,11 +16,7 @@ using std::list;
 
 enum trayCallbackType {TCALLBACK_ADD, TCALLBACK_MOD, TCALLBACK_DEL};
 
-#ifdef UNICODE
-#define tstring std::wstring
-#else
-#define tstring std::string
-#endif
+typedef std::basic_string<TCHAR> tstring;
 
 /**
  * @class clsSystemTray
@@ -38,7 +34,7 @@ class clsSystemTray
 		void CleanTray();
 
 		int GetNumVisible();
-		clsTrayItem *GetTrayIcon(int num);
+		const clsTrayItem *GetTrayIcon(int num);
 
 		BOOL TrayIconEvent(HWND ownerHwnd, UINT iconID, UINT msg, WPARAM wParam, LPARAM lParam);
 		void SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom, UINT pEdge);

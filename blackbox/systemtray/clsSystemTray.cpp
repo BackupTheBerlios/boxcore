@@ -743,11 +743,11 @@ void clsSystemTray::CleanTray()
 		else
 			i++;
 }
-/** @brief GetTrayIcon
-  *
-  * @todo: document this function
+/** @brief Fetches a tray item based on index
+  * @param[in] num The index of the item to fetch
+  * @return A read-only pointer to a tray item
   */
-clsTrayItem * clsSystemTray::GetTrayIcon(int num)
+const clsTrayItem * clsSystemTray::GetTrayIcon(int num)
 {
 	int index = 0;
 	for (list<clsTrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); i++)
