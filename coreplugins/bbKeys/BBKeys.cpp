@@ -31,6 +31,7 @@
 #include "BBApi.h"
 #include "m_alloc.h"
 #include "Tinylist.cpp"
+#include <stdlib.h>
 
 const char szVersion     [] = "bbKeys 1.16 (BBClean SVN)";
 const char szAppName     [] = "bbKeys";
