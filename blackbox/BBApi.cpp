@@ -799,9 +799,15 @@ void WriteValue(LPCSTR path, LPCSTR szKey, LPCSTR value)
 	mark_rc_dirty(fl);
 }
 
-//===========================================================================
-// API: DeleteSetting
-
+/** @brief Delete a setting from an RC file
+  * @param[in] path Path to the RC file
+  * @param[in] szKey The setting key to delete
+  * @version This function is only supported under bbLean (and derivatives)
+  * @par Alternatives:
+  * Rather than using this function, use WriteBool(), WriteInt(), WriteString() or WriteColor() to restore
+  * the default value
+  * @ingroup bbapi_bblean
+  */
 bool DeleteSetting(LPCSTR path, LPCSTR szKey)
 {
 	char buff[256]; int k;
@@ -826,9 +832,17 @@ bool DeleteSetting(LPCSTR path, LPCSTR szKey)
 	return 0 != dirty;
 }
 
-//===========================================================================
-// API: RenameSetting
-
+/** @brief Delete a setting from an RC file
+  * @param[in] path The path to the RC file
+  * @param[in] szKey The key to rename
+  * @param[in] new_keyword The new name of the key
+  * @version This function is only supported under bbLean (and derivatives)
+  * @par Alternatives:
+  * Rather than using this function, ReadBool(), ReadInt(), ReadString() or ReadColor()
+  * to read the existing setting then use WriteBool(), WriteInt(), WriteString() or WriteColor() write this
+  * under a new key
+  * @ingroup bbapi_bblean
+  */
 bool RenameSetting(LPCSTR path, LPCSTR szKey, LPCSTR new_keyword)
 {
 	char buff[256]; unsigned k;
@@ -919,7 +933,7 @@ bool ReadBool(LPCSTR fileName, LPCSTR szKey, bool bDefault)
 /** @brief Read an integer value from a RC file
   * @param[in] fileName The name of the RC file to read
   * @param[in] szKey The name of the key to read
-  * @param[in] bDefault A default value for the key
+  * @param[in] nDefault A default value for the key
   * @return The value read from the RC file if found
   * otherwise the default value given.
   */
@@ -932,7 +946,7 @@ int ReadInt(LPCSTR fileName, LPCSTR szKey, int nDefault)
 /** @brief Read a string value from a RC file
   * @param[in] fileName The name of the RC file to read
   * @param[in] szKey The name of the key to read
-  * @param[in] bDefault A default value for the key
+  * @param[in] szDefault A default value for the key
   * @return The value read from the RC file if found
   * otherwise the default value given.
   */
@@ -945,7 +959,7 @@ LPCSTR ReadString(LPCSTR fileName, LPCSTR szKey, LPCSTR szDefault)
 /** @brief Read a color value from a RC file
   * @param[in] fileName The name of the RC file to read
   * @param[in] szKey The name of the key to read
-  * @param[in] bDefault A default value for the key
+  * @param[in] defaultString A default value for the key
   * @return The value read from the RC file if found
   * otherwise the default value given.
   */
@@ -955,26 +969,21 @@ COLORREF ReadColor(LPCSTR fileName, LPCSTR szKey, LPCSTR defaultString)
 	return ReadColorFromString(szValue ? szValue : defaultString);
 }
 
-//===========================================================================
-// API: FileExists
-// Purpose: Checks for a files existance
-// In: LPCSTR = file to set as check for
-// Out: bool = whether found or not
-//===========================================================================
-
+/** @brief Checks for a files existance
+  * @param[in] szFileName file to set as check for
+  * @return File found or not
+  */
 bool FileExists(LPCSTR szFileName)
 {
 	DWORD a = GetFileAttributes(szFileName);
 	return (DWORD)-1 != a && 0 == (a & FILE_ATTRIBUTE_DIRECTORY);
 }
 
-//===========================================================================
-// API: FileOpen
-// Purpose: Opens file for parsing
-// In: LPCSTR = file to open
-// Out: FILE* = the file itself
-//===========================================================================
 
+/** @brief Opens a file for parsing
+  * @param[in] szPath file to open
+  * @return The file itself
+  */
 FILE *FileOpen(LPCSTR szPath)
 {
 	// hack to prevent BBSlit from loading plugins, since they are
@@ -982,13 +991,10 @@ FILE *FileOpen(LPCSTR szPath)
 	return strcmp(szPath, pluginrc_path) ? fopen(szPath, "rt") : NULL;
 }
 
-//===========================================================================
-// API: FileClose
-// Purpose: Close selected file
-// In: FILE *fp = The file you wish to close
-// Out: bool = Returns the status of completion
-//===========================================================================
-
+ /** @brief Close selected file
+   * @param[in] fp The file you wish to close
+   * @return Returns the status of completion
+   */
 bool FileClose(FILE *fp)
 {
 	return fp && 0==fclose(fp);
@@ -1068,24 +1074,24 @@ void ReplaceEnvVars(LPSTR string)
 	if (r && r <= sizeof buffer) memcpy(string, buffer, r);
 }
 
-//===========================================================================
-// API: GetBlackboxEditor
-//===========================================================================
-
+/** @brief Get the preferred editor executable path
+  * @param[out] editor Buffer in which path will be placed
+  */
 void GetBlackboxEditor(LPSTR editor)
 {
 	replace_shellfolders(editor, Settings_preferredEditor, true);
 }
 
-//===========================================================================
-// API: FindConfigFile
-// Purpose: Look for a config file in the Blackbox, UserAppData and
-//          (optionally) plugin directories
-// In:  LPSTR = pszOut = the location where to put the result
-// In:  LPCSTR = filename to look for, LPCSTR = plugin directory or NULL
-// Out: bool = true of found, FALSE otherwise
-//===========================================================================
-
+/** @brief Look for a config file in the Blackbox, UserAppData and (optionally) plugin directories
+  * @param[out] pszOut The location to place the result
+  * @param[in] filename Filename to look for
+  * @param[in] pluginDir Plugin directory or NULL
+  * @return true if found, false otherwise
+  * @version This function only present in bbLean (and derivatives)
+  * @par Alternative
+  * Try the ConfigFileExists() function present in all branches
+  * @ingroup bbapi_bblean
+  */
 bool FindConfigFile(LPSTR pszOut, LPCSTR filename, LPCSTR pluginDir)
 {
 	char defaultPath[MAX_PATH]; defaultPath[0] = 0;
@@ -1124,10 +1130,11 @@ bool FindConfigFile(LPSTR pszOut, LPCSTR filename, LPCSTR pluginDir)
 	return false;
 }
 
-//===========================================================================
-// API: ConfigFileExists
-//===========================================================================
-
+/** @brief Look for a config file in the Blackbox, UserAppData and (optionally) plugin directories
+  * @param[in] filename Filename to look for
+  * @param[in] pluginDir Plugin directory or NULL
+  * @return The complete path to the config file if found, a empty string if not found
+  */
 LPCSTR ConfigFileExists(LPCSTR filename, LPCSTR pluginDir)
 {
 	if (false == FindConfigFile(tempBuf, filename, pluginDir))
@@ -1164,25 +1171,21 @@ ST LPCSTR bbPath(LPCSTR other_name, LPSTR path, LPCSTR name)
 	return path;
 }
 
-//===========================================================================
-// API: bbrcPath
-// Purpose: Returns the handle to the blackboxrc file that is being used
-// In: LPCSTR = file to set as default bbrc file (defaults to NULL if not specified)
-// Out: LPCSTR = full path of file
-//===========================================================================
-
+/** @brief Returns the path to the blackbox.rc file that is being used
+  * @param[in] other File to set as default blackbox.rc file (default is NULL to keep current file)
+  * @return The full path to the blackbox.rc file
+  * @warning bbLean (and derivatives) do not actually change the file being used
+  */
 LPCSTR bbrcPath(LPCSTR other)
 {
 	return bbPath (other, blackboxrc_path, "blackbox");
 }
 
-//===========================================================================
-// API: extensionsrcPath
-// Purpose: Returns the handle to the extensionsrc file that is being used
-// In: LPCSTR = file to set as default extensionsrc file (defaults to NULL if not specified)
-// Out: LPCSTR = full path of file
-//===========================================================================
-
+/** @brief Returns the path to the extensions.rc file that is being used
+  * @param[in] other File to set as default extensions.rc file (default is NULL to keep current file)
+  * @return The full path to the extensions.rc file
+  * @warning bbLean (and derivatives) do not actually change the file being used
+  */
 LPCSTR extensionsrcPath(LPCSTR other)
 {
 	return bbPath (other, extensionsrc_path, "extensions");

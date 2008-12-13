@@ -102,6 +102,7 @@
 #include "m_alloc.h"
 #include "Tinylist.h"
 #include <assert.h>
+#include <stdlib.h>
 
 #include "clsSystemInfo.h"
 

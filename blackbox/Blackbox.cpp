@@ -1840,7 +1840,7 @@ vector<systemTray> apiVector;
 systemTray* GetTrayIcon(UINT idx)
 {
 	//return NULL;
-	clsTrayItem *item = SystemTrayManager.GetTrayIcon(idx);
+	const clsTrayItem *item = SystemTrayManager.GetTrayIcon(idx);
 	if (item)
 	{
 		if (apiVector.size()<(idx+1))

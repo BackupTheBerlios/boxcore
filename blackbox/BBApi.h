@@ -55,14 +55,19 @@
 #define WIN32_LEAN_AND_MEAN
 #define WINVER 0x0502
 #include <windows.h>
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <stdio.h>
 
 #define ISNULL = NULL
-
 /** @defgroup bbapi Plugin API
+  * @brief The plugin API is divided into several main groupings. This page attempts to make it
+  * easy to find a function you that does what you want. If you just want a flat list of the api contents
+  * see BBApi.h
+  *
   * @{
   */
+
+///@defgroup bbapi_bblean bbLean only API
 
 /** @brief Maximum buffer size to use
   *
@@ -74,9 +79,11 @@
   */
 #define MAX_LINE_LENGTH 4096
 
-/** @defgroup BImageDefs BImage definitions
-  * @{
+/** @name Gradients
+  * Gradient type definitions
   */
+
+///@{
 /** @brief A gradient from the left edge to the right
   */
 #define B_HORIZONTAL 0
@@ -120,6 +127,10 @@
 /*=========================================================================== */
 /* Blackbox messages */
 
+/** @defgroup bbapi_wndmsg Blackbox Window Messages
+  * @brief Window messages sent or understood by the Blackbox core
+  */
+/// @{
 #define BB_REGISTERMESSAGE      10001
 #define BB_UNREGISTERMESSAGE    10002
 
@@ -206,14 +217,26 @@
 #define BBWS_MOVEWINDOWTOWS   25  /* lParam: desktop number, bool follow */
 
 /*------------------------------------------ */
+/** @brief Core tasks updated
+  *
+  * This message is sent by the core when a task is added, deleted or otherwise modified.
+  * It is also sent on workspace changes.Plugins should never send this message, only recieve it.
+  * @par lParam value:
+  * See ::eTaskUpdate for possible lParams
+  * @par wParam value:
+  * An HWND indicating the affected task, except for TASKITEM_REFRESH where it is NULL.
+  */
 #define BB_TASKSUPDATE          10506
 /* lParam for BB_TASKSUPDATE: */
-#define TASKITEM_ADDED 0        /*  wParam: hwnd */
-#define TASKITEM_MODIFIED 1     /*  wParam: hwnd */
+
+//#define TASKITEM_ADDED 0        /*  wParam: hwnd */
+//#define TASKITEM_MODIFIED 1     /*  wParam: hwnd */
 #define TASKITEM_ACTIVATED 2    /*  wParam: hwnd */
 #define TASKITEM_REMOVED 3      /*  wParam: hwnd */
 #define TASKITEM_REFRESH 4      /*  wParam: NULL, sent on workspace change of one or more tasks */
 #define TASKITEM_FLASHED 5      /*  wParam: hwnd */
+
+
 
 #define BB_TRAYUPDATE           10507
 /* lParam for BB_TRAYUPDATE: */
@@ -309,7 +332,25 @@
 /* ----------------------------------- */
 /* done with BB_ messages */
 
+///@}
+
+/** @name lParam options
+  * @{
+  */
+/// @brief Values for BB_TASKUPDATE lParam
+enum eTaskUpdate
+{
+	///@brief A new window has been created
+	TASKITEM_ADDED,
+	///@brief An existing window has changed properties
+	TASKITEM_MODIFIED
+};
+
+/// @}
+
+///@brief The lowest value a Blackbox window message will have
 #define BB_MSGFIRST             10000
+///@brief The highest value a Blackbox window message will have
 #define BB_MSGLAST              13000
 
 /*=========================================================================== */
@@ -317,7 +358,7 @@
 
 /** @brief Contains data for a single style item
   */
-typedef struct StyleItem
+struct StyleItem
 {
 	/* 0.0.80 */
 	/** @brief Style of the border on item
@@ -374,7 +415,7 @@ typedef struct StyleItem
 
 	char reserved[128 - (17*4 + 6)]; /* keep structure size */
 
-} StyleItem;
+};
 
 #define picColor TextColor
 
@@ -617,7 +658,9 @@ extern "C" {
 	API_EXPORT void WriteColor(LPCSTR fileName, LPCSTR szKey, COLORREF value);
 
 	/* Delete/Rename Setting */
+	/// @ingroup bbapi_bblean
 	API_EXPORT bool DeleteSetting(LPCSTR fileName, LPCSTR szKey); /* wildcards supported for keyword */
+	/// @ingroup bbapi_bblean
 	API_EXPORT bool RenameSetting(LPCSTR fileName, LPCSTR old_keyword, LPCSTR new_keyword);
 
 	/* ------------------------------------ */
@@ -633,6 +676,7 @@ extern "C" {
 	API_EXPORT bool FileRead(FILE *filePointer, LPSTR buffer);
 	API_EXPORT bool ReadNextCommand(FILE *filePointer, LPSTR buffer, DWORD maxLength);
 
+	/// @ingroup bbapi_bblean
 	API_EXPORT bool FindConfigFile(LPSTR pszOut, LPCSTR fileName, LPCSTR pluginDir);
 	API_EXPORT LPCSTR ConfigFileExists(LPCSTR filename, LPCSTR pluginDir);
 
@@ -647,6 +691,7 @@ extern "C" {
 	API_EXPORT int GetAppByWindow(HWND Window, char*);
 	API_EXPORT bool IsAppWindow(HWND hwnd);
 
+	/// @ingroup bbapi_bblean
 	API_EXPORT HMONITOR GetMonitorRect(void *from, RECT *r, int Flags);
 	/* Flags: */
 #define GETMON_FROM_WINDOW 1    /* 'from' is HWND */
@@ -710,6 +755,7 @@ extern "C" {
 	API_EXPORT void Log(LPCSTR Title, LPCSTR Line);
 	API_EXPORT int MBoxErrorFile(LPCSTR szFile);
 	API_EXPORT int MBoxErrorValue(LPCSTR szValue);
+	/// @ingroup bbapi_bblean
 	API_EXPORT int BBMessageBox(int flg, const char *fmt, ...);
 
 	/* debugging */
@@ -763,15 +809,18 @@ extern "C" {
 	/* inserts an item, which opens a submenu from a system folder.
 	  'Cmd' optionally may be a Broam which is then sent on user click
 	  with "%s" in the broam string replaced by the selected filename */
+	/// @ingroup bbapi_bblean
 	API_EXPORT MenuItem* MakePathMenu(Menu *ParentMenu, LPCSTR Title, LPCSTR path, LPCSTR Cmd ISNULL);
 
 	/* set disabled state (menu.frame.disabledColor) for last added MenuItem */
+	/// @ingroup bbapi_bblean
 	API_EXPORT void DisableLastItem(Menu *PluginMenu);
 
 	/* shows the menu */
 	API_EXPORT void ShowMenu(Menu *PluginMenu);
 
 	/* checks whether a menu is still on screen */
+	/// @ingroup bbapi_bblean
 	API_EXPORT bool MenuExists(LPCSTR IDString_start);
 
 	/* ------------------------------------ */
@@ -849,9 +898,11 @@ extern "C" {
 	} taskinfo;
 
 	/* get workspace and original position/size for window */
+	/// @ingroup bbapi_bblean
 	API_EXPORT bool GetTaskLocation(HWND, struct taskinfo *pti);
 
 	/* set workspace and/or position for window */
+	/// @ingroup bbapi_bblean
 	API_EXPORT bool SetTaskLocation(HWND, struct taskinfo *pti, UINT flags);
 	/* where flags are: */
 #define BBTI_SETDESK    1 /* move window to desk as specified */
