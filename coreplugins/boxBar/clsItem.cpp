@@ -234,7 +234,7 @@ void clsItem::setTooltip()
 	TOOLINFO toolInfo;
 	ZeroMemory(&toolInfo, sizeof(toolInfo));
 	toolInfo.cbSize = sizeof(toolInfo);
-	toolInfo.uFlags = TTF_SUBCLASS;
+	toolInfo.uFlags = TTF_SUBCLASS | TTF_TRANSPARENT;
 	toolInfo.hwnd = barWnd;
 	toolInfo.uId = (UINT_PTR)this;
 	toolInfo.rect = itemArea;
@@ -320,7 +320,7 @@ void clsItem::draw(HDC pContext)
 		blendFunc.BlendOp = AC_SRC_OVER;
 		blendFunc.BlendFlags = 0;
 		blendFunc.SourceConstantAlpha = itemAlpha;
-		blendFunc.AlphaFormat = AC_SRC_ALPHA;
+		blendFunc.AlphaFormat = 0;
 		msimg32.AlphaBlend(pContext, itemArea.left, itemArea.top, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top, internalDC,
 				   0, 0, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top, blendFunc);
 			SelectObject(internalDC, origBitmap);

@@ -7,6 +7,7 @@
 #include "clsWorkspaceLabel.h"
 
 #include <shellapi.h>
+#include <stdlib.h>
 
 #include "../../dynwinapi/clsUser32.h"
 
@@ -209,7 +210,10 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			if (user32.UpdateLayeredWindow && enableTransparency)
 			{
 				if (!user32.UpdateLayeredWindow(hWnd, GetDC(NULL), &drawPoint, &drawSize, buffer, &dcPoint, RGB(255, 0, 255), &barBlend, alphaDraw ? ULW_ALPHA : ULW_OPAQUE))
+				{
+					style = SN_TOOLBAR;
 					enableTransparency = false;
+				}
 			}
 			else
 				BitBlt(hdc, itemArea.left, itemArea.top,
@@ -225,6 +229,10 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	case BOXBAR_UPDATESIZE:
 		calculateSizes();
+		if (enableTransparency)
+			PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
+		else
+			InvalidateRect(barWnd, &itemArea, TRUE);
 		break;
 
 
@@ -462,14 +470,11 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 			if (hasTray && SetTaskbarPos)
 				SetTaskbarPos(wp->x, wp->y, wp->x + wp->cx, wp->y + wp->cy, barEdge);
-//			else
-//				dbg_printf("No SetTaskbarPos");
 		}
 		break;
 	case WM_LBUTTONDOWN:
 		if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
 		{
-			// start moving, when control-key is held down
 			moving = true;
 			PostMessage(hWnd, WM_SYSCOMMAND, SC_MOVE | 2, 0);
 			return 0;
@@ -492,7 +497,6 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEMOVE:
 		if (user32.TrackMouseEvent && !trackMouse)
 		{
-			//dbg_printf("Start mouse tracking %p",user32.TrackMouseEvent);
 			static TRACKMOUSEEVENT mouseTrack;
 			ZeroMemory(&mouseTrack, sizeof(mouseTrack));
 			mouseTrack.cbSize = sizeof(mouseTrack);
@@ -500,8 +504,6 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			mouseTrack.hwndTrack = barWnd;
 			user32.TrackMouseEvent(&mouseTrack);
 			trackMouse = true;
-			//dbg_printf("Mouse tracking started");
-
 		}
 		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
 	default:
@@ -646,6 +648,11 @@ void clsBar::readSettings()
 	vertical = ReadBool(configFile, "boxBar.vertical:", false);
 	spacingBorder = ReadInt(configFile, "boxBar.spacingBorder:", 3);
 	spacingItems = ReadInt(configFile, "boxBar.spacingItems:", 2);
+	itemAlpha = ReadInt(configFile, "boxBar.alpha:", 255);
+	if (itemAlpha > 255)
+		itemAlpha = 255;
+	else if (itemAlpha < 0)
+		itemAlpha = 0;
 	if (msimg32.AlphaBlend)
 	{
 		if (user32.UpdateLayeredWindow)
@@ -660,6 +667,7 @@ void clsBar::readSettings()
 		}
 		else
 		{
+			enableTransparency = true;
 			alphaDraw = true;
 			if (!eraseBrush)
 			{
@@ -676,8 +684,8 @@ void clsBar::readSettings()
 		alphaDraw = false;
 	}
 
-	barBlend.SourceConstantAlpha = 255;
-	barBlend.AlphaFormat = enableTransparency ? AC_SRC_ALPHA : 0;
+	barBlend.SourceConstantAlpha = itemAlpha;
+	barBlend.AlphaFormat = alphaDraw ? AC_SRC_ALPHA : 0;
 
 	fixed = (vertical ? DIM_HORIZONTAL : DIM_VERTICAL);
 }

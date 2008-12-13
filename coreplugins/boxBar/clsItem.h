@@ -95,8 +95,10 @@ protected:
 	  * based on the current style.
 	  */
 	UINT style;
+	/// @brief Controls whether to use the alpha-blending drawing routines or the standard drawing routines
 	static bool alphaDraw;
 
+	/// @brief Alpha
 	BYTE itemAlpha;
 
 	bool mouseDown;
