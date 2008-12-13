@@ -764,9 +764,8 @@ const clsTrayItem * clsSystemTray::GetTrayIcon(int num)
 }
 
 
-/** @brief GetTraySize
-  *
-  * @todo: document this function
+/** @brief Get the number of visible icons in the tray
+  * @return The number of visible icons in the system tray
   */
 int clsSystemTray::GetNumVisible()
 {
@@ -781,9 +780,13 @@ int clsSystemTray::GetNumVisible()
 	return count;
 }
 
-/** @brief TrayIconEvent
-  *
-  * @todo: document this function
+/** @brief Handles mouse events for system tray icons
+  * @param[in] ownerHwnd The window handle of the icons owner
+  * @param[in] iconID The icon id for the specific icon
+  * @param[in] msg The message to be processed
+  * @param[in] wParam The WPARAM value for the message
+  * @param[in] lParam The LPARAM value for the message
+  * @warning This function will be removed once version information is avialable via the api
   */
 BOOL clsSystemTray::TrayIconEvent(HWND ownerHwnd, UINT iconID, UINT msg, WPARAM wParam, LPARAM lParam)
 {
