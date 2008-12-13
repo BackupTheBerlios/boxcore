@@ -485,8 +485,6 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			Menu *mainMenu = MakeNamedMenu("boxBar", "boxBar", true);
 			configMenu(mainMenu);
-			for (list<clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
-				(*i)->configMenu(mainMenu);
 			ShowMenu(mainMenu);
 			return 0;
 		}
@@ -635,6 +633,7 @@ void clsBar::configMenu(Menu *pMenu)
 	MakeSubmenu(pMenu, subMenu, "Bar Configuration");
 	MakeMenuItemInt(subMenu, "Percentage Size", "@boxBar.percentage", sizePercentage, 0, 100);
 	MakeMenuItem(subMenu, "Vertical", "@boxBar.vertical", vertical);
+	clsItemCollection::configMenu(pMenu);
 }
 
 /** @brief readSettings

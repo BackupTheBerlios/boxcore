@@ -256,3 +256,14 @@ void clsItemCollection::sortItems()
 	}
 }
 
+/** @brief Check contained items for config menus
+  *
+  * @param[in,out] pMenu Menu pointer to which items can be added
+  *
+  * This calls configMenu on each contained item
+  */
+void clsItemCollection::configMenu(Menu *pMenu)
+{
+	for (list<clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+		(*i)->configMenu(pMenu);
+}

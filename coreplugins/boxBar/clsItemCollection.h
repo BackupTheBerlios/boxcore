@@ -17,6 +17,7 @@ class clsItemCollection : public clsItem
 		virtual void addItem(clsItem *pItem);
 		virtual void calculateSizes(bool pSizeGiven = false);
 		virtual void move(int pX, int pY);
+		virtual void configMenu(Menu *pMenu);
 	protected:
 		void sortItems();
 		list<clsItem *> itemList;

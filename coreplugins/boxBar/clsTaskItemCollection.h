@@ -2,6 +2,7 @@
 #define CLSTASKITEMCOLLECTION_H
 
 #include "clsItemCollection.h"
+#include <map>
 
 
 class clsTaskItemCollection : public clsItemCollection
@@ -15,6 +16,8 @@ class clsTaskItemCollection : public clsItemCollection
 	protected:
 		bool stretchTaskarea;
 		void populateTasks();
+
+		std::map<HWND, clsItem *> itemMapping;
 	private:
 };
 

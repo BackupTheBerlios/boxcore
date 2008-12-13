@@ -148,6 +148,27 @@ void clsTaskItem::readSettings()
 	inactiveStyle = ReadBool(configFile, "boxBar.tasks.inactive.background:", true) ? SN_TOOLBAR : 0;
 }
 
+/** @brief configMenu
+  *
+  * @todo: document this function
+  */
+void clsTaskItem::configMenu(Menu *pMenu)
+{
+	char ansiCaption[256];
+	WideCharToMultiByte(CP_ACP, 0, caption, -1, ansiCaption, 256, 0, 0);
+	Menu *submenu = MakeNamedMenu(ansiCaption, ansiCaption, true);
+	MakeSubmenu(pMenu, submenu, ansiCaption);
+	char command[256];
+	sprintf(command, "@boxbar.task.front.%llu", (UINT64)taskWnd);
+	MakeMenuItem(submenu, "Move to start", command, false);
+	sprintf(command, "@boxbar.task.left.%llu", (UINT64)taskWnd);
+	MakeMenuItem(submenu, "Move left/up", command, false);
+	sprintf(command, "@boxbar.task.right.%llu", (UINT64)taskWnd);
+	MakeMenuItem(submenu, "Move right/down", command, false);
+	sprintf(command, "@boxbar.task.end.%llu", (UINT64)taskWnd);
+	MakeMenuItem(submenu, "Move to end", command, false);
+}
+
 int clsTaskItem::inactiveStyle = SN_TOOLBAR;
 int clsTaskItem::activeStyle = SN_TOOLBARWINDOWLABEL;
 int clsTaskItem::inactiveAlpha = 255;
