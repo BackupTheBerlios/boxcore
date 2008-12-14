@@ -1,7 +1,33 @@
+/** @internal
+  * @file clsSystemTray.h
+  * @brief This file contains the definition of clsSystemTray
+  *
+  * This file is part of the boxCore source code @n
+  * <!-- Copyright © 2008 Carsomyr -->
+  * Copyright &copy; 2008 Carsomyr
+  * @par links
+  * http://developer.berlios.de/projects/boxcore @n
+  * @par License
+  * boxCore is free software, released under the GNU General
+  * Public License (GPL version 2 or later), with an extension that allows
+  * linking of proprietary modules under a controlled interface. This means
+  * that plugins etc. are allowed to be released under any license the author
+  * wishes. For details see:
+  * @par
+  * http://www.fsf.org/licenses/gpl.html @n
+  * http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
+  * @par
+  * This program is distributed in the hope that it will be useful, but
+  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+  * for more details.
+  *
+  * The basic operations of this class is based on the functions in Tray.cpp in
+  * the bbLean source code.
+  */
+
 #ifndef CLSSYSTEMTRAY_H
 #define CLSSYSTEMTRAY_H
-
-#define _WIN32_IE 0x0501
 
 #include <shlwapi.h>
 #include <windows.h>
@@ -18,11 +44,11 @@ enum trayCallbackType {TCALLBACK_ADD, TCALLBACK_MOD, TCALLBACK_DEL};
 
 typedef std::basic_string<TCHAR> tstring;
 
-/**
- * @class clsSystemTray
- *
- * @brief Implementes system tray functionality (icon tracking etc)
- */
+/** @internal
+  * @class clsSystemTray
+  *
+  * @brief Implementes system tray functionality (icon tracking etc)
+  */
 class clsSystemTray
 {
 	public:

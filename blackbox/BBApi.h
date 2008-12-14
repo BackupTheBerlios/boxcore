@@ -8,11 +8,11 @@
   * Copyright &copy; 2001-2003 The Blackbox for Windows Development Team @n
   * Copyright &copy; 2004-2007 grischka @n
   * Copyright &copy; 2008 Carsomyr
-  * @par links
+  * @par Links:
   * http://developer.berlios.de/projects/boxcore @n
   * http://bb4win.sourceforge.net/bblean @n
   * http://sourceforge.net/projects/bb4win @n
-  * @par License
+  * @par License:
   * boxCore, bbLean and bb4win are free software, released under the GNU General
   * Public License (GPL version 2 or later), with an extension that allows
   * linking of proprietary modules under a controlled interface. This means
@@ -55,7 +55,6 @@
 #define WIN32_LEAN_AND_MEAN
 #define WINVER 0x0502
 #include <windows.h>
-//#include <stdlib.h>
 #include <stdio.h>
 
 #define ISNULL = NULL
@@ -67,7 +66,29 @@
   * @{
   */
 
-///@defgroup bbapi_bblean bbLean only API
+/** @defgroup bbapi_basic Basic API
+  * @brief This part documents the part of the api that 99% of plugins will use. These functions and window
+  * messages are essential to communication with Blackbox
+  */
+
+/** @defgroup bbapi_tasks Tasks API
+  * @brief This section of the API contains the functions, window message and supporting information
+  * you need to interface to the tasks functionality in Blackbox
+  *
+  * This part of the API is generally used by system bars. Any other plugin that deals with organising, displaying
+  * or otherwise interacting with the running applications will probably also use at least some of these functions.
+  */
+
+/** @defgroup bbapi_tray System Tray API
+  * @brief This section of the API contains the functions, window message and supporting information
+  * you need to interface to the system tray functionality in Blackbox.
+  *
+  * This part of the API is generally used by system bars or standalone system tray plugins
+  */
+
+/** @defgroup bbapi_bblean bbLean only API
+  * @brief These functions are only present in bbLean and derivatives. Alternatives are suggested where possible.
+  */
 
 /** @brief Maximum buffer size to use
   *
@@ -75,12 +96,12 @@
   * to avoid this and size your buffer appropriately because the value for this may
   * differ between branches or forks. Use MAX_PATH instead
   * for paths, and choose a reasonable size for other buffers.
-  * @note The bbLean core (and derivatives) do not use this definition at all internally
+  * @note The bbLean core (and derivatives) use 1024 for this internally
   */
 #define MAX_LINE_LENGTH 4096
 
 /** @name Gradients
-  * Gradient type definitions
+  * Gradient type definitions. It is unlikely that a plugin needs these
   */
 
 ///@{
@@ -127,14 +148,45 @@
 /*=========================================================================== */
 /* Blackbox messages */
 
-/** @defgroup bbapi_wndmsg Blackbox Window Messages
-  * @brief Window messages sent or understood by the Blackbox core
+/** @brief Window Message: Select window messages to recieve
+  *
+  * This is the first message that a plugin sends to the core to indicate which messages
+  * it is interested in. The core will never send this message to a plugin.
+  *
+  * This message is usually sent during the handling of the WM_CREATE message by the plugin window.
+  * @par wParam:
+  * Set to the window handle of the plugin.
+  * @par lParam:
+  * Set to an int* which points to an array of window message numbers to recieve. The last element in this array should
+  * be 0 to mark the end
+  * @par Example:
+  * @code
+  * static int msgs = {BB_BROADCAST, BB_RECONFIGURE, 0};
+  * PostMessage(GetBBWnd(), BB_REGISTERMESSAGE, (WPARAM)hWnd, (LPARAM)msgs);
+  * @endcode
+  * @ingroup bbapi_basic
   */
-/// @{
 #define BB_REGISTERMESSAGE      10001
+
+/** @brief Window Message: Cancel recieving window messages
+  *
+  * This should be the last message a plugin sends to the core before begin unloaded. Its usage is the same as
+  * BB_REGISTERMESSAGE, except that this message cancels the core sending message. The core will
+  * never send this message to a plugin.
+  *
+  * This message is usually sent during the handling of the WM_DESTROY message by the plugin window.
+  * @par wParam:
+  * Set to the window handle of the plugin.
+  * @par lParam:
+  * Set to an int* which points to an array of window message numbers to recieve. The last element in this array should
+  * be 0 to mark the end
+  * @ingroup bbapi_basic
+  */
 #define BB_UNREGISTERMESSAGE    10002
 
 /* ----------------------------------- */
+/** @brief The core must quit
+  */
 #define BB_QUIT                 10101
 #define BB_RESTART              10102
 #define BB_RECONFIGURE          10103
@@ -217,34 +269,88 @@
 #define BBWS_MOVEWINDOWTOWS   25  /* lParam: desktop number, bool follow */
 
 /*------------------------------------------ */
-/** @brief Core tasks updated
+
+
+/** @brief Window Message: The task information in the core has been updated
   *
   * This message is sent by the core when a task is added, deleted or otherwise modified.
-  * It is also sent on workspace changes.Plugins should never send this message, only recieve it.
-  * @par lParam value:
-  * See ::eTaskUpdate for possible lParams
+  * Plugins should never send this message, only recieve it.
   * @par wParam value:
-  * An HWND indicating the affected task, except for TASKITEM_REFRESH where it is NULL.
+  * An HWND indicating the affected task, except when the lParam is  ::TASKITEM_REFRESH where it is NULL.
+  * @par lParam value:
+  * Possible lParams are ::TASKITEM_ADDED, ::TASKITEM_MODIFIED, ::TASKITEM_ACTIVATED,
+  * ::TASKITEM_REMOVED, ::TASKITEM_REFRESH or ::TASKITEM_FLASHED.
+  * See individual items for information on why they are set
+  * @ingroup bbapi_tasks
   */
 #define BB_TASKSUPDATE          10506
-/* lParam for BB_TASKSUPDATE: */
 
-//#define TASKITEM_ADDED 0        /*  wParam: hwnd */
-//#define TASKITEM_MODIFIED 1     /*  wParam: hwnd */
-#define TASKITEM_ACTIVATED 2    /*  wParam: hwnd */
-#define TASKITEM_REMOVED 3      /*  wParam: hwnd */
-#define TASKITEM_REFRESH 4      /*  wParam: NULL, sent on workspace change of one or more tasks */
-#define TASKITEM_FLASHED 5      /*  wParam: hwnd */
+/** @brief lParam: A new task was created
+  *
+  * wParam is the HWND of the new task
+  * @ingroup bbapi_tasks
+  */
+#define TASKITEM_ADDED 0
 
+/** @brief lParam: An existing task was modified
+  *
+  * wParam is the HWND of the modified task
+  * @ingroup bbapi_tasks
+  */
+#define TASKITEM_MODIFIED 1
 
+/** @brief lParam: The active task has changed
+  *
+  * wParam is the HWND of the new active task
+  * @ingroup bbapi_tasks
+  */
+#define TASKITEM_ACTIVATED 2
 
+/** @brief lParam: A task has been deleted
+  *
+  * wParam is the HWND that the task had
+  * @ingroup bbapi_tasks
+  */
+#define TASKITEM_REMOVED 3
+
+/** @brief lParam: An existing task has changed workspaces
+  *
+  * wParam is NULL
+  * @ingroup bbapi_tasks
+  */
+#define TASKITEM_REFRESH 4
+
+/** @brief lParam: An existing task is trying to get attention
+  *
+  * wParam is the HWND of the task whose icon should be flashed
+  * @ingroup bbapi_tasks
+  */
+#define TASKITEM_FLASHED 5
+
+/** @brief Window Message: A tray icon has been updated
+  *
+  * This message is sent by the core when there is a new tray icon, an existing tray icon has changed
+  * or an existing tray icon has been removed. Plugins should not send this message.
+  * @par wParam:
+  * The value of the wParam is not consistent between branches, do not use it
+  * @par lParam:
+  * The possible values for the lParam are ::TRAYICON_ADDED, ::TRAYICON_MODIFIED or ::TRAYICON_REMOVED.
+  * @ingroup bbapi_tray
+  */
 #define BB_TRAYUPDATE           10507
-/* lParam for BB_TRAYUPDATE: */
-#define TRAYICON_ADDED 0
-#define TRAYICON_MODIFIED 1
-#define TRAYICON_REMOVED 2
 
+/** @brief Window Message: The tray must be cleaned
+  *
+  * This message is sent to the core by plugins if they find a tray icon
+  * whose owner no longer exists (the hwnd is invalid)
+  * @par wParam:
+  * Set to 0
+  * @par lParam:
+  * Set to 0
+  * @ingroup bbapi_tray
+  */
 #define BB_CLEANTRAY            10508
+
 #define BB_DRAGTODESKTOP        10510 /* wParam 0:execute drop  1:test if accepted */
 
 /* ----------------------------------- */
@@ -282,15 +388,7 @@
 
 /* ----------------------------------- */
 /* Indices for pluginInfo(int index); */
-#define PLUGIN_NAME         1
-#define PLUGIN_VERSION      2
-#define PLUGIN_AUTHOR       3
-#define PLUGIN_RELEASE      4
-#define PLUGIN_RELEASEDATE  4   /* xoblite */
-#define PLUGIN_LINK         5
-#define PLUGIN_EMAIL        6
-#define PLUGIN_BROAMS       7   /* xoblite */
-#define PLUGIN_UPDATE_URL   8   /* for Kaloth's BBPlugManager */
+
 
 /*=========================================================================== */
 /* BBLean extensions */
@@ -332,21 +430,18 @@
 /* ----------------------------------- */
 /* done with BB_ messages */
 
-///@}
-
-/** @name lParam options
-  * @{
+/** @brief lParam: A new icon has been added to the tray
+  * @ingroup bbapi_tray
   */
-/// @brief Values for BB_TASKUPDATE lParam
-enum eTaskUpdate
-{
-	///@brief A new window has been created
-	TASKITEM_ADDED,
-	///@brief An existing window has changed properties
-	TASKITEM_MODIFIED
-};
-
-/// @}
+#define TRAYICON_ADDED 0
+/** @brief lParam: An existing icon in the tray has changed
+  * @ingroup bbapi_tray
+  */
+#define TRAYICON_MODIFIED 1
+/** @brief lParam: An icon has been removed from the tray
+  * @ingroup bbapi_tray
+  */
+#define TRAYICON_REMOVED 2
 
 ///@brief The lowest value a Blackbox window message will have
 #define BB_MSGFIRST             10000
@@ -360,26 +455,20 @@ enum eTaskUpdate
   */
 struct StyleItem
 {
-	/* 0.0.80 */
 	/** @brief Style of the border on item
-	  * @version Since bb4win 0.0.80
 	  */
 	int bevelstyle;
 	/** @brief Style of the border on item
-	  * @version Since bb4win 0.0.80
 	  */
 	int bevelposition;
 	/** @brief Gradient type
-	  * @version Since bb4win 0.0.80
 	  */
 	int type;
 	/** @brief Indicates that only the border should be drawn when true
-	  * @version Since bb4win 0.0.80
 	  */
 	bool parentRelative;
 	/** @brief Inidcates if this item should be drawn interlaced
 	  * @todo Get better description
-	  * @version Since bb4win 0.0.80
 	  */
 	bool interlaced;
 
@@ -392,6 +481,12 @@ struct StyleItem
 	int Justify;
 	int validated;
 
+	/** @brief Font for this style item
+	  *
+	  * This member was originally 256 characters in bb4win. It has since been reduced to 128 characters,
+	  * and the rest of the space used for all members that follow. The StyleItem.reserved member is used to keep
+	  * the total size of a StyleItem at the same saize as the original bb4win implementation.
+	  */
 	char Font[128];
 
 	/* below: experimental */
@@ -413,6 +508,11 @@ struct StyleItem
 	};
 	COLORREF ShadowColor;
 
+	/** @brief Padding for structure size
+	  *
+	  * The size of this member is designed to keep the StyleItem structure at
+	  * the same size as the original bb4win structure.
+	  */
 	char reserved[128 - (17*4 + 6)]; /* keep structure size */
 
 };
@@ -442,8 +542,8 @@ struct StyleItem
 #define VALID_SHADOWX       (1<<14)
 #define VALID_SHADOWY       (1<<15)
 
-typedef class Menu Menu;
-typedef class MenuItem MenuItem;
+class Menu;
+class MenuItem;
 
 /** @brief Constants for use with GetSettingPtr.
   */
@@ -832,8 +932,13 @@ extern "C" {
 
 	/* ------------------------------------ */
 	/* Tray icon access */
+	/** @addtogroup bbapi_tray
+	  * @{
+	  */
 
-	typedef struct systemTray
+	/** @brief Represents a single system tray icon
+	  */
+	struct systemTray
 	{
 		HWND    hWnd;
 		UINT    uID;
@@ -841,21 +946,25 @@ extern "C" {
 		HICON   hIcon;
 		char    szTip[256 - 4];
 		struct systemTrayBalloon *pBalloon; /* NULL when not present */
-	} systemTray;
+	};
 
-	typedef struct systemTrayBalloon
+	/** @brief Represents a bbLean balloon tooltip for a system tray icon
+	  */
+	struct systemTrayBalloon
 	{
 		UINT    uInfoTimeout;
 		DWORD   dwInfoFlags;
 		char    szInfoTitle[64];
 		char    szInfo[256];
-	} systemTrayBalloon;
+	};
 
 	API_EXPORT int GetTraySize(void);
 	API_EXPORT systemTray* GetTrayIcon(UINT pointer);
 
+	/// @}
+
 	/* experimental: */
-	typedef BOOL (*TRAYENUMPROC)(struct systemTray *, LPARAM);
+//	typedef BOOL (*TRAYENUMPROC)(struct systemTray *, LPARAM);
 //	API_EXPORT void EnumTray (TRAYENUMPROC lpEnumFunc, LPARAM lParam);
 
 	/* ------------------------------------ */
@@ -995,13 +1104,101 @@ extern "C" {
 /// @}
 	/* ------------------------------------ */
 	/* plugin interface declarations */
+/** @defgroup plugin Plugin Interface
+  * @brief This sections lists the functions that a plugin should provide.
+  *
+  * The absolute minimum that a plugin can implement and still be loadable is beginPlugin(),
+  * endPlugin() and pluginInfo(). Implementing beginPluginEx() and beginSlitPlugin() are
+  * highly recommended even if the plugin does not use the slit, as some branches prefer these
+  * functions when loading plugins.
+  * @{
+  */
+
+/** @brief PluginInfo: Plugin should return its name
+  */
+#define PLUGIN_NAME         1
+/** @brief PluginInfo: Plugin should return its version
+  */
+#define PLUGIN_VERSION      2
+/** @brief PluginInfo: Plugin should return its author(s)
+  */
+#define PLUGIN_AUTHOR       3
+/** @brief PluginInfo: Plugin should return its release date
+  */
+#define PLUGIN_RELEASE      4
+/** @brief PluginInfo: Plugin should return its release date
+  */
+#define PLUGIN_RELEASEDATE  4   /* xoblite */
+/** @brief PluginInfo: Plugin should return a link to its homepage
+  */
+#define PLUGIN_LINK         5
+/** @brief PluginInfo: Plugin should return a contact email
+  */
+#define PLUGIN_EMAIL        6
+/** @brief PluginInfo: Plugin should return a list of its bro@ms
+  *
+  * The should be one long string. Bro@@ms are split based on the @ so no spaces are needed between.
+  * This is used by xoblite to generate a menu with the plugins bro@@ms in it.
+  */
+#define PLUGIN_BROAMS       7   /* xoblite */
+/** @brief PluginInfo: Plugin should return a url where an update metafile can be found, if supported
+  */
+#define PLUGIN_UPDATE_URL   8   /* for Kaloth's BBPlugManager */
 
 #ifndef __BBCORE__
-	DLL_EXPORT int beginPlugin(HINSTANCE);
-	DLL_EXPORT int beginSlitPlugin(HINSTANCE, HWND hSlit);
-	DLL_EXPORT int beginPluginEx(HINSTANCE, HWND hSlit);
-	DLL_EXPORT void endPlugin(HINSTANCE);
+	/** @brief Basic plugin startup function
+	  * @param[in] hInstance The instance handle of the plugins DLL. Use when registering window classes etc.
+	  *
+	  * This is the original plugin entry function. When started through this function your plugin will not
+	  * be able to use the slit or be loaded into bbInterface. It is a good idea to implement this for compatibility
+	  * with all Blackbox versions. In many plugins this function just consists of
+	  * @code
+	  * beginPluginEx(hInstance, NULL);
+	  * @endcode
+	  */
+	DLL_EXPORT int beginPlugin(HINSTANCE hInstance);
+
+	/** @brief Slit plugin startup function
+	  * @param[in] hInstance The instance handle of the plugins DLL. Use when registering window classes etc.
+	  * @param[in] hSlit The window handle of the slit. May be NULL if the slit is not present.
+	  *
+	  * This is the original plugin entry function for plugins that supported the slit. The original intention
+	  * was that plugins loaded via this function would always place themselves in the slit. Many
+	  * plugins, however, only use the slit when it is enabled in their own config file.
+	  * In many plugins this function just forwards to ::BeginPluginEx() and consists of
+	  * @code
+	  * beginPluginEx(hInstance, hSlit);
+	  * @endcode
+	  */
+	DLL_EXPORT int beginSlitPlugin(HINSTANCE hInstance, HWND hSlit);
+	/** @brief Flexible plugin startup function
+	  * @param[in] hInstance The instance handle of the plugins DLL. Use when registering window classes etc.
+	  * @param[in] hSlit The window handle of the slit. May be NULL if the slit is not present.
+	  *
+	  * This is the most recent addition to the plugin interface functions. When loaded with this function
+	  * the slit information is available to a plugin. The plugin is expected to control whether it is located
+	  * in the lsit or freestadning by checking its own config file.
+	  */
+	DLL_EXPORT int beginPluginEx(HINSTANCE hInstance, HWND hSlit);
+	/** @brief Plugin shutdown function
+	  * @param[in] hInstance The instance handle of the plugins DLL. Use to deregister window classes etc.
+	  *
+	  * This function is called just before the plugin will be unloaded. This function should make sure that
+	  * all windows are destroyed, window classes unregistered and any other cleanup performed. Once
+	  * you return from this function your plugin will not be able to execute anything else.
+	  */
+	DLL_EXPORT void endPlugin(HINSTANCE hInstance);
+	/** @brief Pluginn information function
+	  * @param[in] index The type of information the plugin should return. The value will be one of
+	  * ::PLUGIN_NAME, ::PLUGIN_VERSION, ::PLUGIN_AUTHOR, ::PLUGIN_RELEASE, ::PLUGIN_LINK, ::PLUGIN_EMAIL,
+	  * ::PLUGIN_BROAMS or ::PLUGIN_UPDATE_URL.
+	  *
+	  * This function should return the information requested by the index parameter. If the parameter
+	  * is not one of the above values it is stadnard practice to return a string containing
+	  * the plugin name and plugin version.
+	  */
 	DLL_EXPORT LPCSTR pluginInfo(int index);
+/// @}
 #endif
 
 #ifdef __cplusplus

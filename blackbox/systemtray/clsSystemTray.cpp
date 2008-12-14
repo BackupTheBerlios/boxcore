@@ -1,3 +1,31 @@
+/** @internal
+  * @file clsSystemTray.cpp
+  * @brief This file contains the implementation of clsSystemTray
+  *
+  * This file is part of the boxCore source code @n
+  * <!-- Copyright © 2008 Carsomyr -->
+  * Copyright &copy; 2008 Carsomyr
+  * @par links
+  * http://developer.berlios.de/projects/boxcore @n
+  * @par License
+  * boxCore is free software, released under the GNU General
+  * Public License (GPL version 2 or later), with an extension that allows
+  * linking of proprietary modules under a controlled interface. This means
+  * that plugins etc. are allowed to be released under any license the author
+  * wishes. For details see:
+  * @par
+  * http://www.fsf.org/licenses/gpl.html @n
+  * http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
+  * @par
+  * This program is distributed in the hope that it will be useful, but
+  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+  * for more details.
+  *
+  * The basic operations of this class is based on the functions in Tray.cpp in
+  * the bbLean source code.
+  */
+
 #include "clsSystemTray.h"
 #include "../../dynwinapi/clsShlwapi.h"
 #include "../../dynwinapi/clsUser32.h"
@@ -65,7 +93,9 @@ struct APPBARDATA_32
 	LONG32 lParam;
 };
 
-/// Used in XP, Vista as well
+/** @internal
+  * Used in XP, Vista as well
+  */
 struct APPBARMSG_64
 {
 	APPBARDATA_64 abd;
@@ -77,7 +107,9 @@ struct APPBARMSG_64
 };
 
 
-///Used in 2k, and 98se
+/** @internal
+  * Used in 2k, and 98se
+  */
 struct APPBARMSG_32
 {
 	APPBARDATA_32 abd;
@@ -88,7 +120,9 @@ struct APPBARMSG_32
 	DWORD dwSourceProcessID;
 };
 
-///We use a pointer to the 32 bit version of APPBARDATA, because we only need  the low order bits, and it keeps us safe
+/** @internal
+  * We use a pointer to the 32 bit version of APPBARDATA, because we only need  the low order bits, and it keeps us safe
+  */
 struct INTERNAL_APPBARMSG
 {
 	APPBARDATA_32 *abd;
@@ -99,11 +133,9 @@ struct INTERNAL_APPBARMSG
 };
 
 
-/**
- * @struct SHELLTRAYDATA
- *
- * @brief Format used by the shell in WM_COPYDATA messages to pass infomration to the system tray
- */
+/** @internal
+  * @brief Format used by the shell in WM_COPYDATA messages to pass infomration to the system tray
+  */
 struct SHELLTRAYDATA
 {
 	DWORD dwMagic; // e.g. 0x34753423;

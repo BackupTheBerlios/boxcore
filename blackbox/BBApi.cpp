@@ -1,4 +1,5 @@
-/** @file BBApi.cpp
+/** @internal
+  * @file BBApi.cpp
   * @brief Contains the implementations for some plugin API functions and helpers
   *
   * This file is part of the boxCore source code @n
@@ -8,11 +9,11 @@
   * Copyright &copy; 2001-2003 The Blackbox for Windows Development Team @n
   * Copyright &copy; 2004-2007 grischka @n
   * Copyright &copy; 2008 Carsomyr
-  * @par links
+  * @par Links:
   * http://developer.berlios.de/projects/boxcore @n
   * http://bb4win.sourceforge.net/bblean @n
   * http://sourceforge.net/projects/bb4win @n
-  * @par License
+  * @par License:
   * boxCore, bbLean and bb4win are free software, released under the GNU General
   * Public License (GPL version 2 or later), with an extension that allows
   * linking of proprietary modules under a controlled interface. This means
@@ -30,6 +31,8 @@
 
 #include "BB.h"
 #include "Settings.h"
+#include "managers.h"
+#include "version.h"
 
 #include <shellapi.h>
 #include <time.h>
@@ -46,54 +49,14 @@ ST char stylerc_path[MAX_PATH];
 
 //===========================================================================
 
-unsigned long getfileversion(const char *path, char *buffer)
-{
-	char *info_buffer; void *value; UINT bytes; DWORD result; DWORD dwHandle;
 
-	if (buffer) buffer[0] = 0;
-
-	dwHandle = 0;
-	result = GetFileVersionInfoSize((LPTSTR)path, &dwHandle);
-	if (0 == result)
-		return 0;
-
-	if (FALSE == GetFileVersionInfo((LPTSTR)path, 0, result, info_buffer=(char*)m_alloc(result)))
-		return 0;
-
-	result = 0;
-
-	if (buffer)
-	{
-		if (VerQueryValue(info_buffer,
-			// change to whatever version encoding used (currently language neutral)
-			TEXT("\\StringFileInfo\\000004b0\\FileVersion"),
-			&value, &bytes))
-		{
-			strcpy(buffer, (const char*)value);
-			result = 1;
-			//dbg_printf("version of %s <%s>", path, buffer);
-		}
-	}
-	else
-	if (VerQueryValue(info_buffer, "\\", &value, &bytes))
-	{
-		VS_FIXEDFILEINFO *vs = (VS_FIXEDFILEINFO*)value;
-		result = MAKELPARAM(
-			MAKEWORD(LOWORD(vs->dwFileVersionLS), HIWORD(vs->dwFileVersionLS)),
-			MAKEWORD(LOWORD(vs->dwFileVersionMS), HIWORD(vs->dwFileVersionMS)));
-		//dbg_printf("version number of %s %08x", path, result);
-	}
-	m_free(info_buffer);
-	return result;
-}
 
 /** @brief Returns the current version
-  * @return Fomratted version string
+  * @return Formatted version string
   */
 LPCSTR GetBBVersion(void)
 {
-	static char bb_version [40];
-	if (0 == *bb_version) getfileversion(bb_exename, bb_version);
+	static char bb_version[] = "bbLean" VERSION;
 	return bb_version;
 }
 
@@ -462,7 +425,7 @@ ST struct lin_list *make_line (struct fil_list *fl, const char *key, int k, cons
 	tl->next = NULL;
 	tl->is_wild = false;
 	//if the key contains a wildcard
-	if (k && memchr(key, '*', k) || memchr(key, '?', k))
+	if ((k && memchr(key, '*', k)) || memchr(key, '?', k))
 	{
 		// add it to the wildcard - list
 		append_node(&fl->wild, new_node(tl));
@@ -1520,7 +1483,7 @@ COLORREF ReadColorFromString(LPCSTR string)
 		}
 
 		if (d - s == 3) // #AB4 short type colors
-			cr = (cr&0xF00)<<12 | (cr&0xFF0)<<8 | (cr&0x0FF)<<4 | cr&0x00F;
+			cr = ((cr&0xF00)<<12) | ((cr&0xFF0)<<8) | ((cr&0x0FF)<<4) | (cr&0x00F);
 
 		return switch_rgb(cr);
 
@@ -2262,10 +2225,14 @@ void SnapWindowToEdge(WINDOWPOS* wp, LPARAM nDist_or_pContent, UINT Flags)
 	// adjust the window-pos
 
 	if (h.dmin < snapdist)
+	{
 		if (sizing) wp->cx += h.omin; else wp->x += h.omin;
+	}
 
 	if (v.dmin < snapdist)
+	{
 		if (sizing) wp->cy += v.omin; else wp->y += v.omin;
+	}
 }
 
 //*****************************************************************************
@@ -2405,6 +2372,69 @@ ST void snap_to_edge(struct edges *h, struct edges *v, bool sizing, bool same_le
 	if (v->d < v->dmin) v->dmin = v->d, v->omin = v->o;
 }
 
+/** @brief Handles mouse events for system tray icons
+  * @param[in] ownerHwnd The window handle of the icons owner
+  * @param[in] iconID The icon id for the specific icon
+  * @param[in] msg The message to be processed
+  * @param[in] wParam The WPARAM value for the message
+  * @param[in] lParam The LPARAM value for the message
+  * This function simply forwards to clsSystemTray::TrayIconEvent()
+  * @warning This is not an official API function, do not link statically to it.
+  */
+BOOL TrayIconEvent(HWND hWnd, UINT uID, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	return SystemTrayManager.TrayIconEvent(hWnd, uID, msg, wParam, lParam);
+}
 
+/** @brief Changes the position of the emulated taskbar
+  * @param[in] pLeft Coordinate of left edge of bar
+  * @param[in] pTop Coordinate of top edge of bar
+  * @param[in] pRight Coordinate of right edge of bar
+  * @param[in] pBottom Coordinate of bottom edge of bar
+  * @param[in] pEdge The edge of the screen the bar is located at
+  * @warning This is not an official API function, do not link statically to it.
+  */
+void SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom, UINT pEdge)
+{
+	SystemTrayManager.SetTaskbarPos(pLeft, pTop, pRight, pBottom, pEdge);
+}
+
+/** @brief Gets the number of visible icons in the tray
+  * @return The number of visible icons in the tray
+  */
+int GetTraySize()
+{
+	return SystemTrayManager.GetNumVisible();
+}
+
+/** @brief Stores systemTray structures for passing to plugins
+  */
+vector<systemTray> apiVector;
+
+/** @brief Retrieve a system tray icons infomration by index
+  * @param[in] idx The icon number to retrieve
+  * @return A pointer to a systemTray struct describing the requested icon.
+  */
+systemTray* GetTrayIcon(UINT idx)
+{
+	const clsTrayItem *item = SystemTrayManager.GetTrayIcon(idx);
+	if (item)
+	{
+		if (apiVector.size()<(idx+1))
+			apiVector.resize(idx+1);
+		apiVector[idx].hWnd = item->hWnd;
+		apiVector[idx].uID = item->iconID;
+		apiVector[idx].uCallbackMessage = item->callbackMessage;
+		apiVector[idx].hIcon = item->hIcon;
+		if (item->showTooltip)
+			WideCharToMultiByte(CP_ACP, 0, item->tooltip.c_str(), -1, apiVector[idx].szTip, 200, NULL, NULL);
+		else
+			apiVector[idx].szTip[0] = '\0';
+		apiVector[idx].pBalloon = NULL;
+		return &apiVector[idx];
+	}
+	else
+		return NULL;
+}
 
 //===========================================================================

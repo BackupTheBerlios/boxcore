@@ -418,6 +418,8 @@ static HBITMAP read_bitmap(LPCSTR path, bool delete_after)
 //===========================================================================
 
 //===========================================================================
+/** @brief document so the todo shows up
+  */
 HBITMAP load_desk_bitmap(LPCSTR command)
 {
 	char token[MAX_PATH];
@@ -442,12 +444,13 @@ HBITMAP load_desk_bitmap(LPCSTR command)
 	char exe_path[MAX_PATH];
 	make_bb_path(exe_path, "bsetroot.exe");
 
-	unsigned long bsrt_vernum = getfileversion(exe_path, NULL);
+	///@todo Fix this so it can work again
+	/*unsigned long bsrt_vernum = getfileversion(exe_path, NULL);
 	if (bsrt_vernum < 0x02000000)
 	{
 		BBExecute_string(command, true);
 		return NULL;
-	}
+	}*/
 
 	char bsetroot_bmp[MAX_PATH];
 	make_bb_path(bsetroot_bmp, "$bsroot$.bmp");

@@ -67,6 +67,9 @@ set (PLUGININFO_EMAIL "carsomyr@users.berlios.de")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resource.rc.in
 ${CMAKE_CURRENT_BINARY_DIR}/resource.rc)
 
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/version.h.in
+${CMAKE_CURRENT_BINARY_DIR}/version.h)
+
 if(MINGW)
   # resource compilation for mingw
   ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/resource.o
@@ -79,6 +82,7 @@ else(MINGW)
 endif(MINGW)
 
 add_executable (blackbox ${BLACKBOX_CORE_SRCS} ${BLACKBOX_MENU_SRCS} ${BLACKBOX_NEW_SRCS} ${BLACKBOX_RESOURCES} )
+include_directories(blackbox ${CMAKE_CURRENT_BINARY_DIR})
 #add_custom_command (TARGET blackbox POST_BUILD
 #	COMMAND ${DLLTOOL} -d ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def -l ${CMAKE_CURRENT_BINARY_DIR}/libblackbox.a -D blackbox.exe
 #	COMMENT "Building proper library")

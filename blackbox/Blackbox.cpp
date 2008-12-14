@@ -513,6 +513,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SystemTrayManager.setCallback(TCALLBACK_MOD,broadcastMod);
 	SystemTrayManager.initialize();
 
+	if (!underExplorer)
+	{
 	if (SystemInfo.isOsVista())
 	{
 		clsClsidInjected vistaInject(L"{730F6CDC-2C86-11D2-8773-92E220524153}");
@@ -527,6 +529,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	{
 		clsClsidRegValues normalKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad");
 		ShellServiceObjectsManager.startServiceObjects(normalKey);
+	}
 	}
 
 	InitApiExtensions();
@@ -613,7 +616,7 @@ void shutdown_blackbox()
 	Menu_All_Delete();
 	kill_plugins();
 	ShellServiceObjectsManager.stopServiceObjects();
-	//SystemTrayManager.terminate();
+	SystemTrayManager.terminate();
 	Desk_Exit();
 	Workspaces_Exit();
 	MenuMaker_Exit();
@@ -678,7 +681,7 @@ void adjust_style(void) // temporary fix for bbStyleMaker 1.2
 	mStyle.windowHandleUnfocus.borderWidth =
 	mStyle.windowGripFocus.borderWidth =
 	mStyle.windowGripUnfocus.borderWidth =
-	mStyle.frameWidth =
+//	mStyle.frameWidth =
 		mStyle.borderWidth;
 
 	mStyle.MenuFrame.borderColor =
@@ -1830,43 +1833,7 @@ void RunStartupStuff(void)
 
 //===========================================================================
 
-int GetTraySize()
-{
-	return SystemTrayManager.GetNumVisible();
-}
-
-vector<systemTray> apiVector;
-
-systemTray* GetTrayIcon(UINT idx)
-{
-	//return NULL;
-	const clsTrayItem *item = SystemTrayManager.GetTrayIcon(idx);
-	if (item)
-	{
-		if (apiVector.size()<(idx+1))
-			apiVector.resize(idx+1);
-		apiVector[idx].hWnd = item->hWnd;
-		apiVector[idx].uID = item->iconID;
-		apiVector[idx].uCallbackMessage = item->callbackMessage;
-		apiVector[idx].hIcon = item->hIcon;
-		if (item->showTooltip)
-			WideCharToMultiByte(CP_ACP, 0, item->tooltip.c_str(), -1, apiVector[idx].szTip, 200, NULL, NULL);
-		else
-			apiVector[idx].szTip[0] = '\0';
-		apiVector[idx].pBalloon = NULL;
-		return &apiVector[idx];
-	}
-	else
-		return NULL;
-}
 
 
-BOOL TrayIconEvent(HWND hWnd, UINT uID, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	return SystemTrayManager.TrayIconEvent(hWnd, uID, msg, wParam, lParam);
-}
 
-void SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom, UINT pEdge)
-{
-	SystemTrayManager.SetTaskbarPos(pLeft, pTop, pRight, pBottom, pEdge);
-}
+
