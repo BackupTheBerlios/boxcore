@@ -33,6 +33,14 @@ else (DOXYGEN_DOT_EXECUTABLE)
 set (USE_DOT "NO")
 endif (DOXYGEN_DOT_EXECUTABLE)
 
+option (INTERNALDOCS "Generate internal project documentation?" OFF)
+
+if (INTERNALDOCS)
+set (INTERNAL_DOCS "YES")
+else (INTERNALDOCS)
+set (INTERNAL_DOCS "NO")
+endif (INTERNALDOCS)
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY IMMEDIATE)
 add_custom_target(doc ${DOXYGEN_EXECUTABLE})
 endif (DOXYGEN_EXECUTABLE)

@@ -44,13 +44,13 @@ div.navtab {
 /* @group Link Styling */
 
 a {
-	color: #153788;
+	color: #AAAAAA;
 	font-weight: normal;
 	text-decoration: none;
 }
 
 .contents a:visited {
-	color: #1b77c5;
+	color: #AAAAAA;
 }
 
 a:hover {
@@ -94,7 +94,7 @@ dl.el {
 
 pre.fragment {
 	border: 1px solid #CCCCCC;
-	background-color: #f5f5f5;
+	background-color: #333333;
 	padding: 4px 6px;
 	margin: 4px 8px 4px 2px;
 }
@@ -120,14 +120,14 @@ div.groupText {
 }
 
 body {
-	background: white;
-	color: black;
+	color: #FFFFFF;
+    background-color: #333333;
 	margin-right: 20px;
 	margin-left: 20px;
 }
 
 td.indexkey {
-	background-color: #e8eef2;
+	background-color: #555555;
 	font-weight: bold;
 	border: 1px solid #CCCCCC;
 	margin: 2px 0px 2px 0;
@@ -135,7 +135,7 @@ td.indexkey {
 }
 
 td.indexvalue {
-	background-color: #e8eef2;
+	background-color: #555555;
 	border: 1px solid #CCCCCC;
 	padding: 2px 10px;
 	margin: 2px 0px;
@@ -150,7 +150,7 @@ p.formulaDsp {
 }
 
 img.formulaDsp {
-	
+
 }
 
 img.formulaInl {
@@ -160,47 +160,47 @@ img.formulaInl {
 /* @group Code Colorization */
 
 span.keyword {
-	color: #008000
+	color: #00FF00
 }
 
 span.keywordtype {
-	color: #604020
+	color: #FF4020
 }
 
 span.keywordflow {
-	color: #e08000
+	color: #FF8000
 }
 
 span.comment {
-	color: #800000
+	color: #FF0000
 }
 
 span.preprocessor {
-	color: #806020
+	color: #FF6020
 }
 
 span.stringliteral {
-	color: #002080
+	color: #0020FF
 }
 
 span.charliteral {
-	color: #008080
+	color: #00FFFF
 }
 
-span.vhdldigit { 
-	color: #ff00ff 
+span.vhdldigit {
+	color: #ff00ff
 }
 
-span.vhdlchar { 
-	color: #000000 
+span.vhdlchar {
+	color: #000000
 }
 
-span.vhdlkeyword { 
-	color: #700070 
+span.vhdlkeyword {
+	color: #700070
 }
 
-span.vhdllogic { 
-	color: #ff0000 
+span.vhdllogic {
+	color: #ff0000
 }
 
 /* @end */
@@ -248,7 +248,7 @@ hr {
 .mdescLeft, .mdescRight,
 .memItemLeft, .memItemRight,
 .memTemplItemLeft, .memTemplItemRight, .memTemplParams {
-	background-color: #FAFAFA;
+	background-color: #444444;
 	border: none;
 	margin: 4px;
 	padding: 1px 0 0 8px;
@@ -256,7 +256,7 @@ hr {
 
 .mdescLeft, .mdescRight {
 	padding: 0px 8px 4px 8px;
-	color: #555;
+	color: #DDDDDD;
 }
 
 .memItemLeft, .memItemRight, .memTemplParams {
@@ -299,12 +299,12 @@ hr {
 }
 
 .memproto, .memdoc {
-	border: 1px solid #84b0c7;	
+	border: 1px solid #84b0c7;
 }
 
 .memproto {
 	padding: 0;
-	background-color: #d5e1e8;
+	background-color: #333333;
 	font-weight: bold;
 	-webkit-border-top-left-radius: 8px;
 	-webkit-border-top-right-radius: 8px;
@@ -314,7 +314,7 @@ hr {
 
 .memdoc {
 	padding: 2px 5px;
-	background-color: #eef3f5;
+	background-color: #555555;
 	border-top-width: 0;
 	-webkit-border-bottom-left-radius: 8px;
 	-webkit-border-bottom-right-radius: 8px;
@@ -335,7 +335,7 @@ hr {
 }
 
 .paramname {
-	color: #602020;
+	color: #C04040;
 	white-space: nowrap;
 }
 .paramname em {
@@ -437,5 +437,5 @@ proper pixel height of your image.
 
 address {
 	font-style: normal;
-	color: #333;
+	color: #EEEEEE;
 }
