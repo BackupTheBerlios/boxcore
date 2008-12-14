@@ -17,8 +17,8 @@ clsItem::clsItem(bool pVertical)
 	mouseButton = 0;
 	minSizeX = 0;
 	minSizeY = 0;
-	tipText = NULL;
 
+	tipText = NULL;
 	leftClick = NULL;
 	rightClick = NULL;
 	midClick = NULL;
@@ -26,6 +26,18 @@ clsItem::clsItem(bool pVertical)
 	X2Click = NULL;
 
 	itemAlpha = 255;
+
+	itemBlend.BlendOp = AC_SRC_OVER;
+	itemBlend.BlendFlags = 0;
+	itemBlend.SourceConstantAlpha = itemAlpha;
+	itemBlend.AlphaFormat = 0;
+
+	ZeroMemory(&itemBitmapInfo, sizeof(itemBitmapInfo));
+	itemBitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	itemBitmapInfo.bmiHeader.biWidth = itemArea.right - itemArea.left;
+	itemBitmapInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
+	itemBitmapInfo.bmiHeader.biPlanes = 1;
+	itemBitmapInfo.bmiHeader.biBitCount = 32;
 }
 
 /** @brief Base destructor
@@ -92,6 +104,10 @@ dimType clsItem::resize(int pX, int pY)
 		itemArea.bottom = itemArea.top + pY;
 		done = ((done == DIM_HORIZONTAL) ? DIM_BOTH : DIM_VERTICAL);
 	}
+	itemBitmapInfo.bmiHeader.biWidth = itemArea.right - itemArea.left;
+	itemBitmapInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
+	if (tipText)
+		setTooltip();
 	return done;
 }
 
@@ -144,7 +160,6 @@ LRESULT clsItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONDOWN:
 		mouseDown = true;
 		mouseButton |= MK_LBUTTON;
-		dbg_printf("Left down");
 		break;
 	case WM_RBUTTONDOWN:
 		mouseDown = true;
@@ -301,28 +316,17 @@ void clsItem::draw(HDC pContext)
 		HBITMAP internalBitmap, origBitmap;
 		if (alphaDraw)
 		{
-			BITMAPINFO bufferInfo;
-			ZeroMemory(&bufferInfo, sizeof(bufferInfo));
-			bufferInfo.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
-			bufferInfo.bmiHeader.biWidth = itemArea.right - itemArea.left;
-			bufferInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
-			bufferInfo.bmiHeader.biPlanes = 1;
-			bufferInfo.bmiHeader.biBitCount = 32;
 			internalDC = CreateCompatibleDC(pContext);
-			internalBitmap = CreateDIBSection(internalDC, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
+			internalBitmap = CreateDIBSection(internalDC, &itemBitmapInfo, DIB_RGB_COLORS, NULL, NULL, 0);
 			origBitmap = (HBITMAP) SelectObject(internalDC, internalBitmap);
 			RECT tempArea;
 			tempArea.left = tempArea.top = 0;
 			tempArea.right = itemArea.right - itemArea.left;
-			tempArea.bottom = itemArea.bottom -itemArea.top;
+			tempArea.bottom = itemArea.bottom - itemArea.top;
 			MakeStyleGradient(internalDC, &tempArea, bbStyle.getStyle(style), bbStyle.getStyleBorder(style));
-			BLENDFUNCTION blendFunc;
-		blendFunc.BlendOp = AC_SRC_OVER;
-		blendFunc.BlendFlags = 0;
-		blendFunc.SourceConstantAlpha = itemAlpha;
-		blendFunc.AlphaFormat = 0;
-		msimg32.AlphaBlend(pContext, itemArea.left, itemArea.top, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top, internalDC,
-				   0, 0, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top, blendFunc);
+			msimg32.AlphaBlend(pContext, itemArea.left, itemArea.top,
+							   itemArea.right - itemArea.left, itemArea.bottom - itemArea.top,
+							   internalDC, 0, 0, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top, itemBlend);
 			SelectObject(internalDC, origBitmap);
 			DeleteObject(internalBitmap);
 			DeleteDC(internalDC);

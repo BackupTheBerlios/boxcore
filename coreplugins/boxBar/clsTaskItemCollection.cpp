@@ -25,6 +25,12 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 		{
 			dbg_printf((LPCSTR) lParam);
 			LPCSTR msg_string = (LPCSTR)lParam;
+			clsItem * backSpacer;
+			if (vertical && stretchTaskarea)
+			{
+				backSpacer = itemList.back();
+				itemList.pop_back();
+			}
 			if (!strnicmp(msg_string, "@boxBar.task.front.", strlen("@boxBar.task.front.")))
 			{
 				HWND targetTask;
@@ -106,6 +112,10 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 				PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 				RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 			}
+			if (vertical && stretchTaskarea)
+			{
+				itemList.push_back(backSpacer);
+			}
 		}
 		break;
 	case BB_TASKSUPDATE:
@@ -116,9 +126,11 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
 			InvalidateRect(barWnd, &itemArea, TRUE);
 			PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
-			break;
+			return 0;
 		case TASKITEM_ADDED:
 			{
+				if (!itemMapping[(HWND)wParam])
+				{
 				tasklist *task = GetTaskListPtr();
 				for (int i = 0; i < GetTaskListSize(); ++i)
 				{
@@ -131,6 +143,11 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 					}
 					task = task->next;
 				}
+				}
+				else
+				{
+					clsItemCollection::wndProc(hWnd, BB_TASKSUPDATE, wParam, TASKITEM_MODIFIED);
+				}
 				PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 				RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 			}
@@ -139,14 +156,7 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			{
 				clsItem *removedTask;
 				removedTask = itemMapping[(HWND)wParam];
-				for (list<clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
-				{
-					if ((*i) == removedTask)
-					{
-						itemList.erase(i);
-						break;
-					}
-				}
+				itemList.remove(removedTask);
 				itemMapping.erase((HWND)wParam);
 				PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 				RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);

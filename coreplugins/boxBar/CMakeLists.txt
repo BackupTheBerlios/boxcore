@@ -50,11 +50,11 @@ set (PLUGININFO_AUTHOR ${AUTHOR})
 set (PLUGININFO_URL http://developer.berlios.de/projects/boxcore/)
 set (PLUGININFO_EMAIL "carsomyr@users.berlios.de")
 
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/version.h)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/version.h)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/CPackConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/CPackConfig.cmake)
 
 add_library(boxBar MODULE ${BOXBAR_SRCS})
-include_directories(boxBar ../../blackbox)
+include_directories(boxBar ../../blackbox ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(boxBar ${UNICOWSLIB} blackbox comctl32 gdi32)
 set_target_properties (boxBar PROPERTIES
 	PREFIX ""

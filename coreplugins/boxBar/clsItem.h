@@ -157,6 +157,8 @@ protected:
 	void setTooltip();
 	TCHAR *tipText;
 private:
+	BLENDFUNCTION itemBlend;
+	BITMAPINFO itemBitmapInfo;
 };
 
 #endif // CLSITEM_H

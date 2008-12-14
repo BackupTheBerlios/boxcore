@@ -25,7 +25,8 @@ void clsTextItem::draw(HDC pContext)
 {
 	clsItem::draw(pContext);
 	HDC internalDC;
-	HBITMAP alphaBitmap, oldBitmap, maskBitmap;
+	HBITMAP alphaBitmap = NULL, oldBitmap = NULL;
+	COLORREF oldColor;
 	BYTE *ptPixels;
 	//alphaDraw = false;
 	if (alphaDraw)
@@ -40,16 +41,15 @@ void clsTextItem::draw(HDC pContext)
 		bufferInfo.bmiHeader.biBitCount = 32;
 		alphaBitmap = CreateDIBSection(pContext, &bufferInfo, DIB_RGB_COLORS, (void **) & ptPixels, NULL, 0);
 		oldBitmap = (HBITMAP) SelectObject(internalDC, alphaBitmap);
-
+		oldColor = SetTextColor(internalDC, RGB(255,255,255));
 	}
 	else
 	{
 		internalDC = pContext;
+		oldColor = SetTextColor(internalDC, bbStyle.getStyleTextColor(fontStyle));
 	}
 	SetBkMode(internalDC, TRANSPARENT);
 	HFONT oldFont = (HFONT) SelectObject(internalDC, bbStyle.getStyleFont(fontStyle));
-	//COLORREF oldColor = SetTextColor(internalDC, bbStyle.getStyleTextColor(fontStyle));
-	COLORREF oldColor = SetTextColor(internalDC, RGB(255,255,255));
 	RECT testRect = itemArea;
 	DrawTextEx(internalDC, text, -1, &testRect, bbStyle.getStyleTextJustify(fontStyle) | DT_CALCRECT, NULL);
 	if (testRect.right > itemArea.right)
