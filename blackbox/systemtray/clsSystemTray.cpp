@@ -766,15 +766,15 @@ void clsSystemTray::setCallback(trayCallbackType pType, void (*pCall)())
   */
 void clsSystemTray::CleanTray()
 {
-	for (list<clsTrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); )
+	for (list<clsTrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); ++i)
 		if (IsWindow((*i)->hWnd) == FALSE)
 		{
-			delete (*i);
-			i = trayItems.erase(i);
+			DeleteIcon((*i)->hWnd, (*i)->iconID, true);
+			CleanTray();
+			break;
 		}
-		else
-			i++;
 }
+
 /** @brief Fetches a tray item based on index
   * @param[in] num The index of the item to fetch
   * @return A read-only pointer to a tray item
