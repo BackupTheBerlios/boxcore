@@ -27,6 +27,7 @@ endif (${CMAKE_SYSTEM_PROCESSOR} STREQUAL AMD64)
 find_package(Doxygen)
 
 if (DOXYGEN_EXECUTABLE)
+set (DOXYGEN_HHC_EXECUTABLE "hhc" CACHE FILEPATH "Path to the hhc program")
 if (DOXYGEN_DOT_EXECUTABLE)
 set (USE_DOT "YES")
 else (DOXYGEN_DOT_EXECUTABLE)
@@ -34,6 +35,11 @@ set (USE_DOT "NO")
 endif (DOXYGEN_DOT_EXECUTABLE)
 
 option (INTERNALDOCS "Generate internal project documentation?" OFF)
+option (DOCS_CHM "Generate a .chm file?" OFF)
+
+if (DOCS_CHM)
+set (DOXYGEN_HHC ${DOXYGEN_HHC_EXECUTABLE})
+endif (DOCS_CHM)
 
 if (INTERNALDOCS)
 set (INTERNAL_DOCS "YES")
