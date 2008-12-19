@@ -148,7 +148,7 @@ int iminmax(int a, int b, int c) {
 
 bool is_alpha(int c)
 {
-	return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z';
+	return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
 }
 
 bool is_num(int c)
@@ -753,7 +753,7 @@ struct _SHChangeNotifyEntry
 	BOOL fRecursive;
 };
 #endif
-#define SHCNF_ACCEPT_INTERRUPTS 0x0001 
+#define SHCNF_ACCEPT_INTERRUPTS 0x0001
 #define SHCNF_ACCEPT_NON_INTERRUPTS 0x0002
 #define SHCNF_NO_PROXY 0x8000
 #endif
@@ -766,10 +766,10 @@ struct _SHChangeNotifyEntry
 #endif
 
 extern UINT (WINAPI *pSHChangeNotifyRegister)(
-	HWND hWnd, 
-	DWORD dwFlags, 
-	LONG wEventMask, 
-	UINT uMsg, 
+	HWND hWnd,
+	DWORD dwFlags,
+	LONG wEventMask,
+	UINT uMsg,
 	DWORD cItems,
 	struct _SHChangeNotifyEntry *lpItems
 	);

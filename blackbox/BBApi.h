@@ -285,7 +285,7 @@
   */
 #define BB_TASKSUPDATE          10506
 
-/** @brief lParam: A new task was created
+/** @brief lParam: A new task was added to the list
   *
   * wParam is the HWND of the new task
   * @ingroup bbapi_tasks
@@ -306,9 +306,9 @@
   */
 #define TASKITEM_ACTIVATED 2
 
-/** @brief lParam: A task has been deleted
+/** @brief lParam: A task has been removed from the list
   *
-  * wParam is the HWND that the task had
+  * wParam is the HWND that the task had, before being removed
   * @ingroup bbapi_tasks
   */
 #define TASKITEM_REMOVED 3
@@ -339,6 +339,19 @@
   */
 #define BB_TRAYUPDATE           10507
 
+/** @brief lParam: A new icon has been added to the tray
+  * @ingroup bbapi_tray
+  */
+#define TRAYICON_ADDED 0
+/** @brief lParam: An existing icon in the tray has changed
+  * @ingroup bbapi_tray
+  */
+#define TRAYICON_MODIFIED 1
+/** @brief lParam: An icon has been removed from the tray
+  * @ingroup bbapi_tray
+  */
+#define TRAYICON_REMOVED 2
+
 /** @brief Window Message: The tray must be cleaned
   *
   * This message is sent to the core by plugins if they find a tray icon
@@ -355,11 +368,76 @@
 
 /* ----------------------------------- */
 /* ShellHook messages, obsolete - register for BB_TASKSUPDATE instead */
+/** @brief Window Message: A new task has been added to the list
+  *
+  * This message is sent by the core for this event. Plugins should never send this message
+  * @par wParam:
+  * The HWND of the new task
+  * @par lParam:
+  * The lParam has no importance for this message
+  * @deprecated Register for and use ::BB_TASKSUPDATE instead
+  * @ingroup bbapi_tasks
+  */
 #define BB_ADDTASK              10601
+
+/** @brief Window Message: A task has been removed from the list
+  *
+  * This message is sent by the core for this event. Plugins should never send this message
+  * @par wParam:
+  * The HWND of the removed task
+  * @par lParam:
+  * The lParam has no importance for this message
+  * @deprecated Register for and use ::BB_TASKSUPDATE instead
+  * @ingroup bbapi_tasks
+  */
 #define BB_REMOVETASK           10602
+
+/** @brief Window Message: The shell should activate its main window
+  *
+  * This message is sent by the core. Plugins are highly unlikely to ever need to process this message.
+  * The core does not process this message so do not send it.
+  * @par wParam:
+  * The wParam has no importance for this message
+  * @par lParam:
+  * The lParam has no importance for this message
+  * @deprecated This message has no real purpose
+  */
 #define BB_ACTIVATESHELLWINDOW  10603
+
+/** @brief Window Message: A task has been activated
+  *
+  * This message is sent by the core for this event. Plugins should never send this message
+  * @par wParam:
+  * The HWND of the task that has been activated
+  * @par lParam:
+  * The lParam is 1 if the task is iin fullscreen mode and 0 otherwise
+  * @deprecated Register for and use ::BB_TASKSUPDATE instead
+  * @ingroup bbapi_tasks
+  */
 #define BB_ACTIVETASK           10604
+
+/** @brief Window Message: A task is being minimised or maximised
+  *
+  * This message is sent by the core for this event. Plugins should never send this message
+  * @par wParam:
+  * The HWND of the task that is being minised or maximised
+  * @par lParam:
+  * The lParam has no importance in this message
+  * @deprecated The taskupdate section of the core claims this message is never really generated
+  * @ingroup bbapi_tasks
+  */
 #define BB_MINMAXTASK           10605
+
+/** @brief Window Message: A task has changed its caption or is requesting to be flashed
+  *
+  * This message is sent by the core for this event. Plugins should never send this message
+  * @par wParam:
+  * The HWND of the task
+  * @par lParam:
+  * The lParam is 1 if the task must be flashed and 0 if the tasks title has changed
+  * @deprecated Register for and use ::BB_TASKSUPDATE instead
+  * @ingroup bbapi_tasks
+  */
 #define BB_REDRAWTASK           10610
 
 /* ----------------------------------- */
@@ -385,10 +463,6 @@
 #define SLIT_ADD                11001
 #define SLIT_REMOVE             11002
 #define SLIT_UPDATE             11003
-
-/* ----------------------------------- */
-/* Indices for pluginInfo(int index); */
-
 
 /*=========================================================================== */
 /* BBLean extensions */
@@ -430,18 +504,7 @@
 /* ----------------------------------- */
 /* done with BB_ messages */
 
-/** @brief lParam: A new icon has been added to the tray
-  * @ingroup bbapi_tray
-  */
-#define TRAYICON_ADDED 0
-/** @brief lParam: An existing icon in the tray has changed
-  * @ingroup bbapi_tray
-  */
-#define TRAYICON_MODIFIED 1
-/** @brief lParam: An icon has been removed from the tray
-  * @ingroup bbapi_tray
-  */
-#define TRAYICON_REMOVED 2
+
 
 ///@brief The lowest value a Blackbox window message will have
 #define BB_MSGFIRST             10000
@@ -990,28 +1053,50 @@ extern "C" {
 
 	} tasklist;
 
-	/* get the size */
+	/** @brief Get the number of tasks currently in the list
+	  * @return The number of current tasks
+	  * @ingroup bbapi_tasks
+	  */
 	API_EXPORT int GetTaskListSize(void);
-	/* get task's HWND by index */
+		/** @brief Get tasks HWND by index
+	  * @ingroup bbapi_tasks
+	  */
 	API_EXPORT HWND GetTask(int index);
-	/* get the index of the currently active task */
+    /** @brief Get the index of the currently active task
+	  * @ingroup bbapi_tasks
+	  */
 	API_EXPORT int GetActiveTask(void);
-	/* Retrieve a pointer to the internal TaskList. */
+	/** @brief Retrieve a pointer to the internal TaskList
+	  * @version Not available in xoblite
+	  * @ingroup bbapi_tasks
+	  */
 	API_EXPORT struct tasklist *GetTaskListPtr(void);
 
-	typedef struct taskinfo
+	/** @brief Task information for GetTaskLocation()and SetTaskLocation()
+	  * @ingroup bbapi_bblean
+	  */
+	struct taskinfo
 	{
-		int xpos, ypos;     /* position */
-		int width, height;  /* size, ignored with 'SetTaskLocation' */
-		int desk;           /* workspace */
-	} taskinfo;
+		/** The tasks x position */
+		int xpos;
+		/** The tasks y position */
+		int ypos;
+		/** Width of the tasks window. Ignored by SetTaskLocation */
+		int width;
+		/** Height of the tasks window. Ignored by SetTaskLocation */
+		int height;
+		/** The tasks workspace */
+		int desk;
+	};
 
-	/* get workspace and original position/size for window */
-	/// @ingroup bbapi_bblean
+	/** @brief Get workspace and original position/size for window
+	  * @ingroup bbapi_bblean
+	  */
 	API_EXPORT bool GetTaskLocation(HWND, struct taskinfo *pti);
 
-	/* set workspace and/or position for window */
-	/// @ingroup bbapi_bblean
+	/** @brief Set workspace and/or position for window
+	  * @ingroup bbapi_bblean
+	  */
 	API_EXPORT bool SetTaskLocation(HWND, struct taskinfo *pti, UINT flags);
 	/* where flags are: */
 #define BBTI_SETDESK    1 /* move window to desk as specified */

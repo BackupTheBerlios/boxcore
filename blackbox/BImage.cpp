@@ -406,7 +406,7 @@ bImage(int width, int height, int type, COLORREF colour_from, COLORREF colour_to
 			// draw 2 lines, to cover the 'interlaced' case
 			y = 0; do { x = 0; s = (unsigned long *)xtab; do {
 			*(unsigned long*)p = *s++;
-			if (interlaced) if (1 & y) darker(p); else lighter(p);
+			if (interlaced) {if (1 & y) darker(p); else lighter(p);}
 			p+=4; } while (++x < width); } while (++y < 2);
 
 			// copy down the lines
@@ -425,7 +425,7 @@ bImage(int width, int height, int type, COLORREF colour_from, COLORREF colour_to
 			// draw 1 column
 			y = 0; s = (unsigned long *)ytab; z = width*4; do {
 			*(unsigned long*)p = *s++;
-			if (interlaced) if (1 & y) darker(p); else lighter(p);
+			if (interlaced) {if (1 & y) darker(p); else lighter(p);}
 			p += z; } while (++y < height);
 
 			// copy colums
@@ -462,7 +462,7 @@ bImage(int width, int height, int type, COLORREF colour_from, COLORREF colour_to
 			// draw 2 lines, to cover the 'interlaced' case
 			y = 0; do { x = 0; s = (unsigned long *)xtab; do {
 			*(unsigned long*)p = *s++;
-			if (interlaced) if (1 & y) darker(p); else lighter(p);
+			if (interlaced) {if (1 & y) darker(p); else lighter(p);}
 			p+=4; } while (++x < width); } while (++y < 2);
 
 			// copy down the lines
@@ -481,7 +481,7 @@ bImage(int width, int height, int type, COLORREF colour_from, COLORREF colour_to
 			// draw 1 column
 			y = 0; s = (unsigned long *)ytab; z = width*4; do {
 			*(unsigned long*)p = *s++;
-			if (interlaced) if (1 & y) darker(p); else lighter(p);
+			if (interlaced) {if (1 & y) darker(p); else lighter(p);}
 			p += z; } while (++y < height);
 
 			// copy colums
@@ -503,7 +503,7 @@ bImage(int width, int height, int type, COLORREF colour_from, COLORREF colour_to
 			table_fn(ytab, height, true);
 			y = 0; do { x = 0; do {
 			diag_fn(p, x, y);
-			if (interlaced) if (1 & y) darker(p); else lighter(p);
+			if (interlaced) {if (1 & y) darker(p); else lighter(p);}
 			p+=4; } while (++x < width); } while (++y < height);
 			break;
 
@@ -535,13 +535,13 @@ bImage(int width, int height, int type, COLORREF colour_from, COLORREF colour_to
 			else rect_fn(p, x, y);
 
 			c = *(unsigned long *)p;
-			if (interlaced) if (2 & y) darker(p); else lighter(p);
+			if (interlaced) {if (2 & y) darker(p); else lighter(p);}
 			*--d = *(unsigned long *)p;
 
 			if (e != (unsigned long *)p)
 			{
 				*e = c;
-				if (interlaced) if (1 & z) darker((unsigned char*)e); else lighter((unsigned char*)e);
+				if (interlaced) {if (1 & z) darker((unsigned char*)e); else lighter((unsigned char*)e);}
 				*--f = *e;
 			}
 			e++;
