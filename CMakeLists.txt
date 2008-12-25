@@ -36,6 +36,7 @@ endif (DOXYGEN_DOT_EXECUTABLE)
 
 option (INTERNALDOCS "Generate internal project documentation?" OFF)
 option (DOCS_CHM "Generate a .chm file?" OFF)
+option (DEBUG_CODE "Activate code for generating debug messages" OFF)
 
 if (DOCS_CHM)
 set (DOXYGEN_HHC ${DOXYGEN_HHC_EXECUTABLE})
@@ -52,6 +53,8 @@ add_custom_target(doc ${DOXYGEN_EXECUTABLE})
 endif (DOXYGEN_EXECUTABLE)
 
 set (CPACK_ALL_INSTALL_TYPES Full Upgrade)
+
+add_subdirectory (debug)
 
 add_subdirectory (blackbox)
 
