@@ -11,7 +11,7 @@ clsTaskItemCollection::clsTaskItemCollection(bool pVertical): clsItemCollection(
 
 /** @brief wndProc
   *
-  * @todo: document this function
+  * @TODO: document this function
   */
 LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -23,7 +23,7 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 		break;
 	case BB_BROADCAST:
 		{
-			dbg_printf((LPCSTR) lParam);
+			TRACE((LPCSTR) lParam);
 			LPCSTR msg_string = (LPCSTR)lParam;
 			clsItem * backSpacer;
 			if (vertical && stretchTaskarea)
@@ -170,7 +170,7 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 
 /** @brief populateTasks
   *
-  * @todo: document this function
+  * @TODO: document this function
   */
 void clsTaskItemCollection::populateTasks()
 {
@@ -203,7 +203,7 @@ void clsTaskItemCollection::populateTasks()
 /** @brief Reads task area settings from RC file
   *
   * This function reads settings related to the general task area, such as whether
-  * it should stretch verticcally or not. Detailed setting are read by clsTaskItem itself
+  * it should stretch vertically or not. Detailed setting are read by clsTaskItem itself
   */
 void clsTaskItemCollection::readSettings()
 {
@@ -223,7 +223,7 @@ void clsTaskItemCollection::readSettings()
   *
   * This adds the submenu for general task properties (as read from the RC file by clsTaskItemCollection)
   * as well as specific task properties (as read by clsTaskItem). The messages generated will be
-  * handled seperately by these two classes
+  * handled separately by these two classes
   */
 void clsTaskItemCollection::configMenu(Menu *pMenu)
 {

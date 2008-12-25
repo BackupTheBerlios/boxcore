@@ -232,7 +232,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if (enableTransparency)
 			PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 		else
-			InvalidateRect(barWnd, &itemArea, TRUE);
+			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 		break;
 
 
@@ -242,7 +242,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case BB_BROADCAST:
 		{
 			const char *msg_string = (LPCSTR)lParam;
-//			dbg_printf(msg_string);
+			TRACE(msg_string);
 			if (!strnicmp(msg_string, "@boxBar.percentage", strlen("@boxBar.percentage")))
 			{
 				sizePercentage = atoi(msg_string + strlen("@boxBar.percentage"));
@@ -255,7 +255,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				WriteBool(configFile, "boxBar.vertical:", vertical);
 				resize(1, 1);
 				populateBar();
-				InvalidateRect(barWnd, &itemArea, TRUE);
+				RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 				PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 			}
 			break;
@@ -548,14 +548,14 @@ dimType clsBar::resize(int pX, int pY)
 		newY = barRect.top + dY;
 
 	SetWindowPos(barWnd, NULL, newX, newY, pX, pY, SWP_NOACTIVATE | SWP_NOZORDER);
+	dimType tempReturn = clsItemCollection::resize(pX, pY);
 	bufferInfo.bmiHeader.biWidth = itemArea.right - itemArea.left;
 	bufferInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
 	SelectObject(buffer, origBitmap);
 	DeleteObject(bufferBitmap);
 	bufferBitmap = CreateDIBSection(buffer, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
 	origBitmap = (HBITMAP)SelectObject(buffer, bufferBitmap);
-	dimType tempReturn = clsItemCollection::resize(pX, pY);
-	InvalidateRect(barWnd, &itemArea, TRUE);
+	RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 	PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 	return tempReturn;
 }

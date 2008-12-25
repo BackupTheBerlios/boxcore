@@ -10,11 +10,12 @@
 #include "clsStyle.h"
 #include "../utils/clsApiLoader.h"
 #include "../../dynwinapi/clsMsimg32.h"
+#include "../../debug/debug.h"
 
 extern clsMsimg32 msimg32;
 
 /** @enum dimType
-  * @brief Dimentions for use in boxBar
+  * @brief Dimensions for use in boxBar
   *
   * Implements flags for vertical and horizontal, as well flags for
   * none and both. The both flag is constructed to allow bit testing with the
@@ -32,7 +33,7 @@ enum dimType {DIM_NONE = 0, DIM_HORIZONTAL = 1, DIM_VERTICAL = 2, DIM_BOTH = 3};
 class clsItem;
 
 /** @typedef mouseFunction
-  * @brief Mousclick callback signature
+  * @brief Mouseclick callback signature
   */
 typedef void (*mouseFunction)(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -72,7 +73,7 @@ protected:
 	  */
 	bool vertical;
 
-	/** @brief Directions in which the item can caluclate its size
+	/** @brief Directions in which the item can calculate its size
 		  *
 		  * Set to DIM_BOTH if the item can calculate complete dimensions
 		  */

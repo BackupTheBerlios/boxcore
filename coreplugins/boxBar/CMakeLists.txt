@@ -47,7 +47,7 @@ set (AUTHOR Carsomyr)
 set (PLUGININFO_NAME ${PROJECT_NAME})
 set (PLUGININFO_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 set (PLUGININFO_AUTHOR ${AUTHOR})
-set (PLUGININFO_URL http://developer.berlios.de/projects/boxcore/)
+set (PLUGININFO_URL "http://developer.berlios.de/projects/boxcore/")
 set (PLUGININFO_EMAIL "carsomyr@users.berlios.de")
 
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/version.h)
@@ -55,12 +55,17 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/CPackConfig.cmake.in ${CMAKE_CURRENT
 
 add_library(boxBar MODULE ${BOXBAR_SRCS})
 include_directories(boxBar ../../blackbox ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(boxBar ${UNICOWSLIB} blackbox comctl32 gdi32)
+target_link_libraries(boxBar ${UNICOWSLIB} debuglib blackbox comctl32 gdi32)
 set_target_properties (boxBar PROPERTIES
 	PREFIX ""
 	COMPILE_DEFINITIONS "UNICODE;_UNICODE"
 	VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
 )
+if (DEBUG_CODE)
+set_target_properties (boxBar PROPERTIES COMPILE_DEFINITIONS "UNICODE;_UNICODE;DEBUG")
+else (DEBUG_CODE)
+set_target_properties (boxBar PROPERTIES COMPILE_DEFINITIONS "UNICODE;_UNICODE;NDEBUG")
+endif (DEBUG_CODE)
 if (MINGW)
 set_target_properties (boxBar PROPERTIES
 	LINK_FLAGS "-s"
