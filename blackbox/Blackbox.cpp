@@ -91,7 +91,7 @@ RECT OldDT;
 bool bbactive = true;
 BOOL save_opaquemove;
 
-clsSystemTray SystemTrayManager(hMainInstance);
+SystemTray SystemTrayManager(hMainInstance);
 clsShellServiceObjects ShellServiceObjectsManager;
 clsSystemInfo SystemInfo;
 

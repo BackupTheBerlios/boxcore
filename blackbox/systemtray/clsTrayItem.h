@@ -55,11 +55,11 @@ struct NID_INTERNAL
   * @class clsTrayItem
   * @brief Contains data for a single tray item
   */
-class clsTrayItem
+class TrayItem
 {
 public:
-	clsTrayItem(NID_INTERNAL &pNID);
-	virtual ~clsTrayItem();
+	TrayItem(NID_INTERNAL &pNID);
+	virtual ~TrayItem();
 
 	bool constructionValid() {
 		return valid;
@@ -99,7 +99,7 @@ public:
 
 	bool valid;
 
-	friend class clsSystemTray;
+	friend class SystemTray;
 };
 
 #endif // CLSTRAYITEM_H

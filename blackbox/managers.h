@@ -30,7 +30,7 @@
 #include "shellserviceobjects/clsShellServiceObjects.h"
 #include "clsSystemInfo.h"
 
-extern clsSystemTray SystemTrayManager;
+extern SystemTray SystemTrayManager;
 extern clsShellServiceObjects ShellServiceObjectsManager;
 extern clsSystemInfo SystemInfo;
 

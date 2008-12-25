@@ -1,6 +1,6 @@
 /** @internal
   * @file clsSystemTray.h
-  * @brief This file contains the definition of clsSystemTray
+  * @brief This file contains the definition of SystemTray
   *
   * This file is part of the boxCore source code @n
   * <!-- Copyright © 2008 Carsomyr -->
@@ -45,22 +45,22 @@ enum trayCallbackType {TCALLBACK_ADD, TCALLBACK_MOD, TCALLBACK_DEL};
 typedef std::basic_string<TCHAR> tstring;
 
 /** @internal
-  * @class clsSystemTray
+  * @class SystemTray
   *
   * @brief Implementes system tray functionality (icon tracking etc)
   */
-class clsSystemTray
+class SystemTray
 {
 	public:
-		clsSystemTray(HINSTANCE &phInstance);
+		SystemTray(HINSTANCE &phInstance);
 		void initialize();
 		void terminate();
-		virtual ~clsSystemTray();
+		virtual ~SystemTray();
 		void announceSystemTray();
 		void CleanTray();
 
 		int GetNumVisible();
-		const clsTrayItem *GetTrayIcon(int num);
+		const TrayItem *GetTrayIcon(int num);
 
 		BOOL TrayIconEvent(HWND ownerHwnd, UINT iconID, UINT msg, WPARAM wParam, LPARAM lParam);
 		void SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom, UINT pEdge);
@@ -81,9 +81,9 @@ class clsSystemTray
 
 		vector<tstring> childClasses;
 		vector<HWND> childWindows;
-		list<clsTrayItem *> trayItems;
+		list<TrayItem *> trayItems;
 
-		void clearIconData(clsTrayItem *);
+		void clearIconData(TrayItem *);
 		LRESULT AddIcon(NID_INTERNAL &);
 		LRESULT ModifyIcon(NID_INTERNAL &pNID, bool triggerCallback = true);
 		LRESULT DeleteIcon(NID_INTERNAL &pNID, bool triggerCallback = true);
@@ -97,7 +97,7 @@ class clsSystemTray
 		static int barLeft, barRight, barTop, barBottom;
 		static UINT barEdge;
 
-		clsTrayItem * lookupIcon(HWND, UINT);
+		TrayItem * lookupIcon(HWND, UINT);
 
 		HMODULE hUser32;
 		BOOL (*ChangeWindowMessageFilter)(UINT message, DWORD dwFlag);

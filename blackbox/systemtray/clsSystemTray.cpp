@@ -1,6 +1,6 @@
 /** @internal
-  * @file clsSystemTray.cpp
-  * @brief This file contains the implementation of clsSystemTray
+  * @file
+  * @brief This file contains the implementation of SystemTray
   *
   * This file is part of the boxCore source code @n
   * <!-- Copyright © 2008 Carsomyr -->
@@ -69,7 +69,7 @@
 clsShlwapi shlwapi;
 clsUser32 user32;
 
-//Recieved from XP onwards (lParam member is 64 bits)
+//Received from XP onwards (lParam member is 64 bits)
 struct APPBARDATA_64
 {
 	DWORD cbSize;
@@ -81,7 +81,7 @@ struct APPBARDATA_64
 	LONG64 lParam;
 };
 
-//Recieved form 2k back, lParam member is 32 bits
+//Received from 2k back, lParam member is 32 bits
 struct APPBARDATA_32
 {
 	DWORD cbSize;
@@ -134,7 +134,7 @@ struct INTERNAL_APPBARMSG
 
 
 /** @internal
-  * @brief Format used by the shell in WM_COPYDATA messages to pass infomration to the system tray
+  * @brief Format used by the shell in WM_COPYDATA messages to pass information to the system tray
   */
 struct SHELLTRAYDATA
 {
@@ -144,13 +144,13 @@ struct SHELLTRAYDATA
 };
 
 /**
- * @brief Performs preperations for system tray creation
+ * @brief Performs preparations for system tray creation
  *
  * The constructor registers the TaskbarCreated window message. The window message is also
- * added to the User Interface Privilage Isolation (UIPI) filter if present. This ensures
+ * added to the User Interface Privilege Isolation (UIPI) filter if present. This ensures
  * that the message will be able to reach all processes.
  */
-clsSystemTray::clsSystemTray(HINSTANCE &phInstance): hInstance(phInstance), trayWndName(TEXT("Shell_TrayWnd"))
+SystemTray::SystemTray(HINSTANCE &phInstance): hInstance(phInstance), trayWndName(TEXT("Shell_TrayWnd"))
 {
 	trayCreatedMessage = RegisterWindowMessage(TEXT("TaskbarCreated"));
 	hUser32 = LoadLibrary(TEXT("user32.dll"));
@@ -177,7 +177,7 @@ clsSystemTray::clsSystemTray(HINSTANCE &phInstance): hInstance(phInstance), tray
  * to load the UIPI filter function. The destructor also calls the terminate function to
  * clean up the system tray itself, if this has not already been done.
  */
-clsSystemTray::~clsSystemTray()
+SystemTray::~SystemTray()
 {
 	terminate();
 	if (hUser32)
@@ -191,7 +191,7 @@ clsSystemTray::~clsSystemTray()
   * Once all windows are created, we broadcast the message to announce that the system tray
   * has been created.
   */
-void clsSystemTray::initialize()
+void SystemTray::initialize()
 {
 	WNDCLASSEX wndClass;
 	ZeroMemory(&wndClass, sizeof(wndClass));
@@ -221,7 +221,7 @@ void clsSystemTray::initialize()
   * registered during initialization. Deletes all trayItems currently in the list after freeing the created icons.
   *
   */
-void clsSystemTray::terminate()
+void SystemTray::terminate()
 {
 	if (hTrayWnd)
 	{
@@ -233,7 +233,7 @@ void clsSystemTray::terminate()
 			UnregisterClass(childClasses[i].c_str(), hInstance);
 	}
 
-	for (list<clsTrayItem *>::iterator i = trayItems.begin();i != trayItems.end();i++)
+	for (list<TrayItem *>::iterator i = trayItems.begin();i != trayItems.end();i++)
 	{
 		clearIconData(*i);
 		delete *i;
@@ -249,7 +249,7 @@ void clsSystemTray::terminate()
   * also consult the list of child windows we have. A window class is then registered with the new name
   * and a window of that class is created.
   */
-HWND clsSystemTray::createTrayChild(const tstring pParentClass, const tstring pChildClass, const tstring pChildName)
+HWND SystemTray::createTrayChild(const tstring pParentClass, const tstring pChildClass, const tstring pChildName)
 {
 	HWND parent = FindWindow(pParentClass.c_str(), NULL);
 
@@ -282,14 +282,14 @@ HWND clsSystemTray::createTrayChild(const tstring pParentClass, const tstring pC
 
 /** @brief Register a child window class and creates an instance attached to the specified parent
   *
-  * @param[in] pParentClass The clss name of the window which should be used as the parent
+  * @param[in] pParentClass The class name of the window which should be used as the parent
   * @param[in] pChildClass The class name that should be used for the child window
   *
-  * We try to locate a parent window of teh requested class by querying the system. If this fails we
+  * We try to locate a parent window of the requested class by querying the system. If this fails we
   * also consult the list of child windows we have. A window class is then registered with the new name
   * and a window of that class is created.
   */
-HWND clsSystemTray::createTrayChild(HWND pParent, const tstring pChildClass, const tstring pChildName)
+HWND SystemTray::createTrayChild(HWND pParent, const tstring pChildClass, const tstring pChildName)
 {
 	WNDCLASSEX wndClass;
 	ZeroMemory(&wndClass, sizeof(wndClass));
@@ -311,7 +311,7 @@ HWND clsSystemTray::createTrayChild(HWND pParent, const tstring pChildClass, con
   *
   * Broadcasts the message registered earlier for this purpose to all windows.
   */
-void clsSystemTray::announceSystemTray()
+void SystemTray::announceSystemTray()
 {
 	SendNotifyMessage(HWND_BROADCAST, trayCreatedMessage, 0, 0);
 }
@@ -320,7 +320,7 @@ void clsSystemTray::announceSystemTray()
   *
   * Currently just calls DefWindowProc, additional functionality will be implemented if neccesary.
   */
-LRESULT CALLBACK clsSystemTray::trayChildWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK SystemTray::trayChildWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	return DefWindowProc(hwnd, message, wParam, lParam);
 }
@@ -328,9 +328,9 @@ LRESULT CALLBACK clsSystemTray::trayChildWndProc(HWND hwnd, UINT message, WPARAM
 /** @brief Window procedure for the system tray window
   *
   * Calls DefWindowProc to handle everything except WM_COPYDATA.
-  * @todo Document this pproperly
+  * @TODO Document this properly, really
   */
-LRESULT CALLBACK clsSystemTray::trayWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK SystemTray::trayWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
@@ -340,7 +340,7 @@ LRESULT CALLBACK clsSystemTray::trayWndProc(HWND hwnd, UINT message, WPARAM wPar
 		return DefWindowProc(hwnd, message, wParam, lParam);
 	}
 
-	clsSystemTray *creator = (clsSystemTray *) GetClassLongPtr(hwnd, 0);
+	SystemTray *creator = (SystemTray *) GetClassLongPtr(hwnd, 0);
 
 	switch (((COPYDATASTRUCT *)lParam)->dwData)
 	{
@@ -505,9 +505,9 @@ LRESULT CALLBACK clsSystemTray::trayWndProc(HWND hwnd, UINT message, WPARAM wPar
   *
   * @todo: document this function
   */
-clsTrayItem * clsSystemTray::lookupIcon(HWND phWnd, UINT puID)
+TrayItem * SystemTray::lookupIcon(HWND phWnd, UINT puID)
 {
-	for (list<clsTrayItem *>::iterator i = trayItems.begin();i != trayItems.end();i++)
+	for (list<TrayItem *>::iterator i = trayItems.begin();i != trayItems.end();i++)
 	{
 		if (((*i)->hWnd == phWnd) && ((*i)->iconID == puID))
 			return *i;
@@ -519,14 +519,14 @@ clsTrayItem * clsSystemTray::lookupIcon(HWND phWnd, UINT puID)
   *
   * @todo: document this function
   */
-LRESULT clsSystemTray::SetIconVersion(NID_INTERNAL &pNID)
+LRESULT SystemTray::SetIconVersion(NID_INTERNAL &pNID)
 {
 	if (IsWindow(pNID.hWnd) == FALSE)
 	{
 		DeleteIcon(pNID);
 		return FALSE;
 	}
-	clsTrayItem *trayItem = lookupIcon(pNID.hWnd, pNID.uID);
+	TrayItem *trayItem = lookupIcon(pNID.hWnd, pNID.uID);
 	if (trayItem)
 	{
 		trayItem->version = pNID.uVersion;
@@ -544,9 +544,9 @@ LRESULT clsSystemTray::SetIconVersion(NID_INTERNAL &pNID)
   *
   * @todo: document this function
   */
-LRESULT clsSystemTray::DeleteIcon(NID_INTERNAL &pNID, bool triggerCallback)
+LRESULT SystemTray::DeleteIcon(NID_INTERNAL &pNID, bool triggerCallback)
 {
-	clsTrayItem *trayItem = lookupIcon(pNID.hWnd, pNID.uID);
+	TrayItem *trayItem = lookupIcon(pNID.hWnd, pNID.uID);
 	if (trayItem)
 	{
 		bool wasHidden = trayItem->stateHidden;
@@ -566,9 +566,9 @@ LRESULT clsSystemTray::DeleteIcon(NID_INTERNAL &pNID, bool triggerCallback)
   *
   * @todo: document this function
   */
-LRESULT clsSystemTray::DeleteIcon(HWND pHwnd, UINT pID, bool triggerCallback)
+LRESULT SystemTray::DeleteIcon(HWND pHwnd, UINT pID, bool triggerCallback)
 {
-	clsTrayItem *trayItem = lookupIcon(pHwnd, pID);
+	TrayItem *trayItem = lookupIcon(pHwnd, pID);
 	if (trayItem)
 	{
 		bool wasHidden = trayItem->stateHidden;
@@ -588,14 +588,14 @@ LRESULT clsSystemTray::DeleteIcon(HWND pHwnd, UINT pID, bool triggerCallback)
   *
   * @todo: document this function
   */
-LRESULT clsSystemTray::ModifyIcon(NID_INTERNAL &pNID, bool triggerCallback)
+LRESULT SystemTray::ModifyIcon(NID_INTERNAL &pNID, bool triggerCallback)
 {
 	if (IsWindow(pNID.hWnd) == FALSE)
 	{
 		DeleteIcon(pNID);
 		return FALSE;
 	}
-	clsTrayItem *trayItem = lookupIcon(pNID.hWnd, pNID.uID);
+	TrayItem *trayItem = lookupIcon(pNID.hWnd, pNID.uID);
 	if (trayItem)
 	{
 		bool wasHidden = trayItem->stateHidden;
@@ -607,7 +607,7 @@ LRESULT clsSystemTray::ModifyIcon(NID_INTERNAL &pNID, bool triggerCallback)
 			if ((pNID.uFlags&NIF_STATE) && (pNID.dwStateMask&pNID.dwState&NIS_SHAREDICON))
 			{
 				bool sharedValid = false;
-				for (list<clsTrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); i++)
+				for (list<TrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); i++)
 					if (!(*i)->stateShared && (*i)->hIconOrig == pNID.hIcon)
 					{
 						sharedValid = true;
@@ -681,14 +681,14 @@ LRESULT clsSystemTray::ModifyIcon(NID_INTERNAL &pNID, bool triggerCallback)
   * @return FALSE is returned if an icon already exists, or if creation fails during any step
   * TRUE is returned is creation is succesfull in both the clsTrayItem constructor and ModifyIcon.
   */
-LRESULT clsSystemTray::AddIcon(NID_INTERNAL &pNID)
+LRESULT SystemTray::AddIcon(NID_INTERNAL &pNID)
 {
-	clsTrayItem *trayItem = lookupIcon(pNID.hWnd, pNID.uID);
+	TrayItem *trayItem = lookupIcon(pNID.hWnd, pNID.uID);
 	if (trayItem)
 		return FALSE;
 	else
 	{
-		trayItem = new clsTrayItem(pNID);
+		trayItem = new TrayItem(pNID);
 		if (trayItem->constructionValid())
 		{
 			trayItems.push_back(trayItem);
@@ -719,13 +719,13 @@ LRESULT clsSystemTray::AddIcon(NID_INTERNAL &pNID)
   *
   * @todo: document this function
   */
-void clsSystemTray::clearIconData(clsTrayItem *pTrayItem)
+void SystemTray::clearIconData(TrayItem *pTrayItem)
 {
 	if (!pTrayItem->stateShared)
 	{
 		if (pTrayItem->iconRefcount != 0)
 		{
-			for (list<clsTrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); i++)
+			for (list<TrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); i++)
 				if ((*i)->stateShared && (*i)->hIconOrig == pTrayItem->hIconOrig)
 				{
 					clearIconData(*i);
@@ -744,7 +744,7 @@ void clsSystemTray::clearIconData(clsTrayItem *pTrayItem)
   *
   * @todo: document this function
   */
-void clsSystemTray::setCallback(trayCallbackType pType, void (*pCall)())
+void SystemTray::setCallback(trayCallbackType pType, void (*pCall)())
 {
 	switch (pType)
 	{
@@ -764,9 +764,9 @@ void clsSystemTray::setCallback(trayCallbackType pType, void (*pCall)())
   *
   * @todo: document this function
   */
-void clsSystemTray::CleanTray()
+void SystemTray::CleanTray()
 {
-	for (list<clsTrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); ++i)
+	for (list<TrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); ++i)
 		if (IsWindow((*i)->hWnd) == FALSE)
 		{
 			DeleteIcon((*i)->hWnd, (*i)->iconID, true);
@@ -779,10 +779,10 @@ void clsSystemTray::CleanTray()
   * @param[in] num The index of the item to fetch
   * @return A read-only pointer to a tray item
   */
-const clsTrayItem * clsSystemTray::GetTrayIcon(int num)
+const TrayItem * SystemTray::GetTrayIcon(int num)
 {
 	int index = 0;
-	for (list<clsTrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); i++)
+	for (list<TrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); i++)
 	{
 		if ((*i)->stateHidden == false)
 		{
@@ -799,10 +799,10 @@ const clsTrayItem * clsSystemTray::GetTrayIcon(int num)
 /** @brief Get the number of visible icons in the tray
   * @return The number of visible icons in the system tray
   */
-int clsSystemTray::GetNumVisible()
+int SystemTray::GetNumVisible()
 {
 	int count = 0;
-	for (list<clsTrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); i++)
+	for (list<TrayItem *>::iterator i = trayItems.begin(); i != trayItems.end(); i++)
 	{
 		if ((*i)->stateHidden == false)
 		{
@@ -820,11 +820,11 @@ int clsSystemTray::GetNumVisible()
   * @param[in] lParam The LPARAM value for the message
   * @warning This function will be removed once version information is avialable via the api
   */
-BOOL clsSystemTray::TrayIconEvent(HWND ownerHwnd, UINT iconID, UINT msg, WPARAM wParam, LPARAM lParam)
+BOOL SystemTray::TrayIconEvent(HWND ownerHwnd, UINT iconID, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	if (IsWindow(ownerHwnd))
 	{
-		clsTrayItem *trayItem = lookupIcon(ownerHwnd, iconID);
+		TrayItem *trayItem = lookupIcon(ownerHwnd, iconID);
 		DWORD pid;
 		if (WM_MOUSEMOVE != msg
 				&& user32.AllowSetForegroundWindow
@@ -873,7 +873,7 @@ BOOL clsSystemTray::TrayIconEvent(HWND ownerHwnd, UINT iconID, UINT msg, WPARAM 
   *
   * @todo: document this function
   */
-void clsSystemTray::SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom, UINT pEdge)
+void SystemTray::SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom, UINT pEdge)
 {
 	barLeft = pLeft;
 	barRight = pRight;
@@ -884,8 +884,8 @@ void clsSystemTray::SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom, 
 }
 
 
-int clsSystemTray::barLeft = 0;
-int clsSystemTray::barRight = 1440;
-int clsSystemTray::barTop = 875;
-int clsSystemTray::barBottom = 900;
-UINT clsSystemTray::barEdge = ABE_BOTTOM;
+int SystemTray::barLeft = 0;
+int SystemTray::barRight = 1440;
+int SystemTray::barTop = 875;
+int SystemTray::barBottom = 900;
+UINT SystemTray::barEdge = ABE_BOTTOM;

@@ -3,9 +3,9 @@
   * @brief Contains the implementations for some plugin API functions and helpers
   *
   * This file is part of the boxCore source code @n
-  * <!-- Copyright © 2001-2003 The Blackbox for Windows Development Team -->
-  * <!-- Copyright © 2004-2007 grischka -->
-  * <!-- Copyright © 2008 Carsomyr -->
+  * <!-- Copyright ï¿½ 2001-2003 The Blackbox for Windows Development Team -->
+  * <!-- Copyright ï¿½ 2004-2007 grischka -->
+  * <!-- Copyright ï¿½ 2008 Carsomyr -->
   * Copyright &copy; 2001-2003 The Blackbox for Windows Development Team @n
   * Copyright &copy; 2004-2007 grischka @n
   * Copyright &copy; 2008 Carsomyr
@@ -1476,7 +1476,7 @@ COLORREF ReadColorFromString(LPCSTR string)
 		for (d = s; (c = *d) != 0; ++d)
 		{
 			cr <<= 4;
-			if (c >= '0' && c <= '9') cr |= c - '0';
+			if (isdigit(c)) cr |= c - '0';
 			else
 			if (c >= 'a' && c <= 'f') cr |= c - ('a'-10);
 			else goto check_rgb;
@@ -2378,7 +2378,7 @@ ST void snap_to_edge(struct edges *h, struct edges *v, bool sizing, bool same_le
   * @param[in] msg The message to be processed
   * @param[in] wParam The WPARAM value for the message
   * @param[in] lParam The LPARAM value for the message
-  * This function simply forwards to clsSystemTray::TrayIconEvent()
+  * This function simply forwards to SystemTray::TrayIconEvent()
   * @warning This is not an official API function, do not link statically to it.
   */
 BOOL TrayIconEvent(HWND hWnd, UINT uID, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -2417,7 +2417,7 @@ vector<systemTray> apiVector;
   */
 systemTray* GetTrayIcon(UINT idx)
 {
-	const clsTrayItem *item = SystemTrayManager.GetTrayIcon(idx);
+	const TrayItem *item = SystemTrayManager.GetTrayIcon(idx);
 	if (item)
 	{
 		if (apiVector.size()<(idx+1))
