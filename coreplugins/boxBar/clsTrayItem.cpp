@@ -25,7 +25,7 @@ clsTrayItem::clsTrayItem(systemTray *trayItem, UINT pIconSize, bool pVertical): 
 
 /** @brief wndProc
   *
-  * @todo: document this function
+  * @TODO: document this function
   */
 LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -72,8 +72,7 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				if ((trayItem->hWnd == iconWnd) && (trayItem->uID == iconID))
 				{
 					icon = trayItem->hIcon;
-					if (tipText)
-							delete tipText;
+					delete tipText;
 					if (strlen(trayItem->szTip))
 					{
 						tipText = new TCHAR[strlen(trayItem->szTip)+1];

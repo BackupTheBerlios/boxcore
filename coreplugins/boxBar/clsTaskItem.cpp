@@ -38,13 +38,16 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVe
 	}
 }
 
-/** @brief TaskItem destructor
+/** @brief TaskItem destructer
   *
   * Cleans up the tooltip, instead of letting it get handled by the base destructor. This
   * is needed because out tipText is not dynamically allocated.
   */
 clsTaskItem::~clsTaskItem()
 {
+	delete iconItem;
+	delete captionItem;
+	itemList.clear();
 	if (tipText)
 	{
 		tipText = NULL;

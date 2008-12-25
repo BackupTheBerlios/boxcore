@@ -46,9 +46,9 @@ clsItem::clsItem(bool pVertical)
   */
 clsItem::~clsItem()
 {
+	delete tipText;
 	if (tipText)
 	{
-		delete tipText;
 		tipText = NULL;
 		setTooltip();
 	}
