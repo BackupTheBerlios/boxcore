@@ -158,7 +158,11 @@ void clsTaskItem::readSettings()
 void clsTaskItem::configMenu(Menu *pMenu)
 {
 	char ansiCaption[256];
+#ifdef UNICODE
 	WideCharToMultiByte(CP_ACP, 0, caption, -1, ansiCaption, 256, 0, 0);
+#else
+	strcpy(ansiCaption, caption);
+#endif
 	Menu *submenu = MakeNamedMenu(ansiCaption, ansiCaption, true);
 	MakeSubmenu(pMenu, submenu, ansiCaption);
 	char command[256];

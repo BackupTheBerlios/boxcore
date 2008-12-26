@@ -58,7 +58,6 @@ include_directories(boxBar ../../blackbox ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(boxBar ${UNICOWSLIB} debuglib blackbox comctl32 gdi32)
 set_target_properties (boxBar PROPERTIES
 	PREFIX ""
-	COMPILE_DEFINITIONS "UNICODE;_UNICODE"
 	VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
 )
 if (DEBUG_CODE)
