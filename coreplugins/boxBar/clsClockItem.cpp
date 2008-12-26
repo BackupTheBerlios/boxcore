@@ -1,6 +1,7 @@
 #include "clsClockItem.h"
 #include <ctime>
 #include <tchar.h>
+#include <locale.h>
 
 clsClockItem::clsClockItem(bool pVertical): clsLabelItem(pVertical)
 {
@@ -10,12 +11,11 @@ clsClockItem::clsClockItem(bool pVertical): clsLabelItem(pVertical)
 	readSettings();
 
 	rightClick = showMenu;
+	_tsetlocale(LC_ALL,L".ACP");
 }
 
 clsClockItem::~clsClockItem()
 {
-	tipText = NULL;
-	setTooltip();
 }
 
 /** @brief wndProc
