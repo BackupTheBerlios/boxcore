@@ -51,6 +51,7 @@
 #include "systemtray/clsSystemTray.h"
 #include "shellserviceobjects/clsShellServiceObjects.h"
 #include "clsSystemInfo.h"
+#include "../debug/debug.h"
 
 //====================
 
@@ -1065,7 +1066,7 @@ bb_quit:
 			SendMessage(hwnd, BB_BROADCAST, 0, lParam);
 			return 1;
 
-		//====================
+				//====================
 		default:
 			if (uMsg == WM_ShellHook)
 			{
