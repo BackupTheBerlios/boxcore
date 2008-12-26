@@ -14,10 +14,11 @@
 clsUser32 user32;
 clsMsimg32 msimg32;
 
-clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemCollection(pVertical)
+clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertical): clsItemCollection(pVertical)
 {
 	trackMouse = false;
 	isBar = true;
+	slitWnd = pSlit;
 	ZeroMemory(&barBlend, sizeof(barBlend));
 	barBlend.BlendOp = AC_SRC_OVER;
 	brushBitmap = NULL;
@@ -88,6 +89,15 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, bool pVertical): clsItemC
 				 this                // creation data
 			 );
 	ShowWindow(barWnd, SW_SHOWNA);
+	if (useSlit && slitWnd)
+	{
+		PostMessage(slitWnd, SLIT_ADD, 0, (LPARAM)barWnd);
+		inSlit = true;
+	}
+	else
+	{
+		inSlit = false;
+	}
 
 	buffer = CreateCompatibleDC(NULL);
 	ZeroMemory(&bufferInfo, sizeof(bufferInfo));
@@ -122,6 +132,8 @@ clsBar::~clsBar()
 	DeleteObject(eraseBrush);
 	DeleteObject(brushBitmap);
 	DeleteDC(buffer);
+	if (inSlit)
+			PostMessage(slitWnd, SLIT_REMOVE, 0, (LPARAM)barWnd);
 	DestroyWindow(barWnd);
 	UnregisterClass(className, hInstance);
 }
@@ -257,6 +269,17 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				populateBar();
 				RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 				PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
+			}
+			else if (toggleWithPlugins && (!stricmp(msg_string, "@BBHidePlugins")))
+			{
+				ShowWindow(barWnd, SW_HIDE);
+				SetDesktopMargin(hWnd, 0, 0);
+			}
+			else if (toggleWithPlugins && (!stricmp(msg_string, "@BBShowPlugins")))
+			{
+				ShowWindow(barWnd, SW_SHOW);
+				if (margin)
+					SetDesktopMargin(barWnd, marginEdge, margin);
 			}
 			break;
 		}
@@ -557,6 +580,8 @@ dimType clsBar::resize(int pX, int pY)
 	origBitmap = (HBITMAP)SelectObject(buffer, bufferBitmap);
 	RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 	PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
+	if (inSlit)
+		PostMessage(slitWnd, SLIT_UPDATE, 0, (LPARAM)barWnd);
 	return tempReturn;
 }
 
@@ -645,6 +670,8 @@ void clsBar::readSettings()
 	sizePercentage = ReadInt(configFile, "boxBar.percentage:", 80);
 	setMargin = ReadBool(configFile, "boxBar.setMargin:", true);
 	vertical = ReadBool(configFile, "boxBar.vertical:", false);
+	toggleWithPlugins = ReadBool(configFile, "boxBar.TogglewithPlugins:", true);
+	useSlit = ReadBool(configFile, "boxBar.useSlit:", false);
 	spacingBorder = ReadInt(configFile, "boxBar.spacingBorder:", 3);
 	spacingItems = ReadInt(configFile, "boxBar.spacingItems:", 2);
 	itemAlpha = ReadInt(configFile, "boxBar.alpha:", 255);

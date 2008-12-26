@@ -35,7 +35,7 @@ int clsBoxBar::beginPluginEx(HINSTANCE hPluginInstance, HWND hSlit)
 		hPlugin = hPluginInstance;
 		hSlitWnd   = hSlit;
 
-		bar = new clsBar(pluginName, hPlugin, true);
+		bar = new clsBar(pluginName, hPlugin, hSlit, true);
 		return 0;
 	}
 	else
