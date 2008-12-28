@@ -345,157 +345,157 @@ LRESULT CALLBACK SystemTray::trayWndProc(HWND hwnd, UINT message, WPARAM wParam,
 	switch (((COPYDATASTRUCT *)lParam)->dwData)
 	{
 	case 0: //Appbar stuff
-		{
-			char msg[100];
-			/*sprintf(msg,"Size of struct %d we got. Size of 32 struct %d, size of 64 struct %d",((COPYDATASTRUCT *)lParam)->cbData, sizeof(APPBARMSGDATA32) ,sizeof(APPBARMSGDATA64));
-			MessageBox(NULL,msg,"Appbar debug",MB_OK);
-			INTERNAL_APPBARDATA myAppbarData;
-			sprintf(msg,"Size of APPBAR %d, 32 is  %d, 64 is %d",((APPBARMSGDATA32*)((COPYDATASTRUCT *)lParam)->lpData)->abd.cbSize,sizeof(SH_APPBARDATA_32),sizeof(SH_APPBARDATA_64));
-			MessageBox(NULL,msg,"Appbar debug",MB_OK);*/
-			INTERNAL_APPBARMSG appbarMsg;
-			//Always cast to 32 bit version for this assignment
-			appbarMsg.abd = &(((APPBARMSG_32 *)((COPYDATASTRUCT *)lParam)->lpData)->abd);
-			switch (((COPYDATASTRUCT *)lParam)->cbData)
-			{
-			case sizeof(APPBARMSG_64):
-							appbarMsg.dwMessage = ((APPBARMSG_64 *)((COPYDATASTRUCT *)lParam)->lpData)->dwMessage;
-				appbarMsg.hSharedMemory = (HANDLE)((APPBARMSG_64 *)((COPYDATASTRUCT *)lParam)->lpData)->hSharedMemory;
-				appbarMsg.dwSourceProcessID = ((APPBARMSG_64 *)((COPYDATASTRUCT *)lParam)->lpData)->dwSourceProcessID;
-				break;
-			case sizeof(APPBARMSG_32):
-							appbarMsg.dwMessage = ((APPBARMSG_32 *)((COPYDATASTRUCT *)lParam)->lpData)->dwMessage;
-				appbarMsg.hSharedMemory = (HANDLE)((APPBARMSG_32 *)((COPYDATASTRUCT *)lParam)->lpData)->hSharedMemory;
-				appbarMsg.dwSourceProcessID = ((APPBARMSG_32 *)((COPYDATASTRUCT *)lParam)->lpData)->dwSourceProcessID;
-				break;
-			default:
-				return FALSE;
-			}
-			switch (appbarMsg.dwMessage)
 	{
-			case 0:
-				return 1;
-			case 5:
-				if (shlwapi.SHLockShared)
-					appbarMsg.abd = (APPBARDATA_32 *)shlwapi.SHLockShared(appbarMsg.hSharedMemory, appbarMsg.dwSourceProcessID);
-				SetRect(&appbarMsg.abd->rc, barLeft, barTop, barRight, barBottom);
-				appbarMsg.abd->uEdge = barEdge;
-				if (shlwapi.SHUnlockShared)
-					shlwapi.SHUnlockShared(appbarMsg.abd);
-				return 1;
-			default:
-				sprintf(msg, "Appbar debug :The message is %ld or %ld", ((APPBARMSG_32*)((COPYDATASTRUCT *)lParam)->lpData)->dwMessage, ((APPBARMSG_64*)((COPYDATASTRUCT *)lParam)->lpData)->dwMessage);
-				OutputDebugString(msg);
-				return FALSE;
-			}
-		}
-		return FALSE;
-	case 1:
+		char msg[100];
+		/*sprintf(msg,"Size of struct %d we got. Size of 32 struct %d, size of 64 struct %d",((COPYDATASTRUCT *)lParam)->cbData, sizeof(APPBARMSGDATA32) ,sizeof(APPBARMSGDATA64));
+		MessageBox(NULL,msg,"Appbar debug",MB_OK);
+		INTERNAL_APPBARDATA myAppbarData;
+		sprintf(msg,"Size of APPBAR %d, 32 is  %d, 64 is %d",((APPBARMSGDATA32*)((COPYDATASTRUCT *)lParam)->lpData)->abd.cbSize,sizeof(SH_APPBARDATA_32),sizeof(SH_APPBARDATA_64));
+		MessageBox(NULL,msg,"Appbar debug",MB_OK);*/
+		INTERNAL_APPBARMSG appbarMsg;
+		//Always cast to 32 bit version for this assignment
+		appbarMsg.abd = &(((APPBARMSG_32 *)((COPYDATASTRUCT *)lParam)->lpData)->abd);
+		switch (((COPYDATASTRUCT *)lParam)->cbData)
 		{
-			NID_INTERNAL NotifyIconData;
-			NID_VISTAA *ansiNID = NULL;
-			NID_VISTAW *unicodeNID = NULL;
-			DWORD trayCommand;
+		case sizeof(APPBARMSG_64):
+			appbarMsg.dwMessage = ((APPBARMSG_64 *)((COPYDATASTRUCT *)lParam)->lpData)->dwMessage;
+			appbarMsg.hSharedMemory = (HANDLE)((APPBARMSG_64 *)((COPYDATASTRUCT *)lParam)->lpData)->hSharedMemory;
+			appbarMsg.dwSourceProcessID = ((APPBARMSG_64 *)((COPYDATASTRUCT *)lParam)->lpData)->dwSourceProcessID;
+			break;
+		case sizeof(APPBARMSG_32):
+			appbarMsg.dwMessage = ((APPBARMSG_32 *)((COPYDATASTRUCT *)lParam)->lpData)->dwMessage;
+			appbarMsg.hSharedMemory = (HANDLE)((APPBARMSG_32 *)((COPYDATASTRUCT *)lParam)->lpData)->hSharedMemory;
+			appbarMsg.dwSourceProcessID = ((APPBARMSG_32 *)((COPYDATASTRUCT *)lParam)->lpData)->dwSourceProcessID;
+			break;
+		default:
+			return FALSE;
+		}
+		switch (appbarMsg.dwMessage)
+		{
+		case 0:
+			return 1;
+		case 5:
+			if (shlwapi.SHLockShared)
+				appbarMsg.abd = (APPBARDATA_32 *)shlwapi.SHLockShared(appbarMsg.hSharedMemory, appbarMsg.dwSourceProcessID);
+			SetRect(&appbarMsg.abd->rc, barLeft, barTop, barRight, barBottom);
+			appbarMsg.abd->uEdge = barEdge;
+			if (shlwapi.SHUnlockShared)
+				shlwapi.SHUnlockShared(appbarMsg.abd);
+			return 1;
+		default:
+			sprintf(msg, "Appbar debug :The message is %ld or %ld", ((APPBARMSG_32*)((COPYDATASTRUCT *)lParam)->lpData)->dwMessage, ((APPBARMSG_64*)((COPYDATASTRUCT *)lParam)->lpData)->dwMessage);
+			OutputDebugString(msg);
+			return FALSE;
+		}
+	}
+	return FALSE;
+	case 1:
+	{
+		NID_INTERNAL NotifyIconData;
+		NID_VISTAA *ansiNID = NULL;
+		NID_VISTAW *unicodeNID = NULL;
+		DWORD trayCommand;
 
-			trayCommand =  ((SHELLTRAYDATA*)((COPYDATASTRUCT*)lParam)->lpData)->dwMessage;
-			ansiNID    = (NID_VISTAA *) & ((SHELLTRAYDATA*)((COPYDATASTRUCT*)lParam)->lpData)->iconData;
-			if ((ansiNID->cbSize == sizeof(NID_PRE2KW)) || (ansiNID->cbSize >= sizeof(NID_2KW)))
-				unicodeNID = (NID_VISTAW *)ansiNID;
+		trayCommand =  ((SHELLTRAYDATA*)((COPYDATASTRUCT*)lParam)->lpData)->dwMessage;
+		ansiNID    = (NID_VISTAA *) & ((SHELLTRAYDATA*)((COPYDATASTRUCT*)lParam)->lpData)->iconData;
+		if ((ansiNID->cbSize == sizeof(NID_PRE2KW)) || (ansiNID->cbSize >= sizeof(NID_2KW)))
+			unicodeNID = (NID_VISTAW *)ansiNID;
 
-			ZeroMemory(&NotifyIconData, sizeof(NotifyIconData));
-			//Copy always present part, no danger here
+		ZeroMemory(&NotifyIconData, sizeof(NotifyIconData));
+		//Copy always present part, no danger here
+		if (unicodeNID)
+		{
+			NotifyIconData.hWnd = (HWND) unicodeNID->hWnd;
+			NotifyIconData.uID = unicodeNID->uID;
+			NotifyIconData.uFlags = unicodeNID->uFlags;
+			NotifyIconData.uCallbackMessage = unicodeNID->uCallbackMessage;
+			NotifyIconData.hIcon = (HICON) unicodeNID->hIcon;
+		}
+		else
+		{
+			NotifyIconData.hWnd = (HWND) ansiNID->hWnd;
+			NotifyIconData.uID = ansiNID->uID;
+			NotifyIconData.uFlags = ansiNID->uFlags;
+			NotifyIconData.uCallbackMessage = ansiNID->uCallbackMessage;
+			NotifyIconData.hIcon = (HICON) ansiNID->hIcon;
+		}
+
+		if (NotifyIconData.uFlags&NIF_TIP)
+		{
+			if (unicodeNID)
+				lstrcpyW(NotifyIconData.szTip, unicodeNID->szTip);
+			else
+				MultiByteToWideChar(CP_ACP, 0, ansiNID->szTip, -1, NotifyIconData.szTip, 128);
+		}
+
+		if (NotifyIconData.uFlags&NIF_STATE)
+		{
 			if (unicodeNID)
 			{
-				NotifyIconData.hWnd = (HWND) unicodeNID->hWnd;
-				NotifyIconData.uID = unicodeNID->uID;
-				NotifyIconData.uFlags = unicodeNID->uFlags;
-				NotifyIconData.uCallbackMessage = unicodeNID->uCallbackMessage;
-				NotifyIconData.hIcon = (HICON) unicodeNID->hIcon;
+				NotifyIconData.dwState = unicodeNID->dwState;
+				NotifyIconData.dwStateMask = unicodeNID->dwStateMask;
 			}
 			else
 			{
-				NotifyIconData.hWnd = (HWND) ansiNID->hWnd;
-				NotifyIconData.uID = ansiNID->uID;
-				NotifyIconData.uFlags = ansiNID->uFlags;
-				NotifyIconData.uCallbackMessage = ansiNID->uCallbackMessage;
-				NotifyIconData.hIcon = (HICON) ansiNID->hIcon;
-			}
-
-			if (NotifyIconData.uFlags&NIF_TIP)
-			{
-				if (unicodeNID)
-					lstrcpyW(NotifyIconData.szTip, unicodeNID->szTip);
-				else
-					MultiByteToWideChar(CP_ACP, 0, ansiNID->szTip, -1, NotifyIconData.szTip, 128);
-			}
-
-			if (NotifyIconData.uFlags&NIF_STATE)
-			{
-				if (unicodeNID)
-				{
-					NotifyIconData.dwState = unicodeNID->dwState;
-					NotifyIconData.dwStateMask = unicodeNID->dwStateMask;
-				}
-				else
-				{
-					NotifyIconData.dwState = ansiNID->dwState;
-					NotifyIconData.dwStateMask = ansiNID->dwStateMask;
-				}
-			}
-
-			if (NotifyIconData.uFlags&NIF_INFO)
-			{
-				if (unicodeNID)
-				{
-					NotifyIconData.uTimeout = unicodeNID->uTimeout;
-					NotifyIconData.dwInfoFlags = unicodeNID->dwInfoFlags;
-					lstrcpyW(NotifyIconData.szInfo, unicodeNID->szInfo);
-					lstrcpyW(NotifyIconData.szInfoTitle, unicodeNID->szInfoTitle);
-				}
-				else
-				{
-					NotifyIconData.dwState = ansiNID->dwState;
-					NotifyIconData.dwStateMask = ansiNID->dwStateMask;
-					MultiByteToWideChar(CP_ACP, 0, ansiNID->szInfo, -1, NotifyIconData.szInfo, 256);
-					MultiByteToWideChar(CP_ACP, 0, ansiNID->szInfoTitle, -1, NotifyIconData.szInfoTitle, 64);
-				}
-			}
-
-			if (trayCommand == NIM_SETVERSION)
-			{
-				if (unicodeNID)
-				{
-					NotifyIconData.uVersion = unicodeNID->uVersion;
-				}
-				else
-				{
-					NotifyIconData.uVersion = ansiNID->uVersion;
-				}
-			}
-
-			if (NotifyIconData.dwInfoFlags&NIIF_LARGE_ICON)
-			{
-				if (unicodeNID)
-					NotifyIconData.hBalloonItem = (HICON) unicodeNID->hBalloonItem;
-				else
-					NotifyIconData.hBalloonItem = (HICON) ansiNID->hBalloonItem;
-			}
-
-			switch (trayCommand)
-			{
-			case NIM_ADD:
-				return creator->AddIcon(NotifyIconData);
-			case NIM_MODIFY:
-				return creator->ModifyIcon(NotifyIconData);
-			case NIM_DELETE:
-				return creator->DeleteIcon(NotifyIconData);
-			case NIM_SETVERSION:
-				return creator->SetIconVersion(NotifyIconData);
-			case NIM_SETFOCUS:
-			default:
-				return DefWindowProc(hwnd, message, wParam, lParam);
+				NotifyIconData.dwState = ansiNID->dwState;
+				NotifyIconData.dwStateMask = ansiNID->dwStateMask;
 			}
 		}
-		break;
+
+		if (NotifyIconData.uFlags&NIF_INFO)
+		{
+			if (unicodeNID)
+			{
+				NotifyIconData.uTimeout = unicodeNID->uTimeout;
+				NotifyIconData.dwInfoFlags = unicodeNID->dwInfoFlags;
+				lstrcpyW(NotifyIconData.szInfo, unicodeNID->szInfo);
+				lstrcpyW(NotifyIconData.szInfoTitle, unicodeNID->szInfoTitle);
+			}
+			else
+			{
+				NotifyIconData.dwState = ansiNID->dwState;
+				NotifyIconData.dwStateMask = ansiNID->dwStateMask;
+				MultiByteToWideChar(CP_ACP, 0, ansiNID->szInfo, -1, NotifyIconData.szInfo, 256);
+				MultiByteToWideChar(CP_ACP, 0, ansiNID->szInfoTitle, -1, NotifyIconData.szInfoTitle, 64);
+			}
+		}
+
+		if (trayCommand == NIM_SETVERSION)
+		{
+			if (unicodeNID)
+			{
+				NotifyIconData.uVersion = unicodeNID->uVersion;
+			}
+			else
+			{
+				NotifyIconData.uVersion = ansiNID->uVersion;
+			}
+		}
+
+		if (NotifyIconData.dwInfoFlags&NIIF_LARGE_ICON)
+		{
+			if (unicodeNID)
+				NotifyIconData.hBalloonItem = (HICON) unicodeNID->hBalloonItem;
+			else
+				NotifyIconData.hBalloonItem = (HICON) ansiNID->hBalloonItem;
+		}
+
+		switch (trayCommand)
+		{
+		case NIM_ADD:
+			return creator->AddIcon(NotifyIconData);
+		case NIM_MODIFY:
+			return creator->ModifyIcon(NotifyIconData);
+		case NIM_DELETE:
+			return creator->DeleteIcon(NotifyIconData);
+		case NIM_SETVERSION:
+			return creator->SetIconVersion(NotifyIconData);
+		case NIM_SETFOCUS:
+		default:
+			return DefWindowProc(hwnd, message, wParam, lParam);
+		}
+	}
+	break;
 	default:
 		return FALSE;
 

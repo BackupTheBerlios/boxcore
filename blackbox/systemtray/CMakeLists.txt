@@ -1,9 +1,12 @@
-#cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.6)
 
-#project (BLACKBOX)
+project (ShellServices)
 
 set (SYSTEMTRAY_SRCS
 clsSystemTray.cpp
+clsShellServiceWindow.cpp
+clsNotifyIconHandler.cpp
+clsNotificationIcon.cpp
 clsTrayItem.cpp
 
 ../../dynwinapi/clsShlwapi.cpp

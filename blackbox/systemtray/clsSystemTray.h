@@ -51,56 +51,56 @@ typedef std::basic_string<TCHAR> tstring;
   */
 class SystemTray
 {
-	public:
-		SystemTray(HINSTANCE &phInstance);
-		void initialize();
-		void terminate();
-		virtual ~SystemTray();
-		void announceSystemTray();
-		void CleanTray();
+public:
+	SystemTray(HINSTANCE &phInstance);
+	void initialize();
+	void terminate();
+	virtual ~SystemTray();
+	void announceSystemTray();
+	void CleanTray();
 
-		int GetNumVisible();
-		const TrayItem *GetTrayIcon(int num);
+	int GetNumVisible();
+	const TrayItem *GetTrayIcon(int num);
 
-		BOOL TrayIconEvent(HWND ownerHwnd, UINT iconID, UINT msg, WPARAM wParam, LPARAM lParam);
-		void SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom, UINT pEdge);
+	BOOL TrayIconEvent(HWND ownerHwnd, UINT iconID, UINT msg, WPARAM wParam, LPARAM lParam);
+	void SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom, UINT pEdge);
 
-		void setCallback(trayCallbackType, void (*)());
-	protected:
-	private:
-		static LRESULT CALLBACK trayWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
-		static LRESULT CALLBACK trayChildWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+	void setCallback(trayCallbackType, void (*)());
+protected:
+private:
+	static LRESULT CALLBACK trayWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK trayChildWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-		HINSTANCE &hInstance;
-		const tstring trayWndName;
-		HWND hTrayWnd;
-		HWND createTrayChild(const tstring pParentClass, const tstring pChildClass, const tstring pChildName = TEXT(""));
-		HWND createTrayChild(HWND pParent, const tstring pChildClass, const tstring pChildName = TEXT(""));
+	HINSTANCE &hInstance;
+	const tstring trayWndName;
+	HWND hTrayWnd;
+	HWND createTrayChild(const tstring pParentClass, const tstring pChildClass, const tstring pChildName = TEXT(""));
+	HWND createTrayChild(HWND pParent, const tstring pChildClass, const tstring pChildName = TEXT(""));
 
-		UINT trayCreatedMessage;
+	UINT trayCreatedMessage;
 
-		vector<tstring> childClasses;
-		vector<HWND> childWindows;
-		list<TrayItem *> trayItems;
+	vector<tstring> childClasses;
+	vector<HWND> childWindows;
+	list<TrayItem *> trayItems;
 
-		void clearIconData(TrayItem *);
-		LRESULT AddIcon(NID_INTERNAL &);
-		LRESULT ModifyIcon(NID_INTERNAL &pNID, bool triggerCallback = true);
-		LRESULT DeleteIcon(NID_INTERNAL &pNID, bool triggerCallback = true);
-		LRESULT DeleteIcon(HWND pHwnd, UINT pID, bool triggerCallback = true);
-		LRESULT SetIconVersion(NID_INTERNAL &);
+	void clearIconData(TrayItem *);
+	LRESULT AddIcon(NID_INTERNAL &);
+	LRESULT ModifyIcon(NID_INTERNAL &pNID, bool triggerCallback = true);
+	LRESULT DeleteIcon(NID_INTERNAL &pNID, bool triggerCallback = true);
+	LRESULT DeleteIcon(HWND pHwnd, UINT pID, bool triggerCallback = true);
+	LRESULT SetIconVersion(NID_INTERNAL &);
 
-		void (*callbackAdded)();
-		void (*callbackModified)();
-		void (*callbackDeleted)();
+	void (*callbackAdded)();
+	void (*callbackModified)();
+	void (*callbackDeleted)();
 
-		static int barLeft, barRight, barTop, barBottom;
-		static UINT barEdge;
+	static int barLeft, barRight, barTop, barBottom;
+	static UINT barEdge;
 
-		TrayItem * lookupIcon(HWND, UINT);
+	TrayItem * lookupIcon(HWND, UINT);
 
-		HMODULE hUser32;
-		BOOL (*ChangeWindowMessageFilter)(UINT message, DWORD dwFlag);
+	HMODULE hUser32;
+	BOOL (*ChangeWindowMessageFilter)(UINT message, DWORD dwFlag);
 
 	struct NID_PRE2KA
 	{
@@ -136,9 +136,10 @@ class SystemTray
 		DWORD dwState;
 		DWORD dwStateMask;
 		CHAR szInfo[256];
-		union {
-		UINT uTimeout;
-		UINT uVersion;
+		union
+		{
+			UINT uTimeout;
+			UINT uVersion;
 		};
 		CHAR szInfoTitle[64];
 		DWORD dwInfoFlags;
@@ -156,9 +157,10 @@ class SystemTray
 		DWORD dwState;
 		DWORD dwStateMask;
 		WCHAR szInfo[256];
-		union {
-		UINT uTimeout;
-		UINT uVersion;
+		union
+		{
+			UINT uTimeout;
+			UINT uVersion;
 		};
 		WCHAR szInfoTitle[64];
 		DWORD dwInfoFlags;
@@ -176,9 +178,10 @@ class SystemTray
 		DWORD dwState;
 		DWORD dwStateMask;
 		CHAR szInfo[256];
-		union {
-		UINT uTimeout;
-		UINT uVersion;
+		union
+		{
+			UINT uTimeout;
+			UINT uVersion;
 		};
 		CHAR szInfoTitle[64];
 		DWORD dwInfoFlags;
@@ -197,9 +200,10 @@ class SystemTray
 		DWORD dwState;
 		DWORD dwStateMask;
 		WCHAR szInfo[256];
-		union {
-		UINT uTimeout;
-		UINT uVersion;
+		union
+		{
+			UINT uTimeout;
+			UINT uVersion;
 		};
 		WCHAR szInfoTitle[64];
 		DWORD dwInfoFlags;
@@ -218,9 +222,10 @@ class SystemTray
 		DWORD dwState;
 		DWORD dwStateMask;
 		CHAR szInfo[256];
-		union {
-		UINT uTimeout;
-		UINT uVersion;
+		union
+		{
+			UINT uTimeout;
+			UINT uVersion;
 		};
 		CHAR szInfoTitle[64];
 		DWORD dwInfoFlags;
@@ -240,9 +245,10 @@ class SystemTray
 		DWORD dwState;
 		DWORD dwStateMask;
 		WCHAR szInfo[256];
-		union {
-		UINT uTimeout;
-		UINT uVersion;
+		union
+		{
+			UINT uTimeout;
+			UINT uVersion;
 		};
 		WCHAR szInfoTitle[64];
 		DWORD dwInfoFlags;
