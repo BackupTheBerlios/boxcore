@@ -87,7 +87,7 @@ include_directories(blackbox ${CMAKE_CURRENT_BINARY_DIR})
 #	COMMAND ${DLLTOOL} -d ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def -l ${CMAKE_CURRENT_BINARY_DIR}/libblackbox.a -D blackbox.exe
 #	COMMENT "Building proper library")
 target_link_libraries (blackbox ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def
-	shellserviceobjects systemtray shlwapi version ole32 uuid comctl32 comdlg32 shell32 advapi32 winmm gdi32)
+	debuglib shellserviceobjects systemtray shlwapi version ole32 uuid comctl32 comdlg32 shell32 advapi32 winmm gdi32)
 set_target_properties (blackbox PROPERTIES
 	IMPORT_SUFFIX .a
 	ENABLE_EXPORTS true
