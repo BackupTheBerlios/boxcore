@@ -1,7 +1,14 @@
 #include "BBApi.h"
 #include "clsItemCollection.h"
+#include <algorithm>
+#include <functional>
 
-clsItemCollection::clsItemCollection(bool pVertical): clsItem(pVertical)
+using std::for_each;
+using std::mem_fun;
+using std::bind2nd;
+
+clsItemCollection::clsItemCollection(bool pVertical) :
+		clsItem(pVertical)
 {
 	fixed = DIM_BOTH;
 	lastMouse = NULL;
@@ -18,25 +25,26 @@ clsItemCollection::~clsItemCollection()
 }
 
 /** @brief Base draw function for collections fo items
-  *
-  * @param[in,out] pContext The drawing context to use, passed on from the WM_PAINT message
-  *
-  * Calls the clsItem::draw in case a style was set, then calls draw for each item in the list, passing on the DC.
-  */
+ *
+ * @param[in,out] pContext The drawing context to use, passed on from the WM_PAINT message
+ *
+ * Calls the clsItem::draw in case a style was set, then calls draw for each item in the list, passing on the DC.
+ */
 void clsItemCollection::draw(HDC pContext)
 {
 	clsItem::draw(pContext);
-	for (list< clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+	for (list<clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
 	{
 		(*i)->draw(pContext);
 	}
 }
 
 /** @brief wndProc
-  *
-  * @todo: document this function
-  */
-LRESULT clsItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+ *
+ * @todo: document this function
+ */
+LRESULT clsItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam,
+								   LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -54,7 +62,8 @@ LRESULT clsItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 	case WM_XBUTTONDOWN:
 	case WM_XBUTTONUP:
 	case WM_XBUTTONDBLCLK:
-		for (list< clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+		for (list<clsItem *>::iterator i = itemList.begin(); i
+				!= itemList.end(); ++i)
 		{
 			if ((*i)->hitTest(LOWORD(lParam), HIWORD(lParam)))
 			{
@@ -73,7 +82,8 @@ LRESULT clsItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 		break;
 	case BOXBAR_NEEDTIP:
 	case WM_TIMER:
-		for (list< clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+		for (list<clsItem *>::iterator i = itemList.begin(); i
+				!= itemList.end(); ++i)
 		{
 			(*i)->wndProc(hWnd, msg, wParam, lParam);
 		}
@@ -82,7 +92,8 @@ LRESULT clsItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 
 	if ((msg >= BB_MSGFIRST) && (msg <= BB_MSGLAST))
 	{
-		for (list< clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+		for (list<clsItem *>::iterator i = itemList.begin(); i
+				!= itemList.end(); ++i)
 		{
 			(*i)->wndProc(hWnd, msg, wParam, lParam);
 		}
@@ -210,10 +221,10 @@ void clsItemCollection::addItem(clsItem *pItem)
 	itemList.push_back(pItem);
 }
 
-
-/** @brief move
+/** @brief Changes the position of the collection and its contents
   *
-  * @todo: document this function
+  * This function calls clsItem::move() to move the collection itself and then
+  * uses sortItems() to reposition the contents of the collection.
   */
 void clsItemCollection::move(int pX, int pY)
 {
@@ -221,11 +232,10 @@ void clsItemCollection::move(int pX, int pY)
 	sortItems();
 }
 
-
 /** @brief sortItems
-  *
-  * @todo: document this function
-  */
+ *
+ * @todo: document this function
+ */
 void clsItemCollection::sortItems()
 {
 	int pos;
@@ -245,25 +255,28 @@ void clsItemCollection::sortItems()
 		if (vertical)
 		{
 
-			(*i)->move(itemArea.left + (available - (*i)->getSize(DIM_HORIZONTAL)) / 2 , pos);
+			(*i)->move(itemArea.left + (available
+										- (*i)->getSize(DIM_HORIZONTAL)) / 2, pos);
 			pos += (*i)->getSize(DIM_VERTICAL) + spacingItems;
 		}
 		else
 		{
-			(*i)->move(pos, itemArea.top + (available - (*i)->getSize(DIM_VERTICAL)) / 2);
+			(*i)->move(pos, itemArea.top + (available
+											- (*i)->getSize(DIM_VERTICAL)) / 2);
 			pos += (*i)->getSize(DIM_HORIZONTAL) + spacingItems;
 		}
 	}
 }
 
-/** @brief Check contained items for config menus
-  *
-  * @param[in,out] pMenu Menu pointer to which items can be added
-  *
-  * This calls configMenu on each contained item
-  */
+/** @brief Check contained items for configuration menus
+ *
+ * @param[in,out] pMenu Menu pointer to which items can be added
+ *
+ * This calls configMenu on each contained item
+ */
 void clsItemCollection::configMenu(Menu *pMenu)
 {
-	for (list<clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
-		(*i)->configMenu(pMenu);
+	for_each(itemList.begin(), itemList.end(),
+			 bind2nd(mem_fun((void(clsItem::*)(Menu*)) &clsItem::configMenu),
+					 pMenu));
 }
