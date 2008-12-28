@@ -1,5 +1,5 @@
 /** @internal
-  * @file clsTrayItem.h
+  * @file
   * @brief This file contains the definition of clsTrayItem for use by the system tray
   *
   * This file is part of the boxCore source code @n
@@ -41,7 +41,8 @@ struct NID_INTERNAL
 	DWORD dwState;
 	DWORD dwStateMask;
 	WCHAR szInfo[256];
-	union{
+	union
+	{
 		UINT uTimeout;
 		UINT uVersion;
 	};
@@ -61,7 +62,8 @@ public:
 	TrayItem(NID_INTERNAL &pNID);
 	virtual ~TrayItem();
 
-	bool constructionValid() {
+	bool constructionValid()
+	{
 		return valid;
 	}
 	//protected:

@@ -1,5 +1,5 @@
 /** @internal
- * @file clsTrayItem.cpp
+ * @file
  * @brief This file contains the implementation of clsTrayItem for the system tray
  *
  * This file is part of the boxCore source code @n
