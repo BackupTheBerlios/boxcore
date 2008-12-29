@@ -32,6 +32,8 @@ public:
 	bool GetNotificationIconInfo(HWND p_hWnd, UINT p_uID, PVOID p_return[], eNotificationIconInfo p_info[], UINT p_count);
 	bool GetNotificationIconInfo(NotificationIcon *p_icon, PVOID p_return[], eNotificationIconInfo p_info[], UINT p_count);
 
+	UINT GetTraySize();
+
 	NotificationIcon *FindIconToShare(HICON p_icon);
 	eUpdateResult DeleteIcon(HWND p_hWnd, UINT p_uID);
 private:
@@ -39,7 +41,7 @@ private:
 	eUpdateResult DeleteIcon(NID_INTERNAL &p_nid);
 	eUpdateResult VersionIcon(NID_INTERNAL &p_nid);
 	eUpdateResult FocusIcon(NID_INTERNAL &p_nid);
-	NotificationIcon *LookupIcon(HWND p_hwnd, UINT p_uID);
+	NotificationIcon *LookupIcon(HWND p_hWnd, UINT p_uID);
 	NotificationIcon *LookupIcon(UINT p_index);
 
 	IconList m_IconList;

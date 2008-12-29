@@ -28,15 +28,72 @@ public:
 	NotificationIcon(LegacyNotificationIcon *p_legacyData, NotifyIconHandler *p_handler);
 	virtual ~NotificationIcon();
 
-	bool IsVisible()
-	{
-		return (!m_hidden && m_hIcon && m_uCallbackMessage);
-	}
+	bool IsVisible();
 
 	bool IsIcon(std::pair<HWND, UINT> p_Test);
 	eUpdateResult UpdateIcon(NID_INTERNAL &p_nid);
 	eUpdateResult VersionIcon(NID_INTERNAL &p_nid);
 	bool ShareIcon(NotificationIcon * const p_sharer, bool p_share);
+	HWND getHWnd() const
+	{
+		return m_hWnd;
+	}
+
+	UINT getUID() const
+	{
+		return m_uID;
+	}
+
+	UINT getUCallbackMessage() const
+	{
+		return m_uCallbackMessage;
+	}
+
+	HICON getHIcon() const
+	{
+		return m_hIcon;
+	}
+
+	CONST WCHAR *getSzTip() const
+	{
+		return m_szTip;
+	}
+
+	CONST WCHAR *getSzInfo() const
+	{
+		return m_szInfo;
+	}
+
+	UINT getUTimeout() const
+	{
+		return m_uTimeout;
+	}
+
+	UINT getUVersion() const
+	{
+		return m_uVersion;
+	}
+
+	CONST WCHAR *getSzInfoTitle() const
+	{
+		return m_szInfoTitle;
+	}
+
+	DWORD getDwInfoFlags() const
+	{
+		return m_dwInfoFlags;
+	}
+
+	HICON getHBalloonIcon() const
+	{
+		return m_hBalloonIcon;
+	}
+
+	bool getShowTip() const
+	{
+		return m_showTip;
+	}
+
 private:
 	LegacyNotificationIcon *m_legacyData;
 	NotifyIconHandler *m_handler;

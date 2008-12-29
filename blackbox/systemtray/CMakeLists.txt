@@ -14,7 +14,7 @@ clsTrayItem.cpp
 )
 
 add_library (systemtray STATIC ${SYSTEMTRAY_SRCS})
-target_link_libraries (systemtray shlwapi)
+target_link_libraries (systemtray debuglib shlwapi)
 
 if (MINGW)
 set_target_properties (systemtray PROPERTIES

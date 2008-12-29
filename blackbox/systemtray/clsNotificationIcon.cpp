@@ -7,6 +7,8 @@
 
 #include "clsNotificationIcon.h"
 #include "clsNotifyIconHandler.h"
+#include <algorithm>
+#include "../../debug/debug.h"
 
 namespace ShellServices
 {
@@ -18,6 +20,14 @@ NotificationIcon::NotificationIcon(LegacyNotificationIcon *p_legacyData, NotifyI
 	m_hWnd = NULL;
 	m_uID = 0;
 	m_hidden = false;
+	m_hIcon = NULL;
+	m_hIconOrig = NULL;
+	m_hBalloonIcon = NULL;
+	ZeroMemory(&m_szTip, sizeof(m_szTip));
+	ZeroMemory(&m_szInfo, sizeof(m_szInfo));
+	ZeroMemory(&m_szInfoTitle, sizeof(m_szInfoTitle));
+
+	m_showTip = false;
 
 	m_sharedIcon = NULL;
 }
@@ -44,11 +54,23 @@ eUpdateResult NotificationIcon::UpdateIcon(NID_INTERNAL & p_nid)
 {
 	bool newIcon = (m_hWnd == NULL);
 	bool hideIcon = false;
-	bool showIcon = false;
+	bool showIcon = newIcon;
+	m_hWnd = p_nid.hWnd;
+	m_uID = p_nid.uID;
 	if (p_nid.uFlags & NIF_MESSAGE)
 	{
+		if (!m_uCallbackMessage)
+		{
+			showIcon = true;
+		}
 		m_uCallbackMessage = p_nid.uCallbackMessage;
 	}
+	if (!m_uCallbackMessage)
+	{
+		hideIcon = true;
+		showIcon = false;
+	}
+
 	bool useSharedIcon = false;
 	if (p_nid.uFlags & NIF_STATE)
 	{
@@ -64,15 +86,23 @@ eUpdateResult NotificationIcon::UpdateIcon(NID_INTERNAL & p_nid)
 			if (p_nid.dwState & NIS_HIDDEN)
 			{
 				m_hidden = true;
+				showIcon = false;
+				hideIcon = true;
 			}
 			else
 			{
 				m_hidden = false;
+				hideIcon = false;
+				showIcon = true;
 			}
 		}
 	}
 	if (p_nid.uFlags & NIF_ICON)
 	{
+		if (!m_hIcon)
+		{
+			showIcon = true;
+		}
 		if (m_sharedIcon)
 		{
 			m_sharedIcon->ShareIcon(this, false);
@@ -89,7 +119,8 @@ eUpdateResult NotificationIcon::UpdateIcon(NID_INTERNAL & p_nid)
 			}
 			else
 			{
-				return ICON_FAILURE;
+				m_hIcon = NULL;
+				m_hIconOrig = NULL;
 			}
 		}
 		else
@@ -97,22 +128,45 @@ eUpdateResult NotificationIcon::UpdateIcon(NID_INTERNAL & p_nid)
 			m_hIconOrig = p_nid.hIcon;
 			m_hIcon = CopyIcon(p_nid.hIcon);
 		}
-
 	}
+	if (!m_hIcon)
+	{
+		hideIcon = true;
+		showIcon = false;
+	}
+
 	if (p_nid.uFlags & NIF_TIP)
 	{
 		lstrcpyW(m_szTip, p_nid.szTip);
+		m_showTip = true;
 	}
 	if (p_nid.uFlags & NIF_INFO)
 	{
 		lstrcpyW(m_szInfo, p_nid.szInfo);
+		OutputDebugStringW(m_szInfo);
 		lstrcpyW(m_szInfoTitle, p_nid.szInfoTitle);
+		OutputDebugStringW(m_szInfoTitle);
 		m_uTimeout = p_nid.uTimeout;
 		m_dwInfoFlags = p_nid.dwInfoFlags;
+		if (m_hBalloonIcon)
+		{
+			DestroyIcon(m_hBalloonIcon);
+			m_hBalloonIcon = NULL;
+		}
 		if (p_nid.hBalloonIcon)
 		{
 			m_hBalloonIcon = CopyIcon(p_nid.hBalloonIcon);
 		}
+	}
+	else
+	{
+		ZeroMemory(&m_szInfo, sizeof(m_szInfo));
+		ZeroMemory(&m_szInfoTitle, sizeof(m_szInfoTitle));
+		m_uTimeout = 0;
+		m_dwInfoFlags = 0;
+		if (m_hBalloonIcon)
+			DestroyIcon(m_hBalloonIcon);
+		m_hBalloonIcon = NULL;
 	}
 	if (p_nid.uFlags & NIF_GUID)
 	{
@@ -142,5 +196,40 @@ eUpdateResult NotificationIcon::VersionIcon(NID_INTERNAL & p_nid)
 	}
 	return ICON_MODIFIED;
 }
+
+bool NotificationIcon::ShareIcon(NotificationIcon *const p_sharer, bool p_share)
+{
+	if (p_share)
+	{
+		std::list<NotificationIcon *>::iterator position = std::find(m_iconSharers.begin(), m_iconSharers.end(), p_sharer);
+		if (m_iconSharers.end() != position)
+		{
+			return false;
+		}
+		else
+		{
+			m_iconSharers.push_back(p_sharer);
+			return true;
+		}
+	}
+	else
+	{
+		std::list<NotificationIcon *>::iterator position = std::find(m_iconSharers.begin(), m_iconSharers.end(), p_sharer);
+		if (m_iconSharers.end() != position)
+		{
+			m_iconSharers.erase(position);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+}
+
+bool NotificationIcon::IsVisible()
+	{
+		return (!m_hidden && m_hIcon && m_uCallbackMessage);
+	}
 
 }

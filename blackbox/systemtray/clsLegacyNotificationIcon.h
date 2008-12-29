@@ -16,7 +16,7 @@ class NotificationIcon;
 class LegacyNotificationIcon
 {
 public:
-	virtual ~LegacyNotificationIcon() = 0;
+	virtual ~LegacyNotificationIcon() {}
 
 	virtual void updateLegacy(NotificationIcon *p_pNotifyIcon) = 0;
 	virtual void updateLegacyPrev(NotificationIcon *p_pNotifyIcon) = 0;

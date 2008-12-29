@@ -44,7 +44,7 @@ class ShellServiceHandler
 {
 public:
 	/** @brief Empty virtual destructor */
-	virtual ~ShellServiceHandler() = 0;
+	virtual ~ShellServiceHandler() {}
 
 	/**@brief Function called by ShellServiceWindow for a WM_COPYDATA message
 	  *

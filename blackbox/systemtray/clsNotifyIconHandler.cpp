@@ -3,19 +3,20 @@
 #include "nid.h"
 #include <utility>
 #include <algorithm>
+#include <functional>
+#include "../../debug/debug.h"
 
 namespace ShellServices
 {
-
 struct SHELLTRAYDATA
 {
-	DWORD dwMagic; // e.g. 0x34753423;
+	DWORD dwMagic;
 	DWORD dwMessage;
 	NOTIFYICONDATA iconData;
 };
-
 NotifyIconHandler::NotifyIconHandler(LegacyNotficationIconFactory p_legacyFactory)
 {
+	m_legacyFactory = p_legacyFactory;
 	createdCallback = NULL;
 	modifiedCallback = NULL;
 	deletedCallback = NULL;
@@ -23,31 +24,32 @@ NotifyIconHandler::NotifyIconHandler(LegacyNotficationIconFactory p_legacyFactor
 
 NotifyIconHandler::~NotifyIconHandler()
 {
-	//dtor
 }
 
 class NotificationIconPredicate
 {
 public:
-	NotificationIconPredicate(HWND p_hWnd, UINT p_uID):m_lookup(p_hWnd, p_uID)
-	{}
+	NotificationIconPredicate(HWND p_hWnd, UINT p_uID)
+			:m_lookup(p_hWnd, p_uID)
+	{
+	}
 
-	bool operator()(NotificationIcon *p_icon)
+	bool operator ()(NotificationIcon *p_icon)
 	{
 		return p_icon->IsIcon(m_lookup);
 	}
-private:
-	std::pair<HWND, UINT> m_lookup;
-};
 
+private:
+	std::pair<HWND,UINT> m_lookup;
+};
 HRESULT NotifyIconHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 {
-	SHELLTRAYDATA *trayData = reinterpret_cast<SHELLTRAYDATA *> (p_lpData);
-	NID_ANSI &ansiNid = *reinterpret_cast<NID_ANSI *> (&(trayData->iconData));
-	NID_UNICODE &uniNid = *reinterpret_cast<NID_UNICODE *> (&(trayData->iconData));
+	SHELLTRAYDATA *trayData = reinterpret_cast<SHELLTRAYDATA*>(p_lpData);
+	NID_ANSI & ansiNid = *reinterpret_cast<NID_ANSI*>(&(trayData->iconData));
+	NID_UNICODE & uniNid = *reinterpret_cast<NID_UNICODE*>(&(trayData->iconData));
 	NID_INTERNAL realNid;
 	ZeroMemory(&realNid, sizeof(realNid));
-	realNid.cbSize = sizeof(realNid);
+	realNid.cbSize = sizeof (realNid);
 	realNid.hWnd = reinterpret_cast<HWND>(ansiNid.hWnd);
 	realNid.uID = ansiNid.uID;
 	realNid.uFlags = ansiNid.uFlags;
@@ -55,92 +57,97 @@ HRESULT NotifyIconHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 	{
 	case NIM_ADD:
 	case NIM_MODIFY:
-		switch (p_cbData)
 		{
-		case NID_VISTAA_SIZE:
-			if ((ansiNid.uFlags & NIF_INFO) && (ansiNid.dwInfoFlags & NIIF_USER))
+			switch (p_cbData - offsetof(SHELLTRAYDATA, iconData))
 			{
-				realNid.hBalloonIcon = reinterpret_cast<HICON>(ansiNid.hBalloonIcon);
-			}
-		case NID_XPA_SIZE:
-			if ((!realNid.hBalloonIcon) && (ansiNid.uFlags & NIF_INFO) && (ansiNid.dwInfoFlags & NIIF_USER))
-			{
-				realNid.hBalloonIcon = reinterpret_cast<HICON>(ansiNid.hIcon);
-			}
-		case NID_2KA_SIZE:
-		case NID_WIN95_SIZE:
-			if (ansiNid.uFlags & NIF_MESSAGE)
-			{
-				realNid.uCallbackMessage = ansiNid.uCallbackMessage;
-			}
-			if (ansiNid.uFlags & NIF_ICON)
-			{
-				realNid.hIcon = reinterpret_cast<HICON>(ansiNid.hIcon);
-			}
-			if (ansiNid.uFlags & NIF_TIP)
-			{
-				MultiByteToWideChar(CP_ACP, 0, ansiNid.szTip, -1, realNid.szTip, 256);
-			}
-			if (ansiNid.uFlags & NIF_STATE)
-			{
-				realNid.dwState = ansiNid.dwState;
-				realNid.dwStateMask = ansiNid.dwStateMask;
-			}
-			if (ansiNid.uFlags & NIF_INFO)
-			{
-				MultiByteToWideChar(CP_ACP, 0, ansiNid.szInfo, -1, realNid.szInfo, 256);
-				MultiByteToWideChar(CP_ACP, 0, ansiNid.szInfoTitle, -1, realNid.szInfoTitle, 256);
-				realNid.uTimeout = ansiNid.uTimeout;
-				realNid.dwInfoFlags = ansiNid.dwInfoFlags;
-			}
-			if (ansiNid.uFlags & NIF_GUID)
-			{
-				realNid.guidItem = ansiNid.guidItem;
-			}
-			break;
-		case NID_VISTAW_SIZE:
-			if ((uniNid.uFlags & NIF_INFO) && (uniNid.dwInfoFlags & NIIF_USER))
-			{
-				realNid.hBalloonIcon = reinterpret_cast<HICON>(uniNid.hBalloonIcon);
-			}
-		case NID_XPW_SIZE:
-			if ((!realNid.hBalloonIcon) && (uniNid.uFlags & NIF_INFO) && (uniNid.dwInfoFlags & NIIF_USER))
-			{
-				realNid.hBalloonIcon = reinterpret_cast<HICON>(uniNid.hIcon);
-			}
-		case NID_2KW_SIZE:
-		case NID_NT_SIZE:
-			if (uniNid.uFlags & NIF_MESSAGE)
-			{
-				realNid.uCallbackMessage = uniNid.uCallbackMessage;
-			}
-			if (uniNid.uFlags & NIF_ICON)
-			{
-				realNid.hIcon = reinterpret_cast<HICON>(uniNid.hIcon);
-			}
-			if (uniNid.uFlags & NIF_TIP)
-			{
-				lstrcpyW(realNid.szTip, uniNid.szTip);
-			}
-			if (uniNid.uFlags & NIF_STATE)
-			{
-				realNid.dwState = uniNid.dwState;
-				realNid.dwStateMask = uniNid.dwStateMask;
-			}
-			if (uniNid.uFlags & NIF_INFO)
-			{
-				lstrcpyW(realNid.szInfo, uniNid.szInfo);
-				lstrcpyW(realNid.szInfoTitle, uniNid.szInfoTitle);
-				realNid.uTimeout = uniNid.uTimeout;
-				realNid.dwInfoFlags = uniNid.dwInfoFlags;
-			}
-			if (ansiNid.uFlags & NIF_GUID)
-			{
-				realNid.guidItem = uniNid.guidItem;
-			}
-			if (ansiNid.uFlags & NIF_TIP)
-			{
-				lstrcpyW(realNid.szTip, uniNid.szTip);
+			case NID_VISTAA_SIZE:
+				if ((ansiNid.uFlags & NIF_INFO) && (ansiNid.dwInfoFlags & NIIF_USER) && ansiNid.hBalloonIcon)
+				{
+					realNid.hBalloonIcon = reinterpret_cast<HICON>(ansiNid.hBalloonIcon);
+				}
+			case NID_XPA_SIZE:
+				if ((!realNid.hBalloonIcon) && (ansiNid.uFlags & NIF_INFO) && (ansiNid.dwInfoFlags & NIIF_USER))
+				{
+					realNid.hBalloonIcon = reinterpret_cast<HICON>(ansiNid.hIcon);
+				}
+			case NID_2KA_SIZE:
+			case NID_WIN95_SIZE:
+				if (ansiNid.uFlags & NIF_MESSAGE)
+				{
+					realNid.uCallbackMessage = ansiNid.uCallbackMessage;
+				}
+				if (ansiNid.uFlags & NIF_ICON)
+				{
+					realNid.hIcon = reinterpret_cast<HICON>(ansiNid.hIcon);
+				}
+				if (ansiNid.uFlags & NIF_TIP)
+				{
+					MultiByteToWideChar(CP_ACP, 0, ansiNid.szTip, -1, realNid.szTip, 256);
+				}
+				if (ansiNid.uFlags & NIF_STATE)
+				{
+					realNid.dwState = ansiNid.dwState;
+					realNid.dwStateMask = ansiNid.dwStateMask;
+				}
+				if (ansiNid.uFlags & NIF_INFO)
+				{
+					MultiByteToWideChar(CP_ACP, 0, ansiNid.szInfo, -1, realNid.szInfo, 256);
+					MultiByteToWideChar(CP_ACP, 0, ansiNid.szInfoTitle, -1, realNid.szInfoTitle, 256);
+					realNid.uTimeout = ansiNid.uTimeout;
+					realNid.dwInfoFlags = ansiNid.dwInfoFlags;
+				}
+				if (ansiNid.uFlags & NIF_GUID)
+				{
+					realNid.guidItem = ansiNid.guidItem;
+				}
+				break;
+			case NID_VISTAW_SIZE:
+				if ((uniNid.uFlags & NIF_INFO) && (uniNid.dwInfoFlags & NIIF_USER) && uniNid.hBalloonIcon)
+				{
+					realNid.hBalloonIcon = reinterpret_cast<HICON>(uniNid.hBalloonIcon);
+				}
+			case NID_XPW_SIZE:
+				if ((!realNid.hBalloonIcon) && (uniNid.uFlags & NIF_INFO) && (uniNid.dwInfoFlags & NIIF_USER))
+				{
+					realNid.hBalloonIcon = reinterpret_cast<HICON>(uniNid.hIcon);
+				}
+			case NID_2KW_SIZE:
+			case NID_NT_SIZE:
+				if (uniNid.uFlags & NIF_MESSAGE)
+				{
+					realNid.uCallbackMessage = uniNid.uCallbackMessage;
+				}
+				if (uniNid.uFlags & NIF_ICON)
+				{
+					realNid.hIcon = reinterpret_cast<HICON>(uniNid.hIcon);
+				}
+				if (uniNid.uFlags & NIF_TIP)
+				{
+					lstrcpyW(realNid.szTip, uniNid.szTip);
+				}
+				if (uniNid.uFlags & NIF_STATE)
+				{
+					realNid.dwState = uniNid.dwState;
+					realNid.dwStateMask = uniNid.dwStateMask;
+				}
+				if (uniNid.uFlags & NIF_INFO)
+				{
+					lstrcpyW(realNid.szInfo, uniNid.szInfo);
+					lstrcpyW(realNid.szInfoTitle, uniNid.szInfoTitle);
+					realNid.uTimeout = uniNid.uTimeout;
+					realNid.dwInfoFlags = uniNid.dwInfoFlags;
+				}
+				if (ansiNid.uFlags & NIF_GUID)
+				{
+					realNid.guidItem = uniNid.guidItem;
+				}
+				if (ansiNid.uFlags & NIF_TIP)
+				{
+					lstrcpyW(realNid.szTip, uniNid.szTip);
+				}
+				break;
+			default:
+							TRACE("The size is %u. Options where %u %u", p_cbData,NID_XPA_SIZE, NID_XPW_SIZE);
 			}
 			eUpdateResult result = UpdateIcon(realNid);
 			if (NIM_ADD == trayData->dwMessage)
@@ -183,12 +190,13 @@ HRESULT NotifyIconHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 				{
 					return FALSE;
 				}
-			}
-			break;
+				break;
 
+			}
 		}
 	case NIM_SETVERSION:
 	{
+		PRINT("Set icon version");
 		switch (p_cbData)
 		{
 		case NID_VISTAA_SIZE:
@@ -213,8 +221,22 @@ HRESULT NotifyIconHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 		}
 	}
 	case NIM_DELETE:
-		break;
+	{
+		TRACE("Deleting icon %p %u", realNid.hWnd, realNid.uID);
+		eUpdateResult result = DeleteIcon(realNid);
+		if (result & ICON_DELETED)
+		{
+			return TRUE;
+		}
+		else
+		{
+			return FALSE;
+		}
+		return result;
+	}
 	case NIM_SETFOCUS:
+		PRINT("Attempt to focus icon");
+		return TRUE;
 		break;
 	}
 	return FALSE;
@@ -240,6 +262,11 @@ eUpdateResult NotifyIconHandler::UpdateIcon(NID_INTERNAL & p_nid)
 {
 	NotificationIconPredicate iconTest(p_nid.hWnd, p_nid.uID);
 	IconList::iterator position = std::find_if(m_IconList.begin(), m_IconList.end(), iconTest);
+	for (IconList::iterator i = m_IconList.begin(); i!= m_IconList.end();++i)
+	{
+		if (((*i)->m_hWnd == p_nid.hWnd) && ((*i)->m_uID == p_nid.uID))
+			position = i;
+	}
 	NotificationIcon *icon;
 	if (position == m_IconList.end())
 	{
@@ -256,7 +283,12 @@ eUpdateResult NotifyIconHandler::UpdateIcon(NID_INTERNAL & p_nid)
 	{
 		icon = *position;
 	}
-	return icon->UpdateIcon(p_nid);
+	eUpdateResult returnVal = icon->UpdateIcon(p_nid);
+	if (position == m_IconList.end() && (returnVal & ICON_ADDED))
+	{
+		m_IconList.push_back(icon);
+	}
+	return returnVal;
 }
 
 eUpdateResult NotifyIconHandler::DeleteIcon(NID_INTERNAL & p_nid)
@@ -266,8 +298,14 @@ eUpdateResult NotifyIconHandler::DeleteIcon(NID_INTERNAL & p_nid)
 
 eUpdateResult NotifyIconHandler::DeleteIcon(HWND p_hWnd, UINT p_uID)
 {
+	//return ICON_DELETED;
 	NotificationIconPredicate iconTest(p_hWnd, p_uID);
 	IconList::iterator position = std::find_if(m_IconList.begin(), m_IconList.end(), iconTest);
+	for (IconList::iterator i = m_IconList.begin(); i!= m_IconList.end();++i)
+		{
+			if (((*i)->m_hWnd == p_hWnd) && ((*i)->m_uID == p_uID))
+				position = i;
+		}
 	if (m_IconList.end() != position)
 	{
 		IconList::iterator prev =  position;
@@ -284,8 +322,9 @@ eUpdateResult NotifyIconHandler::DeleteIcon(HWND p_hWnd, UINT p_uID)
 			prev--;
 			prevIcon = *prev;
 		}
-		nextIcon->m_legacyData->updateLegacyPrev(prevIcon);
-		prevIcon->m_legacyData->updateLegacyNext(nextIcon);
+		TRACE("Previous icon %p Next icon %p",prevIcon, nextIcon);
+		//nextIcon->m_legacyData->updateLegacyPrev(prevIcon);
+		//prevIcon->m_legacyData->updateLegacyNext(nextIcon);
 		delete (*position);
 		m_IconList.erase(position);
 		return ICON_DELETED;
@@ -324,7 +363,7 @@ bool NotifyIconHandler::GetNotificationIconInfo(HWND p_hWnd, UINT p_uID, PVOID p
 
 bool NotifyIconHandler::GetNotificationIconInfo(NotificationIcon *p_icon, PVOID p_return[], eNotificationIconInfo p_info[], UINT p_count)
 {
-	for (UINT i=0; i<p_count; ++i)
+	for (UINT i = 0;i < p_count;++i)
 	{
 		switch (p_info[i])
 		{
@@ -368,6 +407,7 @@ bool NotifyIconHandler::GetNotificationIconInfo(NotificationIcon *p_icon, PVOID 
 			return false;
 		}
 	}
+
 	return true;
 }
 
@@ -390,6 +430,50 @@ eUpdateResult NotifyIconHandler::VersionIcon(NID_INTERNAL & p_nid)
 	}
 }
 
+NotificationIcon *NotifyIconHandler::LookupIcon(HWND p_hWnd, UINT p_uID)
+{
+	NotificationIconPredicate iconTest(p_hWnd, p_uID);
+	IconList::iterator position = std::find_if(m_IconList.begin(), m_IconList.end(), iconTest);
+	for (IconList::iterator i = m_IconList.begin(); i!= m_IconList.end();++i)
+		{
+			if (((*i)->m_hWnd == p_hWnd) && ((*i)->m_uID == p_uID))
+				position = i;
+		}
+	if (m_IconList.end() != position)
+	{
+		return *position;
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+NotificationIcon *NotifyIconHandler::FindIconToShare(HICON p_icon)
+{
+	for (IconList::iterator i = m_IconList.begin();i != m_IconList.end();++i)
+	{
+		if ((*i)->m_hIconOrig == p_icon)
+			return *i;
+	}
+	return NULL;
+}
+
+UINT NotifyIconHandler::GetTraySize()
+{
+	UINT numIcons = 0;
+	for (IconList::iterator i = m_IconList.begin(); i != m_IconList.end(); ++i)
+	{
+		if ((*i)->IsVisible())
+		{
+			numIcons++;
+		}
+	}
+	return numIcons;
+	//return m_IconList.size();
+	//return count_if(m_IconList.begin(), m_IconList.end(), std::mem_fun(&NotificationIcon::IsVisible));
+}
+
 NotificationIcon *NotifyIconHandler::LookupIcon(UINT p_index)
 {
 	IconList::iterator n = m_IconList.begin();
@@ -397,4 +481,6 @@ NotificationIcon *NotifyIconHandler::LookupIcon(UINT p_index)
 	return *n;
 }
 
+// e.g. 0x34753423;
+//dtor
 }
