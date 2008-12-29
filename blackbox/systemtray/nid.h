@@ -114,6 +114,20 @@ struct NID_INTERNAL
 #define NIIF_LARGE_ICON 0x00000020
 #endif
 
+#ifndef NIM_SETFOCUS
+#define NIM_SETFOCUS 0x00000003
+#endif
+#ifndef NIM_SETVERSION
+#define NIM_SETVERSION 0x00000004
+#endif
+
+#ifndef NIS_HIDDEN
+#define NIS_HIDDEN 0x00000001
+#endif
+#ifndef NIS_SHAREDICON
+#define NIS_SHAREDICON 0x00000002
+#endif
+
 }
 
 #endif /* NID_H_ */

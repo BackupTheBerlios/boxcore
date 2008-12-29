@@ -12,6 +12,8 @@ class NotificationIcon;
 
 typedef std::list<NotificationIcon *> IconList;
 
+enum eNotificationIconInfo {NI_HWND, NI_ID, NI_CALLBACKMESSAGE, NI_ICON, NI_TIP, NI_INFOTEXT, NI_INFOTITLE, NI_INFOTIMEOUT, NI_INFOFLAGS, NI_INFOICON, NI_VERSION, NI_LEGACY};
+
 enum eTrayCallbackType {TCALLBACK_ADD, TCALLBACK_MOD, TCALLBACK_DEL};
 
 typedef void (*NotificationIconCallback)(void *);
@@ -23,12 +25,22 @@ public:
 	NotifyIconHandler(LegacyNotficationIconFactory p_legacyFactory);
 	virtual ~NotifyIconHandler();
 
+	void RegisterCallback(eTrayCallbackType p_type, NotificationIconCallback p_callback);
 	virtual HRESULT ProcessMessage(DWORD p_cbData, PVOID p_lpData);
+
+	bool GetNotificationIconInfo(UINT p_index, PVOID p_return[], eNotificationIconInfo p_info[], UINT p_count);
+	bool GetNotificationIconInfo(HWND p_hWnd, UINT p_uID, PVOID p_return[], eNotificationIconInfo p_info[], UINT p_count);
+	bool GetNotificationIconInfo(NotificationIcon *p_icon, PVOID p_return[], eNotificationIconInfo p_info[], UINT p_count);
+
+	NotificationIcon *FindIconToShare(HICON p_icon);
+	eUpdateResult DeleteIcon(HWND p_hWnd, UINT p_uID);
 private:
 	eUpdateResult UpdateIcon(NID_INTERNAL &p_nid);
 	eUpdateResult DeleteIcon(NID_INTERNAL &p_nid);
-	eUpdateResult DeleteIcon(HWND p_HWnd, UINT p_uID);
+	eUpdateResult VersionIcon(NID_INTERNAL &p_nid);
+	eUpdateResult FocusIcon(NID_INTERNAL &p_nid);
 	NotificationIcon *LookupIcon(HWND p_hwnd, UINT p_uID);
+	NotificationIcon *LookupIcon(UINT p_index);
 
 	IconList m_IconList;
 

@@ -16,7 +16,9 @@ struct SHELLTRAYDATA
 
 NotifyIconHandler::NotifyIconHandler(LegacyNotficationIconFactory p_legacyFactory)
 {
-	//ctor
+	createdCallback = NULL;
+	modifiedCallback = NULL;
+	deletedCallback = NULL;
 }
 
 NotifyIconHandler::~NotifyIconHandler()
@@ -140,7 +142,7 @@ HRESULT NotifyIconHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 			{
 				lstrcpyW(realNid.szTip, uniNid.szTip);
 			}
-			bool result = UpdateIcon(realNid);
+			eUpdateResult result = UpdateIcon(realNid);
 			if (NIM_ADD == trayData->dwMessage)
 			{
 				if (result & ICON_ADDED)
@@ -185,9 +187,53 @@ HRESULT NotifyIconHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 			break;
 
 		}
-
+	case NIM_SETVERSION:
+	{
+		switch (p_cbData)
+		{
+		case NID_VISTAA_SIZE:
+		case NID_XPA_SIZE:
+		case NID_2KA_SIZE:
+			realNid.uVersion = ansiNid.uVersion;
+			break;
+		case NID_VISTAW_SIZE:
+		case NID_XPW_SIZE:
+		case NID_2KW_SIZE:
+			realNid.uVersion = uniNid.uVersion;
+			break;
+		}
+		eUpdateResult result = VersionIcon(realNid);
+		if (result & ICON_MODIFIED)
+		{
+			return TRUE;
+		}
+		else
+		{
+			return FALSE;
+		}
+	}
+	case NIM_DELETE:
+		break;
+	case NIM_SETFOCUS:
+		break;
 	}
 	return FALSE;
+}
+
+void NotifyIconHandler::RegisterCallback(eTrayCallbackType p_type, NotificationIconCallback p_callback)
+{
+	switch (p_type)
+	{
+	case TCALLBACK_ADD:
+		createdCallback = p_callback;
+		break;
+	case TCALLBACK_MOD:
+		modifiedCallback = p_callback;
+		break;
+	case TCALLBACK_DEL:
+		deletedCallback = p_callback;
+		break;
+	}
 }
 
 eUpdateResult NotifyIconHandler::UpdateIcon(NID_INTERNAL & p_nid)
@@ -199,11 +245,11 @@ eUpdateResult NotifyIconHandler::UpdateIcon(NID_INTERNAL & p_nid)
 	{
 		if (m_legacyFactory)
 		{
-			icon = new NotificationIcon(m_legacyFactory());
+			icon = new NotificationIcon(m_legacyFactory(), this);
 		}
 		else
 		{
-			icon = new NotificationIcon(NULL);
+			icon = new NotificationIcon(NULL, this);
 		}
 	}
 	else
@@ -211,6 +257,144 @@ eUpdateResult NotifyIconHandler::UpdateIcon(NID_INTERNAL & p_nid)
 		icon = *position;
 	}
 	return icon->UpdateIcon(p_nid);
+}
+
+eUpdateResult NotifyIconHandler::DeleteIcon(NID_INTERNAL & p_nid)
+{
+	return DeleteIcon(p_nid.hWnd, p_nid.uID);
+}
+
+eUpdateResult NotifyIconHandler::DeleteIcon(HWND p_hWnd, UINT p_uID)
+{
+	NotificationIconPredicate iconTest(p_hWnd, p_uID);
+	IconList::iterator position = std::find_if(m_IconList.begin(), m_IconList.end(), iconTest);
+	if (m_IconList.end() != position)
+	{
+		IconList::iterator prev =  position;
+		IconList::iterator next =  position;
+		NotificationIcon *nextIcon = NULL;
+		next++;
+		if (m_IconList.end() != next)
+		{
+			nextIcon = *next;
+		}
+		NotificationIcon *prevIcon = NULL;
+		if (m_IconList.begin() != prev)
+		{
+			prev--;
+			prevIcon = *prev;
+		}
+		nextIcon->m_legacyData->updateLegacyPrev(prevIcon);
+		prevIcon->m_legacyData->updateLegacyNext(nextIcon);
+		delete (*position);
+		m_IconList.erase(position);
+		return ICON_DELETED;
+	}
+	else
+	{
+		return static_cast<eUpdateResult>(0);
+	}
+}
+
+bool NotifyIconHandler::GetNotificationIconInfo(UINT p_index, PVOID p_return[], eNotificationIconInfo p_info[], UINT p_count)
+{
+	NotificationIcon *icon = LookupIcon(p_index);
+	if (icon)
+	{
+		return GetNotificationIconInfo(icon, p_return, p_info, p_count);
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool NotifyIconHandler::GetNotificationIconInfo(HWND p_hWnd, UINT p_uID, PVOID p_return[], eNotificationIconInfo p_info[], UINT p_count)
+{
+	NotificationIcon *icon = LookupIcon(p_hWnd, p_uID);
+	if (icon)
+	{
+		return GetNotificationIconInfo(icon, p_return, p_info, p_count);
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool NotifyIconHandler::GetNotificationIconInfo(NotificationIcon *p_icon, PVOID p_return[], eNotificationIconInfo p_info[], UINT p_count)
+{
+	for (UINT i=0; i<p_count; ++i)
+	{
+		switch (p_info[i])
+		{
+		case NI_CALLBACKMESSAGE:
+			p_return[i] = reinterpret_cast<PVOID>(p_icon->m_uCallbackMessage);
+			break;
+		case NI_HWND:
+			p_return[i] = reinterpret_cast<PVOID>(p_icon->m_hWnd);
+			break;
+		case NI_ICON:
+			p_return[i] = reinterpret_cast<PVOID>(p_icon->m_hIcon);
+			break;
+		case NI_ID:
+			p_return[i] = reinterpret_cast<PVOID>(p_icon->m_uID);
+			break;
+		case NI_INFOFLAGS:
+			p_return[i] = reinterpret_cast<PVOID>(p_icon->m_dwInfoFlags);
+			break;
+		case NI_INFOICON:
+			p_return[i] = reinterpret_cast<PVOID>(p_icon->m_hBalloonIcon);
+			break;
+		case NI_INFOTEXT:
+			p_return[i] = reinterpret_cast<PVOID>(p_icon->m_szInfo);
+			break;
+		case NI_INFOTIMEOUT:
+			p_return[i] = reinterpret_cast<PVOID>(p_icon->m_uTimeout);
+			break;
+		case NI_INFOTITLE:
+			p_return[i] = reinterpret_cast<PVOID>(p_icon->m_szInfoTitle);
+			break;
+		case NI_TIP:
+			p_return[i] = reinterpret_cast<PVOID>(p_icon->m_szTip);
+			break;
+		case NI_VERSION:
+			p_return[i] = reinterpret_cast<PVOID>(p_icon->m_uVersion);
+			break;
+		case NI_LEGACY:
+			p_return[i] = reinterpret_cast<PVOID>(p_icon->m_legacyData);
+			break;
+		default:
+			return false;
+		}
+	}
+	return true;
+}
+
+eUpdateResult NotifyIconHandler::FocusIcon(NID_INTERNAL & p_nid)
+{
+	return static_cast<eUpdateResult>(0);
+}
+
+eUpdateResult NotifyIconHandler::VersionIcon(NID_INTERNAL & p_nid)
+{
+	NotificationIconPredicate iconTest(p_nid.hWnd, p_nid.uID);
+	IconList::iterator position = std::find_if(m_IconList.begin(), m_IconList.end(), iconTest);
+	if (m_IconList.end() != position)
+	{
+		return (*position)->VersionIcon(p_nid);
+	}
+	else
+	{
+		return static_cast<eUpdateResult>(0);
+	}
+}
+
+NotificationIcon *NotifyIconHandler::LookupIcon(UINT p_index)
+{
+	IconList::iterator n = m_IconList.begin();
+	advance(n, p_index);
+	return *n;
 }
 
 }
