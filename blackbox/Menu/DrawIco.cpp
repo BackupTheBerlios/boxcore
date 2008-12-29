@@ -14,9 +14,11 @@ void perform_satnhue(BYTE *pixels, int size, int saturationValue, int hueIntensi
 	mask = pixels;
 	unsigned next_ico = size * size * 4;
 	int y = size;
-	do {
+	do
+	{
 		int x = size;
-		do {
+		do
+		{
 			if (0 == *mask)
 			{
 				back = (icon = mask + next_ico) + next_ico;

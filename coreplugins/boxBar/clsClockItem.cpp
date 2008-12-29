@@ -50,11 +50,11 @@ LRESULT clsClockItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case BB_RECONFIGURE:
-		{
-			readSettings();
-			calculateSizes();
-			return 0;
-		}
+	{
+		readSettings();
+		calculateSizes();
+		return 0;
+	}
 	}
 
 	return clsLabelItem::wndProc(hWnd, msg, wParam, lParam);

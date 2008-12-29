@@ -53,14 +53,21 @@ LPCSTR pluginInfo(int field)
 {
 	switch (field)
 	{
-		default:
-		case 0: return szVersion;
-		case 1: return szAppName;
-		case 2: return szInfoVersion;
-		case 3: return szInfoAuthor;
-		case 4: return szInfoRelDate;
-		case 5: return szInfoLink;
-		case 6: return szInfoEmail;
+	default:
+	case 0:
+		return szVersion;
+	case 1:
+		return szAppName;
+	case 2:
+		return szInfoVersion;
+	case 3:
+		return szInfoAuthor;
+	case 4:
+		return szInfoRelDate;
+	case 5:
+		return szInfoLink;
+	case 6:
+		return szInfoEmail;
 	}
 }
 
@@ -85,8 +92,10 @@ struct HotkeyType
 
 const char* stristr(const char *aa, const char *bb)
 {
-	do {
-		const char *a, *b; char c, d;
+	do
+	{
+		const char *a, *b;
+		char c, d;
 		for (a = aa, b = bb;;++a, ++b)
 		{
 			if (0 == (c = *b)) return aa;
@@ -94,7 +103,8 @@ const char* stristr(const char *aa, const char *bb)
 				if (d != 32 || (c |= 32) < 'a' || c > 'z')
 					break;
 		}
-	} while (*aa++);
+	}
+	while (*aa++);
 	return NULL;
 }
 
@@ -112,7 +122,8 @@ void set_kbdhook(bool set)
 
 	if (set && NULL == hdll)
 	{
-		char path[MAX_PATH]; int nLen;
+		char path[MAX_PATH];
+		int nLen;
 		GetModuleFileName(m_hMainInstance, path, sizeof(path));
 		nLen = strlen(path);
 		while (nLen && path[nLen-1] != '\\') nLen--;
@@ -136,7 +147,8 @@ void set_kbdhook(bool set)
 
 int getvalue(char *from, char *token, char *to, bool from_right)
 {
-	const char *p, *q; int l=0;
+	const char *p, *q;
+	int l=0;
 	if (NULL!=(p=stristr(from, token)))
 	{
 		p += strlen(token);
@@ -150,14 +162,17 @@ int getvalue(char *from, char *token, char *to, bool from_right)
 
 void BBKeys_LoadHotkeys(HWND hwnd)
 {
-	char rcpath[MAX_PATH]; int i;
+	char rcpath[MAX_PATH];
+	int i;
 	GetModuleFileName(m_hMainInstance, rcpath, sizeof(rcpath));
 	for (i=0;;)
 	{
 		int nLen = strlen(rcpath);
 		while (nLen && rcpath[nLen-1] != '\\') nLen--;
-		strcpy(rcpath+nLen, "bbkeysrc");  if (FileExists(rcpath)) break;
-		strcpy(rcpath+nLen, "bbkeys.rc"); if (FileExists(rcpath)) break;
+		strcpy(rcpath+nLen, "bbkeysrc");
+		if (FileExists(rcpath)) break;
+		strcpy(rcpath+nLen, "bbkeys.rc");
+		if (FileExists(rcpath)) break;
 		if (2 == ++i)
 		{
 			return;
@@ -208,7 +223,11 @@ void BBKeys_LoadHotkeys(HWND hwnd)
 
 		if (keytograb[1])
 		{
-			static const struct vkTable { const char* key; int vKey; } vkTable[] =
+			static const struct vkTable
+			{
+				const char* key;
+				int vKey;
+			} vkTable[] =
 			{
 				{"F1", VK_F1},
 				{"F2", VK_F2},
@@ -272,13 +291,13 @@ void BBKeys_LoadHotkeys(HWND hwnd)
 			};
 			const struct vkTable *v = vkTable;
 			do if (!strcmp(v->key, keytograb))
-			{
-				ch = v->vKey;
-				goto found;
-			}
+				{
+					ch = v->vKey;
+					goto found;
+				}
 			while ((++v)->key);
 			if (keytograb[0] == 'V' && keytograb[1] == 'K'
-			  && keytograb[2] >= '0' && keytograb[2] <= '9')
+					&& keytograb[2] >= '0' && keytograb[2] <= '9')
 			{
 				ch = atoi(keytograb+2);
 				goto found;
@@ -295,8 +314,8 @@ found:
 		if (VK_LWIN == ch || VK_RWIN == ch)
 			set_kbdhook(true);
 		else
-		if (0==RegisterHotKey(hwnd, ID, sub, ch))
-			continue;
+			if (0==RegisterHotKey(hwnd, ID, sub, ch))
+				continue;
 
 		//dbg_printf("registered: %02X %02X %s", ch, sub, action);
 
@@ -315,7 +334,8 @@ found:
 //===========================================================================
 void BBKeys_FreeHotkeys(HWND hwnd)
 {
-	HotkeyType * h; int ID = 0;
+	HotkeyType * h;
+	int ID = 0;
 	dolist (h, m_hotKeys)
 	{
 		UnregisterHotKey(hwnd, ID++);
@@ -341,9 +361,9 @@ void send_command(HotkeyType *h)
 		//replace "@BBCore.ShowMenu ..." by "@BBCore.ShowMenuKBD ..."
 		static const char show_menu[] = "@BBCore.ShowMenu";
 		if (0 == memicmp(h->szAction, show_menu, sizeof show_menu - 1)
-		 && (0 == h->szAction[sizeof show_menu - 1]
-			 || ' ' == h->szAction[sizeof show_menu - 1]
-			 ))
+				&& (0 == h->szAction[sizeof show_menu - 1]
+					|| ' ' == h->szAction[sizeof show_menu - 1]
+				   ))
 		{
 			sprintf(buffer, "%sKBD%s", show_menu, action + sizeof show_menu - 1);
 			action = buffer;
@@ -363,46 +383,47 @@ void send_command(HotkeyType *h)
 LRESULT CALLBACK HotkeyProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static int msgs[] = {BB_RECONFIGURE, BB_WINKEY, 0};
-	HotkeyType *h; unsigned sub;
+	HotkeyType *h;
+	unsigned sub;
 
 	switch (message)
 	{
-		case WM_CREATE:
-			SendMessage(BBhwnd, BB_REGISTERMESSAGE, (WPARAM)hwnd, (LPARAM)msgs);
-			BBKeys_LoadHotkeys(hwnd);
-			break;
+	case WM_CREATE:
+		SendMessage(BBhwnd, BB_REGISTERMESSAGE, (WPARAM)hwnd, (LPARAM)msgs);
+		BBKeys_LoadHotkeys(hwnd);
+		break;
 
-		case WM_DESTROY:
-			SendMessage(BBhwnd, BB_UNREGISTERMESSAGE, (WPARAM)hwnd, (LPARAM)msgs);
-			BBKeys_FreeHotkeys(hwnd);
-			break;
+	case WM_DESTROY:
+		SendMessage(BBhwnd, BB_UNREGISTERMESSAGE, (WPARAM)hwnd, (LPARAM)msgs);
+		BBKeys_FreeHotkeys(hwnd);
+		break;
 
-		case BB_RECONFIGURE:
-			OutputDebugString(TEXT("BBKeys reconfigure"));
-			BBKeys_FreeHotkeys(hwnd);
-			BBKeys_LoadHotkeys(hwnd);
-			break;
+	case BB_RECONFIGURE:
+		OutputDebugString(TEXT("BBKeys reconfigure"));
+		BBKeys_FreeHotkeys(hwnd);
+		BBKeys_LoadHotkeys(hwnd);
+		break;
 
-		default:
-			return DefWindowProc(hwnd, message, wParam, lParam);
+	default:
+		return DefWindowProc(hwnd, message, wParam, lParam);
 
-		case BB_WINKEY:
-			sub = 0;
-			if (0x8000 & GetAsyncKeyState(VK_SHIFT))    sub |=MOD_SHIFT;
-			if (0x8000 & GetAsyncKeyState(VK_CONTROL))  sub |=MOD_CONTROL;
-			if (0x8000 & GetAsyncKeyState(VK_MENU))     sub |=MOD_ALT;
-			dolist (h, m_hotKeys)
-				if (wParam == h->ch && sub == h->sub)
-				{
-					send_command(h);
-					break;
-				}
+	case BB_WINKEY:
+		sub = 0;
+		if (0x8000 & GetAsyncKeyState(VK_SHIFT))    sub |=MOD_SHIFT;
+		if (0x8000 & GetAsyncKeyState(VK_CONTROL))  sub |=MOD_CONTROL;
+		if (0x8000 & GetAsyncKeyState(VK_MENU))     sub |=MOD_ALT;
+		dolist (h, m_hotKeys)
+		if (wParam == h->ch && sub == h->sub)
+		{
+			send_command(h);
 			break;
+		}
+		break;
 
-		case WM_HOTKEY:
-			h = (HotkeyType*)nth_node(m_hotKeys, wParam);
-			if (h) send_command(h);
-			break;
+	case WM_HOTKEY:
+		h = (HotkeyType*)nth_node(m_hotKeys, wParam);
+		if (h) send_command(h);
+		break;
 	}
 	return 0;
 }
@@ -441,17 +462,17 @@ int beginPlugin(HINSTANCE hPluginInstance)
 	if (!RegisterClass(&wc)) return 1;
 
 	hKeysWnd = CreateWindowEx(
-		WS_EX_TOOLWINDOW,       // exstyles
-		wc.lpszClassName,       // our window class name
-		NULL,                   // use description for a window title
-		WS_POPUP,
-		0, 0,                   // position
-		0, 0,                   // width & height of window
-		NULL,                   // parent window
-		NULL,                   // no menu
-		m_hMainInstance,        // hInstance of DLL
-		NULL
-		);
+				   WS_EX_TOOLWINDOW,       // exstyles
+				   wc.lpszClassName,       // our window class name
+				   NULL,                   // use description for a window title
+				   WS_POPUP,
+				   0, 0,                   // position
+				   0, 0,                   // width & height of window
+				   NULL,                   // parent window
+				   NULL,                   // no menu
+				   m_hMainInstance,        // hInstance of DLL
+				   NULL
+			   );
 
 	return 0;
 }

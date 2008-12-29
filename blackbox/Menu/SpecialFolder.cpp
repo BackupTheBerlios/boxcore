@@ -39,7 +39,7 @@
 //===========================================================================
 
 SpecialFolderItem::SpecialFolderItem(LPCSTR pszTitle, const char *pszPath, struct pidl_node* pidl_list, const char  *optional_command)
-	: FolderItem(NULL, pszTitle)
+		: FolderItem(NULL, pszTitle)
 {
 	m_pidl_list = pidl_list;
 	m_ItemID    = MENUITEM_ID_SF;
@@ -83,7 +83,8 @@ static void exec_folder_click(const struct _ITEMIDLIST * pidl)
 	const char *p = ReadString(extensionsrcPath(), "blackbox.options.openFolderCommand:", NULL);
 	if (p)
 	{
-		char path[MAX_PATH]; char buffer[MAX_PATH*2];
+		char path[MAX_PATH];
+		char buffer[MAX_PATH*2];
 		if (sh_get_displayname(NULL, pidl, SHGDN_FORPARSING, path))
 		{
 			post_command(replace_argument1(buffer, p, path));
@@ -129,7 +130,7 @@ void SpecialFolderItem::Invoke(int button)
 // SpecialFolder
 //===========================================================================
 SpecialFolder::SpecialFolder(const char *pszTitle, const struct pidl_node *pidl_list, const char  *optional_command)
-	: Menu(pszTitle)
+		: Menu(pszTitle)
 {
 	m_MenuID    = MENU_ID_SF;   // ID
 	m_pidl_list = NULL;         // the list of pidl
@@ -154,7 +155,7 @@ SpecialFolder::~SpecialFolder()
 
 //================================================
 void SpecialFolder::UpdateFolder(void)
-{ 
+{
 	// ---------------------------------------
 	// remember the active item as text
 
@@ -169,11 +170,12 @@ void SpecialFolder::UpdateFolder(void)
 	DeleteMenuItems();
 
 	// load the folder contents
-	MenuItem *Items = NULL; int r = 0;
+	MenuItem *Items = NULL;
+	int r = 0;
 
 	struct pidl_node *p;
 	dolist (p, m_pidl_list)
-		r |= MenuMaker_LoadFolder(&Items, p->v, m_pszExtra);
+	r |= MenuMaker_LoadFolder(&Items, p->v, m_pszExtra);
 
 	if (Items) add_folder_contents(Items, NULL != m_pidl_list->next);
 	else if (r) MakeMenuNOP(this, NLS0("No Files"));
@@ -185,8 +187,8 @@ void SpecialFolder::UpdateFolder(void)
 	if (active_item_text)
 	{
 		dolist (ActiveItem, m_pMenuItems)
-			if (0 == strcmp(active_item_text, ActiveItem->m_pszTitle))
-				break;
+		if (0 == strcmp(active_item_text, ActiveItem->m_pszTitle))
+			break;
 
 		m_free(active_item_text);
 	}
@@ -219,30 +221,30 @@ void join_folders(SpecialFolderItem *i1st)
 {
 	SpecialFolderItem *i2nd;
 	if (i1st) while (NULL != (i2nd = (SpecialFolderItem *)i1st->next))
-	{
-		if (0 == stricmp(i1st->m_pszTitle, i2nd->m_pszTitle))
 		{
-			if (i1st->m_ItemID == MENUITEM_ID_SF && i2nd->m_ItemID == MENUITEM_ID_SF)
+			if (0 == stricmp(i1st->m_pszTitle, i2nd->m_pszTitle))
 			{
-				// if both are folders
-				if (i2nd->m_pidl_list->v)
+				if (i1st->m_ItemID == MENUITEM_ID_SF && i2nd->m_ItemID == MENUITEM_ID_SF)
 				{
-					append_node(&i1st->m_pidl_list, i2nd->m_pidl_list);
-					i2nd->m_pidl_list = NULL;
+					// if both are folders
+					if (i2nd->m_pidl_list->v)
+					{
+						append_node(&i1st->m_pidl_list, i2nd->m_pidl_list);
+						i2nd->m_pidl_list = NULL;
+					}
+join:
+					i1st->next = i2nd->next, delete i2nd;
+					continue;
 				}
-			join:
-				i1st->next = i2nd->next, delete i2nd;
-				continue;
-			}
 
-			if (i1st->m_ItemID != MENUITEM_ID_SF && i2nd->m_ItemID != MENUITEM_ID_SF)
-			{
-				// if both are not folders
-				goto join;
+				if (i1st->m_ItemID != MENUITEM_ID_SF && i2nd->m_ItemID != MENUITEM_ID_SF)
+				{
+					// if both are not folders
+					goto join;
+				}
 			}
+			i1st = i2nd;
 		}
-		i1st = i2nd;
-	}
 }
 
 //===========================================================================
@@ -250,7 +252,8 @@ void join_folders(SpecialFolderItem *i1st)
 
 int SpecialFolder_Compare(MenuItem** m1, MenuItem** m2)
 {
-	int f,x,y,z; const char *a1,*b1,*a2,*b2;
+	int f,x,y,z;
+	const char *a1,*b1,*a2,*b2;
 
 	if (0 != (z = (*m2)->m_nSortPriority - (f = (*m1)->m_nSortPriority)))
 		return z;
@@ -259,7 +262,8 @@ int SpecialFolder_Compare(MenuItem** m1, MenuItem** m2)
 	b1=(*m2)->m_pszTitle;
 
 	if (false == Settings_menusExtensionSort || f == M_SORT_NAME || f == M_SORT_FOLDER)
-		p1: return stricmp(a1, b1);
+p1:
+		return stricmp(a1, b1);
 
 	a2=strrchr(a1,'.');
 	b2=strrchr(b1,'.');
@@ -282,19 +286,23 @@ int SpecialFolder_Compare(MenuItem** m1, MenuItem** m2)
 
 MenuItem * MenuItem::Sort(int(*cmp_fn)(MenuItem**,MenuItem**))
 {
-	MenuItem *item; int n = 0, s;
+	MenuItem *item;
+	int n = 0, s;
 	dolist(item, this) n++;  // get size
 	if (n < 2) return this;
 	MenuItem **a = (MenuItem**)m_alloc(n * sizeof item); // make array
-	n = 0; dolist(item, this) a[n] = item, n++; // store pointers
+	n = 0;
+	dolist(item, this) a[n] = item, n++; // store pointers
 	qsort(a, n, sizeof *a, (int(*)(const void*,const void*))cmp_fn);
 	s = n - 1;
-	do a[--n]->next = item, item = a[n]; while (n); // make list
+	do a[--n]->next = item, item = a[n];
+	while (n); // make list
 
 	if (Settings_menusSeparateFolders && 0 == (MENUITEM_ID_FOLDER & a[s]->m_ItemID))
 	{
 		// find the last folder
-		do item = a[--s]; while(s && 0 == (MENUITEM_ID_FOLDER & item->m_ItemID));
+		do item = a[--s];
+		while (s && 0 == (MENUITEM_ID_FOLDER & item->m_ItemID));
 		if (MENUITEM_ID_FOLDER & item->m_ItemID)
 		{
 			MenuItem* sepItem = new MenuItem("");

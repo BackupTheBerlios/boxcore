@@ -6,14 +6,14 @@ typedef WINAPI BOOL (*fnAlphaBlend)(HDC hdcDest,int xoriginDest,int yoriginDest,
 
 class clsMsimg32
 {
-	public:
-		clsMsimg32();
-		~clsMsimg32();
+public:
+	clsMsimg32();
+	~clsMsimg32();
 
 	fnAlphaBlend AlphaBlend;
-	protected:
-		HMODULE hModule;
-	private:
+protected:
+	HMODULE hModule;
+private:
 };
 
 #endif // CLSMSIMG32_H

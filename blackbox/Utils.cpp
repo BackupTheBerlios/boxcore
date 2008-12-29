@@ -42,13 +42,16 @@
 int BBMessageBox(int flg, const char *fmt, ...)
 {
 	char buffer[10000], *msg = buffer, *caption = "bbLean", *p;
-	va_list arg; va_start(arg, fmt); vsprintf (buffer, fmt, arg);
+	va_list arg;
+	va_start(arg, fmt);
+	vsprintf (buffer, fmt, arg);
 	if ('#' == msg[0] && NULL != (p = strchr(msg+1, msg[0])))
 		caption = msg+1, *p=0, msg = p+1;
 
 	//return MessageBox (BBhwnd, msg, caption, flg | MB_SYSTEMMODAL | MB_SETFOREGROUND);
 
-	MSGBOXPARAMS mp; ZeroMemory(&mp, sizeof mp);
+	MSGBOXPARAMS mp;
+	ZeroMemory(&mp, sizeof mp);
 	mp.cbSize = sizeof mp;
 	mp.hInstance = hMainInstance;
 	//mp.hwndOwner = NULL;
@@ -67,9 +70,9 @@ int BBMessageBox(int flg, const char *fmt, ...)
 
 BOOL BBRegisterClass (WNDCLASS *pWC)
 {
-	if(RegisterClass(pWC)) return 1;
+	if (RegisterClass(pWC)) return 1;
 	BBMessageBox(MB_OK, NLS2("$BBError_RegisterClass$",
-		"Error: Could not register \"%s\" window class."), pWC->lpszClassName);
+							 "Error: Could not register \"%s\" window class."), pWC->lpszClassName);
 	return 0;
 }
 
@@ -92,10 +95,10 @@ COLORREF mixcolors(COLORREF c1, COLORREF c2, int f)
 {
 	int n = 255 - f;
 	return RGB(
-		(GetRValue(c1)*f+GetRValue(c2)*n)/256,
-		(GetGValue(c1)*f+GetGValue(c2)*n)/256,
-		(GetBValue(c1)*f+GetBValue(c2)*n)/256
-		);
+			   (GetRValue(c1)*f+GetRValue(c2)*n)/256,
+			   (GetGValue(c1)*f+GetGValue(c2)*n)/256,
+			   (GetBValue(c1)*f+GetBValue(c2)*n)/256
+		   );
 }
 
 COLORREF shadecolor(COLORREF c, int f)
@@ -103,9 +106,12 @@ COLORREF shadecolor(COLORREF c, int f)
 	int r = (int)GetRValue(c) + f;
 	int g = (int)GetGValue(c) + f;
 	int b = (int)GetBValue(c) + f;
-	if (r < 0) r = 0; if (r > 255) r = 255;
-	if (g < 0) g = 0; if (g > 255) g = 255;
-	if (b < 0) b = 0; if (b > 255) b = 255;
+	if (r < 0) r = 0;
+	if (r > 255) r = 255;
+	if (g < 0) g = 0;
+	if (g > 255) g = 255;
+	if (b < 0) b = 0;
+	if (b > 255) b = 255;
 	return RGB(r, g, b);
 }
 
@@ -126,21 +132,25 @@ void draw_line_h(HDC hDC, int x1, int x2, int y, int w, COLORREF C)
 		MoveToEx(hDC, x1, y, NULL);
 		LineTo  (hDC, x2, y);
 		++y;
-	} while (--w);
+	}
+	while (--w);
 	DeleteObject(SelectObject(hDC, oldPen));
 }
 
 /*----------------------------------------------------------------------------*/
 
-int imax(int a, int b) {
+int imax(int a, int b)
+{
 	return a>b?a:b;
 }
 
-int imin(int a, int b) {
+int imin(int a, int b)
+{
 	return a<b?a:b;
 }
 
-int iminmax(int a, int b, int c) {
+int iminmax(int a, int b, int c)
+{
 	if (a<b) a=b;
 	if (a>c) a=c;
 	return a;
@@ -187,7 +197,8 @@ char *strcpy_max(char *dest, const char *src, int maxlen)
 
 const char* stristr(const char *aa, const char *bb)
 {
-	const char *a, *b; char c, d;
+	const char *a, *b;
+	char c, d;
 	do
 	{
 		for (a = aa, b = bb;;++a, ++b)
@@ -197,7 +208,8 @@ const char* stristr(const char *aa, const char *bb)
 				if (d != 32 || (c |= 32) < 'a' || c > 'z')
 					break;
 		}
-	} while (*aa++);
+	}
+	while (*aa++);
 
 	return NULL;
 }
@@ -232,7 +244,10 @@ const char *get_ext(const char *path)
 {
 	int nLen = strlen(path);
 	int n = nLen;
-	while (n) { if (path[--n] == '.') return path + n; }
+	while (n)
+	{
+		if (path[--n] == '.') return path + n;
+	}
 	return path + nLen;
 }
 
@@ -303,8 +318,11 @@ bool is_relative_path(const char *path)
 
 char *replace_slashes(char *buffer, const char *path)
 {
-	const char *p = path; char *b = buffer; char c;
-	do *b++ = '/' == (c = *p++) ? '\\' : c; while (c);
+	const char *p = path;
+	char *b = buffer;
+	char c;
+	do *b++ = '/' == (c = *p++) ? '\\' : c;
+	while (c);
 	return buffer;
 }
 
@@ -316,7 +334,8 @@ char *replace_slashes(char *buffer, const char *path)
 
 char *add_slash(char *d, const char *s)
 {
-	int l; memcpy(d, s, l = strlen(s));
+	int l;
+	memcpy(d, s, l = strlen(s));
 	if (l && !IS_SLASH(d[l-1])) d[l++] = '\\';
 	d[l] = 0;
 	return d;
@@ -385,7 +404,8 @@ int get_false_true(const char *arg)
 	{
 		if (0==stricmp(arg, "true")) return true;
 		if (0==stricmp(arg, "false")) return false;
-	} return -1;
+	}
+	return -1;
 }
 
 const char *false_true_string(bool f)
@@ -419,7 +439,8 @@ char *replace_argument1(char *d, const char *s, const char *arg)
 
 void arrow_bullet (HDC buf, int x, int y, int d)
 {
-	int s = mStyle.bulletUnix ? 1 : 2; int e = d;
+	int s = mStyle.bulletUnix ? 1 : 2;
+	int e = d;
 
 	if (Settings_arrowUnix)
 		x-=d*s, d+=d, e = 0;
@@ -448,7 +469,7 @@ void BitBltRect(HDC hdc_to, HDC hdc_from, RECT *r)
 		hdc_from,
 		r->left, r->top,
 		SRCCOPY
-		);
+	);
 }
 
 //===========================================================================
@@ -456,7 +477,8 @@ void BitBltRect(HDC hdc_to, HDC hdc_from, RECT *r)
 //===========================================================================
 HWND GetRootWindow(HWND hwnd)
 {
-	HWND pw; HWND dw = GetDesktopWindow();
+	HWND pw;
+	HWND dw = GetDesktopWindow();
 	while (NULL != (pw = GetParent(hwnd)) && dw != pw) hwnd = pw;
 	return hwnd;
 }
@@ -507,31 +529,36 @@ void log_printf(int flag, const char *fmt, ...)
 		{
 			char log_path[MAX_PATH];
 			hlog_file = CreateFile(
-				make_bb_path(log_path, "blackbox.log"),
-				GENERIC_WRITE,
-				FILE_SHARE_READ,
-				NULL,
-				OPEN_ALWAYS,
-				FILE_ATTRIBUTE_NORMAL,
-				NULL
-				);
+							make_bb_path(log_path, "blackbox.log"),
+							GENERIC_WRITE,
+							FILE_SHARE_READ,
+							NULL,
+							OPEN_ALWAYS,
+							FILE_ATTRIBUTE_NORMAL,
+							NULL
+						);
 
 			SetFilePointer(hlog_file, 0, NULL, FILE_END);
-			char date[32]; _strdate(date);
-			char time[10]; _strtime(time);
+			char date[32];
+			_strdate(date);
+			char time[10];
+			_strtime(time);
 			log_printf(flag, "\nStarting Log %s %s\n", date, time);
 		}
 
-		char buffer[4096]; buffer[0] = 0;
+		char buffer[4096];
+		buffer[0] = 0;
 		if ('\n' != *fmt)
 		{
 			if (0 == (0x8000 & flag)) _strtime(buffer);
 			strcat(buffer, "  ");
 		}
-		va_list arg; va_start(arg, fmt);
+		va_list arg;
+		va_start(arg, fmt);
 		vsprintf (buffer+strlen(buffer), fmt, arg);
 		strcat(buffer, "\n");
-		DWORD written; WriteFile(hlog_file, buffer, strlen(buffer), &written, NULL);
+		DWORD written;
+		WriteFile(hlog_file, buffer, strlen(buffer), &written, NULL);
 	}
 }
 
@@ -547,7 +574,8 @@ void reset_logging(void)
 void dbg_printf (const char *fmt, ...)
 {
 	char buffer[4096];
-	va_list arg; va_start(arg, fmt);
+	va_list arg;
+	va_start(arg, fmt);
 	vsprintf (buffer, fmt, arg);
 	strcat(buffer, "\n");
 	OutputDebugString(buffer);
@@ -558,7 +586,8 @@ void dbg_window(HWND window, const char *fmt, ...)
 	char buffer[4096];
 	int x = GetClassName(window, buffer, sizeof buffer);
 	x += sprintf(buffer+x, " <%lX>: ", (DWORD_PTR)window);
-	va_list arg; va_start(arg, fmt);
+	va_list arg;
+	va_start(arg, fmt);
 	vsprintf (buffer+x, fmt, arg);
 	strcat(buffer, "\n");
 	OutputDebugString(buffer);
@@ -602,30 +631,31 @@ int GetAppByWindow(HWND Window, LPSTR processName)
 
 			me.dwSize = sizeof(me);
 			if (pModule32First(hPr, &me))
-			do
-				if (me.hModule == hi)
-				{
-					strcpy(processName, me.szModule);
-					break;
-				}
-			while (pModule32Next(hPr, &me));
+				do
+					if (me.hModule == hi)
+					{
+						strcpy(processName, me.szModule);
+						break;
+					}
+				while (pModule32Next(hPr, &me));
 			CloseHandle(hPr);
 		}
 	}
 	else
-	if (pGetModuleBaseName && pEnumProcessModules)
-	{
-		HMODULE hMod; DWORD cbNeeded;
-		hPr = OpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_VM_READ, FALSE, pid);
-		if (hPr != NULL)
+		if (pGetModuleBaseName && pEnumProcessModules)
 		{
-			if(pEnumProcessModules(hPr, &hMod, sizeof(hMod), &cbNeeded))
+			HMODULE hMod;
+			DWORD cbNeeded;
+			hPr = OpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_VM_READ, FALSE, pid);
+			if (hPr != NULL)
 			{
-				pGetModuleBaseName(hPr, hMod, processName, MAX_PATH);
+				if (pEnumProcessModules(hPr, &hMod, sizeof(hMod), &cbNeeded))
+				{
+					pGetModuleBaseName(hPr, hMod, processName, MAX_PATH);
+				}
+				CloseHandle(hPr);
 			}
-			CloseHandle(hPr);
 		}
-	}
 
 	// dbg_printf("appname = %s\n", processName);
 	return strlen(processName);
@@ -642,7 +672,7 @@ int GetAppByWindow(HWND Window, LPSTR processName)
 BOOL CALLBACK dlgproc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	static char *buffer;
-	switch( msg )
+	switch ( msg )
 	{
 	case WM_INITDIALOG:
 		SetWindowText (hDlg, ((char**)lParam)[0]);
@@ -651,19 +681,23 @@ BOOL CALLBACK dlgproc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 		buffer = ((char**)lParam)[3];
 		MakeSticky(hDlg);
 		{
-			POINT p; GetCursorPos(&p);
-			RECT m; GetMonitorRect(&p, &m, GETMON_WORKAREA|GETMON_FROM_POINT);
-			RECT r; GetWindowRect(hDlg, &r);
-	#if 0
+			POINT p;
+			GetCursorPos(&p);
+			RECT m;
+			GetMonitorRect(&p, &m, GETMON_WORKAREA|GETMON_FROM_POINT);
+			RECT r;
+			GetWindowRect(hDlg, &r);
+#if 0
 			// at cursor
-			r.right -= r.left; r.bottom -= r.top;
+			r.right -= r.left;
+			r.bottom -= r.top;
 			p.x = iminmax(p.x - r.right / 2,  m.left, m.right - r.right);
 			p.y = iminmax(p.y - 10,  m.top, m.bottom - r.bottom);
-	#else
+#else
 			// center screen
 			p.x = (m.left + m.right - r.right + r.left) / 2;
 			p.y = (m.top + m.bottom - r.bottom + r.top) / 2;
-	#endif
+#endif
 			SetWindowPos(hDlg, NULL, p.x, p.y, 0, 0, SWP_NOSIZE|SWP_NOZORDER);
 		}
 		return 1;
@@ -674,7 +708,7 @@ BOOL CALLBACK dlgproc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_COMMAND:
-		switch( LOWORD( wParam ))
+		switch ( LOWORD( wParam ))
 		{
 		case IDOK:
 			GetDlgItemText (hDlg, 402, buffer, 256);
@@ -693,7 +727,7 @@ BOOL CALLBACK dlgproc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 int EditBox(const char *caption, const char *message, const char *initvalue, char *buffer)
 {
 	return DialogBoxParam(
-		NULL, MAKEINTRESOURCE(400), NULL, (DLGPROC)dlgproc, (LPARAM)&caption);
+			   NULL, MAKEINTRESOURCE(400), NULL, (DLGPROC)dlgproc, (LPARAM)&caption);
 }
 
 //===========================================================================
@@ -705,10 +739,10 @@ void SetOnTop (HWND hwnd)
 {
 	if (hwnd && IsWindowVisible(hwnd) && !(GetWindowLongPtr(hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST))
 		SetWindowPos(hwnd,
-			HWND_TOP,
-			0, 0, 0, 0,
-			SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE | SWP_NOSENDCHANGING
-			);
+					 HWND_TOP,
+					 0, 0, 0, 0,
+					 SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE | SWP_NOSENDCHANGING
+					);
 }
 
 //===========================================================================
@@ -725,9 +759,9 @@ int exec_pidl(const _ITEMIDLIST *pidl, LPCSTR verb, LPCSTR arguments)
 	ZeroMemory(&sei,sizeof(sei));
 	sei.cbSize = sizeof(sei);
 	sei.fMask = verb
-		? SEE_MASK_IDLIST | SEE_MASK_FLAG_NO_UI
-		: SEE_MASK_INVOKEIDLIST | SEE_MASK_FLAG_NO_UI
-		;
+				? SEE_MASK_IDLIST | SEE_MASK_FLAG_NO_UI
+				: SEE_MASK_INVOKEIDLIST | SEE_MASK_FLAG_NO_UI
+				;
 	//sei.hwnd = NULL;
 	sei.lpVerb = verb;
 	//sei.lpFile = NULL;
@@ -766,12 +800,12 @@ struct _SHChangeNotifyEntry
 #endif
 
 extern UINT (WINAPI *pSHChangeNotifyRegister)(
-	HWND hWnd,
-	DWORD dwFlags,
-	LONG wEventMask,
-	UINT uMsg,
-	DWORD cItems,
-	struct _SHChangeNotifyEntry *lpItems
+		HWND hWnd,
+		DWORD dwFlags,
+		LONG wEventMask,
+		UINT uMsg,
+		DWORD cItems,
+		struct _SHChangeNotifyEntry *lpItems
 	);
 
 extern BOOL (WINAPI *pSHChangeNotifyDeregister)(UINT ulID);
@@ -789,13 +823,13 @@ UINT add_change_notify_entry(HWND hwnd, const _ITEMIDLIST *pidl)
 	E.pidl = pidl;
 	E.fRecursive = FALSE;
 	return pSHChangeNotifyRegister(
-		hwnd,
-		SHCNF_ACCEPT_INTERRUPTS|SHCNF_ACCEPT_NON_INTERRUPTS|SHCNF_NO_PROXY,
-		SHCNE_ALLEVENTS,
-		BB_FOLDERCHANGED,
-		1,
-		&E
-		);
+			   hwnd,
+			   SHCNF_ACCEPT_INTERRUPTS|SHCNF_ACCEPT_NON_INTERRUPTS|SHCNF_NO_PROXY,
+			   SHCNE_ALLEVENTS,
+			   BB_FOLDERCHANGED,
+			   1,
+			   &E
+		   );
 }
 
 void remove_change_notify_entry(UINT id_notify)
@@ -839,7 +873,8 @@ int BBDrawText(HDC hDC, LPCTSTR lpString, int nCount, LPRECT lpRect, UINT uForma
 
 #ifdef BBOPT_SUPPORT_NLS
 
-struct nls {
+struct nls
+{
 	struct nls *next;
 	unsigned hash;
 	int k;
@@ -860,7 +895,8 @@ void free_nls(void)
 
 static int decode_escape(char *d, const char *s)
 {
-	char c, e, *d0 = d; do
+	char c, e, *d0 = d;
+	do
 	{
 		c = *s++;
 		if ('\\' == c)
@@ -868,15 +904,16 @@ static int decode_escape(char *d, const char *s)
 			e = *s++;
 			if ('n' == e) c = '\n';
 			else
-			if ('r' == e) c = '\r';
-			else
-			if ('t' == e) c = '\t';
-			else
-			if ('\"' == e || '\'' == e || '\\' == e) c = e;
-			else --s;
+				if ('r' == e) c = '\r';
+				else
+					if ('t' == e) c = '\t';
+					else
+						if ('\"' == e || '\'' == e || '\\' == e) c = e;
+						else --s;
 		}
 		*d++ = c;
-	} while(c);
+	}
+	while (c);
 	return d - d0 - 1;
 }
 
@@ -892,10 +929,13 @@ static void load_nls(void)
 	FILE *fp = fopen (make_bb_path(full_path, lang_file), "rb");
 	if (NULL == fp) return;
 
-	char line[4000], key[200], new_text[4000], *np; int nl;
+	char line[4000], key[200], new_text[4000], *np;
+	int nl;
 	key[0] = 0;
 
-	new_text[0] = 0; np = new_text; nl = 0;
+	new_text[0] = 0;
+	np = new_text;
+	nl = 0;
 	for (;;)
 	{
 		bool eof = false == read_next_line(fp, line, sizeof line);
@@ -912,7 +952,9 @@ static void load_nls(void)
 			if (eof) break;
 			if (' ' == s[1]) s += 2;
 			decode_escape(key, s);
-			new_text[0] = 0; np = new_text; nl = 0;
+			new_text[0] = 0;
+			np = new_text;
+			nl = 0;
 			continue;
 		}
 
@@ -942,12 +984,14 @@ const char *nls2a(const char *i, const char *p)
 
 	if (pNLS)
 	{
-		char buffer[256]; int k; unsigned hash;
+		char buffer[256];
+		int k;
+		unsigned hash;
 		hash = calc_hash(buffer, i, &k);
 		struct nls *t;
 		dolist (t, pNLS)
-			if (t->hash==hash && 0==memcmp(buffer, t->key, 1+k))
-				return t->translation;
+		if (t->hash==hash && 0==memcmp(buffer, t->key, 1+k))
+			return t->translation;
 	}
 	return p;
 }

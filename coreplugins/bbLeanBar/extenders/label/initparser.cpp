@@ -48,21 +48,34 @@ void argParser::ParseString(std::string InitString)
 	// Separate the data at spaces
 	bool quoted = false;
 	string thisChar;
-	for (int n=0; n<(int)InitString.length(); n++) {
+	for (int n=0; n<(int)InitString.length(); n++)
+	{
 		thisChar = InitString.substr(n,1);
-		if (quoted) {
-			if (thisChar == "'") {
+		if (quoted)
+		{
+			if (thisChar == "'")
+			{
 				quoted = false;
-			} else {
+			}
+			else
+			{
 				argwords[ParsedArguments].append(thisChar);
 			}
-		} else {
-			if (thisChar == "'") {
+		}
+		else
+		{
+			if (thisChar == "'")
+			{
 				quoted = true;
-			} else {
-				if (thisChar != " ") {
+			}
+			else
+			{
+				if (thisChar != " ")
+				{
 					argwords[ParsedArguments].append(thisChar);
-				} else {
+				}
+				else
+				{
 					ParsedArguments++;
 					// Just to be sure...
 					if (ParsedArguments > 255) ParsedArguments = 255;
@@ -72,16 +85,20 @@ void argParser::ParseString(std::string InitString)
 	}
 
 	// We should have all the words separated and unquoted now.
-	for (int n=0; n<=ParsedArguments; n++) {
+	for (int n=0; n<=ParsedArguments; n++)
+	{
 
 		// Find index of "=" and extract the argument and the key.
 		// If the key is found but no argument, it's assumed to be
 		// a flag.
-		if (argwords[n].find("=") == string::npos) {
+		if (argwords[n].find("=") == string::npos)
+		{
 			// Assume this is a flag and just set it
 			this->ParsedArgumentStruct[n].key = argwords[n];
 			this->ParsedArgumentStruct[n].arg = "";
-		} else {
+		}
+		else
+		{
 			int idx = argwords[n].find("=");
 			this->ParsedArgumentStruct[n].key = argwords[n].substr(0,(int)(idx));
 			this->ParsedArgumentStruct[n].arg = argwords[n].substr(idx+1,(int)(argwords[n].length() - idx -1));
@@ -112,7 +129,8 @@ bool argParser::HasArgument(string Argument)
 string argParser::GetArgument(string Argument)
 {
 	// Return the actual argument
-	for (int n=0; n<=ParsedArguments; n++)	{
+	for (int n=0; n<=ParsedArguments; n++)
+	{
 		if (ParsedArgumentStruct[n].key == Argument) return(ParsedArgumentStruct[n].arg);
 	}
 	return(NULL);
@@ -124,9 +142,12 @@ string argParser::GetArgument(string Argument)
 //
 string argParser::GetArgumentEx(string Argument, string Default)
 {
-	if (this->HasArgument(Argument)) {
+	if (this->HasArgument(Argument))
+	{
 		return(this->GetArgument(Argument));
-	} else {
+	}
+	else
+	{
 		return(Default);
 	}
 }

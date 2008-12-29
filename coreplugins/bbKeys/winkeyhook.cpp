@@ -53,25 +53,25 @@ static void dbg_printf (const char *fmt, ...)
 
 //===========================================================================
 #ifdef __BORLANDC__
-  extern HHOOK g_mHook;
-  extern bool otherkey;
-  extern bool winkey;
+extern HHOOK g_mHook;
+extern bool otherkey;
+extern bool winkey;
 #endif
 
 #ifdef _MSC_VER
 #pragma data_seg(".hook")
-  HHOOK g_mHook = NULL;
-  bool otherkey = false;
-  bool winkey = false;
+HHOOK g_mHook = NULL;
+bool otherkey = false;
+bool winkey = false;
 #pragma data_seg()
-#pragma comment(linker, "/SECTION:.hook,RWS") 
+#pragma comment(linker, "/SECTION:.hook,RWS")
 #endif
 
 #ifdef __GNUC__
-  #define SHARED(X) X __attribute__((section(".shared"), shared))
-  HHOOK SHARED(g_mHook) = NULL;
-  bool SHARED(otherkey) = false;
-  bool SHARED(winkey)   = false;
+#define SHARED(X) X __attribute__((section(".shared"), shared))
+HHOOK SHARED(g_mHook) = NULL;
+bool SHARED(otherkey) = false;
+bool SHARED(winkey)   = false;
 #endif
 
 HINSTANCE hInstance;
@@ -114,22 +114,22 @@ LRESULT CALLBACK LLKeyboardProc (INT nCode, WPARAM wParam, LPARAM lParam)
 	// message does not get passed to the target window
 	if (HC_ACTION == nCode)
 	{
-/*
-		// Check to see if the CTRL key is pressed
-		BOOL bControlKeyDown = GetAsyncKeyState (VK_CONTROL) >> ((sizeof(SHORT) * 8) - 1);
+		/*
+				// Check to see if the CTRL key is pressed
+				BOOL bControlKeyDown = GetAsyncKeyState (VK_CONTROL) >> ((sizeof(SHORT) * 8) - 1);
 
-		// Disable CTRL+ESC
-		if (pkbhs->vkCode == VK_ESCAPE && bControlKeyDown)
-			return 1;
+				// Disable CTRL+ESC
+				if (pkbhs->vkCode == VK_ESCAPE && bControlKeyDown)
+					return 1;
 
-		// Disable ALT+TAB
-		if (pkbhs->vkCode == VK_TAB && pkbhs->flags & LLKHF_ALTDOWN)
-			return 1;
+				// Disable ALT+TAB
+				if (pkbhs->vkCode == VK_TAB && pkbhs->flags & LLKHF_ALTDOWN)
+					return 1;
 
-		// Disable ALT+ESC
-		if (pkbhs->vkCode == VK_ESCAPE && pkbhs->flags & LLKHF_ALTDOWN)
-			return 1;
-*/
+				// Disable ALT+ESC
+				if (pkbhs->vkCode == VK_ESCAPE && pkbhs->flags & LLKHF_ALTDOWN)
+					return 1;
+		*/
 		//dbg_printf("hc_action code %x wp %x", pkbhs->vkCode, wParam);
 
 		int vkCode = ((KBDLLHOOKSTRUCT *)lParam)->vkCode;

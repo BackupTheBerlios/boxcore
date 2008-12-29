@@ -10,18 +10,18 @@ typedef WINAPI BOOL (*fnUpdateLayeredWindow)(HWND hwnd, HDC hdcDest, POINT *pptD
 
 class clsUser32
 {
-	public:
-		clsUser32();
-		~clsUser32();
+public:
+	clsUser32();
+	~clsUser32();
 
 	fnAllowSetForegroundWindow AllowSetForegroundWindow;
 	fnTrackMouseEvent TrackMouseEvent;
 	fnUpdateLayeredWindow UpdateLayeredWindow;
 
-	protected:
-		HMODULE hModule;
+protected:
+	HMODULE hModule;
 
-	private:
+private:
 };
 
 #endif // CLSUSER32_H

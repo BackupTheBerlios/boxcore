@@ -52,7 +52,8 @@ int currentScreen;
 //====================
 // private variables
 
-struct toptask {
+struct toptask
+{
 	struct toptask *next;
 	struct tasklist* task;
 };
@@ -180,11 +181,11 @@ ST void EditWorkspaceNames(void)
 {
 	SwitchToBBWnd();
 	if (IDOK == EditBox(
-		"bbLean",
-		NLS2("$BBWorkspace_EditNames$", "Workspace Names:"),
-		Settings_workspaceNames,
-		Settings_workspaceNames
-		))
+				"bbLean",
+				NLS2("$BBWorkspace_EditNames$", "Workspace Names:"),
+				Settings_workspaceNames,
+				Settings_workspaceNames
+			))
 	{
 		Settings_WriteRCSetting(&Settings_workspaceNames);
 		SetNames();
@@ -195,7 +196,8 @@ ST void EditWorkspaceNames(void)
 ST void SetNames(void)
 {
 	freeall(&deskNames);
-	const char *names = Settings_workspaceNames; int i;
+	const char *names = Settings_workspaceNames;
+	int i;
 	for (i = 0; i < Settings_workspaces; ++i)
 	{
 		char wkspc_name[80];
@@ -242,7 +244,7 @@ ST LRESULT send_syscommand(HWND hwnd, UINT SC_XXX)
 // CyberShadow 2007.05.25: the result isn't required in most cases; post the message instead of sending it, to prevent temporary lock-ups
 ST void post_syscommand(HWND hwnd, UINT SC_XXX)
 {
-    PostMessage(hwnd, WM_SYSCOMMAND, SC_XXX, 0);
+	PostMessage(hwnd, WM_SYSCOMMAND, SC_XXX, 0);
 }
 
 void Workspaces_Command(UINT msg, WPARAM wParam, LPARAM lParam)
@@ -250,197 +252,201 @@ void Workspaces_Command(UINT msg, WPARAM wParam, LPARAM lParam)
 	HWND hwnd = (HWND)lParam;
 	switch (msg)
 	{
-		case BB_SWITCHTON:
-			switchToDesktop((int)lParam);
-			break;
+	case BB_SWITCHTON:
+		switchToDesktop((int)lParam);
+		break;
 
-		case BB_LISTDESKTOPS:
-			if (wParam) EnumDesks(list_desktops_func, wParam);
-			break;
-
-		//====================
-		case BB_WORKSPACE:
-			//dbg_printf("BB_WORKSPACE %d %x", wParam, hwnd);
-			switch (wParam)
-			{
-				// ---------------------------------
-				case BBWS_DESKLEFT: DeskLeft();
-					break;
-				case BBWS_DESKRIGHT: DeskRight();
-					break;
-
-				// ---------------------------------
-				case BBWS_ADDDESKTOP: AddDesktop(1);
-					break;
-				case BBWS_DELDESKTOP: AddDesktop(-1);
-					break;
-
-				// ---------------------------------
-				case BBWS_SWITCHTODESK:
-					DeskSwitch((int)lParam);
-					break;
-
-				case BBWS_LASTDESK:
-					DeskSwitch(Settings_workspaces-1);
-					break;
-
-				case BBWS_GATHERWINDOWS:
-					Workspaces_GatherWindows();
-					break;
-
-				// ---------------------------------
-				case BBWS_MOVEWINDOWLEFT:
-					MoveWindowToWkspc(get_default_window(hwnd), -1);
-					break;
-
-				case BBWS_MOVEWINDOWRIGHT:
-					MoveWindowToWkspc(get_default_window(hwnd), 1);
-					break;
-
-				case BBWS_MOVEWINDOWTOWS:
-					const char *args;
-					bool follow;
-					int ws_number;
-					char ws[10];
-
-					hwnd = get_default_window(NULL);
-					if (NULL==hwnd) break;
-
-					args = (const char *)lParam;
-					NextToken(ws, &args);
-					ws_number = atoi(ws)-1;
-
-					if (*args)
-						follow = !stricmp(args, "true");
-					else
-						follow = Settings_followMoved;
-
-					MoveWindowToDirectWS(hwnd, ws_number, follow);
-					break;
-
-				// ---------------------------------
-				case BBWS_PREVWINDOW:
-					NextWindow((bool)lParam, -1);
-					break;
-
-				case BBWS_NEXTWINDOW:
-					NextWindow((bool)lParam, 1);
-					break;
-
-				// ---------------------------------
-				case BBWS_TOGGLESTICKY:
-					hwnd = get_default_window(hwnd);
-					if (NULL==hwnd) break;
-					if (WS_IsSticky(hwnd))
-						goto case_BBWS_CLEARSTICKY;
-
-				case BBWS_MAKESTICKY:
-					hwnd = get_default_window(hwnd);
-					if (hwnd) WS_MakeItSticky(hwnd);
-					break;
-
-				case_BBWS_CLEARSTICKY:
-				case BBWS_CLEARSTICKY:
-					hwnd = get_default_window(hwnd);
-					if (hwnd) WS_ClearStickyness(hwnd);
-					break;
-
-				// ---------------------------------
-				case BBWS_EDITNAME:
-					EditWorkspaceNames();
-					break;
-
-				case BBWS_MINIMIZEALL:
-					MinimizeAllWindows();
-					break;
-
-				case BBWS_RESTOREALL:
-					RestoreAllWindows();
-					break;
-
-				case BBWS_CASCADE:
-					CascadeWindows(NULL, 0, NULL, 0, NULL);
-					break;
-
-				case BBWS_TILEVERTICAL:
-					TileWindows(NULL, MDITILE_VERTICAL, NULL, 0, NULL);
-					break;
-
-				case BBWS_TILEHORIZONTAL:
-					TileWindows(NULL, MDITILE_HORIZONTAL, NULL, 0, NULL);
-					break;
-
-				default:
-					break;
-			}
-			break;
+	case BB_LISTDESKTOPS:
+		if (wParam) EnumDesks(list_desktops_func, wParam);
+		break;
 
 		//====================
-		case BB_BRINGTOFRONT:
-			WS_BringToFront(hwnd, wParam & BBBTF_CURRENT);
-			break;
-
-		//====================
-		default:
+	case BB_WORKSPACE:
+		//dbg_printf("BB_WORKSPACE %d %x", wParam, hwnd);
+		switch (wParam)
 		{
+			// ---------------------------------
+		case BBWS_DESKLEFT:
+			DeskLeft();
+			break;
+		case BBWS_DESKRIGHT:
+			DeskRight();
+			break;
+
+			// ---------------------------------
+		case BBWS_ADDDESKTOP:
+			AddDesktop(1);
+			break;
+		case BBWS_DELDESKTOP:
+			AddDesktop(-1);
+			break;
+
+			// ---------------------------------
+		case BBWS_SWITCHTODESK:
+			DeskSwitch((int)lParam);
+			break;
+
+		case BBWS_LASTDESK:
+			DeskSwitch(Settings_workspaces-1);
+			break;
+
+		case BBWS_GATHERWINDOWS:
+			Workspaces_GatherWindows();
+			break;
+
+			// ---------------------------------
+		case BBWS_MOVEWINDOWLEFT:
+			MoveWindowToWkspc(get_default_window(hwnd), -1);
+			break;
+
+		case BBWS_MOVEWINDOWRIGHT:
+			MoveWindowToWkspc(get_default_window(hwnd), 1);
+			break;
+
+		case BBWS_MOVEWINDOWTOWS:
+			const char *args;
+			bool follow;
+			int ws_number;
+			char ws[10];
+
+			hwnd = get_default_window(NULL);
+			if (NULL==hwnd) break;
+
+			args = (const char *)lParam;
+			NextToken(ws, &args);
+			ws_number = atoi(ws)-1;
+
+			if (*args)
+				follow = !stricmp(args, "true");
+			else
+				follow = Settings_followMoved;
+
+			MoveWindowToDirectWS(hwnd, ws_number, follow);
+			break;
+
+			// ---------------------------------
+		case BBWS_PREVWINDOW:
+			NextWindow((bool)lParam, -1);
+			break;
+
+		case BBWS_NEXTWINDOW:
+			NextWindow((bool)lParam, 1);
+			break;
+
+			// ---------------------------------
+		case BBWS_TOGGLESTICKY:
 			hwnd = get_default_window(hwnd);
-			if (NULL == hwnd) break;
-			LONG style = GetWindowLongPtr(hwnd, GWL_STYLE);
-			switch (msg)
-			{
-				case BB_WINDOWMINIMIZE:
-					if (0 == (WS_MINIMIZEBOX & style)) break;
-					post_syscommand(hwnd, SC_MINIMIZE);
-					focus_top_window_beside(hwnd);
-					break;
+			if (NULL==hwnd) break;
+			if (WS_IsSticky(hwnd))
+				goto case_BBWS_CLEARSTICKY;
 
-				case BB_WINDOWRESTORE:
-					WS_RestoreWindow(hwnd);
-					break;
+		case BBWS_MAKESTICKY:
+			hwnd = get_default_window(hwnd);
+			if (hwnd) WS_MakeItSticky(hwnd);
+			break;
 
-				case BB_WINDOWCLOSE:
-					post_syscommand(hwnd, SC_CLOSE);
-					focus_top_window_beside(hwnd);
-					break;
+case_BBWS_CLEARSTICKY:
+		case BBWS_CLEARSTICKY:
+			hwnd = get_default_window(hwnd);
+			if (hwnd) WS_ClearStickyness(hwnd);
+			break;
 
-				case BB_WINDOWMAXIMIZE:
-					if (0 == (WS_MAXIMIZEBOX & style)) break;
-					WS_MaximizeWindow(hwnd);
-					break;
+			// ---------------------------------
+		case BBWS_EDITNAME:
+			EditWorkspaceNames();
+			break;
 
-				case BB_WINDOWGROWHEIGHT:
-					if (0 == (WS_MAXIMIZEBOX & style)) break;
-					WS_GrowWindowHeight(hwnd);
-					break;
+		case BBWS_MINIMIZEALL:
+			MinimizeAllWindows();
+			break;
 
-				case BB_WINDOWGROWWIDTH:
-					if (0 == (WS_MAXIMIZEBOX & style)) break;
-					WS_GrowWindowWidth(hwnd);
-					break;
+		case BBWS_RESTOREALL:
+			RestoreAllWindows();
+			break;
 
-				case BB_WINDOWLOWER:
-					WS_LowerWindow(hwnd);
-					break;
+		case BBWS_CASCADE:
+			CascadeWindows(NULL, 0, NULL, 0, NULL);
+			break;
 
-				case BB_WINDOWRAISE:
-					WS_RaiseWindow(hwnd);
-					break;
+		case BBWS_TILEVERTICAL:
+			TileWindows(NULL, MDITILE_VERTICAL, NULL, 0, NULL);
+			break;
 
-				case BB_WINDOWSHADE:
-					if (0 == (WS_SIZEBOX & style)) break;
-					WS_ShadeWindow(hwnd);
-					break;
+		case BBWS_TILEHORIZONTAL:
+			TileWindows(NULL, MDITILE_HORIZONTAL, NULL, 0, NULL);
+			break;
 
-				case BB_WINDOWSIZE:
-					if (0 == (WS_SIZEBOX & style)) break;
-					post_syscommand(hwnd, SC_SIZE);
-					break;
-
-				case BB_WINDOWMOVE:
-					post_syscommand(hwnd, SC_MOVE);
-					break;
-			}
+		default:
+			break;
 		}
+		break;
+
+		//====================
+	case BB_BRINGTOFRONT:
+		WS_BringToFront(hwnd, wParam & BBBTF_CURRENT);
+		break;
+
+		//====================
+	default:
+	{
+		hwnd = get_default_window(hwnd);
+		if (NULL == hwnd) break;
+		LONG style = GetWindowLongPtr(hwnd, GWL_STYLE);
+		switch (msg)
+		{
+		case BB_WINDOWMINIMIZE:
+			if (0 == (WS_MINIMIZEBOX & style)) break;
+			post_syscommand(hwnd, SC_MINIMIZE);
+			focus_top_window_beside(hwnd);
+			break;
+
+		case BB_WINDOWRESTORE:
+			WS_RestoreWindow(hwnd);
+			break;
+
+		case BB_WINDOWCLOSE:
+			post_syscommand(hwnd, SC_CLOSE);
+			focus_top_window_beside(hwnd);
+			break;
+
+		case BB_WINDOWMAXIMIZE:
+			if (0 == (WS_MAXIMIZEBOX & style)) break;
+			WS_MaximizeWindow(hwnd);
+			break;
+
+		case BB_WINDOWGROWHEIGHT:
+			if (0 == (WS_MAXIMIZEBOX & style)) break;
+			WS_GrowWindowHeight(hwnd);
+			break;
+
+		case BB_WINDOWGROWWIDTH:
+			if (0 == (WS_MAXIMIZEBOX & style)) break;
+			WS_GrowWindowWidth(hwnd);
+			break;
+
+		case BB_WINDOWLOWER:
+			WS_LowerWindow(hwnd);
+			break;
+
+		case BB_WINDOWRAISE:
+			WS_RaiseWindow(hwnd);
+			break;
+
+		case BB_WINDOWSHADE:
+			if (0 == (WS_SIZEBOX & style)) break;
+			WS_ShadeWindow(hwnd);
+			break;
+
+		case BB_WINDOWSIZE:
+			if (0 == (WS_SIZEBOX & style)) break;
+			post_syscommand(hwnd, SC_SIZE);
+			break;
+
+		case BB_WINDOWMOVE:
+			post_syscommand(hwnd, SC_MOVE);
+			break;
+		}
+	}
 	}
 }
 
@@ -458,7 +464,7 @@ ST void WS_BringToFront(HWND hwnd, bool to_current)
 	if (n != currentScreen)
 	{
 		if (false == to_current
-			&& (FALSE == Settings_restoreToCurrent || FALSE == IsIconic(hwnd)))
+				&& (FALSE == Settings_restoreToCurrent || FALSE == IsIconic(hwnd)))
 			switchToDesktop(n);
 		else
 			setDesktop(hwnd, currentScreen, false);
@@ -486,27 +492,27 @@ ST void window_set_pos(HWND hwnd, RECT rc)
 	int width = rc.right - rc.left;
 	int height = rc.bottom - rc.top;
 	SetWindowPos(hwnd, NULL,
-		rc.left, rc.top, width, height,
-		SWP_NOZORDER|SWP_NOACTIVATE);
+				 rc.left, rc.top, width, height,
+				 SWP_NOZORDER|SWP_NOACTIVATE);
 }
 
 ST int get_shade_height(HWND hwnd)
 {
 	int shade = SendMessage(hwnd,
-		RegisterWindowMessage("BBLEANSKIN_MSG"),
-		BBLS_GETSHADEHEIGHT, 0);
+							RegisterWindowMessage("BBLEANSKIN_MSG"),
+							BBLS_GETSHADEHEIGHT, 0);
 
 	if (shade) return shade;
 
 	int border = GetSystemMetrics(
-		(WS_SIZEBOX & GetWindowLongPtr(hwnd, GWL_STYLE))
-		? SM_CYFRAME
-		: SM_CYFIXEDFRAME);
+					 (WS_SIZEBOX & GetWindowLongPtr(hwnd, GWL_STYLE))
+					 ? SM_CYFRAME
+					 : SM_CYFIXEDFRAME);
 
 	int caption = GetSystemMetrics(
-		(WS_EX_TOOLWINDOW & GetWindowLongPtr(hwnd, GWL_EXSTYLE))
-		? SM_CYSMCAPTION
-		: SM_CYCAPTION);
+					  (WS_EX_TOOLWINDOW & GetWindowLongPtr(hwnd, GWL_EXSTYLE))
+					  ? SM_CYSMCAPTION
+					  : SM_CYCAPTION);
 
 	//dbg_printf("caption %d  border %d", caption, border);
 	return 2*border + caption;
@@ -514,7 +520,8 @@ ST int get_shade_height(HWND hwnd)
 
 ST void WS_ShadeWindow(HWND hwnd)
 {
-	RECT rc; get_rect(hwnd, &rc);
+	RECT rc;
+	get_rect(hwnd, &rc);
 	int height = rc.bottom - rc.top;
 	DWORD prop = (DWORD_PTR)GetProp(hwnd, BBSHADE_PROP);
 
@@ -554,7 +561,7 @@ ST bool check_for_restore(HWND hwnd)
 	wp.length = sizeof wp;
 	GetWindowPlacement(hwnd, &wp);
 	wp.ptMaxPosition.x =
-	wp.ptMaxPosition.y = -1;
+		wp.ptMaxPosition.y = -1;
 	SetWindowPlacement(hwnd, &wp);
 	return true;
 }
@@ -562,10 +569,12 @@ ST bool check_for_restore(HWND hwnd)
 ST void grow_window(HWND hwnd, bool v)
 {
 	if (check_for_restore(hwnd)) return;
-	RECT r; get_rect(hwnd, &r);
+	RECT r;
+	get_rect(hwnd, &r);
 	LockWindowUpdate(hwnd);
 	post_syscommand(hwnd, SC_MAXIMIZE);
-	RECT r2; get_rect(hwnd, &r2);
+	RECT r2;
+	get_rect(hwnd, &r2);
 	if (v) r.top = r2.top, r.bottom = r2.bottom;
 	else r.left = r2.left, r.right = r2.right;
 	window_set_pos(hwnd, r);
@@ -613,8 +622,8 @@ ST void WS_RaiseWindow(HWND hwnd_notused)
 	struct tasklist *tl = NULL;
 	struct toptask *lp;
 	dolist (lp, pTopTask)
-		if (currentScreen == Workspaces_getDesktop(lp->task->hwnd))
-			tl = lp->task;
+	if (currentScreen == Workspaces_getDesktop(lp->task->hwnd))
+		tl = lp->task;
 	if (tl) WS_BringToFront(tl->hwnd, false);
 }
 
@@ -626,10 +635,10 @@ ST void WS_RaiseWindow(HWND hwnd_notused)
 ST void WS_SendStickyInfo(HWND hwnd)
 {
 	PostMessage(BBhwnd, BB_REDRAWGUI, WS_IsSticky(hwnd)
-			? BBRG_WINDOW|BBRG_STICKY|BBRG_FOCUS
-			: BBRG_WINDOW|BBRG_STICKY,
-			(LPARAM)hwnd
-			);
+				? BBRG_WINDOW|BBRG_STICKY|BBRG_FOCUS
+				: BBRG_WINDOW|BBRG_STICKY,
+				(LPARAM)hwnd
+			   );
 }
 
 ST void WS_MakeItSticky(HWND hwnd)
@@ -662,17 +671,18 @@ bool check_sticky_name(HWND hwnd)
 	//check appnames from "StickyWindows.ini"
 	struct string_node * sl;
 	dolist (sl, stickyNamesList)
-		if (0==stricmp(appName, sl->str))
-		{
-			//dbg_printf("sticky: %s", appName);
-			return true;
-		}
+	if (0==stricmp(appName, sl->str))
+	{
+		//dbg_printf("sticky: %s", appName);
+		return true;
+	}
 	return false;
 }
 
 ST void WS_LoadStickyNamesList()
 {
-	char path[MAX_PATH]; char buffer[256];
+	char path[MAX_PATH];
+	char buffer[256];
 	freeall(&stickyNamesList);
 	FindConfigFile(path, "StickyWindows.ini", NULL);
 	FILE* fp = FileOpen(path);
@@ -731,12 +741,12 @@ void ForceForegroundWindow(HWND theWin)
 {
 	DWORD ThreadID1, ThreadID2;
 	HWND fw = GetForegroundWindow();
-	if(theWin == fw) return; // Nothing to do if already in foreground
+	if (theWin == fw) return; // Nothing to do if already in foreground
 	ThreadID1 = GetWindowThreadProcessId(fw, NULL);
 	ThreadID2 = GetCurrentThreadId();
-	if(ThreadID1 != ThreadID2) AttachThreadInput(ThreadID1, ThreadID2, TRUE);
+	if (ThreadID1 != ThreadID2) AttachThreadInput(ThreadID1, ThreadID2, TRUE);
 	SetForegroundWindow(theWin);
-	if(ThreadID1 != ThreadID2) AttachThreadInput(ThreadID1, ThreadID2, FALSE);
+	if (ThreadID1 != ThreadID2) AttachThreadInput(ThreadID1, ThreadID2, FALSE);
 }
 
 //===========================================================================
@@ -785,8 +795,13 @@ ST HWND search_top_window(int scrn, HWND hwnd_exclude)
 ST bool focus_top_window_beside(HWND hwnd_exclude)
 {
 	HWND hw = search_top_window(currentScreen, hwnd_exclude);
-	if (hw) { SwitchToWindow(hw); return true; }
-	SwitchToBBWnd(); return false;
+	if (hw)
+	{
+		SwitchToWindow(hw);
+		return true;
+	}
+	SwitchToBBWnd();
+	return false;
 }
 
 bool focus_top_window(void)
@@ -950,16 +965,22 @@ ST void MoveWindowToDirectWS(HWND hwnd, int ws_number, bool follow)
 
 ST void NextWindow(bool allDesktops, int dir)
 {
-	HWND hw; int s,i,j, d;
-	s = GetTaskListSize();  if (0==s) return;
-	i = FindTask(GetTopTask());  if (-1==i) i=0;
+	HWND hw;
+	int s,i,j, d;
+	s = GetTaskListSize();
+	if (0==s) return;
+	i = FindTask(GetTopTask());
+	if (-1==i) i=0;
 	j = i;
 	for (;;)
 	{
-		if (dir>0) {
+		if (dir>0)
+		{
 			i++;
 			if (s==i) i=0;
-		} else {
+		}
+		else
+		{
 			if (0==i) i=s;
 			i--;
 		}
@@ -1070,8 +1091,13 @@ ST void RemoveTask(struct tasklist *tl)
 
 ST int FindTask(HWND hwnd)
 {
-	struct tasklist *tl; int i = 0;
-	dolist(tl, taskList) { if (tl->hwnd == hwnd) return i; i++; }
+	struct tasklist *tl;
+	int i = 0;
+	dolist(tl, taskList)
+	{
+		if (tl->hwnd == hwnd) return i;
+		i++;
+	}
 	return -1;
 }
 
@@ -1091,7 +1117,7 @@ ST void CleanTasks(void)
 //==================================
 ST BOOL CALLBACK TaskProc(HWND hwnd, LPARAM lParam)
 {
-	if(IsAppWindow(hwnd))
+	if (IsAppWindow(hwnd))
 		SetTopTask(AddTask(hwnd), 2);
 	return TRUE;
 }
@@ -1160,26 +1186,26 @@ void TaskWndProc(WPARAM wParam, HWND hwnd)
 	switch (code)
 	{
 		//====================
-		case HSHELL_WINDOWCREATED:
-			// windows reshown by the vwm also trigger the HSHELL_WINDOWCREATED
-			if (hwnd && NULL == tl)
-			{
-				AddTask(hwnd);
-			}
-			break;
+	case HSHELL_WINDOWCREATED:
+		// windows reshown by the vwm also trigger the HSHELL_WINDOWCREATED
+		if (hwnd && NULL == tl)
+		{
+			AddTask(hwnd);
+		}
+		break;
 
 		//====================
-		case HSHELL_WINDOWDESTROYED:
-			// windows hidden by the vwm also trigger the HSHELL_WINDOWDESTROYED
-			if (tl && false == is_valid_task(hwnd))
-			{
-				RemoveTask(tl);
-			}
-			break;
+	case HSHELL_WINDOWDESTROYED:
+		// windows hidden by the vwm also trigger the HSHELL_WINDOWDESTROYED
+		if (tl && false == is_valid_task(hwnd))
+		{
+			RemoveTask(tl);
+		}
+		break;
 
 		//====================
-		case HSHELL_WINDOWACTIVATED:
-		hshell_windowactivated:
+	case HSHELL_WINDOWACTIVATED:
+hshell_windowactivated:
 		{
 			//if (extra) ...; // on fullscreen windows, which are not maximized
 
@@ -1205,26 +1231,26 @@ void TaskWndProc(WPARAM wParam, HWND hwnd)
 						setDesktop(hwnd, currentScreen, false);
 					}
 					else
-					if (Settings_followActive
-						&& -1 != FindTask(prev_act_window)
-						&& FALSE == IsIconic(prev_act_window)
-						)
-					{
-						setDesktop(hwnd, n, true);
-					}
-					else
-					if (currentScreen == vwm_get_desk(GetLastActivePopup(hwnd)))
-					{
-						// app on other workspaces has popup'd something spontaneously,
-						// we put the popup on the other WS and switch to
-						setDesktop(hwnd, n, true);
-					}
-					else
-					{
-						setDesktop(hwnd, n, false);
-						SwitchToBBWnd();
-						break;
-					}
+						if (Settings_followActive
+								&& -1 != FindTask(prev_act_window)
+								&& FALSE == IsIconic(prev_act_window)
+						   )
+						{
+							setDesktop(hwnd, n, true);
+						}
+						else
+							if (currentScreen == vwm_get_desk(GetLastActivePopup(hwnd)))
+							{
+								// app on other workspaces has popup'd something spontaneously,
+								// we put the popup on the other WS and switch to
+								setDesktop(hwnd, n, true);
+							}
+							else
+							{
+								setDesktop(hwnd, n, false);
+								SwitchToBBWnd();
+								break;
+							}
 				}
 
 				// ----------------------------------------
@@ -1247,33 +1273,33 @@ void TaskWndProc(WPARAM wParam, HWND hwnd)
 		}
 
 		//====================
-		case HSHELL_REDRAW:
-			if (tl)
+	case HSHELL_REDRAW:
+		if (tl)
+		{
+			get_text(tl);
+			get_ico(tl); // disable for foobar delay issue ?
+
+			UINT tbmsg = TASKITEM_MODIFIED;
+			if (extra)
 			{
-				get_text(tl);
-				get_ico(tl); // disable for foobar delay issue ?
-
-				UINT tbmsg = TASKITEM_MODIFIED;
-				if (extra)
-				{
-					tbmsg = TASKITEM_FLASHED;
-					tl->flashing = true;
-				}
-
-				if (false == tl->active && GetForegroundWindow() == hwnd)
-					goto hshell_windowactivated;
-
-				PostMessage(BBhwnd, BB_TASKSUPDATE, (WPARAM)hwnd, tbmsg);
+				tbmsg = TASKITEM_FLASHED;
+				tl->flashing = true;
 			}
-			break;
-	/*
-		//====================
-		case HSHELL_ACTIVATESHELLWINDOW: // never seen
-			break;
 
-		case HSHELL_GETMINRECT:          // never seen
-			break;
-	*/
+			if (false == tl->active && GetForegroundWindow() == hwnd)
+				goto hshell_windowactivated;
+
+			PostMessage(BBhwnd, BB_TASKSUPDATE, (WPARAM)hwnd, tbmsg);
+		}
+		break;
+		/*
+			//====================
+			case HSHELL_ACTIVATESHELLWINDOW: // never seen
+				break;
+
+			case HSHELL_GETMINRECT:          // never seen
+				break;
+		*/
 	}
 }
 
@@ -1315,8 +1341,13 @@ HWND GetTask(int index)
 
 int GetActiveTask(void)
 {
-	struct tasklist *tl; int i = 0;
-	dolist (tl, taskList) { if (tl->active) return i; i++; }
+	struct tasklist *tl;
+	int i = 0;
+	dolist (tl, taskList)
+	{
+		if (tl->active) return i;
+		i++;
+	}
 	return -1;
 }
 
@@ -1391,7 +1422,8 @@ void EnumDesks (DESKENUMPROC lpEnumFunc, LPARAM lParam)
 {
 	for (int n = 0; n < Settings_workspaces; n++)
 	{
-		DesktopInfo DI; get_desktop_info(&DI, n);
+		DesktopInfo DI;
+		get_desktop_info(&DI, n);
 		if (FALSE == lpEnumFunc(&DI, lParam))
 			break;
 	}

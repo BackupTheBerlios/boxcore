@@ -4,16 +4,16 @@
 
 class clsApiLoader
 {
-	public:
-		clsApiLoader();
-		virtual ~clsApiLoader();
+public:
+	clsApiLoader();
+	virtual ~clsApiLoader();
 
-		void freeLibrary();
-		bool requestApiPresence(CONST TCHAR *pIdentifier);
-		FARPROC requestApiPointer(CONST CHAR *pApiName);
-	protected:
-	private:
-		HMODULE hBlackbox;
+	void freeLibrary();
+	bool requestApiPresence(CONST TCHAR *pIdentifier);
+	FARPROC requestApiPointer(CONST CHAR *pApiName);
+protected:
+private:
+	HMODULE hBlackbox;
 };
 
 #endif // CLSAPILOADER_H

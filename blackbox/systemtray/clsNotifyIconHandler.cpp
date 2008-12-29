@@ -156,19 +156,30 @@ HRESULT NotifyIconHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 			}
 			else
 			{
-				if (result & ICON_MODIFIED)
+				if ((result & ICON_MODIFIED) || (result & ICON_ADDED))
 				{
 					if (modifiedCallback)
 					{
-						switch (result ^ ICON_MODIFIED)
+						switch (result & (ICON_SHOW | ICON_HIDE))
 						{
 						case ICON_SHOW:
+							if (createdCallback)
+								createdCallback(LookupIcon(realNid.hWnd, realNid.uID));
+							return TRUE;
 						case ICON_HIDE:
+							if (deletedCallback)
+								deletedCallback(LookupIcon(realNid.hWnd, realNid.uID));
+							return TRUE;
 						default:
-							modifiedCallback(LookupIcon(realNid.hWnd, realNid.uID));
+							if (modifiedCallback)
+								modifiedCallback(LookupIcon(realNid.hWnd, realNid.uID));
 							return TRUE;
 						}
 					}
+				}
+				else
+				{
+					return FALSE;
 				}
 			}
 			break;
@@ -188,7 +199,7 @@ eUpdateResult NotifyIconHandler::UpdateIcon(NID_INTERNAL & p_nid)
 	{
 		if (m_legacyFactory)
 		{
-		icon = new NotificationIcon(m_legacyFactory());
+			icon = new NotificationIcon(m_legacyFactory());
 		}
 		else
 		{

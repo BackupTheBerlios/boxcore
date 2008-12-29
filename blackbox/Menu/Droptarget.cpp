@@ -64,7 +64,7 @@ public:
 	STDMETHOD(QueryInterface)(REFIID iid, void** ppvObject)
 	{
 		*ppvObject = NULL;
-		if( IsEqualIID(iid, IID_IUnknown) || IsEqualIID(iid, IID_IDropTarget))
+		if ( IsEqualIID(iid, IID_IUnknown) || IsEqualIID(iid, IID_IDropTarget))
 		{
 			*ppvObject = this; // direct inheritance
 			AddRef(); // implicitly assumed for each successful query
@@ -79,13 +79,13 @@ public:
 	}
 
 	STDMETHOD_(ULONG, Release)()
-	{ 
+	{
 		int tempCount = --m_dwRef;
-		if(tempCount==0)
+		if (tempCount==0)
 		{
 			delete this;
 		}
-		return tempCount; 
+		return tempCount;
 	}
 
 private:
@@ -130,13 +130,13 @@ STDMETHODIMP CDropTarget::DragEnter(LPDATAOBJECT pDataObject, DWORD grfKeyState,
 		if (sh_get_uiobject(m_pidl, &pidlFull, &pidlItem, &psfFolder, IID_IDropTarget, (void**)&m_pDropTarget))
 		{
 			HRESULT hr = m_pDropTarget->DragEnter(pDataObject, grfKeyState, pt, pdwEffect);
-			if(SUCCEEDED(hr)) ok = TRUE;
+			if (SUCCEEDED(hr)) ok = TRUE;
 		}
 		if (psfFolder)      psfFolder   ->Release();
 		if (pidlItem)       m_free(pidlItem);
 		if (pidlFull)       m_free(pidlFull);
 	}
-	if(FALSE == ok) *pdwEffect = DROPEFFECT_NONE; // we can't understand this thing
+	if (FALSE == ok) *pdwEffect = DROPEFFECT_NONE; // we can't understand this thing
 	m_pDataObject = pDataObject;
 	return S_OK;
 }
@@ -169,7 +169,7 @@ STDMETHODIMP CDropTarget::DragOver(DWORD grfKeyState, POINTL pt, LPDWORD pdwEffe
 #endif
 
 	// if we have a valid target object, relay the call
-	if(m_pDropTarget)
+	if (m_pDropTarget)
 	{
 		// mouse pointer information is not really relevant to the shell item...
 		return m_pDropTarget->DragOver(grfKeyState, pt, pdwEffect);
@@ -188,7 +188,7 @@ STDMETHODIMP CDropTarget::DragOver(DWORD grfKeyState, POINTL pt, LPDWORD pdwEffe
 STDMETHODIMP CDropTarget::DragLeave()
 {
 	HRESULT hr = S_OK;
-	if(m_pDropTarget)
+	if (m_pDropTarget)
 	{
 		// next call should release the shell item's grip on the transferred data object
 		hr = m_pDropTarget->DragLeave();
@@ -205,7 +205,7 @@ STDMETHODIMP CDropTarget::DragLeave()
 STDMETHODIMP CDropTarget::Drop(LPDATAOBJECT pDataObject, DWORD grfKeyState, POINTL pt, LPDWORD pdwEffect)
 {
 	HRESULT hr = S_OK;
-	if(m_pDropTarget)
+	if (m_pDropTarget)
 	{
 		// this call will actually perform the file operation in pdwEffect
 		hr = m_pDropTarget->Drop(pDataObject, grfKeyState, pt, pdwEffect);

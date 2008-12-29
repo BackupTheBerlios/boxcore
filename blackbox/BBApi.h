@@ -563,7 +563,8 @@ struct StyleItem
 	bool FontShadow; /* xoblite */
 	union
 	{
-		struct {
+		struct
+		{
 			char ShadowX;
 			char ShadowY;
 		};
@@ -795,7 +796,8 @@ enum eSettings
 #endif
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 	/* ------------------------------------ */
@@ -1058,11 +1060,11 @@ extern "C" {
 	  * @ingroup bbapi_tasks
 	  */
 	API_EXPORT int GetTaskListSize(void);
-		/** @brief Get tasks HWND by index
-	  * @ingroup bbapi_tasks
-	  */
+	/** @brief Get tasks HWND by index
+	* @ingroup bbapi_tasks
+	*/
 	API_EXPORT HWND GetTask(int index);
-    /** @brief Get the index of the currently active task
+	/** @brief Get the index of the currently active task
 	  * @ingroup bbapi_tasks
 	  */
 	API_EXPORT int GetActiveTask(void);
@@ -1118,7 +1120,8 @@ extern "C" {
 
 	/* ------------------------------------ */
 	/* Desktop Information: */
-	typedef struct string_node {
+	typedef struct string_node
+	{
 		struct string_node *next;
 		char str[1];
 	} string_node;
@@ -1189,45 +1192,45 @@ extern "C" {
 /// @}
 	/* ------------------------------------ */
 	/* plugin interface declarations */
-/** @defgroup plugin Plugin Interface
-  * @brief This sections lists the functions that a plugin should provide.
-  *
-  * The absolute minimum that a plugin can implement and still be loadable is beginPlugin(),
-  * endPlugin() and pluginInfo(). Implementing beginPluginEx() and beginSlitPlugin() are
-  * highly recommended even if the plugin does not use the slit, as some branches prefer these
-  * functions when loading plugins.
-  * @{
-  */
+	/** @defgroup plugin Plugin Interface
+	  * @brief This sections lists the functions that a plugin should provide.
+	  *
+	  * The absolute minimum that a plugin can implement and still be loadable is beginPlugin(),
+	  * endPlugin() and pluginInfo(). Implementing beginPluginEx() and beginSlitPlugin() are
+	  * highly recommended even if the plugin does not use the slit, as some branches prefer these
+	  * functions when loading plugins.
+	  * @{
+	  */
 
-/** @brief PluginInfo: Plugin should return its name
-  */
+	/** @brief PluginInfo: Plugin should return its name
+	  */
 #define PLUGIN_NAME         1
-/** @brief PluginInfo: Plugin should return its version
-  */
+	/** @brief PluginInfo: Plugin should return its version
+	  */
 #define PLUGIN_VERSION      2
-/** @brief PluginInfo: Plugin should return its author(s)
-  */
+	/** @brief PluginInfo: Plugin should return its author(s)
+	  */
 #define PLUGIN_AUTHOR       3
-/** @brief PluginInfo: Plugin should return its release date
-  */
+	/** @brief PluginInfo: Plugin should return its release date
+	  */
 #define PLUGIN_RELEASE      4
-/** @brief PluginInfo: Plugin should return its release date
-  */
+	/** @brief PluginInfo: Plugin should return its release date
+	  */
 #define PLUGIN_RELEASEDATE  4   /* xoblite */
-/** @brief PluginInfo: Plugin should return a link to its homepage
-  */
+	/** @brief PluginInfo: Plugin should return a link to its homepage
+	  */
 #define PLUGIN_LINK         5
-/** @brief PluginInfo: Plugin should return a contact email
-  */
+	/** @brief PluginInfo: Plugin should return a contact email
+	  */
 #define PLUGIN_EMAIL        6
-/** @brief PluginInfo: Plugin should return a list of its bro@ms
-  *
-  * The should be one long string. Bro@@ms are split based on the @ so no spaces are needed between.
-  * This is used by xoblite to generate a menu with the plugins bro@@ms in it.
-  */
+	/** @brief PluginInfo: Plugin should return a list of its bro@ms
+	  *
+	  * The should be one long string. Bro@@ms are split based on the @ so no spaces are needed between.
+	  * This is used by xoblite to generate a menu with the plugins bro@@ms in it.
+	  */
 #define PLUGIN_BROAMS       7   /* xoblite */
-/** @brief PluginInfo: Plugin should return a url where an update metafile can be found, if supported
-  */
+	/** @brief PluginInfo: Plugin should return a url where an update metafile can be found, if supported
+	  */
 #define PLUGIN_UPDATE_URL   8   /* for Kaloth's BBPlugManager */
 
 #ifndef __BBCORE__

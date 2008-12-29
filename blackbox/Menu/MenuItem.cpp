@@ -49,14 +49,14 @@ MenuItem::MenuItem(const char* pszTitle)
 	next        = NULL;
 
 	m_pMenu     =
-	m_pSubMenu  = NULL;
+		m_pSubMenu  = NULL;
 
 	m_nWidth    =
-	m_nHeight   = 0;
+		m_nHeight   = 0;
 
 	m_isNOP     =
-	m_bActive   =
-	m_isChecked = false;
+		m_bActive   =
+			m_isChecked = false;
 
 	m_nSortPriority = M_SORT_NORMAL;
 	m_ItemID    = MENUITEM_ID_NORMAL;
@@ -79,7 +79,9 @@ MenuItem::~MenuItem()
 	if (m_hIcon) DestroyIcon(m_hIcon);
 	switch (m_iconMode)
 	{
-		case IM_PATH: m_free((char *)m_im_stuff); break;
+	case IM_PATH:
+		m_free((char *)m_im_stuff);
+		break;
 	}
 
 	--g_menu_item_count;
@@ -131,30 +133,30 @@ void MenuItem::ItemTimer(UINT nTimer)
 void MenuItem::Mouse(HWND hwnd, UINT uMsg, DWORD wParam, DWORD lParam)
 {
 	int i = 0;
-	switch(uMsg)
+	switch (uMsg)
 	{
-		case WM_MBUTTONUP:
-			i = INVOKE_MID;
-			break;
+	case WM_MBUTTONUP:
+		i = INVOKE_MID;
+		break;
 
-		case WM_RBUTTONUP:
-			i = INVOKE_RIGHT;
-			break;
+	case WM_RBUTTONUP:
+		i = INVOKE_RIGHT;
+		break;
 
-		case WM_LBUTTONUP:
-			i = INVOKE_LEFT;
-			if (m_pMenu->m_dblClicked) i |= INVOKE_DBL;
-			break;
+	case WM_LBUTTONUP:
+		i = INVOKE_LEFT;
+		if (m_pMenu->m_dblClicked) i |= INVOKE_DBL;
+		break;
 
-		case WM_LBUTTONDBLCLK:
-		case WM_LBUTTONDOWN:
-		case WM_MBUTTONDOWN:
-		case WM_RBUTTONDOWN:
-			SetCapture(hwnd);
+	case WM_LBUTTONDBLCLK:
+	case WM_LBUTTONDOWN:
+	case WM_MBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+		SetCapture(hwnd);
 
-		case WM_MOUSEMOVE:
-			Active(1);
-			break;
+	case WM_MOUSEMOVE:
+		Active(1);
+		break;
 	}
 
 	if (i && m_bActive)// && 0 == m_isNOP)
@@ -172,7 +174,8 @@ void MenuItem::Active(int active)
 	if (m_bActive == new_active) return;
 	m_bActive = new_active;
 
-	RECT r; GetItemRect(&r);
+	RECT r;
+	GetItemRect(&r);
 	InvalidateRect(m_pMenu->m_hwnd, &r, false);
 
 	if (false == new_active)
@@ -231,9 +234,9 @@ void MenuItem::GetTextRect(RECT* r, int iconSize)
 const char* MenuItem::GetDisplayString(void)
 {
 	if (Settings_menusBroamMode
-		&& (MENUITEM_ID_CI & m_ItemID)
-		&& m_pszCommand
-		&& m_pszCommand[0] == '@')
+			&& (MENUITEM_ID_CI & m_ItemID)
+			&& m_pszCommand
+			&& m_pszCommand[0] == '@')
 		return m_pszCommand;
 
 	return m_pszTitle;
@@ -250,9 +253,12 @@ void MenuItem::Measure(HDC hDC, SIZE *size)
 	{
 		// empty [nop]: height = 66%
 		size->cx = 0;
-		if (Settings_compactSeparators == true) {
+		if (Settings_compactSeparators == true)
+		{
 			size->cy = 5;
-		} else {
+		}
+		else
+		{
 			size->cy = MenuInfo.nItemHeight[is] * 5 / 8;
 		}
 		return;
@@ -285,10 +291,10 @@ void MenuItem::Paint(HDC hDC)
 		lit = true;
 	}
 	else
-	if (m_isNOP & MI_NOP_DISABLED)
-	{
-		cr0 = SetTextColor(hDC, mStyle.MenuFrame.disabledColor);
-	}
+		if (m_isNOP & MI_NOP_DISABLED)
+		{
+			cr0 = SetTextColor(hDC, mStyle.MenuFrame.disabledColor);
+		}
 
 	//dbg_printf("Menu separator style is: %s",Settings_menuSeparatorStyle);
 
@@ -315,54 +321,70 @@ void MenuItem::Paint(HDC hDC)
 				for (x = 0; x <= dist; ++x)
 				{
 					int pos, hue = x * 255 / dist;
-					pos = leftS + x; SetPixel(hDC, pos, yS, mixcolors(cs, GetPixel(hDC, pos, y), hue));
-					pos = rightS - x; SetPixel(hDC, pos, yS, mixcolors(cs, GetPixel(hDC, pos, y), hue));
+					pos = leftS + x;
+					SetPixel(hDC, pos, yS, mixcolors(cs, GetPixel(hDC, pos, y), hue));
+					pos = rightS - x;
+					SetPixel(hDC, pos, yS, mixcolors(cs, GetPixel(hDC, pos, y), hue));
 				}
-			} else
-			if (0 == stricmp(Settings_menuSeparatorStyle,"flat"))
-			{
-				// Flat shadow
-				for (x = 0; x <= dist; ++x)
-				{
-					int pos;
-					pos = leftS + x; SetPixel(hDC, pos, yS, cs);
-					pos = rightS - x; SetPixel(hDC, pos, yS, cs);
-				}
-			} else
-			if (0 == stricmp(Settings_menuSeparatorStyle,"bevel"))
-			{
-				// Bevel shadow is simply none...
 			}
+			else
+				if (0 == stricmp(Settings_menuSeparatorStyle,"flat"))
+				{
+					// Flat shadow
+					for (x = 0; x <= dist; ++x)
+					{
+						int pos;
+						pos = leftS + x;
+						SetPixel(hDC, pos, yS, cs);
+						pos = rightS - x;
+						SetPixel(hDC, pos, yS, cs);
+					}
+				}
+				else
+					if (0 == stricmp(Settings_menuSeparatorStyle,"bevel"))
+					{
+						// Bevel shadow is simply none...
+					}
 		}
 		if (0 == stricmp(Settings_menuSeparatorStyle,"gradient"))
 		{
 			for (x = 0; x <= dist; ++x)
 			{
 				int pos, hue = x * 255 / dist;
-				pos = left + x; SetPixel(hDC, pos, y, mixcolors(c, GetPixel(hDC, pos, y), hue));
-				pos = right - x; SetPixel(hDC, pos, y, mixcolors(c, GetPixel(hDC, pos, y), hue));
-			}
-		} else
-		if (0 == stricmp(Settings_menuSeparatorStyle,"flat"))
-		{
-			for (x = 0; x <= dist; ++x)
-			{
-				int pos; //, hue = x * 255 / dist;
-				pos = left + x; SetPixel(hDC, pos, y, c);
-				pos = right - x; SetPixel(hDC, pos, y, c);
-			}
-		} else
-		if (0 == stricmp(Settings_menuSeparatorStyle,"bevel"))
-		{
-			for (x = 0; x <= dist; ++x)
-			{
-				int pos;
-				pos = left + x; SetPixel(hDC, pos, y, mixcolors(0x00000000, GetPixel(hDC, pos, y), 160));
-				pos = right - x; SetPixel(hDC, pos, y, mixcolors(0x00000000, GetPixel(hDC, pos, y), 160));
-				pos = left + x; SetPixel(hDC, pos, y+1, mixcolors(0x00FFFFFF, GetPixel(hDC, pos, y+1), 160));
-				pos = right - x; SetPixel(hDC, pos, y+1, mixcolors(0x00FFFFFF, GetPixel(hDC, pos, y+1), 160));
+				pos = left + x;
+				SetPixel(hDC, pos, y, mixcolors(c, GetPixel(hDC, pos, y), hue));
+				pos = right - x;
+				SetPixel(hDC, pos, y, mixcolors(c, GetPixel(hDC, pos, y), hue));
 			}
 		}
+		else
+			if (0 == stricmp(Settings_menuSeparatorStyle,"flat"))
+			{
+				for (x = 0; x <= dist; ++x)
+				{
+					int pos; //, hue = x * 255 / dist;
+					pos = left + x;
+					SetPixel(hDC, pos, y, c);
+					pos = right - x;
+					SetPixel(hDC, pos, y, c);
+				}
+			}
+			else
+				if (0 == stricmp(Settings_menuSeparatorStyle,"bevel"))
+				{
+					for (x = 0; x <= dist; ++x)
+					{
+						int pos;
+						pos = left + x;
+						SetPixel(hDC, pos, y, mixcolors(0x00000000, GetPixel(hDC, pos, y), 160));
+						pos = right - x;
+						SetPixel(hDC, pos, y, mixcolors(0x00000000, GetPixel(hDC, pos, y), 160));
+						pos = left + x;
+						SetPixel(hDC, pos, y+1, mixcolors(0x00FFFFFF, GetPixel(hDC, pos, y+1), 160));
+						pos = right - x;
+						SetPixel(hDC, pos, y+1, mixcolors(0x00FFFFFF, GetPixel(hDC, pos, y+1), 160));
+					}
+				}
 	}
 
 	int iconSize = m_pMenu->m_iconSize;
@@ -380,41 +402,41 @@ void MenuItem::Paint(HDC hDC)
 			m_bSmallIcon = bSmallIcon;
 			switch (m_iconMode)
 			{
-				case IM_PIDL:
-					{
-						const _ITEMIDLIST *pidl = (MENUITEM_ID_SF == m_ItemID) ?
-							((SpecialFolderItem*)this)->check_pidl() : m_pidl;
+			case IM_PIDL:
+			{
+				const _ITEMIDLIST *pidl = (MENUITEM_ID_SF == m_ItemID) ?
+										  ((SpecialFolderItem*)this)->check_pidl() : m_pidl;
 
-						if (pidl)
-						{
-							SHFILEINFO sfi;
-							HIMAGELIST sysimgl = (HIMAGELIST)SHGetFileInfo((LPCSTR)pidl, 0, &sfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_SYSICONINDEX | (bSmallIcon ? SHGFI_SMALLICON : SHGFI_LARGEICON));
-							if (sysimgl) m_hIcon = ImageList_GetIcon(sysimgl, sfi.iIcon, ILD_NORMAL);
-						}
-					}
-					break;
+				if (pidl)
+				{
+					SHFILEINFO sfi;
+					HIMAGELIST sysimgl = (HIMAGELIST)SHGetFileInfo((LPCSTR)pidl, 0, &sfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_SYSICONINDEX | (bSmallIcon ? SHGFI_SMALLICON : SHGFI_LARGEICON));
+					if (sysimgl) m_hIcon = ImageList_GetIcon(sysimgl, sfi.iIcon, ILD_NORMAL);
+				}
+			}
+			break;
 
-				case IM_TASK:
-					{
-						const struct tasklist *tl = (struct tasklist *)m_im_stuff;
-						m_hIcon = CopyIcon(bSmallIcon ? tl->icon : tl->icon_big);
-					}
-					break;
+			case IM_TASK:
+			{
+				const struct tasklist *tl = (struct tasklist *)m_im_stuff;
+				m_hIcon = CopyIcon(bSmallIcon ? tl->icon : tl->icon_big);
+			}
+			break;
 
-				case IM_PATH:
-					char *icon = (char *)m_im_stuff;
-					char *path = strrchr(icon, ',');
-					int idx;
-					if (path)
-						idx = atoi(path + 1), *path = 0;
-					else
-						idx = 0;
-					if (bSmallIcon)
-						ExtractIconEx(icon, idx, NULL, &m_hIcon, 1);
-					else
-						ExtractIconEx(icon, idx, &m_hIcon, NULL, 1);
-					if (path) *path = ',';
-					break;
+			case IM_PATH:
+				char *icon = (char *)m_im_stuff;
+				char *path = strrchr(icon, ',');
+				int idx;
+				if (path)
+					idx = atoi(path + 1), *path = 0;
+				else
+					idx = 0;
+				if (bSmallIcon)
+					ExtractIconEx(icon, idx, NULL, &m_hIcon, 1);
+				else
+					ExtractIconEx(icon, idx, &m_hIcon, NULL, 1);
+				if (path) *path = ',';
+				break;
 			}
 		}
 
@@ -441,8 +463,8 @@ void MenuItem::Paint(HDC hDC)
 	if (0 == (m_ItemID & (~MENUITEM_ID_CI & (MENUITEM_ID_CIInt|MENUITEM_ID_CIStr))) || Settings_menusBroamMode)
 		BBDrawText(hDC, title, -1, &rect, mStyle.MenuFrame.Justify | DT_MENU_STANDARD, pSI);
 	else
-	if (m_ItemID != MENUITEM_ID_CIStr)
-		BBDrawText(hDC, title, -1, &rect, DT_CENTER | DT_MENU_STANDARD, pSI);
+		if (m_ItemID != MENUITEM_ID_CIStr)
+			BBDrawText(hDC, title, -1, &rect, DT_CENTER | DT_MENU_STANDARD, pSI);
 
 	// set back previous textColor
 	if ((COLORREF)-1 != cr0) SetTextColor(hDC, cr0);

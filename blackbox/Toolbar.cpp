@@ -49,7 +49,8 @@ ToolbarInfo TBInfo;
 
 #define ST static
 
-static const struct cfgmenu tb_sub_placement[] = {
+static const struct cfgmenu tb_sub_placement[] =
+{
 	{ NLS0("Top Left")      , "@Toolbar TopLeft"       , &Settings_toolbarPlacement },
 	{ NLS0("Top Center")    , "@Toolbar TopCenter"     , &Settings_toolbarPlacement },
 	{ NLS0("Top Right")     , "@Toolbar TopRight"      , &Settings_toolbarPlacement },
@@ -59,7 +60,8 @@ static const struct cfgmenu tb_sub_placement[] = {
 	{ NULL }
 };
 
-static const struct cfgmenu tb_sub_settings[] = {
+static const struct cfgmenu tb_sub_settings[] =
+{
 	{ NLS0("Width Percent"),      "@ToolbarWidthPercent", &Settings_toolbarWidthPercent },
 	{ NLS0("Clock Format"),       "@ToolbarClockFormat", Settings_toolbarStrftimeFormat },
 	{ NLS0("Toggle With Plugins"), "@ToolbarTogglePlugins", &Settings_toolbarPluginToggle },
@@ -68,7 +70,8 @@ static const struct cfgmenu tb_sub_settings[] = {
 	{ NULL }
 };
 
-static const struct cfgmenu tb_main[] = {
+static const struct cfgmenu tb_main[] =
+{
 	{ NLS0("Placement"),      NULL, tb_sub_placement },
 	{ NLS0("Settings"),       NULL, tb_sub_settings },
 	{ NLS0("Always On Top"),  "@ToolbarAlwaysOnTop", &Settings_toolbarOnTop },
@@ -134,8 +137,8 @@ int beginToolbar(HINSTANCE hi)
 	ZeroMemory(&Toolbar_Button[0], sizeof(Toolbar_Button));
 	Toolbar_ShowingExternalLabel = false;
 	Toolbar_CurrentWindow[0] =
-	Toolbar_CurrentTime[0] =
-	Toolbar_WorkspaceName[0] = 0;
+		Toolbar_CurrentTime[0] =
+			Toolbar_WorkspaceName[0] = 0;
 
 	ZeroMemory(&TBInfo, sizeof TBInfo);
 	if (false == Settings_toolbarEnabled)
@@ -166,7 +169,7 @@ int beginToolbar(HINSTANCE hi)
 		NULL,                           // no menu
 		hMainInstance,                  // module handle
 		NULL                            // init params
-		);
+	);
 
 	return 0;
 }
@@ -189,15 +192,15 @@ ST void Toolbar_set_pos()
 		SetTransparency(Toolbar_hwnd, Settings_toolbarAlpha);
 
 	SetWindowPos(Toolbar_hwnd,
-		TBInfo.onTop ? HWND_TOPMOST : HWND_NOTOPMOST,
-		TBInfo.xpos,
-		TBInfo.autohidden ? Toolbar_HideY : TBInfo.ypos,
-		TBInfo.width,
-		TBInfo.height,
-		Toolbar_hidden
-			? SWP_HIDEWINDOW | SWP_NOACTIVATE | SWP_NOSENDCHANGING
-			: SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_NOSENDCHANGING
-		);
+				 TBInfo.onTop ? HWND_TOPMOST : HWND_NOTOPMOST,
+				 TBInfo.xpos,
+				 TBInfo.autohidden ? Toolbar_HideY : TBInfo.ypos,
+				 TBInfo.width,
+				 TBInfo.height,
+				 Toolbar_hidden
+				 ? SWP_HIDEWINDOW | SWP_NOACTIVATE | SWP_NOSENDCHANGING
+				 : SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_NOSENDCHANGING
+				);
 
 	if (TBInfo.bbsb_hwnd) PostMessage(TBInfo.bbsb_hwnd, BB_TOOLBARUPDATE, 0, 0);
 }
@@ -217,22 +220,22 @@ bool CheckButton(HWND hwnd, UINT message, POINT MousePoint, RECT *pRect, bool *p
 	{
 		switch (message)
 		{
-			case WM_LBUTTONDOWN:
-			case WM_MBUTTONDOWN:
-			case WM_RBUTTONDOWN:
-			case WM_LBUTTONDBLCLK:
-			case WM_MBUTTONDBLCLK:
-			case WM_RBUTTONDBLCLK:
-				capture_rect = pRect;
-				pressed_state = pState;
-				MouseButtonEvent = handler;
-				if (pressed_state)
-				{
-					*pressed_state = true;
-					InvalidateRect(hwnd, capture_rect, FALSE);
-				}
-				SetCapture(hwnd);
-				MouseButtonEvent(message, button_id = id);
+		case WM_LBUTTONDOWN:
+		case WM_MBUTTONDOWN:
+		case WM_RBUTTONDOWN:
+		case WM_LBUTTONDBLCLK:
+		case WM_MBUTTONDBLCLK:
+		case WM_RBUTTONDBLCLK:
+			capture_rect = pRect;
+			pressed_state = pState;
+			MouseButtonEvent = handler;
+			if (pressed_state)
+			{
+				*pressed_state = true;
+				InvalidateRect(hwnd, capture_rect, FALSE);
+			}
+			SetCapture(hwnd);
+			MouseButtonEvent(message, button_id = id);
 		}
 		return true;
 	}
@@ -265,10 +268,10 @@ bool HandleCapture(HWND hwnd, UINT message, POINT MousePoint)
 		bool inside, hilite, release = false;
 		inside = hilite = (PtInRect(capture_rect, MousePoint) != 0);
 
-		if (message == WM_LBUTTONUP || 
-			message == WM_MBUTTONUP || 
-			message == WM_RBUTTONUP || 
-			GetCapture() != hwnd)
+		if (message == WM_LBUTTONUP ||
+				message == WM_MBUTTONUP ||
+				message == WM_RBUTTONUP ||
+				GetCapture() != hwnd)
 		{
 			release = true;
 			hilite  = false;
@@ -311,20 +314,20 @@ void Toolbar_button_event(UINT message, LPARAM i)
 			co = TBInfo.bbsb_currentOnly, rt = TBInfo.bbsb_reverseTasks;
 
 		co ^= (0 == (GetAsyncKeyState(VK_SHIFT) & 0x8000));
-		switch(i)
+		switch (i)
 		{
-			case 0:
-				PostMessage(BBhwnd, BB_WORKSPACE, BBWS_DESKLEFT, 0);
-				break;
-			case 1:
-				PostMessage(BBhwnd, BB_WORKSPACE, BBWS_DESKRIGHT, 0);
-				break;
-			case 2:
-				PostMessage(BBhwnd, BB_WORKSPACE, (int)rt^BBWS_PREVWINDOW, co);
-				break;
-			case 3:
-				PostMessage(BBhwnd, BB_WORKSPACE, (int)rt^BBWS_NEXTWINDOW, co);
-				break;
+		case 0:
+			PostMessage(BBhwnd, BB_WORKSPACE, BBWS_DESKLEFT, 0);
+			break;
+		case 1:
+			PostMessage(BBhwnd, BB_WORKSPACE, BBWS_DESKRIGHT, 0);
+			break;
+		case 2:
+			PostMessage(BBhwnd, BB_WORKSPACE, (int)rt^BBWS_PREVWINDOW, co);
+			break;
+		case 3:
+			PostMessage(BBhwnd, BB_WORKSPACE, (int)rt^BBWS_NEXTWINDOW, co);
+			break;
 		}
 	}
 }
@@ -371,7 +374,8 @@ ST void Toolbar_setclock(void)
 
 bool check_mouse(HWND hwnd)
 {
-	POINT pt; RECT rct;
+	POINT pt;
+	RECT rct;
 	GetCursorPos(&pt);
 	GetWindowRect(hwnd, &rct);
 	return PtInRect(&rct, pt);
@@ -386,23 +390,26 @@ void drop_style(HDROP hdrop)
 	SendMessage(BBhwnd, BB_SETSTYLE, 1, (LPARAM)filename);
 }
 */
- 
+
 //===========================================================================
 ST void PaintToolbar(HDC hdc, RECT *rcPaint)
 {
-	RECT r; int i; const char *label = Toolbar_CurrentWindow; StyleItem *pSI;
+	RECT r;
+	int i;
+	const char *label = Toolbar_CurrentWindow;
+	StyleItem *pSI;
 
 #ifdef BBOPT_MEMCHECK
 	// Display some statistics.
-	#pragma message("\n"__FILE__ "(397) : warning 0: MEMCHECK enabled.\n")
-/*
-	if (NULL==Toolbar_hFont)
-	{
-		LOGFONT logFont;
-		SystemParametersInfo(SPI_GETICONTITLELOGFONT, 0, &logFont, 0);
-		Toolbar_hFont = CreateFontIndirect(&logFont);
-	}
-*/
+#pragma message("\n"__FILE__ "(397) : warning 0: MEMCHECK enabled.\n")
+	/*
+		if (NULL==Toolbar_hFont)
+		{
+			LOGFONT logFont;
+			SystemParametersInfo(SPI_GETICONTITLELOGFONT, 0, &logFont, 0);
+			Toolbar_hFont = CreateFontIndirect(&logFont);
+		}
+	*/
 	extern int g_menu_count;
 	extern int g_menu_item_count;
 	char temp[256];
@@ -464,19 +471,25 @@ ST void PaintToolbar(HDC hdc, RECT *rcPaint)
 	//====================
 
 	// Paint toolbar Style
-	r.left = r.top = 0; r.right = tbW; r.bottom = tbH; pSI = &mStyle.Toolbar;
+	r.left = r.top = 0;
+	r.right = tbW;
+	r.bottom = tbH;
+	pSI = &mStyle.Toolbar;
 	MakeStyleGradient(buf, &r, pSI, true);
 
 	//====================
 	// Paint unpressed workspace/task buttons...
 
-	r.left = r.top = 0; r.right = r.bottom = tbButtonWH;
+	r.left = r.top = 0;
+	r.right = r.bottom = tbButtonWH;
 	{
 		HPEN activePen   = CreatePen(PS_SOLID, 1, mStyle.ToolbarButtonPressed.picColor);
 		HPEN inactivePen = CreatePen(PS_SOLID, 1, mStyle.ToolbarButton.picColor);
 		HDC src = CreateCompatibleDC(NULL);
 		HGDIOBJ srcother = SelectObject(src, CreateCompatibleBitmap(hdc, tbButtonWH, tbButtonWH));
-		int yOffset = tbH / 2; int xOffset; int f1 = -1;
+		int yOffset = tbH / 2;
+		int xOffset;
+		int f1 = -1;
 		for (i=0; i<4; i++)
 		{
 			int f2 = Toolbar_Button[i].pressed || (Toolbar_force_button_pressed && i&1);
@@ -492,10 +505,10 @@ ST void PaintToolbar(HDC hdc, RECT *rcPaint)
 					MakeStyleGradient(src, &r, pSI, pSI->bordered), f1 = f2;
 
 				BitBlt(buf,
-					Toolbar_Button[i].r.left,
-					Toolbar_Button[i].r.top,
-					tbButtonWH, tbButtonWH, src, 0, 0, SRCCOPY
-					);
+					   Toolbar_Button[i].r.left,
+					   Toolbar_Button[i].r.top,
+					   tbButtonWH, tbButtonWH, src, 0, 0, SRCCOPY
+					  );
 			}
 
 			xOffset = Toolbar_Button[i].r.left + (tbButtonWH / 2);
@@ -518,23 +531,29 @@ ST void PaintToolbar(HDC hdc, RECT *rcPaint)
 	int justify = mStyle.Toolbar.Justify | (DT_VCENTER|DT_SINGLELINE|DT_WORD_ELLIPSIS|DT_NOPREFIX);
 
 	// Paint workspaces background...
-	r.right = (r.left = tbLabelX) + tbLabelW; pSI = &mStyle.ToolbarLabel;
+	r.right = (r.left = tbLabelX) + tbLabelW;
+	pSI = &mStyle.ToolbarLabel;
 	MakeStyleGradient(buf, &r, pSI, pSI->bordered);
-	r.left  += 3; r.right -= 3;
+	r.left  += 3;
+	r.right -= 3;
 	SetTextColor(buf, mStyle.ToolbarLabel.TextColor);
 	BBDrawText(buf, Toolbar_WorkspaceName, -1, &r, justify, pSI);
 
 	// Paint window label background...
-	r.right = (r.left = tbWinLabelX) + tbWinLabelW; pSI = &mStyle.ToolbarWindowLabel;
+	r.right = (r.left = tbWinLabelX) + tbWinLabelW;
+	pSI = &mStyle.ToolbarWindowLabel;
 	MakeStyleGradient(buf, &r, pSI, pSI->bordered);
-	r.left  += 3; r.right -= 3;
+	r.left  += 3;
+	r.right -= 3;
 	SetTextColor(buf, mStyle.ToolbarWindowLabel.TextColor);
 	BBDrawText(buf, label, -1, &r, justify, pSI);
 
 	// Paint clock background...
-	r.right = (r.left = tbClockX) + tbClockW; pSI = &mStyle.ToolbarClock;
+	r.right = (r.left = tbClockX) + tbClockW;
+	pSI = &mStyle.ToolbarClock;
 	MakeStyleGradient(buf, &r, pSI, pSI->bordered);
-	r.left  += 3; r.right -= 3;
+	r.left  += 3;
+	r.right -= 3;
 	SetTextColor(buf, mStyle.ToolbarClock.TextColor);
 	BBDrawText(buf, Toolbar_CurrentTime, -1, &r, justify, pSI);
 
@@ -564,80 +583,80 @@ ST LRESULT CALLBACK Toolbar_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
 	switch (message)
 	{
 		//====================
-		case WM_CREATE:
-			TBInfo.hwnd = Toolbar_hwnd = hwnd;
-			MessageManager_AddMessages (hwnd, msgs);
-			MakeSticky(hwnd);
-			Toolbar_UpdatePosition();
-			break;
+	case WM_CREATE:
+		TBInfo.hwnd = Toolbar_hwnd = hwnd;
+		MessageManager_AddMessages (hwnd, msgs);
+		MakeSticky(hwnd);
+		Toolbar_UpdatePosition();
+		break;
 
 		//====================
-		case WM_DESTROY:
-			RemoveSticky(hwnd);
-			MessageManager_RemoveMessages (hwnd, msgs);
-			SetDesktopMargin(Toolbar_hwnd, 0, 0);
-			if (Toolbar_hFont) DeleteObject(Toolbar_hFont), Toolbar_hFont = NULL;
-			TBInfo.hwnd = Toolbar_hwnd = NULL;
-			break;
+	case WM_DESTROY:
+		RemoveSticky(hwnd);
+		MessageManager_RemoveMessages (hwnd, msgs);
+		SetDesktopMargin(Toolbar_hwnd, 0, 0);
+		if (Toolbar_hFont) DeleteObject(Toolbar_hFont), Toolbar_hFont = NULL;
+		TBInfo.hwnd = Toolbar_hwnd = NULL;
+		break;
 
 		//====================
-		case BB_RECONFIGURE:
-		tbreconfig:
-			Toolbar_UpdatePosition();
-			Toolbar_ShowMenu(false);
-			InvalidateRect(hwnd, NULL, FALSE);
-			break;
+	case BB_RECONFIGURE:
+tbreconfig:
+		Toolbar_UpdatePosition();
+		Toolbar_ShowMenu(false);
+		InvalidateRect(hwnd, NULL, FALSE);
+		break;
 
 		//====================
-		case BB_REDRAWGUI:
-			if (wParam & BBRG_TOOLBAR)
-			{
-				Toolbar_force_button_pressed = 0 != (wParam & BBRG_PRESSED);
-				Toolbar_UpdatePosition();
-				InvalidateRect(hwnd, NULL, FALSE);
-			}
-			break;
-
-		//====================
-		case BB_TASKSUPDATE:
-		showlabel:
-			Toolbar_setlabel();
-			InvalidateRect(hwnd, NULL, FALSE);
-			break;
-
-		case BB_DESKTOPINFO:
-			Toolbar_setlabel();
-			InvalidateRect(hwnd, NULL, FALSE);
-			break;
-
-		//====================
-		case WM_ACTIVATEAPP:
-			if (wParam) SetOnTop(hwnd);
-			break;
-
-		//====================
-
-		case WM_PAINT:
+	case BB_REDRAWGUI:
+		if (wParam & BBRG_TOOLBAR)
 		{
-			PAINTSTRUCT ps;
-			HDC hdc = BeginPaint(hwnd, &ps);
-			PaintToolbar(hdc, &ps.rcPaint);
-			EndPaint(hwnd, &ps);
-			break;
-		}
-
-		//====================
-
-		case BB_SETTOOLBARLABEL:
-			SetTimer(hwnd, TOOLBAR_SETLABEL_TIMER, 2000, (TIMERPROC)NULL);
-			Toolbar_ShowingExternalLabel = true;
-			strcpy_max(Toolbar_CurrentWindow, (LPCSTR)lParam, sizeof Toolbar_CurrentWindow);
+			Toolbar_force_button_pressed = 0 != (wParam & BBRG_PRESSED);
+			Toolbar_UpdatePosition();
 			InvalidateRect(hwnd, NULL, FALSE);
-			break;
+		}
+		break;
+
+		//====================
+	case BB_TASKSUPDATE:
+showlabel:
+		Toolbar_setlabel();
+		InvalidateRect(hwnd, NULL, FALSE);
+		break;
+
+	case BB_DESKTOPINFO:
+		Toolbar_setlabel();
+		InvalidateRect(hwnd, NULL, FALSE);
+		break;
+
+		//====================
+	case WM_ACTIVATEAPP:
+		if (wParam) SetOnTop(hwnd);
+		break;
 
 		//====================
 
-		case WM_TIMER:
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hwnd, &ps);
+		PaintToolbar(hdc, &ps.rcPaint);
+		EndPaint(hwnd, &ps);
+		break;
+	}
+
+	//====================
+
+	case BB_SETTOOLBARLABEL:
+		SetTimer(hwnd, TOOLBAR_SETLABEL_TIMER, 2000, (TIMERPROC)NULL);
+		Toolbar_ShowingExternalLabel = true;
+		strcpy_max(Toolbar_CurrentWindow, (LPCSTR)lParam, sizeof Toolbar_CurrentWindow);
+		InvalidateRect(hwnd, NULL, FALSE);
+		break;
+
+		//====================
+
+	case WM_TIMER:
 		if (wParam == TOOLBAR_AUTOHIDE_TIMER)
 		{
 			if (TBInfo.autoHide)
@@ -669,44 +688,44 @@ ST LRESULT CALLBACK Toolbar_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
 		break;
 
 		//====================
-	/*
-		case WM_DROPFILES:
-			drop_style((HDROP)wParam);
-			break;
-	*/
+		/*
+			case WM_DROPFILES:
+				drop_style((HDROP)wParam);
+				break;
+		*/
 		//====================
 
-		case WM_LBUTTONDOWN:
-			if (wParam & MK_CONTROL)
-			{
-				// Allow window to move if control key is being held down,
-				UpdateWindow(hwnd);
-				SendMessage(hwnd, WM_SYSCOMMAND, 0xf012, 0);
-				break;
-			}
-			goto left_mouse;
+	case WM_LBUTTONDOWN:
+		if (wParam & MK_CONTROL)
+		{
+			// Allow window to move if control key is being held down,
+			UpdateWindow(hwnd);
+			SendMessage(hwnd, WM_SYSCOMMAND, 0xf012, 0);
+			break;
+		}
+		goto left_mouse;
 
-		case WM_LBUTTONDBLCLK:
-			if (wParam & MK_CONTROL)
-			{
-				// double click moves the window back to the default position
-				Toolbar_set_pos();
-				break;
-			}
-			goto left_mouse;
+	case WM_LBUTTONDBLCLK:
+		if (wParam & MK_CONTROL)
+		{
+			// double click moves the window back to the default position
+			Toolbar_set_pos();
+			break;
+		}
+		goto left_mouse;
 
-		case WM_MOUSEMOVE:
-			if (TBInfo.autohidden)
-			{
-				// bring back from autohide
-				SetTimer(hwnd, TOOLBAR_AUTOHIDE_TIMER, 250, NULL);
-				Toolbar_AutoHide(false);
-				break;
-			}
-			goto left_mouse;
+	case WM_MOUSEMOVE:
+		if (TBInfo.autohidden)
+		{
+			// bring back from autohide
+			SetTimer(hwnd, TOOLBAR_AUTOHIDE_TIMER, 250, NULL);
+			Toolbar_AutoHide(false);
+			break;
+		}
+		goto left_mouse;
 
-		case WM_LBUTTONUP:
-		left_mouse:
+	case WM_LBUTTONUP:
+left_mouse:
 		{
 			POINT MouseEventPoint;
 			MouseEventPoint.x = (short)LOWORD(lParam);
@@ -715,99 +734,99 @@ ST LRESULT CALLBACK Toolbar_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
 				break;
 
 			for (int i=0; i<5; i++)
-			if (CheckButton(
-					hwnd,
-					message,
-					MouseEventPoint,
-					&Toolbar_Button[i].r,
-					&Toolbar_Button[i].pressed,
-					Toolbar_button_event,
-					i
-					)) goto _break;
+				if (CheckButton(
+							hwnd,
+							message,
+							MouseEventPoint,
+							&Toolbar_Button[i].r,
+							&Toolbar_Button[i].pressed,
+							Toolbar_button_event,
+							i
+						)) goto _break;
 
 			if (message == WM_LBUTTONDOWN)
 				SetActiveWindow(hwnd);
 		}
-		_break:
+_break:
 		break;
 
 		//====================
 		// show menus
 
-		case WM_RBUTTONUP:
-		{
-			int x = (short)LOWORD(lParam);
-			if (x < tbClockW)
-				PostMessage(BBhwnd, BB_MENU, BB_MENU_TASKS, 0);
-			else
+	case WM_RBUTTONUP:
+	{
+		int x = (short)LOWORD(lParam);
+		if (x < tbClockW)
+			PostMessage(BBhwnd, BB_MENU, BB_MENU_TASKS, 0);
+		else
 			if (x >= TBInfo.width - tbClockW)
 				PostMessage(BBhwnd, BB_MENU, BB_MENU_ROOT, 0);
 			else
 				Toolbar_ShowMenu(true);
-			break;
-		}
+		break;
+	}
 
-		//====================
+	//====================
 
-		case WM_MBUTTONUP:
-			// Is shift key held down?
-			if (wParam & MK_SHIFT)
-				PostMessage(BBhwnd, BB_TOGGLEPLUGINS, 0, 0);
-			else
-				PostMessage(BBhwnd, BB_TOGGLETRAY, 0, 0);
+	case WM_MBUTTONUP:
+		// Is shift key held down?
+		if (wParam & MK_SHIFT)
+			PostMessage(BBhwnd, BB_TOGGLEPLUGINS, 0, 0);
+		else
+			PostMessage(BBhwnd, BB_TOGGLETRAY, 0, 0);
 		break;
 
 		//====================
 		// If moved, snap window to screen edges...
 
-		case WM_WINDOWPOSCHANGING:
-			if (Toolbar_moving)
-				SnapWindowToEdge((WINDOWPOS*)lParam, 0, SNAP_FULLSCREEN);
-			break;
+	case WM_WINDOWPOSCHANGING:
+		if (Toolbar_moving)
+			SnapWindowToEdge((WINDOWPOS*)lParam, 0, SNAP_FULLSCREEN);
+		break;
 
-		case WM_ENTERSIZEMOVE:
-			Toolbar_moving = true;
-			break;
+	case WM_ENTERSIZEMOVE:
+		Toolbar_moving = true;
+		break;
 
-		case WM_EXITSIZEMOVE:
-			Toolbar_moving = false;
-			break;
+	case WM_EXITSIZEMOVE:
+		Toolbar_moving = false;
+		break;
 
 		//====================
 
-		case BB_BROADCAST:
-			if (0 == memcmp((LPSTR)lParam, "@Toolbar", 8))
+	case BB_BROADCAST:
+		if (0 == memcmp((LPSTR)lParam, "@Toolbar", 8))
+		{
+			const char *argument = (LPSTR)lParam;
+			const struct cfgmenu *p_menu, *p_item;
+			const void *v = exec_internal_broam(argument, tb_main, &p_menu, &p_item);
+			if (v) goto tbreconfig;
+			break;
+		}
+		if (!stricmp((LPCSTR)lParam, "@BBShowPlugins"))
+		{
+			Toolbar_hidden = false;
+			Toolbar_UpdatePosition();
+			break;
+		}
+		if (!stricmp((LPCSTR)lParam, "@BBHidePlugins"))
+		{
+			if (Settings_toolbarPluginToggle)
 			{
-				const char *argument = (LPSTR)lParam;
-				const struct cfgmenu *p_menu, *p_item;
-				const void *v = exec_internal_broam(argument, tb_main, &p_menu, &p_item);
-				if (v) goto tbreconfig;
-				break;
-			}
-			if (!stricmp((LPCSTR)lParam, "@BBShowPlugins"))
-			{
-				Toolbar_hidden = false;
+				Toolbar_hidden = true;
 				Toolbar_UpdatePosition();
-				break;
-			}
-			if (!stricmp((LPCSTR)lParam, "@BBHidePlugins"))
-			{
-				if (Settings_toolbarPluginToggle)
-				{
-					Toolbar_hidden = true;
-					Toolbar_UpdatePosition();
-				}
-				break;
 			}
 			break;
+		}
+		break;
 
-		case WM_CLOSE:
-			break;
+	case WM_CLOSE:
+		break;
 
-		default:
-			return DefWindowProc(hwnd,message,wParam,lParam);
+	default:
+		return DefWindowProc(hwnd,message,wParam,lParam);
 
-	//====================
+		//====================
 	}
 	return 0;
 }
@@ -860,7 +879,7 @@ void Toolbar_UpdatePosition()
 	tbLabelH    = labelH;
 
 	int tbheight = imax(labelH, buttonH) +
-		2 * (mStyle.Toolbar.borderWidth + mStyle.Toolbar.marginWidth);
+				   2 * (mStyle.Toolbar.borderWidth + mStyle.Toolbar.marginWidth);
 
 	int tbwidth = imax (300, ScreenWidth * Settings_toolbarWidthPercent / 100);
 
@@ -893,7 +912,7 @@ void Toolbar_UpdatePosition()
 			Toolbar_hwnd,
 			place < 3 ? BB_DM_TOP : BB_DM_BOTTOM,
 			TBInfo.autoHide || Toolbar_hidden ? 0 : TBInfo.height + (TBInfo.onTop ? 0 : 4)
-			);
+		);
 
 		tbClockW = 0;
 		Toolbar_setlabel();
@@ -927,7 +946,8 @@ ToolbarInfo * GetToolbarInfo(void)
 
 void Toolbar_ShowMenu(bool popup)
 {
-	char menu_id[200]; strcpy(menu_id, "IDRoot_configuration_TB");
+	char menu_id[200];
+	strcpy(menu_id, "IDRoot_configuration_TB");
 	ShowMenu(CfgMenuMaker(NLS0("Toolbar"), tb_main, popup, menu_id));
 }
 

@@ -81,78 +81,78 @@ class bImage
 
 // -------------------------------------
 
-static unsigned long bsqrt(unsigned long x)
-{
-	unsigned long q, r;
-	if (x < 2) return x;
-	for (r = x >> 1; q = x / r, q < r; r = (r + q) >> 1);
-	return r;
-}
-
-static void init_sqrt()
-{
-	for (int i = 0; i < SQR_TAB_SIZE; i++)
+	static unsigned long bsqrt(unsigned long x)
 	{
-		// backwards compatible to the elliptic inconsistency in
-		// the original gradient code: sqrt(i/2) instead of sqrt(i)
-		int f = bsqrt(i*SQD/2);
-		_sqrt_table[i] = (unsigned char)(SQR - 1 - f);
+		unsigned long q, r;
+		if (x < 2) return x;
+		for (r = x >> 1; q = x / r, q < r; r = (r + q) >> 1);
+		return r;
 	}
-}
 
-static int isgn(int x)
-{
-	return x>0 ? 1 : x<0 ? -1 : 0;
-}
-
-static int imin(int a, int b)
-{
-	return a<b?a:b;
-}
-
-static void init_dither_tables(void)
-{
-	HDC hdc = GetDC(NULL);
-	bits_per_pixel = GetDeviceCaps(hdc, BITSPIXEL);
-	if (bits_per_pixel > 16 || bits_per_pixel < 8)
+	static void init_sqrt()
 	{
-		bits_per_pixel = 0;
-	}
-	else
-	{
-		int red_bits, green_bits, blue_bits;
-
-		int i;
-		// hardcoded for 16 bit display: red:5, green:6, blue:5
-		red_bits    = 1 << (8 - 5);
-		green_bits  = 1 << (8 - 6);
-		blue_bits   = 1 << (8 - 5);
-		for (i = 0; i < DITH_TABLE_SIZE; i++)
+		for (int i = 0; i < SQR_TAB_SIZE; i++)
 		{
-			_dith_r_table[i] = imin(255, i & -red_bits    );
-			_dith_g_table[i] = imin(255, i & -green_bits  );
-			_dith_b_table[i] = imin(255, i & -blue_bits   );
-		}
-
-		static const unsigned char dither4[16] =
-		{
-		  7, 3, 6, 2,  // 3 1 3 1
-		  1, 5, 0, 4,  // 0 2 0 2
-		  6, 2, 7, 3,  // 3 1 3 1
-		  0, 4, 1, 5   // 0 2 0 2
-		};
-
-		int dr = 8/red_bits, dg = 8/green_bits, db = 8/blue_bits;
-		for (i = 0; i < 16; i++)
-		{
-		  int d = dither4[i];
-		  add_r[i] = d / dr;
-		  add_g[i] = d / dg;
-		  add_b[i] = d / db;
+			// backwards compatible to the elliptic inconsistency in
+			// the original gradient code: sqrt(i/2) instead of sqrt(i)
+			int f = bsqrt(i*SQD/2);
+			_sqrt_table[i] = (unsigned char)(SQR - 1 - f);
 		}
 	}
-	ReleaseDC(NULL, hdc);
-}
+
+	static int isgn(int x)
+	{
+		return x>0 ? 1 : x<0 ? -1 : 0;
+	}
+
+	static int imin(int a, int b)
+	{
+		return a<b?a:b;
+	}
+
+	static void init_dither_tables(void)
+	{
+		HDC hdc = GetDC(NULL);
+		bits_per_pixel = GetDeviceCaps(hdc, BITSPIXEL);
+		if (bits_per_pixel > 16 || bits_per_pixel < 8)
+		{
+			bits_per_pixel = 0;
+		}
+		else
+		{
+			int red_bits, green_bits, blue_bits;
+
+			int i;
+			// hardcoded for 16 bit display: red:5, green:6, blue:5
+			red_bits    = 1 << (8 - 5);
+			green_bits  = 1 << (8 - 6);
+			blue_bits   = 1 << (8 - 5);
+			for (i = 0; i < DITH_TABLE_SIZE; i++)
+			{
+				_dith_r_table[i] = imin(255, i & -red_bits    );
+				_dith_g_table[i] = imin(255, i & -green_bits  );
+				_dith_b_table[i] = imin(255, i & -blue_bits   );
+			}
+
+			static const unsigned char dither4[16] =
+			{
+				7, 3, 6, 2,  // 3 1 3 1
+				1, 5, 0, 4,  // 0 2 0 2
+				6, 2, 7, 3,  // 3 1 3 1
+				0, 4, 1, 5   // 0 2 0 2
+			};
+
+			int dr = 8/red_bits, dg = 8/green_bits, db = 8/blue_bits;
+			for (i = 0; i < 16; i++)
+			{
+				int d = dither4[i];
+				add_r[i] = d / dr;
+				add_g[i] = d / dg;
+				add_b[i] = d / db;
+			}
+		}
+		ReleaseDC(NULL, hdc);
+	}
 
 //===========================================================================
 // ColorDither for 16bit displays.
@@ -162,20 +162,23 @@ static void init_dither_tables(void)
 //  (raster@rasterman.com) for telling me about this... portions of
 //  this code is based off of his code in Imlib"
 
-void TrueColorDither(void)
-{
-  unsigned char *p = pixels; int x, y;
-  for (y = 0; y < height; y++) {
-	int oy = 4 * (y & 3);
-	for (x = 0; x < width; x++) {
-	  int ox = oy + (x & 3);
-	  p[0] = _dith_b_table[p[0] + add_b[ox]];
-	  p[1] = _dith_g_table[p[1] + add_g[ox]];
-	  p[2] = _dith_r_table[p[2] + add_r[ox]];
-	  p+=4;
+	void TrueColorDither(void)
+	{
+		unsigned char *p = pixels;
+		int x, y;
+		for (y = 0; y < height; y++)
+		{
+			int oy = 4 * (y & 3);
+			for (x = 0; x < width; x++)
+			{
+				int ox = oy + (x & 3);
+				p[0] = _dith_b_table[p[0] + add_b[ox]];
+				p[1] = _dith_g_table[p[1] + add_g[ox]];
+				p[2] = _dith_r_table[p[2] + add_r[ox]];
+				p+=4;
+			}
+		}
 	}
-  }
-}
 
 //===========================================================================
 // brightness delta for bevels and interlaced
@@ -184,275 +187,335 @@ void TrueColorDither(void)
 #define DELTA_BEVELCORNER 32
 #define DELTA_INTERLACE 10      // originally 75/112%
 
-static int trans_late(int i, int d)
-{
-	if (d == -DELTA_INTERLACE) d *= 2;
-	else
-	if (d >= DELTA_BEVEL) d *= 2;
-
-	int r = i*(100+d)/100;
-	if (r >= 255) return 255;
-	if (r <= 0) return 0;
-	return r;
-}
-
-void make_delta_table(int m)
-{
-	for (int i = 0; i<256; i++)
+	static int trans_late(int i, int d)
 	{
-		dark_table[i] = trans_late(i, -m);
-		lite_table[i] = trans_late(i, m);
+		if (d == -DELTA_INTERLACE) d *= 2;
+		else
+			if (d >= DELTA_BEVEL) d *= 2;
+
+		int r = i*(100+d)/100;
+		if (r >= 255) return 255;
+		if (r <= 0) return 0;
+		return r;
 	}
-}
 
-static void modify(unsigned char *pixel, int delta)
-{
-	int n = 2;
-	do pixel[n] = trans_late(pixel[n], delta); while (n--);
-}
+	void make_delta_table(int m)
+	{
+		for (int i = 0; i<256; i++)
+		{
+			dark_table[i] = trans_late(i, -m);
+			lite_table[i] = trans_late(i, m);
+		}
+	}
 
-inline void lighter(unsigned char *pixel)
-{
-	pixel[0] = lite_table[pixel[0]];
-	pixel[1] = lite_table[pixel[1]];
-	pixel[2] = lite_table[pixel[2]];
-}
+	static void modify(unsigned char *pixel, int delta)
+	{
+		int n = 2;
+		do pixel[n] = trans_late(pixel[n], delta);
+		while (n--);
+	}
 
-inline void darker(unsigned char *pixel)
-{
-	pixel[0] = dark_table[pixel[0]];
-	pixel[1] = dark_table[pixel[1]];
-	pixel[2] = dark_table[pixel[2]];
-}
+	inline void lighter(unsigned char *pixel)
+	{
+		pixel[0] = lite_table[pixel[0]];
+		pixel[1] = lite_table[pixel[1]];
+		pixel[2] = lite_table[pixel[2]];
+	}
+
+	inline void darker(unsigned char *pixel)
+	{
+		pixel[0] = dark_table[pixel[0]];
+		pixel[1] = dark_table[pixel[1]];
+		pixel[2] = dark_table[pixel[2]];
+	}
 
 //====================
-void bevel(bool sunken, int pos)
-{
-	if (--pos < 0) return;
-	int w = width, h = height;
-	int nx = w - 2*pos - 1;
-	int ny = h - 2*pos - 1;
-	if (nx <= 0 || ny <= 0) return;
+	void bevel(bool sunken, int pos)
+	{
+		if (--pos < 0) return;
+		int w = width, h = height;
+		int nx = w - 2*pos - 1;
+		int ny = h - 2*pos - 1;
+		if (nx <= 0 || ny <= 0) return;
 
-	int f1 = DELTA_BEVEL;
-	int f2 = DELTA_BEVELCORNER;
+		int f1 = DELTA_BEVEL;
+		int f2 = DELTA_BEVELCORNER;
 
-	if (sunken) f1 = -f1, f2 = -f2;
-	make_delta_table (f1);
+		if (sunken) f1 = -f1, f2 = -f2;
+		make_delta_table (f1);
 
-	unsigned char *p; int d, e, n;
+		unsigned char *p;
+		int d, e, n;
 
-	p = pixels + (pos + w * pos) * 4;
+		p = pixels + (pos + w * pos) * 4;
 
-	d = ny * w * 4; e = 4; n = nx;
-	while (--n) { p += e; darker(p); lighter(p+d); }
-	p += e;
-	modify(p,-f2);  // bottom-right corner pixel
+		d = ny * w * 4;
+		e = 4;
+		n = nx;
+		while (--n)
+		{
+			p += e;
+			darker(p);
+			lighter(p+d);
+		}
+		p += e;
+		modify(p,-f2);  // bottom-right corner pixel
 
-	d = nx * 4; e = w * 4; n = ny;
-	while (--n) { p += e; darker(p); lighter(p-d); }
-	p += e;
-	modify(p-d, f2); // top-left corner pixel
-}
+		d = nx * 4;
+		e = w * 4;
+		n = ny;
+		while (--n)
+		{
+			p += e;
+			darker(p);
+			lighter(p-d);
+		}
+		p += e;
+		modify(p-d, f2); // top-left corner pixel
+	}
 
 //====================
-void table_fn(unsigned char *p, int length, bool invert)
-{
-	unsigned char *c = p;
-	int i, e, d;
-	if (invert) i = length-1, d = e = -1;
-	else i = 0, d = 1, e = length;
-	while (i != e)
+	void table_fn(unsigned char *p, int length, bool invert)
 	{
-		c[0] = from_blue  + diff_blue  * i / length;
-		c[1] = from_green + diff_green * i / length;
-		c[2] = from_red   + diff_red   * i / length;
-		c[3] = 255;
-		c += 4; i += d;
+		unsigned char *c = p;
+		int i, e, d;
+		if (invert) i = length-1, d = e = -1;
+		else i = 0, d = 1, e = length;
+		while (i != e)
+		{
+			c[0] = from_blue  + diff_blue  * i / length;
+			c[1] = from_green + diff_green * i / length;
+			c[2] = from_red   + diff_red   * i / length;
+			c[3] = 255;
+			c += 4;
+			i += d;
+		}
 	}
-}
 
 
-void table_fn_mirror(unsigned char *p, int length, bool invert)
-{
-	unsigned char *c = p;
-	int i, e, d;
-	int v;
-	if (invert) i = length-1, d = e = -1;
-	else i = 0, d = 1, e = length;
-	while (i != e)
+	void table_fn_mirror(unsigned char *p, int length, bool invert)
 	{
-		// length = 10
-		// i = 0   (0 * 2) = 0
-		// i = 1   (1 * 2) = 2
-		// i = 5   (5 * 2) = 10
-		// i = 6   (10 - (6 - (10 / 2))) = 10 - (6 - 5) = 6
-		v = (i < (length / 2))?(i * 2):length - ((i - (length / 2))*2);
-		c[0] = from_blue  + diff_blue  * v / length;
-		c[1] = from_green + diff_green * v / length;
-		c[2] = from_red   + diff_red   * v / length;
-		c[3] = 255;
-		c += 4; i += d;
+		unsigned char *c = p;
+		int i, e, d;
+		int v;
+		if (invert) i = length-1, d = e = -1;
+		else i = 0, d = 1, e = length;
+		while (i != e)
+		{
+			// length = 10
+			// i = 0   (0 * 2) = 0
+			// i = 1   (1 * 2) = 2
+			// i = 5   (5 * 2) = 10
+			// i = 6   (10 - (6 - (10 / 2))) = 10 - (6 - 5) = 6
+			v = (i < (length / 2))?(i * 2):length - ((i - (length / 2))*2);
+			c[0] = from_blue  + diff_blue  * v / length;
+			c[1] = from_green + diff_green * v / length;
+			c[2] = from_red   + diff_red   * v / length;
+			c[3] = 255;
+			c += 4;
+			i += d;
+		}
 	}
-}
 
 
 
-void table_fn_split(unsigned char *p, int length, bool invert)
-{
-	unsigned char *c = p;
-	int i, e, d;
-	if (invert) i = length-1, d = e = -1;
-	else i = 0, d = 1, e = length;
-	while (i != e)
+	void table_fn_split(unsigned char *p, int length, bool invert)
 	{
-		c[0] = (i>=(e/2))?(from_blue):(from_blue + diff_blue);
-		c[1] = (i>=(e/2))?(from_green):(from_green + diff_green);
-		c[2] = (i>=(e/2))?(from_red):(from_red + diff_red);
-		c[3] = 255;
-		c += 4; i += d;
+		unsigned char *c = p;
+		int i, e, d;
+		if (invert) i = length-1, d = e = -1;
+		else i = 0, d = 1, e = length;
+		while (i != e)
+		{
+			c[0] = (i>=(e/2))?(from_blue):(from_blue + diff_blue);
+			c[1] = (i>=(e/2))?(from_green):(from_green + diff_green);
+			c[2] = (i>=(e/2))?(from_red):(from_red + diff_red);
+			c[3] = 255;
+			c += 4;
+			i += d;
+		}
 	}
-}
 
-inline void diag_fn(unsigned char *c, int x, int y)
-{
-	unsigned char *xp = xtab + x*4;
-	unsigned char *yp = ytab + y*4;
-	c[0] = ((unsigned)xp[0] + (unsigned)yp[0]) >> 1;
-	c[1] = ((unsigned)xp[1] + (unsigned)yp[1]) >> 1;
-	c[2] = ((unsigned)xp[2] + (unsigned)yp[2]) >> 1;
-	c[3] = 255;
-}
+	inline void diag_fn(unsigned char *c, int x, int y)
+	{
+		unsigned char *xp = xtab + x*4;
+		unsigned char *yp = ytab + y*4;
+		c[0] = ((unsigned)xp[0] + (unsigned)yp[0]) >> 1;
+		c[1] = ((unsigned)xp[1] + (unsigned)yp[1]) >> 1;
+		c[2] = ((unsigned)xp[2] + (unsigned)yp[2]) >> 1;
+		c[3] = 255;
+	}
 
-inline void rect_fn(unsigned char *c, int x, int y)
-{
-	if (alternativ ^ (x*height <= y*width))
-		*(unsigned long*)c = ((unsigned long*)xtab)[x];
-	else
-		*(unsigned long*)c = ((unsigned long*)ytab)[y];
-}
+	inline void rect_fn(unsigned char *c, int x, int y)
+	{
+		if (alternativ ^ (x*height <= y*width))
+			*(unsigned long*)c = ((unsigned long*)xtab)[x];
+		else
+			*(unsigned long*)c = ((unsigned long*)ytab)[y];
+	}
 
-inline void elli_fn(unsigned char *c, int x, int y)
-{
-	int dx = SQF - 1 - SQF * x / width;
-	int dy = SQF - 1 - SQF * y / height;
-	int f = _sqrt_table[(dx*dx + dy*dy) / SQD];
-	*(unsigned long *)c = ((unsigned long*)xtab)[f];
-}
+	inline void elli_fn(unsigned char *c, int x, int y)
+	{
+		int dx = SQF - 1 - SQF * x / width;
+		int dy = SQF - 1 - SQF * y / height;
+		int f = _sqrt_table[(dx*dx + dy*dy) / SQD];
+		*(unsigned long *)c = ((unsigned long*)xtab)[f];
+	}
 
 // -------------------------------------
 public:
 
-bImage(int width, int height, int type, COLORREF colour_from, COLORREF colour_to, bool interlaced, int bevelStyle, int bevelPosition)
-{
-	pixels = NULL;
-
-	if (width<2)  { if (width<=0) return; width = 2; }
-	if (height<2) { if (height<=0) return; height = 2; }
-
-	this->width = width;
-	this->height = height;
-
-	int byte_size = (width * height) * 4;
-	int table_size = width + height;
-	if (table_size < SQR) table_size = SQR;
-	pixels = new unsigned char [byte_size + table_size * 4];
-	xtab = pixels + byte_size;
-	ytab = xtab + width * 4;
-
-	bool sunken = bevelStyle == BEVEL_SUNKEN;
-
-	if (sunken && false == ISNEWSTYLE) switch (type) {
-	// for historical reasons: invert color gradient for
-	// sunken bevels and these types:
-	case B_PIPECROSS:
-	case B_ELLIPTIC:
-	case B_RECTANGLE:
-	case B_PYRAMID:
+	bImage(int width, int height, int type, COLORREF colour_from, COLORREF colour_to, bool interlaced, int bevelStyle, int bevelPosition)
 	{
-		COLORREF tmp = colour_from;
-		colour_from = colour_to;
-		colour_to = tmp;
-	}}
+		pixels = NULL;
 
-	int i;
+		if (width<2)
+		{
+			if (width<=0) return;
+			width = 2;
+		}
+		if (height<2)
+		{
+			if (height<=0) return;
+			height = 2;
+		}
 
-	i = GetBValue(colour_to) - (from_blue = GetBValue(colour_from));
-	diff_blue = i + isgn(i);
-	i = GetGValue(colour_to) - (from_green = GetGValue(colour_from));
-	diff_green = i + isgn(i);
-	i = GetRValue(colour_to) - (from_red = GetRValue(colour_from));
-	diff_red = i + isgn(i);
+		this->width = width;
+		this->height = height;
 
-	if (interlaced)
-		make_delta_table(sunken != (0 == (height & 1)) ? -DELTA_INTERLACE : DELTA_INTERLACE);
+		int byte_size = (width * height) * 4;
+		int table_size = width + height;
+		if (table_size < SQR) table_size = SQR;
+		pixels = new unsigned char [byte_size + table_size * 4];
+		xtab = pixels + byte_size;
+		ytab = xtab + width * 4;
 
-	unsigned long *s, *d, c, *e, *f;
-	int x, y, z;
-	unsigned char *p = pixels;
-	alternativ = false;
+		bool sunken = bevelStyle == BEVEL_SUNKEN;
 
-	switch (type)
-	{
-		// -------------------------------------
+		if (sunken && false == ISNEWSTYLE) switch (type)
+			{
+				// for historical reasons: invert color gradient for
+				// sunken bevels and these types:
+			case B_PIPECROSS:
+			case B_ELLIPTIC:
+			case B_RECTANGLE:
+			case B_PYRAMID:
+			{
+				COLORREF tmp = colour_from;
+				colour_from = colour_to;
+				colour_to = tmp;
+			}
+			}
+
+		int i;
+
+		i = GetBValue(colour_to) - (from_blue = GetBValue(colour_from));
+		diff_blue = i + isgn(i);
+		i = GetGValue(colour_to) - (from_green = GetGValue(colour_from));
+		diff_green = i + isgn(i);
+		i = GetRValue(colour_to) - (from_red = GetRValue(colour_from));
+		diff_red = i + isgn(i);
+
+		if (interlaced)
+			make_delta_table(sunken != (0 == (height & 1)) ? -DELTA_INTERLACE : DELTA_INTERLACE);
+
+		unsigned long *s, *d, c, *e, *f;
+		int x, y, z;
+		unsigned char *p = pixels;
+		alternativ = false;
+
+		switch (type)
+		{
+			// -------------------------------------
 		default:
 		case B_SOLID:
 			diff_red = diff_green = diff_blue = 0;
 
-		// -------------------------------------
+			// -------------------------------------
 		case B_HORIZONTAL:
 			table_fn(xtab, width, false);
 
 			// draw 2 lines, to cover the 'interlaced' case
-			y = 0; do { x = 0; s = (unsigned long *)xtab; do {
-			*(unsigned long*)p = *s++;
-			if (interlaced) {if (1 & y) darker(p); else lighter(p);}
-			p+=4; } while (++x < width); } while (++y < 2);
+			y = 0;
+			do
+			{
+				x = 0;
+				s = (unsigned long *)xtab;
+				do
+				{
+					*(unsigned long*)p = *s++;
+					if (interlaced)
+					{
+						if (1 & y) darker(p);
+						else lighter(p);
+					}
+					p+=4;
+				}
+				while (++x < width);
+			}
+			while (++y < 2);
 
 			// copy down the lines
 			d = (unsigned long*)p;
-			while (y < height) {
-			s = (unsigned long*)pixels + (y&1)*width;
-			memcpy(d, s, width*4);
-			d += width; y++;
+			while (y < height)
+			{
+				s = (unsigned long*)pixels + (y&1)*width;
+				memcpy(d, s, width*4);
+				d += width;
+				y++;
 			}
 			break;
 
-		// -------------------------------------
+			// -------------------------------------
 		case B_VERTICAL:
 			table_fn(ytab, height, true);
 
 			// draw 1 column
-			y = 0; s = (unsigned long *)ytab; z = width*4; do {
-			*(unsigned long*)p = *s++;
-			if (interlaced) {if (1 & y) darker(p); else lighter(p);}
-			p += z; } while (++y < height);
+			y = 0;
+			s = (unsigned long *)ytab;
+			z = width*4;
+			do
+			{
+				*(unsigned long*)p = *s++;
+				if (interlaced)
+				{
+					if (1 & y) darker(p);
+					else lighter(p);
+				}
+				p += z;
+			}
+			while (++y < height);
 
 			// copy colums
 			s = (unsigned long*)pixels;
-			y = 0; do {
-			d = s, s += width; c = *d++;
-			do *d = c; while (++d<s);
-			} while (++y < height);
+			y = 0;
+			do
+			{
+				d = s, s += width;
+				c = *d++;
+				do *d = c;
+				while (++d<s);
+			}
+			while (++y < height);
 			break;
 
-	/*
-		case B_MIRRORVERTICAL:
-			table_fn_mirror(xtab, height, false);
-			// draw 1 column
-			y = 0; s = (unsigned long *)ytab; z = width*4; do {
-			*(unsigned long*)p = *s++;
-			if (interlaced) if (1 & y) darker(p); else lighter(p);
-			p += z; } while (++y < height);
+			/*
+				case B_MIRRORVERTICAL:
+					table_fn_mirror(xtab, height, false);
+					// draw 1 column
+					y = 0; s = (unsigned long *)ytab; z = width*4; do {
+					*(unsigned long*)p = *s++;
+					if (interlaced) if (1 & y) darker(p); else lighter(p);
+					p += z; } while (++y < height);
 
-			// copy colums
-			s = (unsigned long*)pixels;
-			y = 0; do {
-			d = s, s += width; c = *d++;
-			do *d = c; while (++d<s);
-			} while (++y < height);
-			break;
-	*/
+					// copy colums
+					s = (unsigned long*)pixels;
+					y = 0; do {
+					d = s, s += width; c = *d++;
+					do *d = c; while (++d<s);
+					} while (++y < height);
+					break;
+			*/
 
 		case B_MIRRORHORIZONTAL:
 			// Horizontal gradient. Color1 -> Color2 -> Color1
@@ -460,17 +523,33 @@ bImage(int width, int height, int type, COLORREF colour_from, COLORREF colour_to
 			// Noccy: should use table_fn_mirror
 
 			// draw 2 lines, to cover the 'interlaced' case
-			y = 0; do { x = 0; s = (unsigned long *)xtab; do {
-			*(unsigned long*)p = *s++;
-			if (interlaced) {if (1 & y) darker(p); else lighter(p);}
-			p+=4; } while (++x < width); } while (++y < 2);
+			y = 0;
+			do
+			{
+				x = 0;
+				s = (unsigned long *)xtab;
+				do
+				{
+					*(unsigned long*)p = *s++;
+					if (interlaced)
+					{
+						if (1 & y) darker(p);
+						else lighter(p);
+					}
+					p+=4;
+				}
+				while (++x < width);
+			}
+			while (++y < 2);
 
 			// copy down the lines
 			d = (unsigned long*)p;
-			while (y < height) {
-			s = (unsigned long*)pixels + (y&1)*width;
-			memcpy(d, s, width*4);
-			d += width; y++;
+			while (y < height)
+			{
+				s = (unsigned long*)pixels + (y&1)*width;
+				memcpy(d, s, width*4);
+				d += width;
+				y++;
 			}
 			break;
 
@@ -479,35 +558,63 @@ bImage(int width, int height, int type, COLORREF colour_from, COLORREF colour_to
 			table_fn_split(ytab, height, false);
 
 			// draw 1 column
-			y = 0; s = (unsigned long *)ytab; z = width*4; do {
-			*(unsigned long*)p = *s++;
-			if (interlaced) {if (1 & y) darker(p); else lighter(p);}
-			p += z; } while (++y < height);
+			y = 0;
+			s = (unsigned long *)ytab;
+			z = width*4;
+			do
+			{
+				*(unsigned long*)p = *s++;
+				if (interlaced)
+				{
+					if (1 & y) darker(p);
+					else lighter(p);
+				}
+				p += z;
+			}
+			while (++y < height);
 
 			// copy colums
 			s = (unsigned long*)pixels;
-			y = 0; do {
-			d = s, s += width; c = *d++;
-			do *d = c; while (++d<s);
-			} while (++y < height);
+			y = 0;
+			do
+			{
+				d = s, s += width;
+				c = *d++;
+				do *d = c;
+				while (++d<s);
+			}
+			while (++y < height);
 			break;
 
 
-		// -------------------------------------
+			// -------------------------------------
 		case B_CROSSDIAGONAL:
 			table_fn(xtab, width, true);
 			goto diag;
 		case B_DIAGONAL:
 			table_fn(xtab, width, false);
-		diag:
+diag:
 			table_fn(ytab, height, true);
-			y = 0; do { x = 0; do {
-			diag_fn(p, x, y);
-			if (interlaced) {if (1 & y) darker(p); else lighter(p);}
-			p+=4; } while (++x < width); } while (++y < height);
+			y = 0;
+			do
+			{
+				x = 0;
+				do
+				{
+					diag_fn(p, x, y);
+					if (interlaced)
+					{
+						if (1 & y) darker(p);
+						else lighter(p);
+					}
+					p+=4;
+				}
+				while (++x < width);
+			}
+			while (++y < height);
 			break;
 
-		// -------------------------------------
+			// -------------------------------------
 		case B_PIPECROSS:
 			alternativ = true;
 		case B_RECTANGLE:
@@ -522,78 +629,99 @@ bImage(int width, int height, int type, COLORREF colour_from, COLORREF colour_to
 			goto draw_quadrant;
 
 
-		draw_quadrant:
+draw_quadrant:
 			// one quadrant is drawn, and mirrored horizontally and vertically
-			s = (unsigned long*)p + height*width; z = height;
-			y = 0; do {
-			d = (unsigned long*)p + width; f = s; s -= width; e = s; z--;
-			x = 0; do {
-
-			if (B_ELLIPTIC == type) elli_fn(p, x, y);
-			else
-			if (B_PYRAMID == type) diag_fn(p, x, y);
-			else rect_fn(p, x, y);
-
-			c = *(unsigned long *)p;
-			if (interlaced) {if (2 & y) darker(p); else lighter(p);}
-			*--d = *(unsigned long *)p;
-
-			if (e != (unsigned long *)p)
+			s = (unsigned long*)p + height*width;
+			z = height;
+			y = 0;
+			do
 			{
-				*e = c;
-				if (interlaced) {if (1 & z) darker((unsigned char*)e); else lighter((unsigned char*)e);}
-				*--f = *e;
-			}
-			e++;
+				d = (unsigned long*)p + width;
+				f = s;
+				s -= width;
+				e = s;
+				z--;
+				x = 0;
+				do
+				{
 
-			p+=4; } while ((x+=2) < width);
-			p+=(width/2)*4; } while ((y+=2) < height);
+					if (B_ELLIPTIC == type) elli_fn(p, x, y);
+					else
+						if (B_PYRAMID == type) diag_fn(p, x, y);
+						else rect_fn(p, x, y);
+
+					c = *(unsigned long *)p;
+					if (interlaced)
+					{
+						if (2 & y) darker(p);
+						else lighter(p);
+					}
+					*--d = *(unsigned long *)p;
+
+					if (e != (unsigned long *)p)
+					{
+						*e = c;
+						if (interlaced)
+						{
+							if (1 & z) darker((unsigned char*)e);
+							else lighter((unsigned char*)e);
+						}
+						*--f = *e;
+					}
+					e++;
+
+					p+=4;
+				}
+				while ((x+=2) < width);
+				p+=(width/2)*4;
+			}
+			while ((y+=2) < height);
 			break;
+		}
+
+		if (bevelStyle != BEVEL_FLAT) bevel(sunken, bevelPosition);
+		if (-1 == bits_per_pixel) init_dither_tables();
+		if (bits_per_pixel >= 8 && IMAGEDITHER) TrueColorDither();
 	}
 
-	if (bevelStyle != BEVEL_FLAT) bevel(sunken, bevelPosition);
-	if (-1 == bits_per_pixel) init_dither_tables();
-	if (bits_per_pixel >= 8 && IMAGEDITHER) TrueColorDither();
-}
+	~bImage()
+	{
+		if (pixels) delete pixels;
+	}
 
-~bImage()
-{
-	if (pixels) delete pixels;
-}
+	HBITMAP create_bmp(void)
+	{
+		if (NULL == pixels) return NULL;
+		BITMAPINFO bv4info;
+		setup_bv4info(&bv4info);
+		unsigned char *p = NULL;
+		HBITMAP bmp = CreateDIBSection(NULL, &bv4info, DIB_RGB_COLORS, (void**)&p, NULL, 0);
+		if (bmp && p) memcpy(p, pixels, width * height * 4);
+		return bmp;
+		//return CreateDIBitmap(hdc, (BITMAPINFOHEADER*)&bv4info, CBM_INIT, pixels, &bv4info, DIB_RGB_COLORS);
+	}
 
-HBITMAP create_bmp(void)
-{
-	if (NULL == pixels) return NULL;
-	BITMAPINFO bv4info;
-	setup_bv4info(&bv4info);
-	unsigned char *p = NULL;
-	HBITMAP bmp = CreateDIBSection(NULL, &bv4info, DIB_RGB_COLORS, (void**)&p, NULL, 0);
-	if (bmp && p) memcpy(p, pixels, width * height * 4);
-	return bmp;
-	//return CreateDIBitmap(hdc, (BITMAPINFOHEADER*)&bv4info, CBM_INIT, pixels, &bv4info, DIB_RGB_COLORS);
-}
-
-void copy_to_hdc(HDC hDC, int px, int py, int w, int h)
-{
-	if (NULL == pixels) return;
-	BITMAPINFO bv4info;
-	setup_bv4info(&bv4info);
-	SetDIBitsToDevice(hDC, px, py, w, h, 0, 0, 0, h, pixels, &bv4info, DIB_RGB_COLORS);
-}
+	void copy_to_hdc(HDC hDC, int px, int py, int w, int h)
+	{
+		if (NULL == pixels) return;
+		BITMAPINFO bv4info;
+		setup_bv4info(&bv4info);
+		SetDIBitsToDevice(hDC, px, py, w, h, 0, 0, 0, h, pixels, &bv4info, DIB_RGB_COLORS);
+	}
 
 // -------------------------------------
 private:
 
-void setup_bv4info(BITMAPINFO *bv4info)
-{
-	ZeroMemory(bv4info, sizeof(*bv4info));
-	bv4info->bmiHeader.biSize = sizeof(bv4info->bmiHeader);
-	bv4info->bmiHeader.biWidth = width;
-	bv4info->bmiHeader.biHeight = height;
-	bv4info->bmiHeader.biPlanes = 1;
-	bv4info->bmiHeader.biBitCount = 32;
-	bv4info->bmiHeader.biCompression = BI_RGB;
-}
+	void setup_bv4info(BITMAPINFO *bv4info)
+	{
+		ZeroMemory(bv4info, sizeof(*bv4info));
+		bv4info->bmiHeader.biSize = sizeof(bv4info->bmiHeader);
+		bv4info->bmiHeader.biWidth = width;
+		bv4info->bmiHeader.biHeight = height;
+		bv4info->bmiHeader.biPlanes = 1;
+		bv4info->bmiHeader.biBitCount = 32;
+		bv4info->bmiHeader.biCompression = BI_RGB;
+	}
 
 }; // end of bImage
 
@@ -620,13 +748,15 @@ extern "C" void MakeGradient(HDC hDC, RECT rect, int type, COLORREF colour_from,
 		HGDIOBJ otherPen = SelectObject(hDC, CreatePen(PS_SOLID, 1, borderColour));
 		while (--borderWidth >= 0)
 		{
-			rect.right--; rect.bottom--;
+			rect.right--;
+			rect.bottom--;
 			MoveToEx(hDC, rect.left, rect.top, NULL);
 			LineTo(hDC, rect.right, rect.top );
 			LineTo(hDC, rect.right, rect.bottom);
 			LineTo(hDC, rect.left,  rect.bottom);
 			LineTo(hDC, rect.left,  rect.top);
-			rect.left++; rect.top++;
+			rect.left++;
+			rect.top++;
 		}
 		DeleteObject(SelectObject(hDC, otherPen));
 	}

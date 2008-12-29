@@ -43,7 +43,7 @@
 //===========================================================================
 
 CommandItem::CommandItem(const char* pszCommand, const char* pszTitle, bool isChecked)
-	: MenuItem(pszTitle)
+		: MenuItem(pszTitle)
 {
 	m_pszCommand = new_str(pszCommand);
 	m_isChecked = isChecked;
@@ -58,7 +58,7 @@ void CommandItem::Invoke(int button)
 		m_pMenu->hide_on_click();
 		if (m_pszCommand) post_command(m_pszCommand);
 		else
-		if (m_pidl) exec_pidl(m_pidl, NULL, NULL);
+			if (m_pidl) exec_pidl(m_pidl, NULL, NULL);
 		return;
 	}
 
@@ -79,7 +79,7 @@ void CommandItem::Invoke(int button)
 // base class for IntegerItem / StringItem
 
 CommandItemEx::CommandItemEx(const char *pszCommand, const char *fmt)
-	: CommandItem(NULL, "", false)
+		: CommandItem(NULL, "", false)
 {
 	char buffer[1000];
 	if (NULL == strchr(pszCommand, '%'))
@@ -106,14 +106,15 @@ void CommandItemEx::next_item (UINT wParam)
 
 VolumeItem::VolumeItem(const char* pszTitle): CommandItem(NULL, pszTitle, false)
 {
-    m_ItemID = MENUITEM_ID_CIInt;
-    m_isNOP = MI_NOP_TEXT;
+	m_ItemID = MENUITEM_ID_CIInt;
+	m_isNOP = MI_NOP_TEXT;
 }
 
 void VolumeItem::Measure(HDC hDC, SIZE *size)
 {
 	RECT r = { 0, 0, 0, 0 };
-	char title[128]; *title = 0;
+	char title[128];
+	*title = 0;
 	if (m_pszTitle && *m_pszTitle)
 	{
 		strcat(title, m_pszTitle);
@@ -125,8 +126,8 @@ void VolumeItem::Measure(HDC hDC, SIZE *size)
 
 	int is = m_pMenu->m_iconSize;
 	if (-2 == is) is = MenuInfo.nIconSize;
-    size->cx = max(Settings_VolumeWidth, r.right + 2) + 4 - 2 * MenuInfo.nItemIndent[is];
-    size->cy = max(Settings_VolumeHeight, r.bottom + 6);
+	size->cx = max(Settings_VolumeWidth, r.right + 2) + 4 - 2 * MenuInfo.nItemIndent[is];
+	size->cy = max(Settings_VolumeHeight, r.bottom + 6);
 }
 
 void VolumeItem::Mouse(HWND hwnd, UINT uMsg, DWORD wParam, DWORD lParam)
@@ -135,28 +136,28 @@ void VolumeItem::Mouse(HWND hwnd, UINT uMsg, DWORD wParam, DWORD lParam)
 	RECT r;
 	GetItemRect(&r);
 	InflateRect(&r, -2, -2);
-	switch(uMsg)
+	switch (uMsg)
 	{
-		case WM_MOUSEMOVE:
-			MenuItem::Mouse(hwnd, uMsg, wParam, lParam);
-			Active(2);
-			if (!(wParam & MK_LBUTTON)) return;
+	case WM_MOUSEMOVE:
+		MenuItem::Mouse(hwnd, uMsg, wParam, lParam);
+		Active(2);
+		if (!(wParam & MK_LBUTTON)) return;
 
-		case WM_LBUTTONDOWN:
-			volume_set(100 * (xmouse - r.left) / (r.right - r.left));
-			Active(2);
-			m_pMenu->redraw();
-			return;
+	case WM_LBUTTONDOWN:
+		volume_set(100 * (xmouse - r.left) / (r.right - r.left));
+		Active(2);
+		m_pMenu->redraw();
+		return;
 
-		case WM_MBUTTONDOWN:
-			PostMessage(BBhwnd, BB_EXECUTE, 0, (LPARAM) "control.exe mmsys.cpl");
-			return;
+	case WM_MBUTTONDOWN:
+		PostMessage(BBhwnd, BB_EXECUTE, 0, (LPARAM) "control.exe mmsys.cpl");
+		return;
 
-		case WM_RBUTTONDOWN:
-			volume_mute(true);
-			Active(2);
-			m_pMenu->redraw();
-			return;
+	case WM_RBUTTONDOWN:
+		volume_mute(true);
+		Active(2);
+		m_pMenu->redraw();
+		return;
 	}
 }
 
@@ -179,7 +180,7 @@ void VolumeItem::Paint(HDC hDC)
 	GetItemRect(&r);
 	InflateRect(&r, -2, -2);
 	r.right = (r.right - r.left) * vol / 100 + r.left;
-	if(1 <= r.right - r.left)
+	if (1 <= r.right - r.left)
 		MakeStyleGradient(hDC, &r, style, style->bordered);
 
 	// draw menu item text
@@ -215,7 +216,7 @@ void VolumeItem::Paint(HDC hDC)
 //===========================================================================
 
 IntegerItem::IntegerItem(const char* pszCommand, int value, int minval, int maxval)
-	: CommandItemEx(pszCommand, " %d")
+		: CommandItemEx(pszCommand, " %d")
 {
 	m_ItemID = MENUITEM_ID_CIInt;
 	m_value = value;
@@ -231,10 +232,10 @@ void IntegerItem::Measure(HDC hDC, SIZE *size)
 	char buf[128], val[128];
 	sprintf(val, offstring && offvalue == m_value ? NLS1(offstring) : "%d", m_value);
 	sprintf(buf, "%c %s %c",
-		m_value == m_min ? ' ': '-',
-		val,
-		m_value == m_max ? ' ': '+'
-		);
+			m_value == m_min ? ' ': '-',
+			val,
+			m_value == m_max ? ' ': '+'
+		   );
 	replace_str(&m_pszTitle, buf);
 
 	MenuItem::Measure(hDC, size);
@@ -249,20 +250,21 @@ void IntegerItem::Mouse(HWND hwnd, UINT uMsg, DWORD wParam, DWORD lParam)
 {
 	if (false == Settings_menusBroamMode)
 	{
-		switch(uMsg) {
+		switch (uMsg)
+		{
 		case WM_LBUTTONDOWN:
 		case WM_LBUTTONDBLCLK:
-			{
-				Active(2);
-				int xmouse = (short)LOWORD(lParam);
-				int xwidth = m_pMenu->m_width;
-				direction = (xmouse < xwidth / 2) ? -1 : 1;
-				m_pMenu->m_captureflg |= MENU_CAPT_TWEAKINT;
-				SetCapture(hwnd);
-				m_count = 0;
-				ItemTimer(MENU_INTITEM_TIMER);
-			}
-			return;
+		{
+			Active(2);
+			int xmouse = (short)LOWORD(lParam);
+			int xwidth = m_pMenu->m_width;
+			direction = (xmouse < xwidth / 2) ? -1 : 1;
+			m_pMenu->m_captureflg |= MENU_CAPT_TWEAKINT;
+			SetCapture(hwnd);
+			m_count = 0;
+			ItemTimer(MENU_INTITEM_TIMER);
+		}
+		return;
 
 		case WM_LBUTTONUP:
 			if (direction)
@@ -320,34 +322,34 @@ void IntegerItem::Key(UINT nMsg, WPARAM wParam)
 			set_next_value();
 		}
 		else
-		if (VK_RIGHT == wParam)
-		{
-			direction = 1;
-			set_next_value();
-		}
-		else
-		if (VK_UP == wParam || VK_DOWN==wParam)
-		{
-			next_item(wParam);
-		}
+			if (VK_RIGHT == wParam)
+			{
+				direction = 1;
+				set_next_value();
+			}
+			else
+				if (VK_UP == wParam || VK_DOWN==wParam)
+				{
+					next_item(wParam);
+				}
 	}
 	else
-	if (WM_KEYUP == nMsg)
-	{
-		if (VK_LEFT == wParam || VK_RIGHT == wParam)
+		if (WM_KEYUP == nMsg)
 		{
-			if (direction)
+			if (VK_LEFT == wParam || VK_RIGHT == wParam)
 			{
-				Invoke(INVOKE_LEFT);
-				direction = 0;
+				if (direction)
+				{
+					Invoke(INVOKE_LEFT);
+					direction = 0;
+				}
 			}
 		}
-	}
-	else
-	if (WM_CHAR == nMsg && (VK_ESCAPE == wParam || VK_RETURN==wParam))
-	{
-		next_item(0);
-	}
+		else
+			if (WM_CHAR == nMsg && (VK_ESCAPE == wParam || VK_RETURN==wParam))
+			{
+				next_item(0);
+			}
 
 }
 
@@ -369,7 +371,7 @@ void IntegerItem::Invoke(int button)
 //===========================================================================
 
 StringItem::StringItem(const char* pszCommand, const char *init_string)
-	: CommandItemEx(pszCommand, " %s")
+		: CommandItemEx(pszCommand, " %s")
 {
 	if (init_string) replace_str(&m_pszTitle, init_string);
 	m_ItemID = MENUITEM_ID_CIStr;
@@ -407,11 +409,11 @@ void StringItem::Key(UINT nMsg, WPARAM wParam)
 		next_item(wParam);
 	}
 	else
-	if (WM_CHAR == nMsg && wParam==VK_ESCAPE)
-	{
-		SetWindowText(hText, m_pszTitle);
-		next_item(0);
-	}
+		if (WM_CHAR == nMsg && wParam==VK_ESCAPE)
+		{
+			SetWindowText(hText, m_pszTitle);
+			next_item(0);
+		}
 }
 
 void StringItem::Invoke(int button)
@@ -445,17 +447,17 @@ void StringItem::SetPosition(void)
 	if (NULL == hText)
 	{
 		hText = CreateWindow(
-			TEXT("EDIT"),
-			NULL,
-			WS_CHILD
-			| ES_AUTOHSCROLL
-			| ES_MULTILINE,
-			0, 0, 0, 0,
-			m_pMenu->m_hwnd,
-			(HMENU)1234,
-			hMainInstance,
-			NULL
-			);
+					TEXT("EDIT"),
+					NULL,
+					WS_CHILD
+					| ES_AUTOHSCROLL
+					| ES_MULTILINE,
+					0, 0, 0, 0,
+					m_pMenu->m_hwnd,
+					(HMENU)1234,
+					hMainInstance,
+					NULL
+				);
 
 		SetWindowLongPtr(hText, GWLP_USERDATA, (LONG_PTR)this);
 		wpEditProc = (WNDPROC)SetWindowLongPtr(hText, GWLP_WNDPROC, (LONG_PTR)EditProc);
@@ -470,7 +472,8 @@ void StringItem::SetPosition(void)
 
 	int is = m_pMenu->m_iconSize;
 	if (-2 == is) is = MenuInfo.nIconSize;
-	RECT r; GetTextRect(&r, is);
+	RECT r;
+	GetTextRect(&r, is);
 	int h = r.bottom - r.top - 4;
 	int w = r.right - r.left + 2;
 	SetWindowPos(hText, NULL, r.left-1, r.top+2, w, h, SWP_NOZORDER | SWP_NOACTIVATE | SWP_SHOWWINDOW);
@@ -488,97 +491,98 @@ void StringItem::SetPosition(void)
 LRESULT CALLBACK StringItem::EditProc(HWND hText, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	StringItem *pStringItem = (StringItem*)GetWindowLongPtr(hText, GWLP_USERDATA);
-	switch(msg)
+	switch (msg)
 	{
 		// --------------------------------------------------------
 		// Send Result
 
-		case WM_MOUSEMOVE:
-			PostMessage(GetParent(hText), WM_MOUSEMOVE, wParam, MAKELPARAM(10, pStringItem->m_nTop+2));
-			break;
+	case WM_MOUSEMOVE:
+		PostMessage(GetParent(hText), WM_MOUSEMOVE, wParam, MAKELPARAM(10, pStringItem->m_nTop+2));
+		break;
 
 		// --------------------------------------------------------
 		// Key Intercept
 
-		case WM_KEYDOWN:
-			switch (wParam)
-			{
-				case VK_DOWN:
-				case VK_UP:
-					pStringItem->Key(msg, wParam);
-					return 0;
-			}
-			break;
+	case WM_KEYDOWN:
+		switch (wParam)
+		{
+		case VK_DOWN:
+		case VK_UP:
+			pStringItem->Key(msg, wParam);
+			return 0;
+		}
+		break;
 
-		case WM_CHAR:
-			switch (wParam)
-			{
-				case VK_RETURN:
-					pStringItem->Invoke(INVOKE_LEFT);
-					pStringItem->next_item(0);
-					return 0;
+	case WM_CHAR:
+		switch (wParam)
+		{
+		case VK_RETURN:
+			pStringItem->Invoke(INVOKE_LEFT);
+			pStringItem->next_item(0);
+			return 0;
 
-				case VK_ESCAPE:
-					pStringItem->Key(msg, wParam);
+		case VK_ESCAPE:
+			pStringItem->Key(msg, wParam);
 
-				case VK_TAB:
-					return 0;
+		case VK_TAB:
+			return 0;
 
-				case 'A' - 0x40: // ctrl-A: select all
-					SendMessage(hText, EM_SETSEL, 0, GetWindowTextLength(hText));
-					return 0;
-			}
-			break;
+		case 'A' - 0x40: // ctrl-A: select all
+			SendMessage(hText, EM_SETSEL, 0, GetWindowTextLength(hText));
+			return 0;
+		}
+		break;
 
 		// --------------------------------------------------------
 		// Paint
 
-		case WM_PAINT:
-		{
-			PAINTSTRUCT ps;
-			HDC hdc = BeginPaint(hText, &ps);
-			RECT r; GetClientRect(hText, &r);
-			HDC buf = CreateCompatibleDC(hdc);
-			HGDIOBJ oldbuf = SelectObject(buf, CreateCompatibleBitmap(hdc, r.right, r.bottom));
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hText, &ps);
+		RECT r;
+		GetClientRect(hText, &r);
+		HDC buf = CreateCompatibleDC(hdc);
+		HGDIOBJ oldbuf = SelectObject(buf, CreateCompatibleBitmap(hdc, r.right, r.bottom));
 
-			StyleItem *pSI = &mStyle.MenuFrame;
-			MakeGradient(buf, r, pSI->type, pSI->Color, pSI->ColorTo, pSI->interlaced, BEVEL_SUNKEN, BEVEL1, 0, 0, 0);
-			CallWindowProc(pStringItem->wpEditProc, hText, msg, (WPARAM)buf, lParam);
+		StyleItem *pSI = &mStyle.MenuFrame;
+		MakeGradient(buf, r, pSI->type, pSI->Color, pSI->ColorTo, pSI->interlaced, BEVEL_SUNKEN, BEVEL1, 0, 0, 0);
+		CallWindowProc(pStringItem->wpEditProc, hText, msg, (WPARAM)buf, lParam);
 
-			BitBltRect(hdc, buf, &ps.rcPaint);
-			DeleteObject(SelectObject(buf, oldbuf));
-			DeleteDC(buf);
-			EndPaint(hText, &ps);
-			return 0;
-		}
+		BitBltRect(hdc, buf, &ps.rcPaint);
+		DeleteObject(SelectObject(buf, oldbuf));
+		DeleteDC(buf);
+		EndPaint(hText, &ps);
+		return 0;
+	}
 
-		case WM_ERASEBKGND:
-			return TRUE;
+	case WM_ERASEBKGND:
+		return TRUE;
 
-		case WM_DESTROY:
-			pStringItem->hText = NULL;
-			break;
+	case WM_DESTROY:
+		pStringItem->hText = NULL;
+		break;
 
-		case WM_SETFOCUS:
-			pStringItem->m_pMenu->m_bHasFocus = true;
+	case WM_SETFOCUS:
+		pStringItem->m_pMenu->m_bHasFocus = true;
 #ifdef CHECKFOCUS
-			dbg_printf("WM_SETFOCUS %s", "edit");
-			InvalidateRect(pStringItem->m_pMenu->m_hwnd, NULL, FALSE);
+		dbg_printf("WM_SETFOCUS %s", "edit");
+		InvalidateRect(pStringItem->m_pMenu->m_hwnd, NULL, FALSE);
 #endif
-			break;
+		break;
 
-		case WM_KILLFOCUS:
-			if (SendMessage(hText, EM_GETMODIFY, 0, 0))
-				pStringItem->Invoke(INVOKE_LEFT);
+	case WM_KILLFOCUS:
+		if (SendMessage(hText, EM_GETMODIFY, 0, 0))
+			pStringItem->Invoke(INVOKE_LEFT);
 
-			pStringItem->Active(0);
+		pStringItem->Active(0);
 
-			pStringItem->m_pMenu->m_bHasFocus = false;
+		pStringItem->m_pMenu->m_bHasFocus = false;
 #ifdef CHECKFOCUS
-			dbg_printf("WM_KILLFOCUS %s", "edit");
-			InvalidateRect(pStringItem->m_pMenu->m_hwnd, NULL, FALSE);
+		dbg_printf("WM_KILLFOCUS %s", "edit");
+		InvalidateRect(pStringItem->m_pMenu->m_hwnd, NULL, FALSE);
 #endif
-			break;
+		break;
 	}
 	return CallWindowProc(pStringItem->wpEditProc, hText, msg, wParam, lParam);
 }

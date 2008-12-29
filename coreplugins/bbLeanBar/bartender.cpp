@@ -35,7 +35,8 @@ using namespace std;
 bool QueryExtensionDetails(const char* libname, const char* itemkey);
 
 
-bool GetExtenderList() {
+bool GetExtenderList()
+{
 
 	WIN32_FIND_DATA FindFileData;
 	HANDLE hFind;
@@ -55,11 +56,12 @@ bool GetExtenderList() {
 	hFind = FindFirstFile(strPattern.c_str(), &FindFileData);
 	if (hFind != INVALID_HANDLE_VALUE)
 	{
-		while(true)
+		while (true)
 		{
 			dbg_printf("Bartender found DLL %s...", FindFileData.cFileName);
 			strModule = strPath + FindFileData.cFileName;
-			if (QueryExtensionDetails(strModule.c_str(),&modkey)) {
+			if (QueryExtensionDetails(strModule.c_str(),&modkey))
+			{
 				dbg_printf("Loaded key '%s' from module %s!",modkey,strModule.c_str());
 			}
 			if (FindNextFile(hFind, &FindFileData) == 0) break;
@@ -74,7 +76,8 @@ bool GetExtenderList() {
 }
 
 
-bool QueryExtensionDetails(const char* libname, const char* itemkey) {
+bool QueryExtensionDetails(const char* libname, const char* itemkey)
+{
 	// First, load the module. A NULL is a bad thing, so if that happens we return
 	// a false.
 	HINSTANCE hPlugin = LoadLibrary(libname);

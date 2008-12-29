@@ -5,7 +5,8 @@
 
 void debugPrint(const char *fmt, ...)
 {
-	char buffer[256]; va_list arg;
+	char buffer[256];
+	va_list arg;
 	va_start(arg, fmt);
 	vsprintf (buffer, fmt, arg);
 	strcat(buffer, "\n");
@@ -24,18 +25,18 @@ ST void init_tooltips(void)
 	InitCommonControlsEx(&ic);
 
 	hToolTips = CreateWindowEx(
-		WS_EX_TOPMOST|WS_EX_TOOLWINDOW,
-		TOOLTIPS_CLASS,
-		NULL,
-		WS_POPUP | TTS_ALWAYSTIP | TTS_NOPREFIX,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		NULL,
-		NULL,
-		NULL,
-		NULL);
+					WS_EX_TOPMOST|WS_EX_TOOLWINDOW,
+					TOOLTIPS_CLASS,
+					NULL,
+					WS_POPUP | TTS_ALWAYSTIP | TTS_NOPREFIX,
+					CW_USEDEFAULT,
+					CW_USEDEFAULT,
+					CW_USEDEFAULT,
+					CW_USEDEFAULT,
+					NULL,
+					NULL,
+					NULL,
+					NULL);
 
 	SendMessage(hToolTips, TTM_SETMAXTIPWIDTH, 0, 300);
 	SendMessage(hToolTips, TTM_SETDELAYTIME, TTDT_AUTOMATIC, 300);
@@ -63,7 +64,8 @@ void SetToolTip(HWND hwnd, RECT *tipRect, char *tipText)
 {
 	if (NULL==hToolTips || 0 == *tipText) return;
 
-	struct tt **tp, *t; unsigned n=0;
+	struct tt **tp, *t;
+	unsigned n=0;
 	for (tp=&tt0; NULL!=(t=*tp); tp=&t->next)
 	{
 		if (hwnd == t->ti.hwnd && 0==memcmp(&t->ti.rect, tipRect, sizeof(RECT)))
@@ -106,24 +108,25 @@ void SetToolTip(HWND hwnd, RECT *tipRect, char *tipText)
 void ClearToolTips(HWND hwnd)
 {
 	struct tt **tp, *t;
-	tp=&tt0; while (NULL!=(t=*tp))
+	tp=&tt0;
+	while (NULL!=(t=*tp))
 	{
 		if (hwnd != t->ti.hwnd)
 		{
 			tp=&t->next;
 		}
 		else
-		if (0==t->used_flg)
-		{
-			SendMessage(hToolTips, TTM_DELTOOL, 0, (LPARAM)&t->ti);
-			*tp=t->next;
-			delete t;
-		}
-		else
-		{
-			t->used_flg = 0;
-			tp=&t->next;
-		}
+			if (0==t->used_flg)
+			{
+				SendMessage(hToolTips, TTM_DELTOOL, 0, (LPARAM)&t->ti);
+				*tp=t->next;
+				delete t;
+			}
+			else
+			{
+				t->used_flg = 0;
+				tp=&t->next;
+			}
 	}
 }
 
@@ -282,57 +285,61 @@ private:
 		if (ret) return *ret;
 		switch (message)
 		{
-			case WM_PAINT:
-				this->paint(hwnd);
-				break;
+		case WM_PAINT:
+			this->paint(hwnd);
+			break;
 
 
-			case WM_CREATE:
-				Post(NIN_BALLOONSHOW);
-				// we do it like this because if the value is unset (=0) the old code should
-				// become active and do things like they used to be done. 8 seconds or more.
-				if (balloonTimeout == 0) {
-					SetTimer(hwnd, iBalloonTimerId, imax(8000, balloon.uInfoTimeout), NULL);
-				} else {
-					// If a value is set, we use it rather than the default value
-					SetTimer(hwnd, iBalloonTimerId, balloonTimeout, NULL);
-				}
-				break;
+		case WM_CREATE:
+			Post(NIN_BALLOONSHOW);
+			// we do it like this because if the value is unset (=0) the old code should
+			// become active and do things like they used to be done. 8 seconds or more.
+			if (balloonTimeout == 0)
+			{
+				SetTimer(hwnd, iBalloonTimerId, imax(8000, balloon.uInfoTimeout), NULL);
+			}
+			else
+			{
+				// If a value is set, we use it rather than the default value
+				SetTimer(hwnd, iBalloonTimerId, balloonTimeout, NULL);
+			}
+			break;
 
-			case WM_DESTROY:
+		case WM_DESTROY:
+			KillTimer(hwnd,iBalloonTimerId);
+			if (false == this->finished) Post(NIN_BALLOONHIDE);
+			break;
+
+		case WM_TIMER:
+			// Kill the timer and destroy the balloon.
+			Post(NIN_BALLOONTIMEOUT);
+			KillTimer(hwnd,iBalloonTimerId);
+			delete this;
+			break;
+
+		case WM_RBUTTONDOWN:
+			if (balloonRightButtonDismiss)
+			{
+				debugPrint("Dismissing balloon popup!");
 				KillTimer(hwnd,iBalloonTimerId);
-				if (false == this->finished) Post(NIN_BALLOONHIDE);
-				break;
-
-			case WM_TIMER:
-				// Kill the timer and destroy the balloon.
 				Post(NIN_BALLOONTIMEOUT);
-				KillTimer(hwnd,iBalloonTimerId);
 				delete this;
 				break;
+			}
+		case WM_LBUTTONDOWN:
+		case WM_MBUTTONDOWN:
+			KillTimer(hwnd,iBalloonTimerId);
+			Post(NIN_BALLOONUSERCLICK);
+			delete this;
+			break;
 
-			case WM_RBUTTONDOWN:
-				if (balloonRightButtonDismiss) {
-					debugPrint("Dismissing balloon popup!");
-					KillTimer(hwnd,iBalloonTimerId);
-					Post(NIN_BALLOONTIMEOUT);
-					delete this;
-					break;
-				}
-			case WM_LBUTTONDOWN:
-			case WM_MBUTTONDOWN:
-				KillTimer(hwnd,iBalloonTimerId);
-				Post(NIN_BALLOONUSERCLICK);
-				delete this;
-				break;
+		case BB_RECONFIGURE:
+			calculate_size();
+			BBP_reconfigure(this);
+			break;
 
-			case BB_RECONFIGURE:
-				calculate_size();
-				BBP_reconfigure(this);
-				break;
-
-			default:
-				return DefWindowProc(hwnd, message, wParam, lParam);
+		default:
+			return DefWindowProc(hwnd, message, wParam, lParam);
 		}
 		return 0;
 	}
@@ -385,16 +392,16 @@ public:
 		ti.lpszText = balloon.szInfo;
 
 		hwndBalloon = CreateWindowEx(
-			WS_EX_TOPMOST|WS_EX_TOOLWINDOW,
-			TOOLTIPS_CLASS,
-			NULL,
-			WS_POPUP | TTS_NOPREFIX | TTS_BALLOON,
-			0,0,0,0,
-			hwndParent,
-			NULL,
-			hInstance,
-			NULL
-			);
+						  WS_EX_TOPMOST|WS_EX_TOOLWINDOW,
+						  TOOLTIPS_CLASS,
+						  NULL,
+						  WS_POPUP | TTS_NOPREFIX | TTS_BALLOON,
+						  0,0,0,0,
+						  hwndParent,
+						  NULL,
+						  hInstance,
+						  NULL
+					  );
 
 		SendMessage(hwndBalloon, TTM_SETMAXTIPWIDTH, 0, 270);
 		SendMessage(hwndBalloon, TTM_ADDTOOL, 0, (LPARAM)&ti);
@@ -428,33 +435,33 @@ private:
 		win_balloon *p = (win_balloon *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 		switch (message)
 		{
-			case WM_CREATE:
-				debugPrint("wm_create: balloonTimeout=%i.",balloonTimeout);
-				break;
+		case WM_CREATE:
+			debugPrint("wm_create: balloonTimeout=%i.",balloonTimeout);
+			break;
 
-			case WM_DESTROY:
-				if (false == p->finished)
-					p->Post(NIN_BALLOONHIDE);
-				break;
+		case WM_DESTROY:
+			if (false == p->finished)
+				p->Post(NIN_BALLOONHIDE);
+			break;
 
-			case WM_TIMER:
-				debugPrint("wm_timer: balloonTimeout=%i.",balloonTimeout);
-				if (iBalloonTimerId != (int)wParam) break;
-				p->Post(NIN_BALLOONTIMEOUT);
-				KillTimer(hwnd, iBalloonTimerId);
-				debugPrint("wm_timer: timer was killed!");
-				delete p;
-				return 0;
+		case WM_TIMER:
+			debugPrint("wm_timer: balloonTimeout=%i.",balloonTimeout);
+			if (iBalloonTimerId != (int)wParam) break;
+			p->Post(NIN_BALLOONTIMEOUT);
+			KillTimer(hwnd, iBalloonTimerId);
+			debugPrint("wm_timer: timer was killed!");
+			delete p;
+			return 0;
 
-			case WM_RBUTTONDOWN:
-			case WM_LBUTTONDOWN:
-			case WM_MBUTTONDOWN:
-				p->Post(NIN_BALLOONUSERCLICK);
-				delete p;
-				return 0;
+		case WM_RBUTTONDOWN:
+		case WM_LBUTTONDOWN:
+		case WM_MBUTTONDOWN:
+			p->Post(NIN_BALLOONUSERCLICK);
+			delete p;
+			return 0;
 
-			default:
-				break;
+		default:
+			break;
 		}
 		return CallWindowProc (p->prev_wndproc, hwnd, message, wParam, lParam);
 	}

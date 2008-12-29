@@ -66,14 +66,21 @@ LPCSTR pluginInfo(int field)
 {
 	switch (field)
 	{
-		default:
-		case 0: return szVersion;
-		case 1: return szAppName;
-		case 2: return szInfoVersion;
-		case 3: return szInfoAuthor;
-		case 4: return szInfoRelDate;
-		case 5: return szInfoLink;
-		case 6: return szInfoEmail;
+	default:
+	case 0:
+		return szVersion;
+	case 1:
+		return szAppName;
+	case 2:
+		return szInfoVersion;
+	case 3:
+		return szInfoAuthor;
+	case 4:
+		return szInfoRelDate;
+	case 5:
+		return szInfoLink;
+	case 6:
+		return szInfoEmail;
 	}
 }
 
@@ -128,8 +135,20 @@ struct plugin_info *g_PI;
 #define NIN_BALLOONUSERCLICK (WM_USER + 5)
 
 //===========================================================================
-struct config { const char *str; char mode; void *def; void *ptr; };
-struct pmenu { const char *displ; const char *msg; char f; void *ptr; };
+struct config
+{
+	const char *str;
+	char mode;
+	void *def;
+	void *ptr;
+};
+struct pmenu
+{
+	const char *displ;
+	const char *msg;
+	char f;
+	void *ptr;
+};
 
 LRESULT CALLBACK fakeWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -141,9 +160,9 @@ struct barinfo : plugin_info
 	barinfo()
 	{
 		if (ApiLoader.requestApiPresence(TEXT("boxCore::hasTrayIconEvent")));
-			TrayIconEvent = (fnTrayIconEvent)ApiLoader.requestApiPointer("TrayIconEvent");
+		TrayIconEvent = (fnTrayIconEvent)ApiLoader.requestApiPointer("TrayIconEvent");
 		if (ApiLoader.requestApiPresence(TEXT("boxCore::hasSetTaskbarPos")));
-			SetTaskbarPos = (fnSetTaskbarPos)ApiLoader.requestApiPointer("SetTaskbarPos");
+		SetTaskbarPos = (fnSetTaskbarPos)ApiLoader.requestApiPointer("SetTaskbarPos");
 	}
 
 	void process_broam(const char *temp, int f);
@@ -248,7 +267,10 @@ struct barinfo : plugin_info
 	// to implement the 'current tasks only' feature
 
 	struct tasklist *TL;
-	struct tasklist *GetTaskListPtrEx(void) { return TL; }
+	struct tasklist *GetTaskListPtrEx(void)
+	{
+		return TL;
+	}
 
 	static BOOL task_enum_func(struct tasklist *tl, LPARAM lParam)
 	{
@@ -287,15 +309,24 @@ struct barinfo : plugin_info
 
 	struct tasklist * GetTaskPtrEx(int pos)
 	{
-		struct tasklist *tl = TL; int i = 0;
-		while (tl) { if (pos == i) break; i++, tl = tl->next; }
+		struct tasklist *tl = TL;
+		int i = 0;
+		while (tl)
+		{
+			if (pos == i) break;
+			i++, tl = tl->next;
+		}
 		return tl;
 	}
 
 	int GetTaskListSizeEx(void)
 	{
-		struct tasklist *tl = TL; int i = 0;
-		while (tl) { i++, tl = tl->next; }
+		struct tasklist *tl = TL;
+		int i = 0;
+		while (tl)
+		{
+			i++, tl = tl->next;
+		}
 		return i;
 	}
 
@@ -325,8 +356,16 @@ struct barinfo : plugin_info
 
 	static BOOL gettrayicon_fn(systemTray *icon, LPARAM lParam)
 	{
-		struct is { int n; systemTray * st; } *ip = (is*)lParam;
-		if (0 == ip->n -- ) { ip->st = icon; return FALSE; }
+		struct is
+		{
+			int n;
+			systemTray * st;
+		} *ip = (is*)lParam;
+		if (0 == ip->n -- )
+		{
+			ip->st = icon;
+			return FALSE;
+		}
 		return TRUE;
 	}
 
@@ -339,7 +378,11 @@ struct barinfo : plugin_info
 
 	systemTray *GetTrayIcon(int i)
 	{
-		struct { int n; systemTray * st; } is = { i, NULL };
+		struct
+		{
+			int n;
+			systemTray * st;
+		} is = { i, NULL };
 		EnumTray(gettrayicon_fn, (LPARAM)&is);
 		return is.st;
 	}
@@ -373,59 +416,61 @@ ST bool tbStyle[3]             ;
 
 void barinfo::make_cfg()
 {
-	struct config c [] = {
-	{  "widthPercent" ,     R_INT, (void*)72,             &widthPercent },
-	{  "tasks.style" ,      R_INT, (void*)2,              &TaskStyleCfg },
-	{  "tasks.reverse" ,    R_BOL, (void*)false,          &reverseTasks },
-	{  "tasks.current" ,    R_BOL, (void*)false,          &currentOnlyCfg },
-	{  "tasks.sysmenu" ,    R_BOL, (void*)false,          &taskSysmenu },
-	{  "tasks.drawBorder" , R_BOL, (void*)false,          &task_with_border },
-	{  "icon.saturation" ,  R_INT, (void*)0,              &iconSaturationValue },
-	{  "icon.hue" ,         R_INT, (void*)60,             &iconHueIntensity },
-	{  "tray.saturation" ,  R_INT, (void*)0,              &traySaturationValue },
-	{  "tray.hue" ,         R_INT, (void*)60,             &trayHueIntensity },
-	{  "alpha.value" ,      R_INT, (void*)255,            &alphaValue },
-	{  "icon.Size" ,        R_INT, (void*)0,              &iconSize },
-	{  "strftimeFormat" ,   R_STR, (void*)"%H:%M",        &strftimeFormat },
-	{  "strftimeTipsFormat",R_STR, (void*)"%A %d %B %Y",  &strftimeTipsFormat },
-	{  "balloonTips" ,      R_BOL, (void*)true,           &enable_balloons },
-	{  "autoFullscreenHide",R_BOL, (void*)false,          &hide_in_fullscreen },
-	{  "tasks.maxWidth",    R_INT, (void*)0,              &maxTaskItemWidth },
+	struct config c [] =
+	{
+		{  "widthPercent" ,     R_INT, (void*)72,             &widthPercent },
+		{  "tasks.style" ,      R_INT, (void*)2,              &TaskStyleCfg },
+		{  "tasks.reverse" ,    R_BOL, (void*)false,          &reverseTasks },
+		{  "tasks.current" ,    R_BOL, (void*)false,          &currentOnlyCfg },
+		{  "tasks.sysmenu" ,    R_BOL, (void*)false,          &taskSysmenu },
+		{  "tasks.drawBorder" , R_BOL, (void*)false,          &task_with_border },
+		{  "icon.saturation" ,  R_INT, (void*)0,              &iconSaturationValue },
+		{  "icon.hue" ,         R_INT, (void*)60,             &iconHueIntensity },
+		{  "tray.saturation" ,  R_INT, (void*)0,              &traySaturationValue },
+		{  "tray.hue" ,         R_INT, (void*)60,             &trayHueIntensity },
+		{  "alpha.value" ,      R_INT, (void*)255,            &alphaValue },
+		{  "icon.Size" ,        R_INT, (void*)0,              &iconSize },
+		{  "strftimeFormat" ,   R_STR, (void*)"%H:%M",        &strftimeFormat },
+		{  "strftimeTipsFormat",R_STR, (void*)"%A %d %B %Y",  &strftimeTipsFormat },
+		{  "balloonTips" ,      R_BOL, (void*)true,           &enable_balloons },
+		{  "autoFullscreenHide",R_BOL, (void*)false,          &hide_in_fullscreen },
+		{  "tasks.maxWidth",    R_INT, (void*)0,              &maxTaskItemWidth },
 // Noccy: Changed this back to 0 to allow for default behaviour
-	{  "balloonTimeout" ,   R_INT, (void*)0,              &balloonTimeout },
-	{  "balloonRightDismiss", R_BOL, (void*)false,          &balloonRightButtonDismiss },
-	{ NULL,0,NULL,NULL }
+		{  "balloonTimeout" ,   R_INT, (void*)0,              &balloonTimeout },
+		{  "balloonRightDismiss", R_BOL, (void*)false,          &balloonRightButtonDismiss },
+		{ NULL,0,NULL,NULL }
 	};
 
 	cfg_list = (struct config *)memcpy(new char[sizeof c], c,  sizeof c);
 
-	struct pmenu m [] = {
-	{ "Width Percent",          "widthPercent",   CFG_INT, &widthPercent  },
+	struct pmenu m [] =
+	{
+		{ "Width Percent",          "widthPercent",   CFG_INT, &widthPercent  },
 
-	#define MENUITEM_TBSTYLE 1
-	{ "Text only",              "tbStyle0",       CFG_TASK, &tbStyle[0] },
-	{ "Icons only",             "tbStyle1",       CFG_TASK, &tbStyle[1] },
-	{ "Text and Icons",         "tbStyle2",       CFG_TASK, &tbStyle[2] },
-	{ "Reversed",               "reversedTasks",  CFG_TASK, &reverseTasks  },
-	{ "Max Item Size",          "maxTaskItemWidth",   CFG_INT|CFG_255, &maxTaskItemWidth },
-	#define MENUITEM_CURRENT 6
-	{ "Current Only",           "currentOnly",    CFG_TASK, &currentOnlyCfg },
-	{ "System Menu",            "sysMenu",        CFG_TASK, &taskSysmenu },
-	{ "Draw Border",            "drawBorder",     CFG_TASK, &task_with_border },
-	#define MENUITEM_TASK_LAST 9
-	{ "Size",                   "iconSize",       CFG_INT, &iconSize  },
-	{ "Task Saturation",        "iconSaturation", CFG_INT|CFG_255, &iconSaturationValue  },
-	{ "Task Hue",               "iconHue",        CFG_INT|CFG_255, &iconHueIntensity  },
-	{ "Tray Saturation",        "traySaturation", CFG_INT|CFG_255, &traySaturationValue  },
-	{ "Tray Hue",               "trayHue",        CFG_INT|CFG_255, &trayHueIntensity  },
-	#define MENUITEM_SPECIAL 14
-	{ "Enable Balloon Tips",    "enableBalloonTips", 0, &enable_balloons  },
-	{ "Detect Fullscreen App",  "autoFullscreenHide", 0, &hide_in_fullscreen  },
-	#define MENUITEM_NORMAL 16
-	{ "Clock Format",           "clockFormat",    CFG_STR, &strftimeFormat  },
-	{ "Clock Tips Format",      "clockTipsFormat", CFG_STR, &strftimeTipsFormat  },
-	#define MENUITEM_LAST 18
-	{ NULL,NULL,0,NULL }
+#define MENUITEM_TBSTYLE 1
+		{ "Text only",              "tbStyle0",       CFG_TASK, &tbStyle[0] },
+		{ "Icons only",             "tbStyle1",       CFG_TASK, &tbStyle[1] },
+		{ "Text and Icons",         "tbStyle2",       CFG_TASK, &tbStyle[2] },
+		{ "Reversed",               "reversedTasks",  CFG_TASK, &reverseTasks  },
+		{ "Max Item Size",          "maxTaskItemWidth",   CFG_INT|CFG_255, &maxTaskItemWidth },
+#define MENUITEM_CURRENT 6
+		{ "Current Only",           "currentOnly",    CFG_TASK, &currentOnlyCfg },
+		{ "System Menu",            "sysMenu",        CFG_TASK, &taskSysmenu },
+		{ "Draw Border",            "drawBorder",     CFG_TASK, &task_with_border },
+#define MENUITEM_TASK_LAST 9
+		{ "Size",                   "iconSize",       CFG_INT, &iconSize  },
+		{ "Task Saturation",        "iconSaturation", CFG_INT|CFG_255, &iconSaturationValue  },
+		{ "Task Hue",               "iconHue",        CFG_INT|CFG_255, &iconHueIntensity  },
+		{ "Tray Saturation",        "traySaturation", CFG_INT|CFG_255, &traySaturationValue  },
+		{ "Tray Hue",               "trayHue",        CFG_INT|CFG_255, &trayHueIntensity  },
+#define MENUITEM_SPECIAL 14
+		{ "Enable Balloon Tips",    "enableBalloonTips", 0, &enable_balloons  },
+		{ "Detect Fullscreen App",  "autoFullscreenHide", 0, &hide_in_fullscreen  },
+#define MENUITEM_NORMAL 16
+		{ "Clock Format",           "clockFormat",    CFG_STR, &strftimeFormat  },
+		{ "Clock Tips Format",      "clockTipsFormat", CFG_STR, &strftimeTipsFormat  },
+#define MENUITEM_LAST 18
+		{ NULL,NULL,0,NULL }
 	};
 
 	cfg_menu = (struct pmenu *)memcpy(new char [sizeof m], m,  sizeof m);
@@ -437,7 +482,11 @@ void barinfo::make_cfg()
 
 ST BOOL update_task_flag_fn(struct tasklist *tl, LPARAM lParam)
 {
-	struct ts { HWND hwnd; LPARAM lParam; } *tp = (ts*)lParam;
+	struct ts
+	{
+		HWND hwnd;
+		LPARAM lParam;
+	} *tp = (ts*)lParam;
 	if (tl->hwnd == tp->hwnd)
 		tl->flashing = TASKITEM_FLASHED == tp->lParam;
 
@@ -452,7 +501,11 @@ ST void set_task_flags(HWND hwnd, UINT lParam)
 	if (hwnd && FALSE == IsWindow(hwnd))
 		return;
 
-	struct ts { HWND hwnd; LPARAM lParam; } ts = { hwnd, lParam };
+	struct ts
+	{
+		HWND hwnd;
+		LPARAM lParam;
+	} ts = { hwnd, lParam };
 	EnumTasks(update_task_flag_fn, (LPARAM)&ts);
 }
 
@@ -519,17 +572,18 @@ void barinfo::update_windowlabel(void)
 	windowlabel[0] = 0;
 	struct tasklist *tl;
 	dolist (tl, GetTaskListPtrEx())
-		if (tl->active)
-		{
-			strcpy_max(windowlabel, tl->caption, sizeof windowlabel);
-			break;
-		}
+	if (tl->active)
+	{
+		strcpy_max(windowlabel, tl->caption, sizeof windowlabel);
+		break;
+	}
 }
 
 //===========================================================================
 ST void drop_style(HDROP hdrop)
 {
-	char filename[MAX_PATH]; filename[0]=0;
+	char filename[MAX_PATH];
+	filename[0]=0;
 	DragQueryFile(hdrop, 0, filename, sizeof(filename));
 	DragFinish(hdrop);
 	SendMessage(BBhwnd, BB_SETSTYLE, 1, (LPARAM)filename);
@@ -545,16 +599,17 @@ bool check_fullscreen_window(HMONITOR hMon)
 	if (hMon != GetMonitorRect(fg_hwnd, &s, GETMON_FROM_WINDOW))
 		return false;
 	// check for just maximized does not work for e.g. Firefox
-	RECT r; GetWindowRect(fg_hwnd, &r);
-/*
-	dbg_printf("%d/%d %d/%d - %d/%d %d/%d - %d",
-		r.left, r.top, r.right, r.bottom,
-		s.left, s.top, s.right, s.bottom,
-		hide_flag
-		);
-*/
+	RECT r;
+	GetWindowRect(fg_hwnd, &r);
+	/*
+		dbg_printf("%d/%d %d/%d - %d/%d %d/%d - %d",
+			r.left, r.top, r.right, r.bottom,
+			s.left, s.top, s.right, s.bottom,
+			hide_flag
+			);
+	*/
 	return r.right - r.left >= s.right - s.left
-		&& r.bottom - r.top >= s.bottom - s.top;
+		   && r.bottom - r.top >= s.bottom - s.top;
 }
 
 /*ST bool check_mouse(HWND hwnd)
@@ -600,289 +655,289 @@ LRESULT barinfo::wnd_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam,
 	switch (message)
 	{
 		//=============================================
-		case WM_ERASEBKGND:
-			return TRUE;
+	case WM_ERASEBKGND:
+		return TRUE;
 
 		//=============================================
-		case WM_PAINT:
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+
+		HDC hdc = BeginPaint(hwnd, &ps);
+		HDC buf = CreateCompatibleDC(NULL);
+		HGDIOBJ other = SelectObject(buf, CreateCompatibleBitmap(hdc, this->width, this->height));
+
+		RECT r = {0, 0, this->width, 0};
+		for (int i = 0; i < BarLines; i++)
 		{
-			PAINTSTRUCT ps;
-
-			HDC hdc = BeginPaint(hwnd, &ps);
-			HDC buf = CreateCompatibleDC(NULL);
-			HGDIOBJ other = SelectObject(buf, CreateCompatibleBitmap(hdc, this->width, this->height));
-
-			RECT r = {0, 0, this->width, 0};
-			for (int i = 0; i < BarLines; i++)
-			{
-				int o = bbLeanBarLineHeight[i];
-				r.bottom = r.top + o;
-				StyleItem *T = (StyleItem *)GetSettingPtr(SN_TOOLBAR);
-				this->pBuff->MakeStyleGradient(buf, &r, T, true);
-				r.top += o - styleBorderWidth;
-			}
-
-			hdcPaint = buf;
-			p_rcPaint = &ps.rcPaint;
-			this->pLeanBar->draw();
-			this->pLeanBar->settip();
-			ClearToolTips(hwnd);
-			this->pBuff->ClearBitmaps();
-			update_flag = 0;
-
-			BitBltRect(hdc, buf, &ps.rcPaint);
-			DeleteObject(SelectObject(buf, other));
-			DeleteDC(buf);
-			EndPaint(hwnd, &ps);
-			return 0;
+			int o = bbLeanBarLineHeight[i];
+			r.bottom = r.top + o;
+			StyleItem *T = (StyleItem *)GetSettingPtr(SN_TOOLBAR);
+			this->pBuff->MakeStyleGradient(buf, &r, T, true);
+			r.top += o - styleBorderWidth;
 		}
 
-		//=============================================
-		case WM_CREATE:
-			SendMessage(BBhwnd, BB_REGISTERMESSAGE, (WPARAM)hwnd, (LPARAM)msgs);
+		hdcPaint = buf;
+		p_rcPaint = &ps.rcPaint;
+		this->pLeanBar->draw();
+		this->pLeanBar->settip();
+		ClearToolTips(hwnd);
+		this->pBuff->ClearBitmaps();
+		update_flag = 0;
+
+		BitBltRect(hdc, buf, &ps.rcPaint);
+		DeleteObject(SelectObject(buf, other));
+		DeleteDC(buf);
+		EndPaint(hwnd, &ps);
+		return 0;
+	}
+
+	//=============================================
+	case WM_CREATE:
+		SendMessage(BBhwnd, BB_REGISTERMESSAGE, (WPARAM)hwnd, (LPARAM)msgs);
 #ifdef XOB
-			init_tasks(hwnd, this->hInstance);
+		init_tasks(hwnd, this->hInstance);
 #endif
-			this->pBuff = new BuffBmp;
-			this->pLeanBar = new LeanBar(this);
+		this->pBuff = new BuffBmp;
+		this->pLeanBar = new LeanBar(this);
 
 #ifdef WITH_EXTENDERS
-			GetExtenderList();
+		GetExtenderList();
 #endif
-			GetRCSettings();
-			currentOnly = currentOnlyCfg;
-			TaskStyle = TaskStyleCfg;
+		GetRCSettings();
+		currentOnly = currentOnlyCfg;
+		TaskStyle = TaskStyleCfg;
 
+		GetStyleSettings();
+		this->NewTasklist();
+		this->update_windowlabel();
+		set_screen_info();
+		this->set_clock_string();
+		this->update_bar(1);
+		this->set_fullscreen_timer();
+		break;
+
+		//=============================================
+	case WM_DESTROY:
+		SendMessage(BBhwnd, BB_UNREGISTERMESSAGE, (WPARAM)hwnd, (LPARAM)msgs);
+		SetDesktopMargin(hwnd, 0, 0);
+		delete this->pLeanBar;
+		delete this->pBuff;
+		if (hFont) DeleteObject(hFont), hFont = NULL;
+		DelTasklist();
+		this->reset_tbinfo();
+#ifdef XOB
+		exit_tasks();
+#endif
+		break;
+
+		//=============================================
+	case BB_TOGGLETRAY:
+		BBP_set_hidden(this, false == this->hidden);
+		break;
+
+		//=============================================
+	case BB_REDRAWGUI:
+		if (wParam & BBRG_TOOLBAR)
+		{
+			force_button_pressed = 0 != (wParam & BBRG_PRESSED);
 			GetStyleSettings();
-			this->NewTasklist();
-			this->update_windowlabel();
-			set_screen_info();
 			this->set_clock_string();
 			this->update_bar(1);
-			this->set_fullscreen_timer();
-			break;
-
-		//=============================================
-		case WM_DESTROY:
-			SendMessage(BBhwnd, BB_UNREGISTERMESSAGE, (WPARAM)hwnd, (LPARAM)msgs);
-			SetDesktopMargin(hwnd, 0, 0);
-			delete this->pLeanBar;
-			delete this->pBuff;
-			if (hFont) DeleteObject(hFont), hFont = NULL;
-			DelTasklist();
-			this->reset_tbinfo();
-#ifdef XOB
-			exit_tasks();
-#endif
-			break;
-
-		//=============================================
-		case BB_TOGGLETRAY:
-			BBP_set_hidden(this, false == this->hidden);
-			break;
-
-		//=============================================
-		case BB_REDRAWGUI:
-			if (wParam & BBRG_TOOLBAR)
-			{
-				force_button_pressed = 0 != (wParam & BBRG_PRESSED);
-				GetStyleSettings();
-				this->set_clock_string();
-				this->update_bar(1);
-			}
-			break;
+		}
+		break;
 
 		//=============================================
 		// If Blackbox sends a reconfigure message, load the new settings and update window...
 
-		case BB_RECONFIGURE:
-			GetExtenderList();
-			GetRCSettings();
-			GetStyleSettings();
-			this->NewTasklist();
-			this->update_windowlabel();
-			set_screen_info();
-			this->set_clock_string();
-			this->update_bar(1);
-			this->set_fullscreen_timer();
-			break;
+	case BB_RECONFIGURE:
+		GetExtenderList();
+		GetRCSettings();
+		GetStyleSettings();
+		this->NewTasklist();
+		this->update_windowlabel();
+		set_screen_info();
+		this->set_clock_string();
+		this->update_bar(1);
+		this->set_fullscreen_timer();
+		break;
 
 		//=============================================
 		// Desktop or Desktop Name changed
 
-		case BB_DESKTOPINFO:
-			if (((DesktopInfo *)lParam)->isCurrent)
-			{
-				set_screen_info();
-				this->NewTasklist();
-				this->update_bar(2);
-			}
-			break;
+	case BB_DESKTOPINFO:
+		if (((DesktopInfo *)lParam)->isCurrent)
+		{
+			set_screen_info();
+			this->NewTasklist();
+			this->update_bar(2);
+		}
+		break;
 
 		//=============================================
 		// Task was added/removed/activated/has changed text
 
-		case BB_TASKSUPDATE:
-			if (false == is_bblean) set_task_flags((HWND)wParam, lParam);
+	case BB_TASKSUPDATE:
+		if (false == is_bblean) set_task_flags((HWND)wParam, lParam);
 
-			this->NewTasklist();
+		this->NewTasklist();
 
-			if (false == ShowingExternalLabel)
-				this->update_windowlabel();
+		if (false == ShowingExternalLabel)
+			this->update_windowlabel();
 
-			this->update_bar(2);
+		this->update_bar(2);
 
-			if (false == this->toggled_hidden)
-			{
-				bool hide_flag = this->hide_in_fullscreen
-					&& false == this->autoHide
-					&& check_fullscreen_window(this->hMon);
+		if (false == this->toggled_hidden)
+		{
+			bool hide_flag = this->hide_in_fullscreen
+							 && false == this->autoHide
+							 && check_fullscreen_window(this->hMon);
 
-				BBP_set_hidden(this, hide_flag);
-			}
-			break;
+			BBP_set_hidden(this, hide_flag);
+		}
+		break;
 
 		//=============================================
 		// Tray Icon was added/removed/has changed tooltip
 
-		case BB_TRAYUPDATE:
-			//dbg_printf("BB_TRAYUPDATE %x %d", wParam, lParam);
-			if (TRAYICON_MODIFIED == lParam)
+	case BB_TRAYUPDATE:
+		//dbg_printf("BB_TRAYUPDATE %x %d", wParam, lParam);
+		if (TRAYICON_MODIFIED == lParam)
+		{
+			if (NIF_TIP == wParam || NIF_INFO == wParam)
 			{
-				if (NIF_TIP == wParam || NIF_INFO == wParam)
-				{
-					this->pLeanBar->settip();
-					ClearToolTips(hwnd);
-				}
-				else
-				{
-					this->pLeanBar->invalidate_item(M_TRAYLIST);
-				}
+				this->pLeanBar->settip();
+				ClearToolTips(hwnd);
 			}
 			else
 			{
-				this->update_bar(4);
+				this->pLeanBar->invalidate_item(M_TRAYLIST);
+			}
+		}
+		else
+		{
+			this->update_bar(4);
+		}
+		break;
+
+		//=============================================
+	case WM_TIMER:
+		if (CLOCK_TIMER == wParam)
+		{
+			this->set_clock_string();
+			//pLeanBar->invalidate_item(M_CLCK);
+			this->update_bar(1);
+			break;
+		}
+
+		if (TASK_RISE_TIMER == wParam)
+		{
+			handle_task_timer(m_TinyDropTarget);
+			break;
+		}
+
+		if (FULLSCREEN_CHECK_TIMER == wParam)
+		{
+			if (false == this->toggled_hidden)
+			{
+				bool hide_flag = this->hide_in_fullscreen
+								 && false == this->autoHide
+								 && check_fullscreen_window(this->hMon);
+
+				BBP_set_hidden(this, hide_flag);
 			}
 			break;
+		}
 
-		//=============================================
-		case WM_TIMER:
-			if (CLOCK_TIMER == wParam)
-			{
-				this->set_clock_string();
-				//pLeanBar->invalidate_item(M_CLCK);
-				this->update_bar(1);
-				break;
-			}
+		KillTimer(hwnd, wParam);
 
-			if (TASK_RISE_TIMER == wParam)
-			{
-				handle_task_timer(m_TinyDropTarget);
-				break;
-			}
-
-			if (FULLSCREEN_CHECK_TIMER == wParam)
-			{
-				if (false == this->toggled_hidden)
-				{
-					bool hide_flag = this->hide_in_fullscreen
-						&& false == this->autoHide
-						&& check_fullscreen_window(this->hMon);
-
-					BBP_set_hidden(this, hide_flag);
-				}
-				break;
-			}
-
-			KillTimer(hwnd, wParam);
-
-			if (LABEL_TIMER == wParam)
-			{
-				ShowingExternalLabel = false;
-				update_windowlabel();
-				//pLeanBar->invalidate_item(M_WINL);
-				this->update_bar(1);
-				break;
-			}
-			break;
-
-		//=============================================
-		case BB_DRAGOVER:
-			task_over_hwnd = NULL;
-			if (this->auto_hidden)
-				BBP_set_autoHide(this, true);
-			else
-				this->pLeanBar->mouse_event((short)LOWORD(lParam), (short)HIWORD(lParam), message, wParam);
-			return (LRESULT)task_over_hwnd;
-
-		//=============================================
-		case BB_SETTOOLBARLABEL:
-			if (NULL == strchr(item_string, M_WINL))
-				break;
-
-			SetTimer(hwnd, LABEL_TIMER, 2000, (TIMERPROC)NULL);
-			ShowingExternalLabel = true;
-			strcpy_max(windowlabel, (LPCSTR)lParam, sizeof windowlabel);
+		if (LABEL_TIMER == wParam)
+		{
+			ShowingExternalLabel = false;
+			update_windowlabel();
 			//pLeanBar->invalidate_item(M_WINL);
 			this->update_bar(1);
 			break;
+		}
+		break;
+
+		//=============================================
+	case BB_DRAGOVER:
+		task_over_hwnd = NULL;
+		if (this->auto_hidden)
+			BBP_set_autoHide(this, true);
+		else
+			this->pLeanBar->mouse_event((short)LOWORD(lParam), (short)HIWORD(lParam), message, wParam);
+		return (LRESULT)task_over_hwnd;
+
+		//=============================================
+	case BB_SETTOOLBARLABEL:
+		if (NULL == strchr(item_string, M_WINL))
+			break;
+
+		SetTimer(hwnd, LABEL_TIMER, 2000, (TIMERPROC)NULL);
+		ShowingExternalLabel = true;
+		strcpy_max(windowlabel, (LPCSTR)lParam, sizeof windowlabel);
+		//pLeanBar->invalidate_item(M_WINL);
+		this->update_bar(1);
+		break;
 
 		//=============================================
 		// R.S.: please dont touch
-		case WM_MOUSEACTIVATE:
-			return MA_NOACTIVATE;
+	case WM_MOUSEACTIVATE:
+		return MA_NOACTIVATE;
 
 		//=============================================
-		case WM_NCRBUTTONUP:
-			this->show_menu(true);
+	case WM_NCRBUTTONUP:
+		this->show_menu(true);
+		break;
+
+	case WM_RBUTTONDOWN:
+	case WM_RBUTTONUP:
+	case WM_RBUTTONDBLCLK:
+		//if (0x8000 & GetAsyncKeyState(VK_CONTROL))
+		if (wParam & MK_CONTROL)
+		{
+			if (WM_RBUTTONUP == message)
+				this->show_menu(true);
 			break;
+		}
+		goto mouse;
 
-		case WM_RBUTTONDOWN:
-		case WM_RBUTTONUP:
-		case WM_RBUTTONDBLCLK:
-			//if (0x8000 & GetAsyncKeyState(VK_CONTROL))
-			if (wParam & MK_CONTROL)
-			{
-				if (WM_RBUTTONUP == message)
-					this->show_menu(true);
-				break;
-			}
-			goto mouse;
-
-		case WM_LBUTTONDBLCLK:
-			if (wParam & MK_CONTROL)
-			{
-				BBP_set_place(this, old_place);
-				break;
-			}
-			goto mouse;
-
-		case WM_MOUSEWHEEL:
-		case WM_MOUSEMOVE:
-		case WM_LBUTTONDOWN:
-		case WM_LBUTTONUP:
-
-		case WM_MBUTTONDOWN:
-		case WM_MBUTTONUP:
-		case WM_MBUTTONDBLCLK:
-		mouse:
-			this->pLeanBar->mouse_event((short)LOWORD(lParam), (short)HIWORD(lParam), message, wParam);
+	case WM_LBUTTONDBLCLK:
+		if (wParam & MK_CONTROL)
+		{
+			BBP_set_place(this, old_place);
 			break;
+		}
+		goto mouse;
+
+	case WM_MOUSEWHEEL:
+	case WM_MOUSEMOVE:
+	case WM_LBUTTONDOWN:
+	case WM_LBUTTONUP:
+
+	case WM_MBUTTONDOWN:
+	case WM_MBUTTONUP:
+	case WM_MBUTTONDBLCLK:
+mouse:
+		this->pLeanBar->mouse_event((short)LOWORD(lParam), (short)HIWORD(lParam), message, wParam);
+		break;
 
 		//=============================================
-		case WM_DROPFILES:
-			drop_style((HDROP)wParam);
-			break;
+	case WM_DROPFILES:
+		drop_style((HDROP)wParam);
+		break;
 
 		/*case NIN_BALLOONSHOW:
 			((msg_balloon*)lParam)->show();
 			break;*/
 
 		//=============================================
-		default:
-			return DefWindowProc(hwnd,message,wParam,lParam);
+	default:
+		return DefWindowProc(hwnd,message,wParam,lParam);
 
-	//====================
+		//====================
 	}
 	return 0;
 }
@@ -911,7 +966,8 @@ void barinfo::GetRCSettings()
 		this->place = POS_TopCenter;
 
 	struct config *p = cfg_list;
-	do switch (p->mode) {
+	do switch (p->mode)
+		{
 		case R_BOL:
 			*(bool*)p->ptr = BBP_read_bool(this, p->str, (bool)(INT_PTR)p->def);
 			break;
@@ -924,7 +980,8 @@ void barinfo::GetRCSettings()
 			BBP_read_string(this, (char*)p->ptr, p->str, (char*)p->def);
 			break;
 
-	} while ((++p)->str);
+		}
+	while ((++p)->str);
 
 	ICOCLICKSLEEP = BBP_read_int(this, "tray.focusdelay", 60);
 	pSettings_arrowUnix = ReadBool(extensionsrcPath(), "blackbox.appearance.arrow.unix:", true);
@@ -932,7 +989,8 @@ void barinfo::GetRCSettings()
 	// -----------------------------------------------------------------
 	// read the bbleanbar.items
 
-	char *ip = item_string; LONG pos = 0;
+	char *ip = item_string;
+	LONG pos = 0;
 	char item_key[80];
 	sprintf(item_key, "%s.item:", this->rc_key);
 
@@ -944,7 +1002,8 @@ void barinfo::GetRCSettings()
 
 		//dbg_printf("c=<%s> pos=%d", c, pos);
 
-		static const char *baritemstrings[] = {
+		static const char *baritemstrings[] =
+		{
 			"Tasks" ,
 			"Tray" ,
 			"WorkspaceLabel" ,
@@ -988,16 +1047,16 @@ void barinfo::GetRCSettings()
 	// Labels click actions
 	static const char _SHOWMENU[] = "@BBCore.ShowMenu";
 	GetMouseEventSettings(this->rcpath, this->rc_key, "WorkspaceLabel", me_workspace);
-	if(NULL == me_workspace[ME_LEFT])  me_workspace[ME_LEFT]  = new_str("@BBCore.RightWorkspace");
-	if(NULL == me_workspace[ME_MID])   me_workspace[ME_MID]   = new_str("@BBCore.ShowMenu workspaces");
-	if(NULL == me_workspace[ME_RIGHT]) me_workspace[ME_RIGHT] = new_str("@BBCore.LeftWorkspace");
+	if (NULL == me_workspace[ME_LEFT])  me_workspace[ME_LEFT]  = new_str("@BBCore.RightWorkspace");
+	if (NULL == me_workspace[ME_MID])   me_workspace[ME_MID]   = new_str("@BBCore.ShowMenu workspaces");
+	if (NULL == me_workspace[ME_RIGHT]) me_workspace[ME_RIGHT] = new_str("@BBCore.LeftWorkspace");
 
 	GetMouseEventSettings(this->rcpath, this->rc_key, "Clock", me_clock);
-	if(NULL == me_clock[ME_RIGHT]) me_clock[ME_RIGHT] = new_str(_SHOWMENU);
-	if(NULL == me_clock[ME_DBL])   me_clock[ME_DBL]   = new_str("control.exe timedate.cpl");
+	if (NULL == me_clock[ME_RIGHT]) me_clock[ME_RIGHT] = new_str(_SHOWMENU);
+	if (NULL == me_clock[ME_DBL])   me_clock[ME_DBL]   = new_str("control.exe timedate.cpl");
 
 	GetMouseEventSettings(this->rcpath, this->rc_key, "WindowLabel", me_window);
-	if(NULL == me_window[ME_RIGHT]) me_window[ME_RIGHT] = new_str(_SHOWMENU);
+	if (NULL == me_window[ME_RIGHT]) me_window[ME_RIGHT] = new_str(_SHOWMENU);
 
 	// -----------------------------------------------------------------
 	// Buttons click actions
@@ -1008,16 +1067,16 @@ void barinfo::GetRCSettings()
 	if (me_taskSty[ME_LEFT]) m_free(me_taskSty[ME_LEFT]), me_taskSty[ME_LEFT] = NULL;
 
 	GetMouseEventSettings(this->rcpath, this->rc_key, "WorkspaceButtonL", me_wspb_l);
-	if(NULL == me_wspb_l[ME_LEFT]) me_wspb_l[ME_LEFT] = new_str("@BBCore.LeftWorkspace");
+	if (NULL == me_wspb_l[ME_LEFT]) me_wspb_l[ME_LEFT] = new_str("@BBCore.LeftWorkspace");
 
 	GetMouseEventSettings(this->rcpath, this->rc_key, "WorkspaceButtonR", me_wspb_r);
-	if(NULL == me_wspb_r[ME_LEFT]) me_wspb_r[ME_LEFT] = new_str("@BBCore.RightWorkspace");
+	if (NULL == me_wspb_r[ME_LEFT]) me_wspb_r[ME_LEFT] = new_str("@BBCore.RightWorkspace");
 
 	GetMouseEventSettings(this->rcpath, this->rc_key, "WindowButtonL", me_wnd_l);
-	if(NULL == me_wnd_l[ME_LEFT]) me_wnd_l[ME_LEFT] = new_str("@BBCore.PrevWindow");
+	if (NULL == me_wnd_l[ME_LEFT]) me_wnd_l[ME_LEFT] = new_str("@BBCore.PrevWindow");
 
 	GetMouseEventSettings(this->rcpath, this->rc_key, "WindowButtonR", me_wnd_r);
-	if(NULL == me_wnd_r[ME_LEFT]) me_wnd_r[ME_LEFT] = new_str("@BBCore.NextWindow");
+	if (NULL == me_wnd_r[ME_LEFT]) me_wnd_r[ME_LEFT] = new_str("@BBCore.NextWindow");
 }
 
 //===========================================================================
@@ -1026,7 +1085,8 @@ void barinfo::GetRCSettings()
 void barinfo::WriteRCSettings()
 {
 	struct config *p = cfg_list;
-	do switch (p->mode) {
+	do switch (p->mode)
+		{
 		case R_BOL:
 			BBP_write_bool(this, p->str, *(bool*)p->ptr);
 			break;
@@ -1039,7 +1099,8 @@ void barinfo::WriteRCSettings()
 			BBP_write_string(this, p->str, (char*)p->ptr);
 			break;
 
-	} while ((++p)->str);
+		}
+	while ((++p)->str);
 }
 
 //===========================================================================
@@ -1058,21 +1119,21 @@ void barinfo::GetStyleSettings()
 
 	if (T->validated & VALID_TEXTCOLOR) X = T;
 	else
-	if (W->parentRelative)          X = W;
-	else
-	if (L->parentRelative)          X = L;
-	else
-	if (B->parentRelative)          X = B;
-	else                            X = L;
+		if (W->parentRelative)          X = W;
+		else
+			if (L->parentRelative)          X = L;
+			else
+				if (B->parentRelative)          X = B;
+				else                            X = L;
 
 	Color_T = X->TextColor;
 
 	if (false == W->parentRelative) X = W, SN_A = SN_TOOLBARWINDOWLABEL;
 	else
-	if (false == L->parentRelative) X = L, SN_A = SN_TOOLBARLABEL;
-	else
-	if (false == C->parentRelative) X = C, SN_A = SN_TOOLBARCLOCK;
-	else                            X = W, SN_A = SN_TOOLBARWINDOWLABEL;
+		if (false == L->parentRelative) X = L, SN_A = SN_TOOLBARLABEL;
+		else
+			if (false == C->parentRelative) X = C, SN_A = SN_TOOLBARCLOCK;
+			else                            X = W, SN_A = SN_TOOLBARWINDOWLABEL;
 
 	Color_A = X->TextColor;
 
@@ -1111,7 +1172,7 @@ void barinfo::GetStyleSettings()
 			labelH = imax(10, fontH) + 2 * 2;
 	}
 	else
-		if(0 == iconSize)
+		if (0 == iconSize)
 			labelH = imax(8, T->FontHeight) + 2;
 		else
 			labelH = imax(iconSize, T->FontHeight + 2);
@@ -1153,12 +1214,12 @@ void barinfo::GetStyleSettings()
 		{
 			if (M_TASK == c)
 			{
-				 has_tasks = true;
-				 if (h < h1) h = h1;
+				has_tasks = true;
+				if (h < h1) h = h1;
 			}
 			if (M_TRAY == c)
 			{
-				 if (h < h2) h = h2;
+				if (h < h2) h = h2;
 			}
 		}
 
@@ -1211,10 +1272,10 @@ void barinfo::process_broam(const char *temp, int f)
 				if (cp->f & CFG_INT)
 					*(int*)cp->ptr = atoi(temp+n+1);
 				else
-				if (cp->f & CFG_STR)
-					strcpy((char*)cp->ptr, temp+n+1);
-				else
-					*(bool*)cp->ptr = false == *(bool*)cp->ptr;
+					if (cp->f & CFG_STR)
+						strcpy((char*)cp->ptr, temp+n+1);
+					else
+						*(bool*)cp->ptr = false == *(bool*)cp->ptr;
 			}
 
 			int f = cp - cfg_menu;
@@ -1243,7 +1304,8 @@ void barinfo::process_broam(const char *temp, int f)
 		return;
 	}
 
-	char class_name[256]; int uID;
+	char class_name[256];
+	int uID;
 	if (2 == sscanf(temp, "toggleTrayIcon %d %s", &uID, class_name))
 	{
 		dbg_printf("toggleTrayIcon %d %s", uID, class_name);
@@ -1262,21 +1324,22 @@ void barinfo::insert_cfg_menu_item(n_menu *cSub, struct pmenu *cp)
 	if (cp->f & CFG_TASK && false == has_tasks)
 		;
 	else
-	if (cp->f & CFG_INT)
-		n_menuitem_int(cSub, cp->displ, cp->msg, *(int*)cp->ptr, 0, cp->f & CFG_255 ? 255 : 100);
-	else
-	if (cp->f & CFG_STR)
-		n_menuitem_str(cSub, cp->displ, cp->msg, (char*)cp->ptr);
-	else
-	if (0 == *cp->displ)
-		n_menuitem_nop(cSub, NULL);
-	else
-		n_menuitem_bol(cSub, cp->displ, cp->msg, cp->ptr ? *(bool*)cp->ptr : false);
+		if (cp->f & CFG_INT)
+			n_menuitem_int(cSub, cp->displ, cp->msg, *(int*)cp->ptr, 0, cp->f & CFG_255 ? 255 : 100);
+		else
+			if (cp->f & CFG_STR)
+				n_menuitem_str(cSub, cp->displ, cp->msg, (char*)cp->ptr);
+			else
+				if (0 == *cp->displ)
+					n_menuitem_nop(cSub, NULL);
+				else
+					n_menuitem_bol(cSub, cp->displ, cp->msg, cp->ptr ? *(bool*)cp->ptr : false);
 }
 
 void barinfo::show_menu(bool pop)
 {
-	n_menu *myMenu, *cSub, *wSub; int i;
+	n_menu *myMenu, *cSub, *wSub;
+	int i;
 
 	for (i= 0; i<3; i++) tbStyle[i] = i == TaskStyleCfg;
 	nobool = false;
@@ -1293,14 +1356,16 @@ void barinfo::show_menu(bool pop)
 	n_menuitem_nop(cSub, NULL);
 	n_menu *m = cSub;
 	i = 1;
-	do {
+	do
+	{
 		if (i == MENUITEM_TBSTYLE) m = n_submenu(cSub, "Tasks");
 		insert_cfg_menu_item(m, cp);
 		i++;
 		if (i == MENUITEM_TASK_LAST) m = n_submenu(cSub, "Icons");
 		if (i == MENUITEM_SPECIAL) m = n_submenu(cSub, "Special");
 		if (i == MENUITEM_NORMAL) m = cSub;
-	} while ((++cp)->displ);
+	}
+	while ((++cp)->displ);
 
 	wSub = n_submenu(myMenu, "Window");
 	n_menuitem_cmd(wSub, "Minimize All", "@BBCore.MinimizeAll");
@@ -1335,51 +1400,51 @@ void barinfo::show_menu(bool pop)
 void barinfo::pos_changed(void)
 {
 	set_desktop_margin();
-/*
-	ToolbarInfo *TBInfo = GetToolbarInfo();
-	if (NULL == TBInfo) return;
+	/*
+		ToolbarInfo *TBInfo = GetToolbarInfo();
+		if (NULL == TBInfo) return;
 
-	if (NULL == TBInfo->hwnd)
-		TBInfo->hwnd = hwnd;
+		if (NULL == TBInfo->hwnd)
+			TBInfo->hwnd = hwnd;
 
-	if (TBInfo->hwnd != hwnd)
-		return;
+		if (TBInfo->hwnd != hwnd)
+			return;
 
-	TBInfo->placement        = place - POS_TopLeft + PLACEMENT_TOP_LEFT;
-	TBInfo->widthPercent     = widthPercent;
-	TBInfo->onTop            = alwaysOnTop;
-	TBInfo->autoHide         = autoHide;
-	TBInfo->pluginToggle     = pluginToggle;
-	TBInfo->disabled         = false;
+		TBInfo->placement        = place - POS_TopLeft + PLACEMENT_TOP_LEFT;
+		TBInfo->widthPercent     = widthPercent;
+		TBInfo->onTop            = alwaysOnTop;
+		TBInfo->autoHide         = autoHide;
+		TBInfo->pluginToggle     = pluginToggle;
+		TBInfo->disabled         = false;
 
-	TBInfo->alphaValue       = alpha;
-	TBInfo->transparency     = alpha < 255;
+		TBInfo->alphaValue       = alpha;
+		TBInfo->transparency     = alpha < 255;
 
-	TBInfo->autohidden       = auto_hidden;
-	TBInfo->hidden           = hidden;
+		TBInfo->autohidden       = auto_hidden;
+		TBInfo->hidden           = hidden;
 
-	TBInfo->xpos             = xpos;
-	TBInfo->ypos             = ypos;
-	TBInfo->width            = width;
-	TBInfo->height           = height;
-	TBInfo->hwnd             = hwnd;
+		TBInfo->xpos             = xpos;
+		TBInfo->ypos             = ypos;
+		TBInfo->width            = width;
+		TBInfo->height           = height;
+		TBInfo->hwnd             = hwnd;
 
-	if (TBInfo->bbsb_hwnd)
-		PostMessage(TBInfo->bbsb_hwnd, BB_TOOLBARUPDATE, 0, 0);
-*/
+		if (TBInfo->bbsb_hwnd)
+			PostMessage(TBInfo->bbsb_hwnd, BB_TOOLBARUPDATE, 0, 0);
+	*/
 }
 
 void barinfo::reset_tbinfo(void)
 {
-/*
-	ToolbarInfo *TBInfo = GetToolbarInfo();
-	if (TBInfo && TBInfo->hwnd == hwnd)
-	{
-		TBInfo->hwnd = NULL;
-		TBInfo->disabled = TBInfo->hidden = true;
-		PostMessage(BBhwnd, BB_TOOLBARUPDATE, 0, 0);
-	}
-*/
+	/*
+		ToolbarInfo *TBInfo = GetToolbarInfo();
+		if (TBInfo && TBInfo->hwnd == hwnd)
+		{
+			TBInfo->hwnd = NULL;
+			TBInfo->disabled = TBInfo->hidden = true;
+			PostMessage(BBhwnd, BB_TOOLBARUPDATE, 0, 0);
+		}
+	*/
 }
 
 //===========================================================================
@@ -1401,11 +1466,11 @@ int beginPluginEx(HINSTANCE hPluginInstance, HWND hSlit)
 			{
 				tray_notify_wnd = FindWindowEx(traywnd, NULL, "TrayNotifyWnd", NULL);
 				tray_clock_wnd = FindWindowEx(tray_notify_wnd, NULL, "TrayClockWClass", NULL);
-			/*
-				dbg_printf("systray_wnd %x", traywnd);
-				dbg_printf("tray_notify_wnd %x", tray_notify_wnd);
-				dbg_printf("tray_clock_wnd %x",  tray_clock_wnd );
-			*/
+				/*
+					dbg_printf("systray_wnd %x", traywnd);
+					dbg_printf("tray_notify_wnd %x", tray_notify_wnd);
+					dbg_printf("tray_clock_wnd %x",  tray_clock_wnd );
+				*/
 				break;
 			}
 		}
@@ -1421,10 +1486,10 @@ int beginPluginEx(HINSTANCE hPluginInstance, HWND hSlit)
 	BBP_clear(PI);
 
 	sprintf(PI->instance_name,
-		instance_index ? "%s.%d" : "%s",
-		szAppName,
-		1+instance_index
-		);
+			instance_index ? "%s.%d" : "%s",
+			szAppName,
+			1+instance_index
+		   );
 
 	//dbg_printf("instance_name: <%s>", PI->instance_name);
 
@@ -1473,7 +1538,7 @@ void endPlugin(HINSTANCE hPluginInstance)
 {
 	struct plugin_info *PI = g_PI;
 	int i;
-	for(i = 0; i < NB_MOUSE_EVENT; ++i)
+	for (i = 0; i < NB_MOUSE_EVENT; ++i)
 	{
 		m_free(me_workspace[i]);
 		m_free(me_window[i]);

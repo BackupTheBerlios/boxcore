@@ -7,23 +7,23 @@
 
 class clsBoxBar
 {
-	public:
-		clsBoxBar();
-		virtual ~clsBoxBar();
+public:
+	clsBoxBar();
+	virtual ~clsBoxBar();
 
-		int beginPluginEx(HINSTANCE hPluginInstance, HWND hSlit);
-		void endPlugin(HINSTANCE hPluginInstance);
-	protected:
-	private:
-		TCHAR pluginName[100];
-		HINSTANCE hPlugin;
+	int beginPluginEx(HINSTANCE hPluginInstance, HWND hSlit);
+	void endPlugin(HINSTANCE hPluginInstance);
+protected:
+private:
+	TCHAR pluginName[100];
+	HINSTANCE hPlugin;
 
-		HWND hBlackboxWnd;
-		HWND hSlitWnd;
+	HWND hBlackboxWnd;
+	HWND hSlitWnd;
 
-		bool started;
+	bool started;
 
-		clsBar *bar;
+	clsBar *bar;
 };
 
 #endif // CLSBOXBAR_H

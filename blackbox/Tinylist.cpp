@@ -40,7 +40,11 @@ void remove_node (void *a0, const void *e)
 {
 	list_node *n, *a = (list_node*)a0;
 	for ( ; a; a = n)
-		if ((n = a->next) == (list_node*)e) { a->next = n->next; break; }
+		if ((n = a->next) == (list_node*)e)
+		{
+			a->next = n->next;
+			break;
+		}
 }
 
 void remove_item(void *a, void *e)
@@ -49,14 +53,16 @@ void remove_item(void *a, void *e)
 }
 
 void freeall(void *p)
-{   list_node *s, *q;
+{
+	list_node *s, *q;
 	q=*(list_node**)p;
 	for ( ; q; q=(s=q)->next, m_free(s));
 	*(list_node**)p=q;
 }
 
 void reverse_list (void *d)
-{   list_node *a, *b, *c;
+{
+	list_node *a, *b, *c;
 	a=*(list_node**)d;
 	for (b=NULL; a; c=a->next, a->next=b, b=a, a=c);
 	*(list_node**)d=b;
@@ -66,13 +72,15 @@ void append_node (void *a0, const void *e0)
 {
 	list_node *a = (list_node*)a0, *e = (list_node*)e0;
 	for ( ;a->next;a=a->next);
-	a->next=e; e->next=NULL;
+	a->next=e;
+	e->next=NULL;
 }
 
 void cons_node (void *a0, const void *e0)
 {
 	list_node *a = (list_node*)a0, *e = (list_node*)e0;
-	e->next = a->next; a->next = e;
+	e->next = a->next;
+	a->next = e;
 }
 
 void *member(const void *a0, const void *e0)
@@ -134,20 +142,24 @@ void *new_node(const void *p)
 
 int listlen(const void *v0)
 {
-	list_node *v = (list_node*)v0; int i = 0;
-	while(v) i++, v=v->next;
+	list_node *v = (list_node*)v0;
+	int i = 0;
+	while (v) i++, v=v->next;
 	return i;
 }
 
-char *new_str(const char *s) {
+char *new_str(const char *s)
+{
 	return s ? strcpy((char*)m_alloc(strlen(s)+1), s) : NULL;
 }
 
-void free_str(char **s){
+void free_str(char **s)
+{
 	if (*s) m_free(*s), *s=NULL;
 }
 
-void replace_str(char **s, const char *n){
+void replace_str(char **s, const char *n)
+{
 	if (*s) m_free(*s);
 	*s = new_str(n);
 }

@@ -56,7 +56,7 @@ void clsTextItem::draw(HDC pContext)
 		PostMessage(barWnd, BOXBAR_NEEDTIP, (WPARAM)text, (LPARAM)this);
 	else
 		PostMessage(barWnd, BOXBAR_NEEDTIP, NULL, (LPARAM)this);
-	if(alphaDraw)
+	if (alphaDraw)
 	{
 		testRect.left = testRect.top = 0;
 		testRect.right = itemArea.right - itemArea.left;
@@ -65,7 +65,7 @@ void clsTextItem::draw(HDC pContext)
 	}
 	else
 	{
-	DrawTextEx(internalDC, text, -1, &itemArea, bbStyle.getStyleTextJustify(fontStyle) | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS | DT_NOPREFIX, NULL);
+		DrawTextEx(internalDC, text, -1, &itemArea, bbStyle.getStyleTextJustify(fontStyle) | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS | DT_NOPREFIX, NULL);
 	}
 	SetTextColor(internalDC, oldColor);
 	SelectObject(internalDC, oldFont);
@@ -88,7 +88,7 @@ void clsTextItem::draw(HDC pContext)
 		blendFunc.SourceConstantAlpha = itemAlpha;
 		blendFunc.AlphaFormat = AC_SRC_ALPHA;
 		msimg32.AlphaBlend(pContext, itemArea.left, itemArea.top, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top, internalDC,
-				   0, 0, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top, blendFunc);
+						   0, 0, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top, blendFunc);
 		SelectObject(internalDC, oldBitmap);
 		DeleteObject(alphaBitmap);
 		DeleteDC(internalDC);

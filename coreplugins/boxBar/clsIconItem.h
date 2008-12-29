@@ -6,17 +6,17 @@
 
 class clsIconItem : public clsItem
 {
-	public:
-		clsIconItem(HICON pIcon, UINT pSize, bool pVertical);
+public:
+	clsIconItem(HICON pIcon, UINT pSize, bool pVertical);
 
-		void setIcon(HICON pIcon);
+	void setIcon(HICON pIcon);
 
-		virtual void draw(HDC pContext);
-		virtual void calculateSizes(bool pSizeGiven = false);
-	protected:
-		HICON icon;
-		UINT iconSize;
-	private:
+	virtual void draw(HDC pContext);
+	virtual void calculateSizes(bool pSizeGiven = false);
+protected:
+	HICON icon;
+	UINT iconSize;
+private:
 };
 
 #endif // CLSICONITEM_H

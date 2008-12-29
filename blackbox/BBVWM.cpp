@@ -114,7 +114,7 @@ void vwm_update_winlist(void)
 		char buffer[80];
 		GetClassName(wl->hwnd, buffer, sizeof buffer);
 		dbg_printf("hwnd:%x desk:%d moved:%d hidden:%d iconic:%d <%s>",
-			wl->hwnd, wl->desk, wl->moved, wl->hidden, wl->iconic, buffer);
+				   wl->hwnd, wl->desk, wl->moved, wl->hidden, wl->iconic, buffer);
 	}
 #endif
 }
@@ -137,15 +137,16 @@ ST void center_window(int *left, int *top, int width, int height)
 
 ST void fix_iconized_window(winlist *wl)
 {
-	WINDOWPLACEMENT wp; wp.length = sizeof wp;
+	WINDOWPLACEMENT wp;
+	wp.length = sizeof wp;
 	GetWindowPlacement(wl->hwnd, &wp);
 	RECT *n = &wp.rcNormalPosition;
-/*
-	*n = wl->rect;
-	RECT m; GetMonitorRect((POINT*)&wl->rect.left, &m, GETMON_WORKAREA|GETMON_FROM_POINT);
-	n->top -= m.top; n->bottom -= m.top;
-	n->left -= m.left; n->right -= m.left;
-*/
+	/*
+		*n = wl->rect;
+		RECT m; GetMonitorRect((POINT*)&wl->rect.left, &m, GETMON_WORKAREA|GETMON_FROM_POINT);
+		n->top -= m.top; n->bottom -= m.top;
+		n->left -= m.left; n->right -= m.left;
+	*/
 	int left = n->left;
 	int top = n->top;
 	int width = n->right - n->left;
@@ -172,7 +173,7 @@ ST void check_owned_windows(HWND hwnd)
 	hwnd = get_root(hwnd);
 	winlist *wl;
 	dolist (wl, vwm_WL)
-		wl->check = hwnd == get_root(wl->hwnd);
+	wl->check = hwnd == get_root(wl->hwnd);
 }
 
 /// thread wrapper function
@@ -186,7 +187,7 @@ void WINAPI EndDeferWindowPosThreadProc(HDWP hWinPosInfo)
 /// unresponding application. The following function attempts to do EndDeferWindowPos in an asynchronous manner.
 void EndDeferWindowPosAsync(HDWP hWinPosInfo)
 {
-	if(SystemInfo.isOsNT())
+	if (SystemInfo.isOsNT())
 	{
 		// The kernel-mode part of the Windows USER API has a function called NtUserEndDeferWindowPosEx.
 		// This function takes two parameters - the HDWP (the same one used for *DeferWindowPos functions),
@@ -204,18 +205,18 @@ void EndDeferWindowPosAsync(HDWP hWinPosInfo)
 
 		HMODULE user32 = GetModuleHandle("user32.dll");
 		unsigned char* func = (unsigned char*)GetProcAddress(user32, "EndDeferWindowPos");
-		if(func && func[10]==0xE8)    // CALL IMM32 opcode
+		if (func && func[10]==0xE8)   // CALL IMM32 opcode
 		{
 			typedef int WINAPI (*NtUserEndDeferWindowPosEx)(HDWP, BOOL);
 
 			// get address of NtUserEndDeferWindowPosEx, from within EndDeferWindowPos's code
 			NtUserEndDeferWindowPosEx func2 = (NtUserEndDeferWindowPosEx)
-				(func +
-				 15   +    // 10+5 (5 is size of the CALL instruction)
-				 (func[11] <<  0 |     // CALL's argument is an offset relative to the address of the next instruction
-				  func[12] <<  8 |
-				  func[13] << 16 |
-				  func[14] << 24));
+											  (func +
+											   15   +    // 10+5 (5 is size of the CALL instruction)
+											   (func[11] <<  0 |     // CALL's argument is an offset relative to the address of the next instruction
+												func[12] <<  8 |
+												func[13] << 16 |
+												func[14] << 24));
 
 			// call it
 			func2(hWinPosInfo, TRUE);
@@ -229,7 +230,7 @@ void EndDeferWindowPosAsync(HDWP hWinPosInfo)
 		DWORD tid;
 		// this MIGHT be possible to write as CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)EndDeferWindowPos, ...) (that is,
 		// create the thread directly with the API), but the way compilers/linkers do DLL bindings could break this
-    	CloseHandle(CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)EndDeferWindowPosThreadProc, (LPVOID)hWinPosInfo, 0, &tid));
+		CloseHandle(CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)EndDeferWindowPosThreadProc, (LPVOID)hWinPosInfo, 0, &tid));
 	}
 }
 
@@ -240,8 +241,8 @@ ST void defer_windows(int newdesk)
 	if (gather)
 		newdesk = currentScreen;
 	else
-	if (newdesk >= Settings_workspaces)
-		newdesk = Settings_workspaces-1;
+		if (newdesk >= Settings_workspaces)
+			newdesk = Settings_workspaces-1;
 
 	currentScreen = newdesk;
 
@@ -252,8 +253,8 @@ ST void defer_windows(int newdesk)
 		if (wl->sticky || gather)
 			wl->desk = newdesk;
 		else
-		if (wl->desk >= Settings_workspaces)
-			wl->desk = Settings_workspaces-1;
+			if (wl->desk >= Settings_workspaces)
+				wl->desk = Settings_workspaces-1;
 
 		int left = wl->rect.left;
 		int top = wl->rect.top;
@@ -339,12 +340,12 @@ ST bool set_location_helper(HWND hwnd, struct taskinfo *t, UINT flags)
 	{
 		if (wl->check && false == wl->iconic)
 			SetWindowPos(wl->hwnd, NULL,
-				wl->rect.left,
-				wl->rect.top,
-				wl->rect.right - wl->rect.left,
-				wl->rect.bottom - wl->rect.top,
-				SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE
-				);
+						 wl->rect.left,
+						 wl->rect.top,
+						 wl->rect.right - wl->rect.left,
+						 wl->rect.bottom - wl->rect.top,
+						 SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE
+						);
 	}
 
 	return true;
@@ -396,7 +397,8 @@ bool vwm_set_location(HWND hwnd, struct taskinfo *t, UINT flags)
 
 bool vwm_set_workspace(HWND hwnd, int new_desk)
 {
-	RECT r; GetWindowRect(hwnd, &r);
+	RECT r;
+	GetWindowRect(hwnd, &r);
 	center_window((int*)&r.left, (int*)&r.top, r.right - r.left, r.bottom - r.top);
 	struct taskinfo t;
 	t.desk  = new_desk;
@@ -409,7 +411,8 @@ bool vwm_make_sticky(HWND hwnd, bool sticky)
 {
 	vwm_update_winlist();
 	check_owned_windows(hwnd);
-	winlist *wl; bool r = false;
+	winlist *wl;
+	bool r = false;
 	dolist (wl, vwm_WL) if (wl->check) wl->sticky = sticky, r = true;
 	return r;
 }
@@ -427,7 +430,8 @@ int vwm_get_desk(HWND hwnd)
 bool vwm_get_location(HWND hwnd, struct taskinfo *t)
 {
 	winlist *wl = (winlist*)assoc(vwm_WL, hwnd);
-	int desk; RECT r, *rp;
+	int desk;
+	RECT r, *rp;
 
 	if (wl && (wl->moved || wl->iconic))
 	{
@@ -498,7 +502,9 @@ void vwm_reconfig(bool alt_method, bool xpfix)
 	{
 		bool sticky = check_sticky_name(wl->hwnd);
 		if (wl->sticky != sticky || wl->desk >= Settings_workspaces)
-		{ wl->sticky = sticky, defer = true; }
+		{
+			wl->sticky = sticky, defer = true;
+		}
 	}
 	if (defer) defer_windows(currentScreen);
 }

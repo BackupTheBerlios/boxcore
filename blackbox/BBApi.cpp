@@ -133,14 +133,14 @@ LPSTR NextToken(LPSTR buf, LPCSTR *string, const char *delims)
 
 			if ('\"'==c || '\''==c) q=c;
 			else
-			if (IS_SPC(c) && bufptr==buf)
-				continue;
+				if (IS_SPC(c) && bufptr==buf)
+					continue;
 		}
 		else
-		if (c==q)
-		{
-			q=0;
-		}
+			if (c==q)
+			{
+				q=0;
+			}
 		*bufptr++ = c;
 	}
 	while (bufptr > buf && IS_SPC(bufptr[-1])) bufptr--;
@@ -177,34 +177,50 @@ LPSTR Tokenize(LPCSTR string, LPSTR buf, LPCSTR delims)
 
 int BBTokenize (LPCSTR srcString, char **lpszBuffers, DWORD dwNumBuffers, LPSTR szExtraParameters)
 {
-	int   ol, stored; DWORD dwBufferCount;
+	int   ol, stored;
+	DWORD dwBufferCount;
 	char  quoteChar, c, *output;
-	quoteChar = 0; dwBufferCount = stored = 0;
+	quoteChar = 0;
+	dwBufferCount = stored = 0;
 	while (dwBufferCount < dwNumBuffers)
 	{
-		output = lpszBuffers[dwBufferCount]; ol = 0;
+		output = lpszBuffers[dwBufferCount];
+		ol = 0;
 		while (0 != (c = *srcString))
 		{
 			srcString++;
-			switch (c) {
-				case ' ':
-				case '\t':
-					if (quoteChar) goto _default;
-					if (ol) goto next;
+			switch (c)
+			{
+			case ' ':
+			case '\t':
+				if (quoteChar) goto _default;
+				if (ol) goto next;
+				continue;
+
+			case '"':
+			case '\'':
+				if (0==quoteChar)
+				{
+					quoteChar = c;
 					continue;
+				}
+				if (c==quoteChar)
+				{
+					quoteChar = 0;
+					goto next;
+				}
 
-				case '"':
-				case '\'':
-					if (0==quoteChar) { quoteChar = c; continue; }
-					if (c==quoteChar) { quoteChar = 0; goto next; }
-
-				_default:
-				default:
-					output[ol]=c; ol++; continue;
+_default:
+			default:
+				output[ol]=c;
+				ol++;
+				continue;
 			}
 		}
-		if (ol) next: stored++;
-		output[ol]=0; dwBufferCount++;
+if (ol) next:
+			stored++;
+		output[ol]=0;
+		dwBufferCount++;
 	}
 	if (szExtraParameters)
 	{
@@ -323,7 +339,7 @@ ST void write_rcfile(struct fil_list *fl)
 ST void mark_rc_dirty(struct fil_list *fl)
 {
 #ifdef BBOPT_DEVEL
-	#pragma message("\n"__FILE__ "(370) : warning X0: Delayed Writing to rc-files enabled.\n")
+#pragma message("\n"__FILE__ "(370) : warning X0: Delayed Writing to rc-files enabled.\n")
 	fl->dirty = true;
 	SetTimer(BBhwnd, BB_WRITERC_TIMER, 2, NULL);
 #else
@@ -362,13 +378,14 @@ void reset_reader(void)
 
 unsigned calc_hash(char *p, const char *s, int *pLen)
 {
-	unsigned h, c; char *d = p;
+	unsigned h, c;
+	char *d = p;
 	for (h = 0; 0 != (c = *s); ++s, ++d)
 	{
-	   if (c <= 'Z' && c >= 'A') c += 32;
-	   *d = c;
-	   if ((h ^= c) & 1) h^=0xedb88320;
-	   h>>=1;
+		if (c <= 'Z' && c >= 'A') c += 32;
+		*d = c;
+		if ((h ^= c) & 1) h^=0xedb88320;
+		h>>=1;
 	}
 	*d = 0;
 	*pLen = d - p;
@@ -384,7 +401,10 @@ unsigned calc_hash(char *p, const char *s, int *pLen)
 
 ST int xrm_match (const char *str, const char *pat)
 {
-	int c = 256, m = 0; const char *pp, *ss; char s, p; int l;
+	int c = 256, m = 0;
+	const char *pp, *ss;
+	char s, p;
+	int l;
 	for (;;)
 	{
 		s = *str, p = *pat;
@@ -405,17 +425,20 @@ ST int xrm_match (const char *str, const char *pat)
 		if ('?' == p)
 			m += c; // one point with matching wildcard
 		else
-		if (memcmp(str, pat, l))
-			return 0; // zero for no match
-		else
-			m += 2*c; // two points for exact match
-		str = ss; pat = pp; c /= 2;
+			if (memcmp(str, pat, l))
+				return 0; // zero for no match
+			else
+				m += 2*c; // two points for exact match
+		str = ss;
+		pat = pp;
+		c /= 2;
 	}
 }
 
 ST struct lin_list *make_line (struct fil_list *fl, const char *key, int k, const char *val)
 {
-	struct lin_list *tl; int v = strlen(val);
+	struct lin_list *tl;
+	int v = strlen(val);
 	tl=(struct lin_list*)m_alloc(sizeof(*tl) + k*2 + v + 1);
 	tl->v = v++;
 	tl->o = (tl->k = k+1) + v;
@@ -442,7 +465,9 @@ ST void free_line(struct fil_list *fl, struct lin_list *tl)
 
 ST struct lin_list **search_line(struct lin_list **tlp, const char *key, struct list_node *wild)
 {
-	int n, m, k; char buff[256]; unsigned h = calc_hash(buff, key, &k);
+	int n, m, k;
+	char buff[256];
+	unsigned h = calc_hash(buff, key, &k);
 	struct lin_list **wlp = NULL, *tl;
 	while (NULL != (tl = *tlp))
 	{
@@ -463,7 +488,9 @@ ST struct lin_list **search_line(struct lin_list **tlp, const char *key, struct 
 
 char * read_file_into_buffer (const char *path, int max_len)
 {
-	FILE *fp; char *buf; int k;
+	FILE *fp;
+	char *buf;
+	int k;
 	if (NULL == (fp = fopen(path,"rb")))
 		return NULL;
 
@@ -499,7 +526,8 @@ char scan_line(char **pp, char **ss, int *ll)
 	//find end of line
 	for (s=p; 0!=(e=*p) && 10!=e; p++);
 	//cut off trailing spaces
-	for (d = p; d>s && IS_SPC(d[-1]); d--); *d=0;
+	for (d = p; d>s && IS_SPC(d[-1]); d--);
+	*d=0;
 	//ready for next line
 	if (e) ++p;
 	*pp = p, *ss = s, *ll = d-s;
@@ -544,7 +572,8 @@ void translate_items070(char *buffer, int bufsize, char **pkey, int *pklen)
 			memmove(q, p[1], lr);
 			k = k0;
 		}
-	} while ((p += 2)[0]);
+	}
+	while ((p += 2)[0]);
 	*pklen = k;
 }
 
@@ -555,7 +584,8 @@ ST struct fil_list *read_file(const char *filename)
 {
 	struct lin_list **slp, *sl;
 	struct fil_list **flp, *fl;
-	char *buf, *p, *d, *s, *t, c; int k;
+	char *buf, *p, *d, *s, *t, c;
+	int k;
 
 	DWORD ticknow = GetTickCount();
 	char path[MAX_PATH];
@@ -605,7 +635,8 @@ ST struct fil_list *read_file(const char *filename)
 	//set timestamp
 	get_filetime(fl->path, &fl->ft);
 
-	slp = &fl->lines; p = buf;
+	slp = &fl->lines;
+	p = buf;
 
 	fl->new_style =
 		0 == stricmp(fl->path, stylePath())
@@ -623,7 +654,8 @@ ST struct fil_list *read_file(const char *filename)
 		else
 		{   //skip spaces between key and value, replace tabs etc
 			for (t = s; 0 != (c=*t); t++) if (IS_SPC(c)) *t = ' ';
-			k = d - s + 1; while (*++d == ' ');
+			k = d - s + 1;
+			while (*++d == ' ');
 		}
 
 		char buffer[100];
@@ -706,7 +738,8 @@ bool is_newstyle(LPCSTR path)
 
 int stri_eq_len(const char *a, const char *b)
 {
-	char c, d; int n = 0;
+	char c, d;
+	int n = 0;
 	for (;;++a, ++b)
 	{
 		if (0 == (c = *b)) return n;
@@ -744,7 +777,8 @@ void WriteValue(LPCSTR path, LPCSTR szKey, LPCSTR value)
 		if (value && 0==strcmp(tl->str + tl->k, value))
 			return; //if it didn't change, quit
 
-		*tlp = tl->next; free_line(fl, tl);
+		*tlp = tl->next;
+		free_line(fl, tl);
 	}
 #if 1
 	else
@@ -773,17 +807,20 @@ void WriteValue(LPCSTR path, LPCSTR szKey, LPCSTR value)
   */
 bool DeleteSetting(LPCSTR path, LPCSTR szKey)
 {
-	char buff[256]; int k;
+	char buff[256];
+	int k;
 	strlwr((char*)memcpy(buff, szKey, 1 + (k = strlen(szKey))));
 	struct fil_list *fl = read_file(path);
 
-	struct lin_list **slp, *sl; int dirty = 0;
+	struct lin_list **slp, *sl;
+	int dirty = 0;
 	for (slp = &fl->lines; NULL!=(sl=*slp); )
 	{
 		//if (sl->k==1+k && 0==memcmp(sl->str, buff, k))
 		if (('*' == *buff && 1==k) || xrm_match(sl->str, buff))
 		{
-			*slp = sl->next; free_line(fl, sl);
+			*slp = sl->next;
+			free_line(fl, sl);
 			++dirty;
 		}
 		else
@@ -808,18 +845,21 @@ bool DeleteSetting(LPCSTR path, LPCSTR szKey)
   */
 bool RenameSetting(LPCSTR path, LPCSTR szKey, LPCSTR new_keyword)
 {
-	char buff[256]; unsigned k;
+	char buff[256];
+	unsigned k;
 	strlwr((char*)memcpy(buff, szKey, 1 + (k = strlen(szKey))));
 	struct fil_list *fl = read_file(path);
 
-	struct lin_list **slp, *sl, *tl; int dirty = 0;
+	struct lin_list **slp, *sl, *tl;
+	int dirty = 0;
 	for (slp = &fl->lines; NULL!=(sl=*slp); slp = &(*slp)->next)
 	{
 		if (sl->k==1+k && 0==memcmp(sl->str, buff, k))
 		{
 			tl = make_line(fl, new_keyword, strlen(new_keyword), sl->str+sl->k);
 			tl->next = sl->next;
-			*slp = tl; free_line(fl, sl);
+			*slp = tl;
+			free_line(fl, sl);
 			++dirty;
 		}
 	}
@@ -954,10 +994,10 @@ FILE *FileOpen(LPCSTR szPath)
 	return strcmp(szPath, pluginrc_path) ? fopen(szPath, "rt") : NULL;
 }
 
- /** @brief Close selected file
-   * @param[in] fp The file you wish to close
-   * @return Returns the status of completion
-   */
+/** @brief Close selected file
+  * @param[in] fp The file you wish to close
+  * @return Returns the status of completion
+  */
 bool FileClose(FILE *fp)
 {
 	return fp && 0==fclose(fp);
@@ -1001,7 +1041,8 @@ bool read_next_line(FILE *fp, LPSTR szBuffer, DWORD dwLength)
 {
 	if (fp && fgets(szBuffer, dwLength, fp))
 	{
-		char *p, *q, c; p = q = szBuffer;
+		char *p, *q, c;
+		p = q = szBuffer;
 		while (0 != (c = *p) && IS_SPC(c)) p++;
 		while (0 != (c = *p)) *q++ = IS_SPC(c) ? ' ' : c, p++;
 		while (q > szBuffer && IS_SPC(q[-1])) q--;
@@ -1057,17 +1098,18 @@ void GetBlackboxEditor(LPSTR editor)
   */
 bool FindConfigFile(LPSTR pszOut, LPCSTR filename, LPCSTR pluginDir)
 {
-	char defaultPath[MAX_PATH]; defaultPath[0] = 0;
+	char defaultPath[MAX_PATH];
+	defaultPath[0] = 0;
 
 	if (is_relative_path(filename))
 	{
-/*
-		// Look for the file in the $UserAppData$\Blackbox directory,
-		char temp[MAX_PATH];
-		sprintf(temp, "APPDATA\\Blackbox\\%s", filename);
-		replace_shellfolders(pszOut, temp, false);
-		if (FileExists(pszOut)) return true;
-*/
+		/*
+				// Look for the file in the $UserAppData$\Blackbox directory,
+				char temp[MAX_PATH];
+				sprintf(temp, "APPDATA\\Blackbox\\%s", filename);
+				replace_shellfolders(pszOut, temp, false);
+				if (FileExists(pszOut)) return true;
+		*/
 		// If pluginDir is specified, we look for the file in this directory...
 		if (pluginDir)
 		{
@@ -1116,20 +1158,20 @@ ST LPCSTR bbPath(LPCSTR other_name, LPSTR path, LPCSTR name)
 			FindConfigFile(path, other_name, NULL);
 	}
 	else
-	if (0 == path[0])
-	{
-		char file_dot_rc[MAX_PATH];
-		sprintf(file_dot_rc, "%s.rc", name);
-		if (false == FindConfigFile(path, file_dot_rc, NULL))
+		if (0 == path[0])
 		{
-			char file_rc[MAX_PATH];
-			sprintf(file_rc, "%src", name);
-			if (false == FindConfigFile(path, file_rc, NULL))
+			char file_dot_rc[MAX_PATH];
+			sprintf(file_dot_rc, "%s.rc", name);
+			if (false == FindConfigFile(path, file_dot_rc, NULL))
 			{
-				FindConfigFile(path, file_dot_rc, NULL);
+				char file_rc[MAX_PATH];
+				sprintf(file_rc, "%src", name);
+				if (false == FindConfigFile(path, file_rc, NULL))
+				{
+					FindConfigFile(path, file_dot_rc, NULL);
+				}
 			}
 		}
-	}
 	//dbg_printf("other <%s>  path <%s>  name <%s>", other_name, path, name);
 	return path;
 }
@@ -1198,7 +1240,12 @@ LPCSTR stylePath(LPCSTR other)
 // (old)Out: LPCSTR = literal hex value
 //===========================================================================
 
-ST struct litcolor1 { const char *cname; COLORREF cref; } litcolor1_ary[] = {
+ST struct litcolor1
+{
+	const char *cname;
+	COLORREF cref;
+} litcolor1_ary[] =
+{
 
 	{ "ghostwhite", RGB(248,248,255) },
 	{ "whitesmoke", RGB(245,245,245) },
@@ -1336,9 +1383,14 @@ ST struct litcolor1 { const char *cname; COLORREF cref; } litcolor1_ary[] = {
 	{ "darkmagenta", RGB(139,0,139) },
 	{ "darkred", RGB(139,0,0) },
 	{ "lightgreen", RGB(144,238,144) }
-	};
+};
 
-ST struct litcolor4 { const char *cname; COLORREF cref[4]; } litcolor4_ary[] = {
+ST struct litcolor4
+{
+	const char *cname;
+	COLORREF cref[4];
+} litcolor4_ary[] =
+{
 
 	{ "snow", { RGB(255,250,250), RGB(238,233,233), RGB(205,201,201), RGB(139,137,137) }},
 	{ "seashell", { RGB(255,245,238), RGB(238,229,222), RGB(205,197,191), RGB(139,134,130) }},
@@ -1418,11 +1470,13 @@ ST struct litcolor4 { const char *cname; COLORREF cref[4]; } litcolor4_ary[] = {
 	{ "purple", { RGB(155,48,255), RGB(145,44,238), RGB(125,38,205), RGB(85,26,139) }},
 	{ "mediumpurple", { RGB(171,130,255), RGB(159,121,238), RGB(137,104,205), RGB(93,71,139) }},
 	{ "thistle", { RGB(255,225,255), RGB(238,210,238), RGB(205,181,205), RGB(139,123,139) }}
-	};
+};
 
 COLORREF ParseLiteralColor(LPCSTR colour)
 {
-	int i, n; unsigned l; char *p, c, buf[32];
+	int i, n;
+	unsigned l;
+	char *p, c, buf[32];
 	l = strlen(colour) + 1;
 	if (l > 2 && l < sizeof buf)
 	{
@@ -1441,17 +1495,26 @@ COLORREF ParseLiteralColor(LPCSTR colour)
 		i = *(p = &buf[l-2]) - '1';
 		if (i>=0 && i<4)
 		{
-			*p=0; --l;
+			*p=0;
+			--l;
 			struct litcolor4 *cp4=litcolor4_ary;
 			n = sizeof(litcolor4_ary) / sizeof(*cp4);
-			do { if (0==memcmp(buf, cp4->cname, l)) return cp4->cref[i]; cp4++; }
+			do
+			{
+				if (0==memcmp(buf, cp4->cname, l)) return cp4->cref[i];
+				cp4++;
+			}
 			while (--n);
 		}
 		else
 		{
 			struct litcolor1 *cp1=litcolor1_ary;
 			n = sizeof(litcolor1_ary) / sizeof(*cp1);
-			do { if (0==memcmp(buf, cp1->cname, l)) return cp1->cref; cp1++; }
+			do
+			{
+				if (0==memcmp(buf, cp1->cname, l)) return cp1->cref;
+				cp1++;
+			}
 			while (--n);
 		}
 	}
@@ -1471,15 +1534,16 @@ COLORREF ReadColorFromString(LPCSTR string)
 	if ('#'==*s) s++;
 	for (;;)
 	{
-		COLORREF cr = 0; char *d, c;
+		COLORREF cr = 0;
+		char *d, c;
 		// check if its a valid hex number
 		for (d = s; (c = *d) != 0; ++d)
 		{
 			cr <<= 4;
 			if (isdigit(c)) cr |= c - '0';
 			else
-			if (c >= 'a' && c <= 'f') cr |= c - ('a'-10);
-			else goto check_rgb;
+				if (c >= 'a' && c <= 'f') cr |= c - ('a'-10);
+				else goto check_rgb;
 		}
 
 		if (d - s == 3) // #AB4 short type colors
@@ -1492,13 +1556,19 @@ check_rgb:
 		s = stub;
 		if (0 == memcmp(s, "rgb:", 4))
 		{
-			int j=3; s+=4; d = rgbstr;
-			do {
+			int j=3;
+			s+=4;
+			d = rgbstr;
+			do
+			{
 				d[0] = *s && '/'!=*s ? *s++ : '0';
 				d[1] = *s && '/'!=*s ? *s++ : d[0];
-				d+=2; if ('/'==*s) ++s;
-			} while (--j);
-			*d=0; s = rgbstr;
+				d+=2;
+				if ('/'==*s) ++s;
+			}
+			while (--j);
+			*d=0;
+			s = rgbstr;
 			continue;
 		}
 
@@ -1527,9 +1597,9 @@ void Log(LPCSTR Title, LPCSTR Line)
 int MBoxErrorFile(LPCSTR szFile)
 {
 	return BBMessageBox(MB_OK, NLS2("$BBError_ReadFile$",
-		"Error: Unable to open file \"%s\"."
-		"\nPlease check location and try again."
-		), szFile);
+									"Error: Unable to open file \"%s\"."
+									"\nPlease check location and try again."
+								   ), szFile);
 }
 
 //===========================================================================
@@ -1542,7 +1612,7 @@ int MBoxErrorFile(LPCSTR szFile)
 int MBoxErrorValue(LPCSTR szValue)
 {
 	return BBMessageBox(MB_OK, NLS2("$BBError_MsgBox$",
-		"Error: %s"), szValue);
+									"Error: %s"), szValue);
 }
 
 //===========================================================================
@@ -1566,7 +1636,8 @@ BOOL BBExecute(
 {
 	if (szCommand[0])
 	{
-		SHELLEXECUTEINFO sei; ZeroMemory(&sei, sizeof(sei));
+		SHELLEXECUTEINFO sei;
+		ZeroMemory(&sei, sizeof(sei));
 		sei.cbSize       = sizeof(sei);
 		sei.hwnd         = Owner;
 		sei.lpVerb       = szOperation;
@@ -1581,16 +1652,16 @@ BOOL BBExecute(
 	}
 	if (!noErrorMsgs)
 		BBMessageBox(MB_OK, NLS2("$BBError_Execute$",
-			"Error: Could not execute:"
-			"\nCommand:  \t%s"
-			"\nOperation:\t%s"
-			"\nArguments:\t%s"
-			"\nWorking Directory:\t%s"),
-			string_empty_or_null(szCommand),
-			string_empty_or_null(szOperation),
-			string_empty_or_null(szArgs),
-			string_empty_or_null(szDirectory)
-			);
+								 "Error: Could not execute:"
+								 "\nCommand:  \t%s"
+								 "\nOperation:\t%s"
+								 "\nArguments:\t%s"
+								 "\nWorking Directory:\t%s"),
+					 string_empty_or_null(szCommand),
+					 string_empty_or_null(szOperation),
+					 string_empty_or_null(szArgs),
+					 string_empty_or_null(szDirectory)
+					);
 
 	return FALSE;
 }
@@ -1615,7 +1686,9 @@ BOOL BBExecute_string(const char *command, bool no_errors)
 
 bool ShellCommand(const char *command, const char *work_dir, bool wait)
 {
-	SHELLEXECUTEINFO sei; char path[MAX_PATH]; BOOL r;
+	SHELLEXECUTEINFO sei;
+	char path[MAX_PATH];
+	BOOL r;
 	NextToken(path, &command);
 	ZeroMemory(&sei, sizeof sei);
 	sei.cbSize = sizeof sei;
@@ -1644,7 +1717,9 @@ bool ShellCommand(const char *command, const char *work_dir, bool wait)
 
 bool IsAppWindow(HWND hwnd)
 {
-	LONG nStyle, nExStyle; HWND hOwner; HWND hParent;
+	LONG nStyle, nExStyle;
+	HWND hOwner;
+	HWND hParent;
 
 	if (!IsWindow(hwnd))
 		return false;
@@ -1655,12 +1730,12 @@ bool IsAppWindow(HWND hwnd)
 	nStyle = GetWindowLongPtr(hwnd, GWL_STYLE);
 
 	// if it is a WS_CHILD or not WS_VISIBLE, fail it
-	if((nStyle & WS_CHILD) || !(nStyle & WS_VISIBLE) || (nStyle & WS_DISABLED))
+	if ((nStyle & WS_CHILD) || !(nStyle & WS_VISIBLE) || (nStyle & WS_DISABLED))
 		return false;
 
 	nExStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
 	// if the window is a WS_EX_TOOLWINDOW fail it
-	if((nExStyle & WS_EX_TOOLWINDOW) && !(nExStyle & WS_EX_APPWINDOW))
+	if ((nExStyle & WS_EX_TOOLWINDOW) && !(nExStyle & WS_EX_APPWINDOW))
 		return false;
 
 	// If this has a parent, then only accept this window
@@ -1672,7 +1747,7 @@ bool IsAppWindow(HWND hwnd)
 	// If this has an owner, then only accept this window
 	// if the parent is not accepted
 	hOwner = GetWindow(hwnd, GW_OWNER);
-	if(hOwner && IsAppWindow(hOwner))
+	if (hOwner && IsAppWindow(hOwner))
 		return false;
 
 	return true;
@@ -1685,7 +1760,8 @@ bool IsAppWindow(HWND hwnd)
 
 void MakeStyleGradient(HDC hdc, RECT *rp, StyleItem * pSI, bool withBorder)
 {
-	COLORREF borderColor; int borderWidth;
+	COLORREF borderColor;
+	int borderWidth;
 	if (withBorder)
 	{
 		if (pSI->bordered)
@@ -1706,16 +1782,16 @@ void MakeStyleGradient(HDC hdc, RECT *rp, StyleItem * pSI, bool withBorder)
 	}
 
 	MakeGradient(hdc, *rp,
-		pSI->parentRelative ? -1 : pSI->type,
-		pSI->Color,
-		pSI->ColorTo,
-		pSI->interlaced,
-		pSI->bevelstyle,
-		pSI->bevelposition,
-		0,
-		borderColor,
-		borderWidth
-		);
+				 pSI->parentRelative ? -1 : pSI->type,
+				 pSI->Color,
+				 pSI->ColorTo,
+				 pSI->interlaced,
+				 pSI->bevelstyle,
+				 pSI->bevelposition,
+				 0,
+				 borderColor,
+				 borderWidth
+				);
 }
 
 //===========================================================================
@@ -1726,28 +1802,35 @@ void MakeStyleGradient(HDC hdc, RECT *rp, StyleItem * pSI, bool withBorder)
 // Out: void = None
 //===========================================================================
 
-struct styleprop { const char *key; int  val; };
+struct styleprop
+{
+	const char *key;
+	int  val;
+};
 
-ST struct styleprop styleprop_1[] = {
+ST struct styleprop styleprop_1[] =
+{
 	{"flat"        ,BEVEL_FLAT           },
 	{"raised"      ,BEVEL_RAISED         },
 	{"sunken"      ,BEVEL_SUNKEN         },
 	{NULL          ,BEVEL_RAISED         }
-	};
+};
 
-ST struct styleprop styleprop_2[] = {
+ST struct styleprop styleprop_2[] =
+{
 	{"bevel1"      ,BEVEL1         },
 	{"bevel2"      ,BEVEL2         },
 	{"bevel3"      ,3              },
 	{NULL          ,BEVEL1         }
-	};
+};
 
-ST struct styleprop styleprop_3[] = {
+ST struct styleprop styleprop_3[] =
+{
 	{"splitvertical",B_SPLITVERTICAL   },
 	{"solid"        ,B_SOLID           },
 	{"mirrorhorizontal",B_MIRRORHORIZONTAL   },
 	{"horizontal"   ,B_HORIZONTAL      },
-/*	{"mirrorvertical",B_MIRRORVERTICAL }, */
+	/*	{"mirrorvertical",B_MIRRORVERTICAL }, */
 	{"vertical"     ,B_VERTICAL        },
 	{"crossdiagonal",B_CROSSDIAGONAL   },
 	{"diagonal"     ,B_DIAGONAL        },
@@ -1756,11 +1839,12 @@ ST struct styleprop styleprop_3[] = {
 	{"rectangle"    ,B_RECTANGLE       },
 	{"pyramid"      ,B_PYRAMID         },
 	{NULL           ,-1                }
-	};
+};
 
 ST int check_item(const char *p, struct styleprop *s)
 {
-	do if (strstr(p, s->key)) break; while ((++s)->key);
+	do if (strstr(p, s->key)) break;
+	while ((++s)->key);
 	return s->val;
 }
 
@@ -1771,7 +1855,8 @@ int ParseType(char *buf)
 
 void ParseItem(LPCSTR szItem, StyleItem *item)
 {
-	char buf[256]; int t;
+	char buf[256];
+	int t;
 	strlwr(strcpy(buf, szItem));
 	item->bevelstyle = check_item(buf, styleprop_1);
 	item->bevelposition = BEVEL_FLAT == item->bevelstyle ? 0 : check_item(buf, styleprop_2);
@@ -1910,11 +1995,11 @@ HMONITOR GetMonitorRect(void *from, RECT *r, int flags)
 		if (flags & GETMON_FROM_WINDOW)
 			hMon = pMonitorFromWindow((HWND)from, MONITOR_DEFAULTTONEAREST);
 		else
-		if (flags & GETMON_FROM_POINT)
-			hMon = pMonitorFromPoint(*(POINT*)from, MONITOR_DEFAULTTONEAREST);
-		else
-		if (flags & GETMON_FROM_MONITOR)
-			hMon = (HMONITOR)from;
+			if (flags & GETMON_FROM_POINT)
+				hMon = pMonitorFromPoint(*(POINT*)from, MONITOR_DEFAULTTONEAREST);
+			else
+				if (flags & GETMON_FROM_MONITOR)
+					hMon = (HMONITOR)from;
 	}
 
 	if (flags & GETMON_WORKAREA)
@@ -1952,31 +2037,31 @@ void SetDesktopMargin(HWND hwnd, int location, int margin)
 	if (BB_DM_RESET == location)
 		freeall(&margin_list); // reset everything
 	else
-	if (BB_DM_REFRESH == location)
-		; // do nothing
-	else
-	if (hwnd)
-	{
-		// search for hwnd:
-		struct dt_margins *p = (struct dt_margins *)assoc(margin_list, hwnd);
-		if (margin)
-		{
-			if (NULL == p) // insert a _new structure
-			{
-				p = (struct dt_margins *)c_alloc(sizeof(struct dt_margins));
-				cons_node (&margin_list, p);
-				p->hwnd = hwnd;
-			}
-			p->location = location;
-			p->margin = margin;
-			if (multimon) p->hmon = pMonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
-		}
+		if (BB_DM_REFRESH == location)
+			; // do nothing
 		else
-		if (p)
-		{
-			remove_item(&margin_list, p);
-		}
-	}
+			if (hwnd)
+			{
+				// search for hwnd:
+				struct dt_margins *p = (struct dt_margins *)assoc(margin_list, hwnd);
+				if (margin)
+				{
+					if (NULL == p) // insert a _new structure
+					{
+						p = (struct dt_margins *)c_alloc(sizeof(struct dt_margins));
+						cons_node (&margin_list, p);
+						p->hwnd = hwnd;
+					}
+					p->location = location;
+					p->margin = margin;
+					if (multimon) p->hmon = pMonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+				}
+				else
+					if (p)
+					{
+						remove_item(&margin_list, p);
+					}
+			}
 	update_screen_areas(margin_list);
 }
 
@@ -2002,7 +2087,8 @@ struct _screen_list
 
 void get_custom_margin(RECT *pcm, int screen)
 {
-	char key[80]; int i = 0, x;
+	char key[80];
+	int i = 0, x;
 	static const char *edges[4] = { "Left:", "Top:", "Right:", "Bottom:" };
 	if (0 == screen) x = sprintf(key, "blackbox.desktop.margin");
 	else x = sprintf(key, "blackbox.desktop.%d.margin", 1+screen);
@@ -2057,10 +2143,18 @@ void WINAPI update_screen_areas_thread(struct dt_margins *dt_margins)
 				RECT *s = &pS->screen_rect;
 				switch (p->location)
 				{
-					case BB_DM_LEFT   : n->left     = imax(n->left  , s->left   + p->margin); break;
-					case BB_DM_TOP    : n->top      = imax(n->top   , s->top    + p->margin); break;
-					case BB_DM_RIGHT  : n->right    = imin(n->right , s->right  - p->margin); break;
-					case BB_DM_BOTTOM : n->bottom   = imin(n->bottom, s->bottom - p->margin); break;
+				case BB_DM_LEFT   :
+					n->left     = imax(n->left  , s->left   + p->margin);
+					break;
+				case BB_DM_TOP    :
+					n->top      = imax(n->top   , s->top    + p->margin);
+					break;
+				case BB_DM_RIGHT  :
+					n->right    = imin(n->right , s->right  - p->margin);
+					break;
+				case BB_DM_BOTTOM :
+					n->bottom   = imin(n->bottom, s->bottom - p->margin);
+					break;
 				}
 			}
 		}
@@ -2092,8 +2186,8 @@ void WINAPI update_screen_areas_thread(struct dt_margins *dt_margins)
 
 void update_screen_areas(struct dt_margins *dt_margins)
 {
-    DWORD tid;
-    CloseHandle(CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)update_screen_areas_thread, (LPVOID)dt_margins, 0, &tid));
+	DWORD tid;
+	CloseHandle(CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)update_screen_areas_thread, (LPVOID)dt_margins, 0, &tid));
 }
 
 // ------------------------------------------------------------
@@ -2110,10 +2204,21 @@ void update_screen_areas(struct dt_margins *dt_margins)
 //===========================================================================
 
 // Structures
-struct edges { int from1, from2, to1, to2, dmin, omin, d, o, def; };
+struct edges
+{
+	int from1, from2, to1, to2, dmin, omin, d, o, def;
+};
 
-struct snap_info { struct edges *h; struct edges *v;
-	bool sizing; bool same_level; int pad; HWND self; HWND parent; };
+struct snap_info
+{
+	struct edges *h;
+	struct edges *v;
+	bool sizing;
+	bool same_level;
+	int pad;
+	HWND self;
+	HWND parent;
+};
 
 // Local fuctions
 //ST void snap_to_grid(struct edges *h, struct edges *v, bool sizing, int grid, int pad);
@@ -2133,7 +2238,8 @@ void SnapWindowToEdge(WINDOWPOS* wp, LPARAM nDist_or_pContent, UINT Flags)
 
 	// well, why is this here? Because some plugins call this even if
 	// they reposition themselves rather than being moved by the user.
-	static DWORD snap_tick; DWORD ticknow = GetTickCount();
+	static DWORD snap_tick;
+	DWORD ticknow = GetTickCount();
 	if (GetCapture() != self)
 	{
 		if (snap_tick < ticknow) return;
@@ -2181,7 +2287,8 @@ void SnapWindowToEdge(WINDOWPOS* wp, LPARAM nDist_or_pContent, UINT Flags)
 			if (0 == (Flags&SNAP_NOPARENT))
 			{
 				// snap to frame edges
-				RECT r; GetClientRect(parent, &r);
+				RECT r;
+				GetClientRect(parent, &r);
 				h.to1 = r.left;
 				h.to2 = r.right;
 				v.to1 = r.top;
@@ -2195,7 +2302,8 @@ void SnapWindowToEdge(WINDOWPOS* wp, LPARAM nDist_or_pContent, UINT Flags)
 				EnumThreadWindows(GetCurrentThreadId(), SnapEnumProc, (LPARAM)&si);
 
 			// snap to screen edges
-			RECT r; GetMonitorRect(self, &r, snap_workarea ?  GETMON_WORKAREA|GETMON_FROM_WINDOW : GETMON_FROM_WINDOW);
+			RECT r;
+			GetMonitorRect(self, &r, snap_workarea ?  GETMON_WORKAREA|GETMON_FROM_WINDOW : GETMON_FROM_WINDOW);
 			h.to1 = r.left;
 			h.to2 = r.right;
 			v.to1 = r.top;
@@ -2226,12 +2334,14 @@ void SnapWindowToEdge(WINDOWPOS* wp, LPARAM nDist_or_pContent, UINT Flags)
 
 	if (h.dmin < snapdist)
 	{
-		if (sizing) wp->cx += h.omin; else wp->x += h.omin;
+		if (sizing) wp->cx += h.omin;
+		else wp->x += h.omin;
 	}
 
 	if (v.dmin < snapdist)
 	{
-		if (sizing) wp->cy += v.omin; else wp->y += v.omin;
+		if (sizing) wp->cy += v.omin;
+		else wp->y += v.omin;
 	}
 }
 
@@ -2247,7 +2357,8 @@ ST BOOL CALLBACK SnapEnumProc(HWND hwnd, LPARAM lParam)
 		HWND pw = (style & WS_CHILD) ? GetParent(hwnd) : NULL;
 		if (pw == si->parent && false == IsMenu(hwnd))
 		{
-			RECT r; GetWindowRect(hwnd, &r);
+			RECT r;
+			GetWindowRect(hwnd, &r);
 			r.right -= r.left;
 			r.bottom -= r.top;
 			if (pw) ScreenToClient(pw, (POINT*)&r.left);
@@ -2291,8 +2402,10 @@ ST void snap_to_grid(struct edges *h, struct edges *v, bool sizing, int grid, in
 //*****************************************************************************
 ST void snap_to_edge(struct edges *h, struct edges *v, bool sizing, bool same_level, int pad)
 {
-	int o, d, n; struct edges *t;
-	h->d = h->def; v->d = v->def;
+	int o, d, n;
+	struct edges *t;
+	h->d = h->def;
+	v->d = v->def;
 	for (n = 2;;) // v- and h-edge
 	{
 		// see if there is any common edge, i.e if the lower top is above the upper bottom.
@@ -2349,7 +2462,8 @@ ST void snap_to_edge(struct edges *h, struct edges *v, bool sizing, bool same_le
 			}
 		}
 		if (0 == --n) break;
-		t = h; h = v, v = t;
+		t = h;
+		h = v, v = t;
 	}
 
 	if (false == sizing && false == same_level)
@@ -2364,7 +2478,8 @@ ST void snap_to_edge(struct edges *h, struct edges *v, bool sizing, bool same_le
 				if (d < h->d) h->d = d, h->o = o;
 			}
 			if (0 == --n) break;
-			t = h; h = v, v = t;
+			t = h;
+			h = v, v = t;
 		}
 	}
 

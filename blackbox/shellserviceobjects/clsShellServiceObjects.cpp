@@ -48,7 +48,7 @@ int clsShellServiceObjects::startServiceObjects(clsClsidSource &pSource)
 {
 	int numStarted=0;
 	CLSID objectClsid;
-	while(1)
+	while (1)
 	{
 		objectClsid=pSource.getNextCLSID();
 		if (objectClsid!=CLSID_NULL)
@@ -80,7 +80,7 @@ int clsShellServiceObjects::startServiceObjects(clsClsidSource &pSource)
 int clsShellServiceObjects::stopServiceObjects()
 {
 	int numStopped=0;
-	for(unsigned int i=0;i<serviceObjects.size();i++)
+	for (unsigned int i=0;i<serviceObjects.size();i++)
 	{
 		serviceObjects[i]->Exec(&CGID_ShellServiceObject, 3, OLECMDEXECOPT_DODEFAULT, NULL, NULL);
 		serviceObjects[i]->Release();

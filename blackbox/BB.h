@@ -59,36 +59,36 @@
 #define NO_SHDOCVW_GUIDS
 
 #ifdef __BORLANDC__
-  #ifdef CRTSTRING
-	#include "crt-string.h"
-	#define TRY if (1)
-	#define EXCEPT if(0)
-  #else
-	#define TRY __try
-	#define EXCEPT __except(1)
-  #endif
+#ifdef CRTSTRING
+#include "crt-string.h"
+#define TRY if (1)
+#define EXCEPT if(0)
+#else
+#define TRY __try
+#define EXCEPT __except(1)
+#endif
 #endif
 
 #ifdef __GNUC__
-  #define TRY if (1)
-  #define EXCEPT if(0)
+#define TRY if (1)
+#define EXCEPT if(0)
 #endif
 
 #ifdef _MSC_VER
-  #ifdef BBOPT_STACKDUMP
-	#define TRY if (1)
-	#define EXCEPT if(0)
-  #else
-	#define TRY _try
-	#define EXCEPT _except(1)
-  #endif
-  #define stricmp _stricmp
-  #define strnicmp _strnicmp
-  #define memicmp _memicmp
-  #define strlwr _strlwr
-  #define strupr _strupr
+#ifdef BBOPT_STACKDUMP
+#define TRY if (1)
+#define EXCEPT if(0)
 #else
-  #undef BBOPT_STACKDUMP
+#define TRY _try
+#define EXCEPT _except(1)
+#endif
+#define stricmp _stricmp
+#define strnicmp _strnicmp
+#define memicmp _memicmp
+#define strlwr _strlwr
+#define strupr _strupr
+#else
+#undef BBOPT_STACKDUMP
 #endif
 
 // ==============================================================
@@ -258,7 +258,11 @@ Menu *GetContextMenu(const struct _ITEMIDLIST *pidl);
 /* workspaces and tasks */
 bool focus_top_window(void);
 void ForceForegroundWindow(HWND theWin);
-struct hwnd_list { struct hwnd_list *next; HWND hwnd; };
+struct hwnd_list
+{
+	struct hwnd_list *next;
+	HWND hwnd;
+};
 
 // ==============================================================
 /* BBApi.cpp - some (non api) utils */

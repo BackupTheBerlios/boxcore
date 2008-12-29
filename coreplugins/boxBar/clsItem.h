@@ -55,7 +55,8 @@ public:
 	void drawNow();
 	virtual dimType resize(int pX, int pY);
 	virtual void move(int pX, int pY);
-	virtual dimType getFixed() {
+	virtual dimType getFixed()
+	{
 		return fixed;
 	}
 	virtual void readSettings();
@@ -150,7 +151,8 @@ protected:
 	static HWND hBlackboxWnd;
 	static HINSTANCE hInstance;
 
-	static int getTimerID() {
+	static int getTimerID()
+	{
 		static int id = 10;
 		return id++;
 	}

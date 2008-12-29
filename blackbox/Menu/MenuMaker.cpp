@@ -80,25 +80,26 @@ void Menu_All_Update(int special)
 {
 	switch (special)
 	{
-		case MENU_IS_CONFIG:
-			if (MenuExists("IDRoot_configuration"))
-				ShowMenu(MakeConfigMenu(false));
-			break;
+	case MENU_IS_CONFIG:
+		if (MenuExists("IDRoot_configuration"))
+			ShowMenu(MakeConfigMenu(false));
+		break;
 
-		case MENU_IS_TASKS:
-			if (MenuExists("IDRoot_workspace"))
-				ShowMenu(MakeDesktopMenu(false));
-			else
+	case MENU_IS_TASKS:
+		if (MenuExists("IDRoot_workspace"))
+			ShowMenu(MakeDesktopMenu(false));
+		else
 			if (MenuExists("IDRoot_icons"))
 				ShowMenu(MakeIconsMenu(false));
-			break;
+		break;
 	}
 }
 
 //===========================================================================
 int get_bulletstyle (const char *tmp)
 {
-	static const char *bullet_strings[] = {
+	static const char *bullet_strings[] =
+	{
 		"diamond"  ,
 		"triangle" ,
 		"square"   ,
@@ -109,9 +110,10 @@ int get_bulletstyle (const char *tmp)
 		"venus"    ,
 		"empty"    ,
 		NULL
-		};
+	};
 
-	static const char bullet_styles[] = {
+	static const char bullet_styles[] =
+	{
 		BS_DIAMOND   ,
 		BS_TRIANGLE  ,
 		BS_SQUARE    ,
@@ -121,7 +123,7 @@ int get_bulletstyle (const char *tmp)
 		BS_MARS      ,
 		BS_VENUS     ,
 		BS_EMPTY     ,
-		};
+	};
 
 	int i = get_string_index(tmp, bullet_strings);
 	if (-1 != i) return bullet_styles[i];
@@ -137,15 +139,16 @@ void MenuMaker_Configure()
 	MenuMaker_Clear();
 
 	// Noccy: Added this to re-create the menu class.
-	if (lastMenuShadowState != Settings_menuShadowsEnabled) {
+	if (lastMenuShadowState != Settings_menuShadowsEnabled)
+	{
 		un_register_menuclass();
 		register_menuclass();
 		lastMenuShadowState = Settings_menuShadowsEnabled;
 	}
 
 	MenuInfo.move_cursor = Settings_usedefCursor
-		? LoadCursor(NULL, IDC_SIZEALL)
-		: LoadCursor(hMainInstance, (char*)IDC_MOVEMENU);
+						   ? LoadCursor(NULL, IDC_SIZEALL)
+						   : LoadCursor(hMainInstance, (char*)IDC_MOVEMENU);
 
 	StyleItem *MTitle = &mStyle.MenuTitle;
 	StyleItem *MFrame = &mStyle.MenuFrame;
@@ -189,11 +192,11 @@ void MenuMaker_Configure()
 	if (MFrame->validated & VALID_MARGIN)
 		MenuInfo.nFrameMargin += MFrame->marginWidth;
 	else
-	if (BEVEL_SUNKEN == MFrame->bevelstyle || BEVEL2 == MFrame->bevelposition)
-		MenuInfo.nFrameMargin += MFrame->bevelposition;
-	else
-	if (MHilite->borderWidth)
-		MenuInfo.nFrameMargin += 1;
+		if (BEVEL_SUNKEN == MFrame->bevelstyle || BEVEL2 == MFrame->bevelposition)
+			MenuInfo.nFrameMargin += MFrame->bevelposition;
+		else
+			if (MHilite->borderWidth)
+				MenuInfo.nFrameMargin += 1;
 
 	// --------------------------------------
 	// calculate title height, indent, margin
@@ -204,10 +207,10 @@ void MenuMaker_Configure()
 	if (MTitle->validated & VALID_MARGIN)
 		titleHeight = tfh + 2*MTitle->marginWidth;
 	else
-	if (Settings_newMetrics)
-		titleHeight = imax(10, tfh) + 2 + 2*mStyle.bevelWidth;
-	else
-		titleHeight = MTitle->FontHeight + 2*mStyle.bevelWidth;
+		if (Settings_newMetrics)
+			titleHeight = imax(10, tfh) + 2 + 2*mStyle.bevelWidth;
+		else
+			titleHeight = MTitle->FontHeight + 2*mStyle.bevelWidth;
 
 	int titleMargin = (titleHeight - tfh + 1) / 2;
 
@@ -260,13 +263,13 @@ void MenuMaker_Configure()
 	if (MHilite->validated & VALID_MARGIN)
 		itemHeight = ffh + MHilite->marginWidth;
 	else
-	if (MFrame->validated & VALID_MARGIN)
-		itemHeight = ffh + 1 + 2*(MHilite->borderWidth + (MFrame->marginWidth ? 1 : 0));
-	else
-	if (Settings_newMetrics)
-		itemHeight = imax(10, ffh) + 2 + (mStyle.bevelWidth+1)/2;
-	else
-		itemHeight = MFrame->FontHeight + (mStyle.bevelWidth+1)/2;
+		if (MFrame->validated & VALID_MARGIN)
+			itemHeight = ffh + 1 + 2*(MHilite->borderWidth + (MFrame->marginWidth ? 1 : 0));
+		else
+			if (Settings_newMetrics)
+				itemHeight = imax(10, ffh) + 2 + (mStyle.bevelWidth+1)/2;
+			else
+				itemHeight = MFrame->FontHeight + (mStyle.bevelWidth+1)/2;
 
 	MenuInfo.nIconSize = -1 == Settings_menuIconSize ? itemHeight - 2 : Settings_menuIconSize;
 
@@ -278,20 +281,20 @@ void MenuMaker_Configure()
 		MenuInfo.nItemIndent[i] = itemHeight + 1;
 		MenuInfo.nScrollerSize[i] = imax(10, itemHeight + MFrame->borderWidth + 1);
 	}
-/*
-	if (-1 == Settings_menuIconSize)
-		MenuInfo.nIconSize = itemHeight - 2;
-	else
-	{
-		MenuInfo.nIconSize = Settings_menuIconSize;
-		if (MenuInfo.nIconSize > itemHeight - 2)
-			itemHeight = MenuInfo.nIconSize + 2;
-	}
+	/*
+		if (-1 == Settings_menuIconSize)
+			MenuInfo.nIconSize = itemHeight - 2;
+		else
+		{
+			MenuInfo.nIconSize = Settings_menuIconSize;
+			if (MenuInfo.nIconSize > itemHeight - 2)
+				itemHeight = MenuInfo.nIconSize + 2;
+		}
 
-	MenuInfo.nItemHeight = itemHeight;
-	MenuInfo.nItemIndent = itemHeight + 1;
-	MenuInfo.nScrollerSize = imax(10, MenuInfo.nItemIndent+MFrame->borderWidth);
-*/
+		MenuInfo.nItemHeight = itemHeight;
+		MenuInfo.nItemIndent = itemHeight + 1;
+		MenuInfo.nScrollerSize = imax(10, MenuInfo.nItemIndent+MFrame->borderWidth);
+	*/
 	// --------------------------------------
 	// Transparency
 	Settings_menuAlpha = Settings_menuAlphaEnabled ? Settings_menuAlphaValue : 255;
@@ -300,8 +303,8 @@ void MenuMaker_Configure()
 	MenuInfo.MaxMenuHeight = GetSystemMetrics(SM_CYSCREEN) * 4 / 5;
 
 	MenuInfo.MaxMenuWidth = Settings_menusBroamMode
-		? iminmax(Settings_menuMaxWidth*2, 320, 640)
-		: Settings_menuMaxWidth;
+							? iminmax(Settings_menuMaxWidth*2, 320, 640)
+							: Settings_menuMaxWidth;
 
 	MenuInfo.nAvgFontWidth = 0;
 }
@@ -309,7 +312,8 @@ void MenuMaker_Configure()
 //===========================================================================
 bool get_string_within (char *dest, char **p_src, const char *delim, bool right)
 {
-	char *a, *b; *dest = 0;
+	char *a, *b;
+	*dest = 0;
 	if (NULL == (a = strchr(*p_src, delim[0])))
 		return false;
 	if (NULL == (b = right ? strrchr(++a, delim[1]) : strchr(++a, delim[1])))
@@ -342,31 +346,31 @@ char * get_special_command(char *out, char *in)
 //===========================================================================
 static const char default_root_menu[] =
 	"[begin]"
-"\0"  "[path](Programs){PROGRAMS}"
-"\0"  "[path](Desktop){DESKTOP}"
-"\0"  "[submenu](Blackbox)"
-"\0"    "[config](Configuration)"
-"\0"    "[stylesmenu](Styles){styles}"
-"\0"    "[submenu](Edit)"
-"\0"      "[editstyle](style)"
-"\0"      "[editmenu](menu.rc)"
-"\0"      "[editplugins](plugins.rc)"
-"\0"      "[editblackbox](blackbox.rc)"
-"\0"      "[editextensions](extensions.rc)"
-"\0"      "[end]"
-"\0"    "[about](About)"
-"\0"    "[reconfig](Reconfigure)"
-"\0"    "[restart](Restart)"
-"\0"    "[exit](Quit)"
-"\0"    "[end]"
-"\0"  "[submenu](Goodbye)"
-"\0"    "[logoff](Log Off)"
-"\0"    "[reboot](Reboot)"
-"\0"    "[shutdown](Shutdown)"
-"\0"    "[end]"
-"\0""[end]"
-"\0"
-;
+	"\0"  "[path](Programs){PROGRAMS}"
+	"\0"  "[path](Desktop){DESKTOP}"
+	"\0"  "[submenu](Blackbox)"
+	"\0"    "[config](Configuration)"
+	"\0"    "[stylesmenu](Styles){styles}"
+	"\0"    "[submenu](Edit)"
+	"\0"      "[editstyle](style)"
+	"\0"      "[editmenu](menu.rc)"
+	"\0"      "[editplugins](plugins.rc)"
+	"\0"      "[editblackbox](blackbox.rc)"
+	"\0"      "[editextensions](extensions.rc)"
+	"\0"      "[end]"
+	"\0"    "[about](About)"
+	"\0"    "[reconfig](Reconfigure)"
+	"\0"    "[restart](Restart)"
+	"\0"    "[exit](Quit)"
+	"\0"    "[end]"
+	"\0"  "[submenu](Goodbye)"
+	"\0"    "[logoff](Log Off)"
+	"\0"    "[reboot](Reboot)"
+	"\0"    "[shutdown](Shutdown)"
+	"\0"    "[end]"
+	"\0""[end]"
+	"\0"
+	;
 
 //===========================================================================
 static const char *menu_cmds[] =
@@ -432,9 +436,10 @@ Menu* ParseMenu(FILE **fp, int *fc, const char *path, const char *title, const c
 
 	Menu *pMenu = NULL;
 	MenuItem *Inserted_Items = NULL;
-	int inserted = 0, f, cmd_id; char *s, *cp;
+	int inserted = 0, f, cmd_id;
+	char *s, *cp;
 
-	for(;;)
+	for (;;)
 	{
 		// read the line
 		if (NULL == path)
@@ -442,16 +447,16 @@ Menu* ParseMenu(FILE **fp, int *fc, const char *path, const char *title, const c
 			*(const char**)fp += 1 + strlen(strcpy(buffer, *(const char**)fp));
 		}
 		else
-		if (false == ReadNextCommand(fp[*fc], buffer, sizeof(buffer)))
-		{
-			if (*fc) // continue from included file
+			if (false == ReadNextCommand(fp[*fc], buffer, sizeof(buffer)))
 			{
-				FileClose(fp[(*fc)--]);
-				continue;
+				if (*fc) // continue from included file
+				{
+					FileClose(fp[(*fc)--]);
+					continue;
+				}
+				cmd_id = e_no_end;
+				goto skip;
 			}
-			cmd_id = e_no_end;
-			goto skip;
-		}
 
 		// replace %USER% etc.
 		if (strchr(buffer, '%')) ReplaceEnvVars(buffer);
@@ -475,7 +480,7 @@ skip:
 		if (NULL == pMenu && cmd_id != e_begin) // first item must be begin
 		{
 			pMenu = MakeNamedMenu(
-				title ? title : NLS0("missing [begin]"), IDString, popup);
+						title ? title : NLS0("missing [begin]"), IDString, popup);
 		}
 
 		// insert collected items from [insertpath]/[stylesdir] now?
@@ -490,82 +495,88 @@ skip:
 		{
 			// If the line contains [begin] we create a title item...
 			// If no menu title has been defined, display Blackbox version...
-			case e_begin:
-				if (0==label[0]) strcpy(label, GetBBVersion());
+		case e_begin:
+			if (0==label[0]) strcpy(label, GetBBVersion());
 
-				if (NULL == pMenu)
-				{
-					pMenu = MakeNamedMenu(label, IDString, popup);
-					continue;
-				}
-				// fall through, [begin] is like [submenu] when within the menu
-			//====================
-			case e_submenu:
-				{
-					sprintf(buffer, "%s_%s", IDString, label);
-					Menu *mSub = ParseMenu(fp, fc, path, data[0]?data:label, buffer, popup);
-					if (mSub) MakeSubmenu(pMenu, mSub, label, icon);
-					else MakeMenuNOP(pMenu, label);
-				}
+			if (NULL == pMenu)
+			{
+				pMenu = MakeNamedMenu(label, IDString, popup);
 				continue;
+			}
+			// fall through, [begin] is like [submenu] when within the menu
+			//====================
+		case e_submenu:
+		{
+			sprintf(buffer, "%s_%s", IDString, label);
+			Menu *mSub = ParseMenu(fp, fc, path, data[0]?data:label, buffer, popup);
+			if (mSub) MakeSubmenu(pMenu, mSub, label, icon);
+			else MakeMenuNOP(pMenu, label);
+		}
+		continue;
+
+		//====================
+		case e_no_end:
+			MakeMenuNOP(pMenu, NLS0("missing [end]"));
+		case e_end:
+			pMenu->m_bIsDropTarg = true;
+			return pMenu;
 
 			//====================
-			case e_no_end:
-				MakeMenuNOP(pMenu, NLS0("missing [end]"));
-			case e_end:
-				pMenu->m_bIsDropTarg = true;
-				return pMenu;
+		case e_include:
+			s = unquote(buffer, label[0] ? label : data);
+			if (is_relative_path(s) && path)
+				s = strcat(add_slash(data, get_directory(data, path)), s);
 
-			//====================
-			case e_include:
-				s = unquote(buffer, label[0] ? label : data);
-				if (is_relative_path(s) && path)
-					s = strcat(add_slash(data, get_directory(data, path)), s);
-
-				if (++*fc < MENU_INCLUDE_MAXLEVEL && NULL != (fp[*fc] = FileOpen(s)))
-					continue;
-				--*fc;
-				MakeMenuNOP(pMenu, NLS0("[include] failed"));
+			if (++*fc < MENU_INCLUDE_MAXLEVEL && NULL != (fp[*fc] = FileOpen(s)))
 				continue;
+			--*fc;
+			MakeMenuNOP(pMenu, NLS0("[include] failed"));
+			continue;
 
 			//====================
-			case e_nop:
-				MakeMenuNOP(pMenu, label);
-				continue;
+		case e_nop:
+			MakeMenuNOP(pMenu, label);
+			continue;
 
 			//====================
-			case e_sep:
-				MakeMenuNOP(pMenu)->m_isNOP = MI_NOP_SEP;
-				continue;
+		case e_sep:
+			MakeMenuNOP(pMenu)->m_isNOP = MI_NOP_SEP;
+			continue;
 
 			//====================
-			case e_separator:
-				MakeMenuNOP(pMenu)->m_isNOP = MI_NOP_SEP | MI_NOP_LINE;
-				continue;
+		case e_separator:
+			MakeMenuNOP(pMenu)->m_isNOP = MI_NOP_SEP | MI_NOP_LINE;
+			continue;
 
 			//====================
-			case e_volume:
-				MakeMenuVOL(pMenu, label);
-				continue;
+		case e_volume:
+			MakeMenuVOL(pMenu, label);
+			continue;
 
 			//====================
 			// a [stylemenu] item is pointing to a dynamic style folder...
-			case e_stylesmenu: s = "@BBCore.style %s"; goto s_folder;
+		case e_stylesmenu:
+			s = "@BBCore.style %s";
+			goto s_folder;
 
 			// a [path] item is pointing to a dynamic folder...
-			case e_path: s = get_special_command(buffer, data);
-			s_folder:
-				MakePathMenu(pMenu, label, data, s, icon);
-				continue;
+		case e_path:
+			s = get_special_command(buffer, data);
+s_folder:
+			MakePathMenu(pMenu, label, data, s, icon);
+			continue;
 
 			//====================
 			// a [styledir] item will insert styles from a folder...
-			case e_stylesdir: s = "@BBCore.style %s"; goto s_insert;
+		case e_stylesdir:
+			s = "@BBCore.style %s";
+			goto s_insert;
 
 			//====================
 			// a [insertpath] item will insert items from a folder...
-			case e_insertpath: s = get_special_command(buffer, data);
-			s_insert:
+		case e_insertpath:
+			s = get_special_command(buffer, data);
+s_insert:
 			{
 				struct pidl_node *p, *plist = get_folder_pidl_list(label[0] ? label : data);
 				dolist (p, plist) ++inserted, MenuMaker_LoadFolder(&Inserted_Items, p->v, s);
@@ -575,40 +586,41 @@ skip:
 
 			//====================
 			// special items...
-			case e_workspaces:
-				MakeSubmenu(pMenu, MakeDesktopMenu(popup), label[0]?label:NLS0("Workspaces"), icon);
-				continue;
+		case e_workspaces:
+			MakeSubmenu(pMenu, MakeDesktopMenu(popup), label[0]?label:NLS0("Workspaces"), icon);
+			continue;
 
-			case e_tasks:
-				MakeSubmenu(pMenu, MakeIconsMenu(popup), label[0]?label:NLS0("Icons"), icon);
-				continue;
+		case e_tasks:
+			MakeSubmenu(pMenu, MakeIconsMenu(popup), label[0]?label:NLS0("Icons"), icon);
+			continue;
 
-			case e_config:
-				MakeSubmenu(pMenu, MakeConfigMenu(popup), label[0]?label:NLS0("Configuration"), icon);
-				continue;
-
-			//====================
-			case e_exec:
-				if ('@' != data[0]) goto core_broam;
-				// data specifies a broadcast message
-				MakeMenuItem(pMenu, label, data, false, icon);
-				continue;
+		case e_config:
+			MakeSubmenu(pMenu, MakeConfigMenu(popup), label[0]?label:NLS0("Configuration"), icon);
+			continue;
 
 			//====================
-			case e_other:
-				f = get_workspace_number(menucommand);
-				if (-1 != f) // is this [workspace#]
-				{
-					s = label; DesktopInfo DI;
-					if (0 == *s) s = DI.name, get_desktop_info(&DI, f);
-					MakeSubmenu(pMenu, GetTaskFolder(f, popup), s, icon);
-					continue;
-				}
-				goto core_broam;
+		case e_exec:
+			if ('@' != data[0]) goto core_broam;
+			// data specifies a broadcast message
+			MakeMenuItem(pMenu, label, data, false, icon);
+			continue;
+
+			//====================
+		case e_other:
+			f = get_workspace_number(menucommand);
+			if (-1 != f) // is this [workspace#]
+			{
+				s = label;
+				DesktopInfo DI;
+				if (0 == *s) s = DI.name, get_desktop_info(&DI, f);
+				MakeSubmenu(pMenu, GetTaskFolder(f, popup), s, icon);
+				continue;
+			}
+			goto core_broam;
 
 			//====================
 			// everything else is converted to a '@BBCore....' broam
-			core_broam:
+core_broam:
 			{
 				int x = sprintf(buffer, "@BBCore.%s", strlwr(menucommand));
 				if (data[0]) buffer[x]=' ', strcpy(buffer+x+1, data);
@@ -628,7 +640,8 @@ static char *IDRoot_String(char *buffer, const char *menu_id)
 
 Menu * MakeRootMenu(const char *menu_id, const char *path, const char *default_menu)
 {
-	FILE *fp[MENU_INCLUDE_MAXLEVEL]; int fc = 0;
+	FILE *fp[MENU_INCLUDE_MAXLEVEL];
+	int fc = 0;
 	if (NULL == (fp[0] = FileOpen(path)))
 	{
 		path = NULL;
@@ -652,7 +665,8 @@ int MenuMaker_LoadFolder(MenuItem **ppItems, LPCITEMIDLIST pIDFolder, const char
 	LPMALLOC pMalloc = NULL;
 	IShellFolder* pThisFolder;
 	LPENUMIDLIST pEnumIDList = NULL;
-	LPITEMIDLIST pID; ULONG nReturned;
+	LPITEMIDLIST pID;
+	ULONG nReturned;
 	int r = 0;
 
 	// nothing to do on NULL pidl's
@@ -694,7 +708,7 @@ int MenuMaker_LoadFolder(MenuItem **ppItems, LPCITEMIDLIST pIDFolder, const char
 					NULL,
 					(struct pidl_node*)new_node(pIDFull),
 					optional_command
-					);
+				);
 			}
 			else
 			{
@@ -714,7 +728,7 @@ int MenuMaker_LoadFolder(MenuItem **ppItems, LPCITEMIDLIST pIDFolder, const char
 						buffer,
 						szDispName,
 						false
-						);
+					);
 
 					pItem->m_nSortPriority = M_SORT_NAME;
 					pItem->m_ItemID |= MENUITEM_ID_STYLE;
@@ -725,7 +739,7 @@ int MenuMaker_LoadFolder(MenuItem **ppItems, LPCITEMIDLIST pIDFolder, const char
 						NULL,
 						szDispName,
 						false
-						);
+					);
 
 					if (uAttr & SFGAO_LINK) pItem->m_nSortPriority = M_SORT_NAME;
 				}
@@ -751,8 +765,8 @@ void init_check_optional_command(const char *cmd, char *current_optional_command
 	if (0 == memicmp(cmd, s = "@BBCore.style %s", 13))
 		sprintf(current_optional_command, s, stylePath());
 	else
-	if (0 == memicmp(cmd, s = "@BBCore.rootCommand %s", 20))
-		sprintf(current_optional_command, s, Desk_extended_rootCommand(NULL));
+		if (0 == memicmp(cmd, s = "@BBCore.rootCommand %s", 20))
+			sprintf(current_optional_command, s, Desk_extended_rootCommand(NULL));
 }
 
 //===========================================================================
@@ -786,7 +800,8 @@ Menu *SingleFolderMenu(const char* path)
 
 bool check_menu_toggle(const char *menu_id, bool kbd_invoked)
 {
-	Menu *m; char IDString[MAX_PATH];
+	Menu *m;
+	char IDString[MAX_PATH];
 
 	if (menu_id[0])
 		m = Menu::FindNamedMenu(IDRoot_String(IDString, menu_id));
@@ -797,7 +812,7 @@ bool check_menu_toggle(const char *menu_id, bool kbd_invoked)
 		return false;
 
 	if (m->has_focus_in_chain()
-	 && (kbd_invoked || window_under_mouse() == m->m_hwnd))
+			&& (kbd_invoked || window_under_mouse() == m->m_hwnd))
 	{
 		focus_top_window();
 		Menu_All_Hide();
@@ -851,75 +866,75 @@ bool MenuMaker_ShowMenu(int id, LPARAM param)
 	switch (id)
 	{
 		// -------------------------------
-		case BB_MENU_ROOT: // Main menu
-			menu_id = menu_string_ids[n = e_root];
-			break;
+	case BB_MENU_ROOT: // Main menu
+		menu_id = menu_string_ids[n = e_root];
+		break;
 
-		case BB_MENU_TASKS: // Workspaces menu
-			menu_id = menu_string_ids[n = e_workspaces];
-			break;
+	case BB_MENU_TASKS: // Workspaces menu
+		menu_id = menu_string_ids[n = e_workspaces];
+		break;
 
-		case BB_MENU_ICONS: // Iconized tasks menu
-			menu_id = menu_string_ids[n = e_icons];
-			break;
-
-		// -------------------------------
-		case BB_MENU_TOOLBAR: // toolbar menu
-			Toolbar_ShowMenu(true);
-			return true;
-
-		case BB_MENU_CONTEXT:
-			m = GetContextMenu((LPCITEMIDLIST)param);
-			break;
-
-		case BB_MENU_PLUGIN:
-			m = (Menu*)param;
-			break;
+	case BB_MENU_ICONS: // Iconized tasks menu
+		menu_id = menu_string_ids[n = e_icons];
+		break;
 
 		// -------------------------------
-		case BB_MENU_BYBROAM_KBD: // "BBCore.KeyMenu [x y] [param]"
-			from_kbd = true;
+	case BB_MENU_TOOLBAR: // toolbar menu
+		Toolbar_ShowMenu(true);
+		return true;
 
-		case BB_MENU_BYBROAM: // "BBCore.ShowMenu [x y] [param]"
-			int i;
-			char c, args[MAX_PATH];
-			char *arg = (char *)param;
-			if (NULL == arg || 0 == *arg) goto _without_menu_xy;
+	case BB_MENU_CONTEXT:
+		m = GetContextMenu((LPCITEMIDLIST)param);
+		break;
 
-			strcpy(args, arg);
+	case BB_MENU_PLUGIN:
+		m = (Menu*)param;
+		break;
 
-			arg = strtok(args, " ");
-			if (NULL == arg) goto _without_menu_xy;
-			for (i = ('-' == arg[0])? 1: 0, c = arg[i]; is_num(c); c = arg[++i]);
-			if (c) goto _without_menu_xy;
-			menu_x = atoi(arg);
+		// -------------------------------
+	case BB_MENU_BYBROAM_KBD: // "BBCore.KeyMenu [x y] [param]"
+		from_kbd = true;
 
-			arg = strtok(NULL, " ");
-			if (NULL == arg) goto _without_menu_xy;
-			for (i = ('-' == arg[0])? 1: 0, c = arg[i]; is_num(c); c = arg[++i]);
-			if (c) goto _without_menu_xy;
-			menu_y = atoi(arg);
-			menu_with_xy = true;
+	case BB_MENU_BYBROAM: // "BBCore.ShowMenu [x y] [param]"
+		int i;
+		char c, args[MAX_PATH];
+		char *arg = (char *)param;
+		if (NULL == arg || 0 == *arg) goto _without_menu_xy;
 
-			menu_id = (char *)strtok(NULL, "");
-			if (NULL == menu_id)
-				menu_id = "";
-			goto _with_menu_xy;
+		strcpy(args, arg);
 
-		_without_menu_xy:
-			menu_id = (const char *)param;
+		arg = strtok(args, " ");
+		if (NULL == arg) goto _without_menu_xy;
+		for (i = ('-' == arg[0])? 1: 0, c = arg[i]; is_num(c); c = arg[++i]);
+		if (c) goto _without_menu_xy;
+		menu_x = atoi(arg);
 
-		_with_menu_xy:
-			arg = (char *)menu_id;
-			for (i = ('-' == arg[0])? 1: 0, c = arg[i]; is_num(c); c = arg[++i]);
-			if (0 == c || ' ' == c)
-			{
-				arg[i] = 0;
-				menu_iconsize = atoi(arg);
-				menu_id = arg + i + (c ? 1 : 0);
-			}
-			n = get_string_index(menu_id, menu_string_ids);
-			break;
+		arg = strtok(NULL, " ");
+		if (NULL == arg) goto _without_menu_xy;
+		for (i = ('-' == arg[0])? 1: 0, c = arg[i]; is_num(c); c = arg[++i]);
+		if (c) goto _without_menu_xy;
+		menu_y = atoi(arg);
+		menu_with_xy = true;
+
+		menu_id = (char *)strtok(NULL, "");
+		if (NULL == menu_id)
+			menu_id = "";
+		goto _with_menu_xy;
+
+_without_menu_xy:
+		menu_id = (const char *)param;
+
+_with_menu_xy:
+		arg = (char *)menu_id;
+		for (i = ('-' == arg[0])? 1: 0, c = arg[i]; is_num(c); c = arg[++i]);
+		if (0 == c || ' ' == c)
+		{
+			arg[i] = 0;
+			menu_iconsize = atoi(arg);
+			menu_id = arg + i + (c ? 1 : 0);
+		}
+		n = get_string_index(menu_id, menu_string_ids);
+		break;
 	}
 
 	if (menu_id)
@@ -929,32 +944,32 @@ bool MenuMaker_ShowMenu(int id, LPARAM param)
 
 		switch (n)
 		{
-			case e_root:
-			case e_lastmenu:
-				m = MakeRootMenu(menu_id, menuPath(), default_root_menu);
-				break;
+		case e_root:
+		case e_lastmenu:
+			m = MakeRootMenu(menu_id, menuPath(), default_root_menu);
+			break;
 
-			case e_workspaces:
-				m = MakeDesktopMenu(true);
-				break;
+		case e_workspaces:
+			m = MakeDesktopMenu(true);
+			break;
 
-			case e_icons:
-				m = MakeIconsMenu(true);
-				break;
+		case e_icons:
+			m = MakeIconsMenu(true);
+			break;
 
-			case e_configuration:
-				m = MakeConfigMenu(true);
-				break;
+		case e_configuration:
+			m = MakeConfigMenu(true);
+			break;
 
-			case e_other:
-				if (-1 != (n = get_workspace_number(menu_id)))
-					m = GetTaskFolder(n, true);
-				else
+		case e_other:
+			if (-1 != (n = get_workspace_number(menu_id)))
+				m = GetTaskFolder(n, true);
+			else
 				if (FindConfigFile(path, menu_id, NULL))
 					m = MakeRootMenu(menu_id, path, NULL);
 				else
 					m = SingleFolderMenu(menu_id);
-				break;
+			break;
 		}
 	}
 

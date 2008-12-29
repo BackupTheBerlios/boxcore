@@ -68,7 +68,7 @@ static int getsetVolume(int x)
 		return 0;
 
 	if (MMSYSERR_NOERROR!=mixerGetDevCaps((UINT_PTR) m_hMixer, &m_mxcaps,
-			sizeof(MIXERCAPS)))
+										  sizeof(MIXERCAPS)))
 		return 0;
 
 	// get dwLineID
@@ -76,7 +76,7 @@ static int getsetVolume(int x)
 	mxl.cbStruct = sizeof(MIXERLINE);
 	mxl.dwComponentType = MIXERLINE_COMPONENTTYPE_DST_SPEAKERS;
 	if (MMSYSERR_NOERROR!=mixerGetLineInfo((HMIXEROBJ) m_hMixer, &mxl,
-			MIXER_OBJECTF_HMIXER | MIXER_GETLINEINFOF_COMPONENTTYPE))
+										   MIXER_OBJECTF_HMIXER | MIXER_GETLINEINFOF_COMPONENTTYPE))
 		return 0;
 
 	// get dwControlID
@@ -98,9 +98,9 @@ static int getsetVolume(int x)
 	if (0 <= x)
 	{ // set
 		DWORD dwVol = m_dwMinimum + vol2int(vol) * (m_dwMaximum - m_dwMinimum)
-				/ 1000;
+					  / 1000;
 		MIXERCONTROLDETAILS_UNSIGNED mxcdVolume =
-		{ dwVol };
+			{ dwVol };
 		MIXERCONTROLDETAILS mxcd;
 		mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
 		mxcd.dwControlID = m_dwVolumeControlID;
@@ -127,7 +127,7 @@ static int getsetVolume(int x)
 			return 0;
 
 		vol = int2vol(1000 * (mxcdVolume.dwValue - m_dwMinimum) / (m_dwMaximum
-				- m_dwMinimum));
+					  - m_dwMinimum));
 	}
 	mixerClose(m_hMixer);
 	return vol;
@@ -138,17 +138,20 @@ static int getsetVolumeVista(int x)
 	HRESULT hr;
 	IMMDeviceEnumerator *deviceEnumerator = NULL;
 	CLSID CLSID_MMDeviceEnumerator =
-	{ 0xBCDE0395, 0xE52F, 0x467C,
-	{ 0x8E, 0x3D, 0xC4, 0x57, 0x92, 0x91, 0x69, 0x2E } };
+		{ 0xBCDE0395, 0xE52F, 0x467C,
+		  { 0x8E, 0x3D, 0xC4, 0x57, 0x92, 0x91, 0x69, 0x2E }
+		};
 	IID IID_IMMDeviceEnumerator =
-	{ 0xA95664D2, 0x9614, 0x4F35,
-	{ 0xA7, 0x46, 0xDE, 0x8D, 0xB6, 0x36, 0x17, 0xE6 } };
+		{ 0xA95664D2, 0x9614, 0x4F35,
+		  { 0xA7, 0x46, 0xDE, 0x8D, 0xB6, 0x36, 0x17, 0xE6 }
+		};
 	IID IID_IAudioEndpointVolume =
-	{ 0x5CDF2C82, 0x841E, 0x4546,
-	{ 0x97, 0x22, 0x0C, 0xF7, 0x40, 0x78, 0x22, 0x9A } };
+		{ 0x5CDF2C82, 0x841E, 0x4546,
+		  { 0x97, 0x22, 0x0C, 0xF7, 0x40, 0x78, 0x22, 0x9A }
+		};
 	CoInitialize(NULL);
 	hr = CoCreateInstance(CLSID_MMDeviceEnumerator, NULL, CLSCTX_INPROC_SERVER,
-			IID_IMMDeviceEnumerator, (LPVOID *) &deviceEnumerator);
+						  IID_IMMDeviceEnumerator, (LPVOID *) &deviceEnumerator);
 
 	IMMDevice *defaultDevice = NULL;
 	hr = deviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole,
@@ -156,7 +159,7 @@ static int getsetVolumeVista(int x)
 
 	IAudioEndpointVolume *endpointVolume = NULL;
 	hr = defaultDevice->Activate(IID_IAudioEndpointVolume,
-			CLSCTX_INPROC_SERVER, NULL, (LPVOID *) &endpointVolume);
+								 CLSCTX_INPROC_SERVER, NULL, (LPVOID *) &endpointVolume);
 
 	float volume;
 	if (x == -1)
@@ -203,17 +206,20 @@ static bool volume_mute_vista(bool toggle)
 	HRESULT hr;
 	IMMDeviceEnumerator *deviceEnumerator = NULL;
 	CLSID CLSID_MMDeviceEnumerator =
-	{ 0xBCDE0395, 0xE52F, 0x467C,
-	{ 0x8E, 0x3D, 0xC4, 0x57, 0x92, 0x91, 0x69, 0x2E } };
+		{ 0xBCDE0395, 0xE52F, 0x467C,
+		  { 0x8E, 0x3D, 0xC4, 0x57, 0x92, 0x91, 0x69, 0x2E }
+		};
 	IID IID_IMMDeviceEnumerator =
-	{ 0xA95664D2, 0x9614, 0x4F35,
-	{ 0xA7, 0x46, 0xDE, 0x8D, 0xB6, 0x36, 0x17, 0xE6 } };
+		{ 0xA95664D2, 0x9614, 0x4F35,
+		  { 0xA7, 0x46, 0xDE, 0x8D, 0xB6, 0x36, 0x17, 0xE6 }
+		};
 	IID IID_IAudioEndpointVolume =
-	{ 0x5CDF2C82, 0x841E, 0x4546,
-	{ 0x97, 0x22, 0x0C, 0xF7, 0x40, 0x78, 0x22, 0x9A } };
+		{ 0x5CDF2C82, 0x841E, 0x4546,
+		  { 0x97, 0x22, 0x0C, 0xF7, 0x40, 0x78, 0x22, 0x9A }
+		};
 	CoInitialize(NULL);
 	hr = CoCreateInstance(CLSID_MMDeviceEnumerator, NULL, CLSCTX_INPROC_SERVER,
-			IID_IMMDeviceEnumerator, (LPVOID *) &deviceEnumerator);
+						  IID_IMMDeviceEnumerator, (LPVOID *) &deviceEnumerator);
 
 	IMMDevice *defaultDevice = NULL;
 	hr = deviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole,
@@ -221,7 +227,7 @@ static bool volume_mute_vista(bool toggle)
 
 	IAudioEndpointVolume *endpointVolume = NULL;
 	hr = defaultDevice->Activate(IID_IAudioEndpointVolume,
-			CLSCTX_INPROC_SERVER, NULL, (LPVOID *) &endpointVolume);
+								 CLSCTX_INPROC_SERVER, NULL, (LPVOID *) &endpointVolume);
 	BOOL muteStatus;
 	endpointVolume->GetMute(&muteStatus);
 	if (toggle)
@@ -264,7 +270,7 @@ static bool volume_mute_other(bool toggle)
 			mxl.dwSource = 0;
 			mxl.dwComponentType = MIXERLINE_COMPONENTTYPE_DST_SPEAKERS;
 			mmr = mixerGetLineInfo((HMIXEROBJ) hmx, &mxl,
-					MIXER_GETLINEINFOF_DESTINATION);
+								   MIXER_GETLINEINFOF_DESTINATION);
 			if (MMSYSERR_NOERROR != mmr || MIXERLINE_LINEF_ACTIVE
 					!= mxl.fdwLine)
 				continue;
@@ -275,7 +281,7 @@ static bool volume_mute_other(bool toggle)
 			mxlc.cbmxctrl = sizeof(MIXERCONTROL);
 			mxlc.pamxctrl = new MIXERCONTROL[mxl.cControls];
 			mmr = mixerGetLineControls((HMIXEROBJ) hmx, &mxlc,
-					MIXER_GETLINECONTROLSF_ALL);
+									   MIXER_GETLINECONTROLSF_ALL);
 			for (j = 0; j < mxl.cControls; ++j)
 			{
 				if (mxlc.pamxctrl[j].dwControlType
@@ -295,11 +301,11 @@ static bool volume_mute_other(bool toggle)
 			mxcd.cbDetails = sizeof(pmxcd_u);
 			mxcd.paDetails = pmxcd_u;
 			mixerGetControlDetails((HMIXEROBJ) hmx, &mxcd,
-					MIXER_GETCONTROLDETAILSF_VALUE);
+								   MIXER_GETCONTROLDETAILSF_VALUE);
 			toggle ? pmxcd_u[0].dwValue = !pmxcd_u[0].dwValue
-					: pmxcd_u[0].dwValue = pmxcd_u[0].dwValue; // toggle mute
+										  : pmxcd_u[0].dwValue = pmxcd_u[0].dwValue; // toggle mute
 			mixerSetControlDetails((HMIXEROBJ) hmx, &mxcd,
-					MIXER_GETCONTROLDETAILSF_VALUE);
+								   MIXER_GETCONTROLDETAILSF_VALUE);
 
 			delete[] mxlc.pamxctrl;
 		}

@@ -43,7 +43,8 @@
 //////////////////////////////////////////////////////////////////////
 int GetIDListSize(LPCITEMIDLIST pidl)
 {
-	int cb; int c = 0;
+	int cb;
+	int c = 0;
 	if (pidl)
 	{
 		while (0!=(cb=pidl->mkid.cb))
@@ -59,7 +60,8 @@ int GetIDListSize(LPCITEMIDLIST pidl)
 //////////////////////////////////////////////////////////////////////
 LPITEMIDLIST duplicateIDlist(LPCITEMIDLIST pidl)
 {
-	LPITEMIDLIST pidlNew; int cb;
+	LPITEMIDLIST pidlNew;
+	int cb;
 	if (NULL==pidl) return NULL;
 	pidlNew = (LPITEMIDLIST)m_alloc(cb = GetIDListSize(pidl));
 	memcpy(pidlNew, pidl, cb);
@@ -69,7 +71,8 @@ LPITEMIDLIST duplicateIDlist(LPCITEMIDLIST pidl)
 //////////////////////////////////////////////////////////////////////
 LPITEMIDLIST joinIDlists(LPCITEMIDLIST pidlA, LPCITEMIDLIST pidlB)
 {
-	LPITEMIDLIST pidl; int cbA, cbB;
+	LPITEMIDLIST pidl;
+	int cbA, cbB;
 
 	cbA = GetIDListSize(pidlA);
 	if (cbA) cbA -= sizeof(short);
@@ -98,7 +101,7 @@ void SHMalloc_Free(void * pidl)
 //////////////////////////////////////////////////////////////////////
 
 BOOL sh_get_displayname(LPSHELLFOLDER piFolder, LPCITEMIDLIST pidl,
-						 DWORD dwFlags, LPTSTR pszName)
+						DWORD dwFlags, LPTSTR pszName)
 {
 	STRRET str;
 	BOOL fDesktop = FALSE;
@@ -107,7 +110,7 @@ BOOL sh_get_displayname(LPSHELLFOLDER piFolder, LPCITEMIDLIST pidl,
 	// Check to see if a parent folder was specified.  If not, get a pointer
 	// to the desktop folder.
 	//
-	if (NULL == piFolder)   
+	if (NULL == piFolder)
 	{
 		HRESULT hr = SHGetDesktopFolder(&piFolder);
 
@@ -125,25 +128,25 @@ BOOL sh_get_displayname(LPSHELLFOLDER piFolder, LPCITEMIDLIST pidl,
 		//StrRetToBufA(&str, pidl, pszName, MAX_PATH);
 		switch (str.uType)
 		{
-			case STRRET_WSTR:
-				WideCharToMultiByte(CP_ACP, 0, str.pOleStr, -1, pszName, MAX_PATH, NULL, NULL);
-				SHMalloc_Free(str.pOleStr);
-				//dbg_printf("WSTR: %s", pszName);
-				break;
+		case STRRET_WSTR:
+			WideCharToMultiByte(CP_ACP, 0, str.pOleStr, -1, pszName, MAX_PATH, NULL, NULL);
+			SHMalloc_Free(str.pOleStr);
+			//dbg_printf("WSTR: %s", pszName);
+			break;
 
-			case STRRET_OFFSET:
-				strcpy(pszName, (LPSTR)pidl + str.uOffset);
-				//dbg_printf("OFFS: %s", pszName);
-				break;
+		case STRRET_OFFSET:
+			strcpy(pszName, (LPSTR)pidl + str.uOffset);
+			//dbg_printf("OFFS: %s", pszName);
+			break;
 
-			case STRRET_CSTR:
-				strcpy(pszName, str.cStr);
-				//dbg_printf("CSTR: %s", pszName);
-				break;
+		case STRRET_CSTR:
+			strcpy(pszName, str.cStr);
+			//dbg_printf("CSTR: %s", pszName);
+			break;
 
-			default:
-				fSuccess = FALSE;
-				break;
+		default:
+			fSuccess = FALSE;
+			break;
 		}
 	}
 	else
@@ -176,7 +179,7 @@ IShellFolder* sh_get_folder_interface(LPCITEMIDLIST pIDFolder)
 		return pShellFolder;
 
 	hr = pShellFolder->BindToObject(
-		pIDFolder, NULL, IID_IShellFolder, (LPVOID*)&pThisFolder);
+			 pIDFolder, NULL, IID_IShellFolder, (LPVOID*)&pThisFolder);
 
 	pShellFolder->Release();
 
@@ -196,7 +199,7 @@ bool sh_get_uiobject(
 	struct IShellFolder **ppsfFolder,
 	const struct _GUID riid,
 	void **pObject
-	)
+)
 {
 	*ppidlItem  = NULL;
 	*ppsfFolder = NULL;
@@ -215,7 +218,7 @@ bool sh_get_uiobject(
 
 	//fake ITEMIDLIST - array for 1 file object
 	HRESULT hr = (*ppsfFolder)->GetUIObjectOf((HWND)NULL,
-		1, (LPCITEMIDLIST*)ppidlItem, riid, NULL, pObject);
+				 1, (LPCITEMIDLIST*)ppidlItem, riid, NULL, pObject);
 
 	return SUCCEEDED(hr) && NULL != *pObject;
 }
@@ -228,7 +231,9 @@ bool sh_get_uiobject(
 
 LPITEMIDLIST sh_getpidl (IShellFolder *pSF, const char *path)
 {
-	HRESULT hr; WCHAR wpath[MAX_PATH]; ULONG chEaten;
+	HRESULT hr;
+	WCHAR wpath[MAX_PATH];
+	ULONG chEaten;
 	LPITEMIDLIST pIDFolder;
 
 	if (NULL == pSF)
@@ -243,7 +248,7 @@ LPITEMIDLIST sh_getpidl (IShellFolder *pSF, const char *path)
 
 	MultiByteToWideChar(CP_ACP, 0, temp, -1, wpath, MAX_PATH);
 	hr = pSF->ParseDisplayName(
-		NULL, NULL, wpath, &chEaten, &pIDFolder, NULL);
+			 NULL, NULL, wpath, &chEaten, &pIDFolder, NULL);
 
 	pSF->Release();
 	if (NOERROR!=hr)
@@ -321,70 +326,72 @@ HICON sh_geticon (LPCITEMIDLIST pID, int iconsize)
 
 int get_csidl(const char **pPath)
 {
-	static const char idl[] = {
-	  "DESKTOP"                   // 0x0000 <desktop>
-	"\0INTERNET"                  // 0x0001 Internet Explorer (icon on desktop)
-	"\0PROGRAMS"                  // 0x0002 Start Menu\Programs
-	"\0CONTROLS"                  // 0x0003 My Computer\Control Panel
-	"\0PRINTERS"                  // 0x0004 My Computer\Printers
-	"\0PERSONAL"                  // 0x0005 My Documents
-	"\0FAVORITES"                 // 0x0006 <user name>\Favorites
-	"\0STARTUP"                   // 0x0007 Start Menu\Programs\Startup
-	"\0RECENT"                    // 0x0008 <user name>\Recent
-	"\0SENDTO"                    // 0x0009 <user name>\SendTo
-	"\0BITBUCKET"                 // 0x000a <desktop>\Recycle Bin
-	"\0STARTMENU"                 // 0x000b <user name>\Start Menu
-	"\0"                          // 0x000c
-	"\0"                          // 0x000d
-	"\0"                          // 0x000e
-	"\0"                          // 0x000f
-	"\0DESKTOPDIRECTORY"          // 0x0010 <user name>\Desktop
-	"\0DRIVES"                    // 0x0011 My Computer
-	"\0NETWORK"                   // 0x0012 Network Neighborhood
-	"\0NETHOOD"                   // 0x0013 <user name>\nethood
-	"\0FONTS"                     // 0x0014 windows\fonts
-	"\0TEMPLATES"                 // 0x0015
-	"\0COMMON_STARTMENU"          // 0x0016 All Users\Start Menu
-	"\0COMMON_PROGRAMS"           // 0X0017 All Users\Programs
-	"\0COMMON_STARTUP"            // 0x0018 All Users\Startup
-	"\0COMMON_DESKTOPDIRECTORY"   // 0x0019 All Users\Desktop
-	"\0APPDATA"                   // 0x001a <user name>\Application Data
-	"\0PRINTHOOD"                 // 0x001b <user name>\PrintHood
-	"\0LOCAL_APPDATA"             // 0x001c <user name>\Local Settings\Applicaiton Data (non roaming)
-	"\0ALTSTARTUP"                // 0x001d non localized startup
-	"\0COMMON_ALTSTARTUP"         // 0x001e non localized common startup
-	"\0COMMON_FAVORITES"          // 0x001f
-	"\0INTERNET_CACHE"            // 0x0020
-	"\0COOKIES"                   // 0x0021
-	"\0HISTORY"                   // 0x0022
-	"\0COMMON_APPDATA"            // 0x0023 All Users\Application Data
-	"\0WINDOWS"                   // 0x0024 GetWindowsDirectory()
-	"\0SYSTEM"                    // 0x0025 GetSystemDirectory()
-	"\0PROGRAM_FILES"             // 0x0026 C:\Program Files
-	"\0MYPICTURES"                // 0x0027 C:\Program Files\My Pictures
-	"\0PROFILE"                   // 0x0028 USERPROFILE
-	"\0SYSTEMX86"                 // 0x0029 x86 system directory on RISC
-	"\0PROGRAM_FILESX86"          // 0x002a x86 C:\Program Files on RISC
-	"\0PROGRAM_FILES_COMMON"      // 0x002b C:\Program Files\Common
-	"\0PROGRAM_FILES_COMMONX86"   // 0x002c x86 Program Files\Common on RISC
-	"\0COMMON_TEMPLATES"          // 0x002d All Users\Templates
-	"\0COMMON_DOCUMENTS"          // 0x002e All Users\Documents
-	"\0COMMON_ADMINTOOLS"         // 0x002f All Users\Start Menu\Programs\Administrative Tools
-	"\0ADMINTOOLS"                // 0x0030 <user name>\Start Menu\Programs\Administrative Tools
-	"\0CONNECTIONS"               // 0x0031 Network and Dial-up Connections
+	static const char idl[] =
+	{
+		"DESKTOP"                   // 0x0000 <desktop>
+		"\0INTERNET"                  // 0x0001 Internet Explorer (icon on desktop)
+		"\0PROGRAMS"                  // 0x0002 Start Menu\Programs
+		"\0CONTROLS"                  // 0x0003 My Computer\Control Panel
+		"\0PRINTERS"                  // 0x0004 My Computer\Printers
+		"\0PERSONAL"                  // 0x0005 My Documents
+		"\0FAVORITES"                 // 0x0006 <user name>\Favorites
+		"\0STARTUP"                   // 0x0007 Start Menu\Programs\Startup
+		"\0RECENT"                    // 0x0008 <user name>\Recent
+		"\0SENDTO"                    // 0x0009 <user name>\SendTo
+		"\0BITBUCKET"                 // 0x000a <desktop>\Recycle Bin
+		"\0STARTMENU"                 // 0x000b <user name>\Start Menu
+		"\0"                          // 0x000c
+		"\0"                          // 0x000d
+		"\0"                          // 0x000e
+		"\0"                          // 0x000f
+		"\0DESKTOPDIRECTORY"          // 0x0010 <user name>\Desktop
+		"\0DRIVES"                    // 0x0011 My Computer
+		"\0NETWORK"                   // 0x0012 Network Neighborhood
+		"\0NETHOOD"                   // 0x0013 <user name>\nethood
+		"\0FONTS"                     // 0x0014 windows\fonts
+		"\0TEMPLATES"                 // 0x0015
+		"\0COMMON_STARTMENU"          // 0x0016 All Users\Start Menu
+		"\0COMMON_PROGRAMS"           // 0X0017 All Users\Programs
+		"\0COMMON_STARTUP"            // 0x0018 All Users\Startup
+		"\0COMMON_DESKTOPDIRECTORY"   // 0x0019 All Users\Desktop
+		"\0APPDATA"                   // 0x001a <user name>\Application Data
+		"\0PRINTHOOD"                 // 0x001b <user name>\PrintHood
+		"\0LOCAL_APPDATA"             // 0x001c <user name>\Local Settings\Applicaiton Data (non roaming)
+		"\0ALTSTARTUP"                // 0x001d non localized startup
+		"\0COMMON_ALTSTARTUP"         // 0x001e non localized common startup
+		"\0COMMON_FAVORITES"          // 0x001f
+		"\0INTERNET_CACHE"            // 0x0020
+		"\0COOKIES"                   // 0x0021
+		"\0HISTORY"                   // 0x0022
+		"\0COMMON_APPDATA"            // 0x0023 All Users\Application Data
+		"\0WINDOWS"                   // 0x0024 GetWindowsDirectory()
+		"\0SYSTEM"                    // 0x0025 GetSystemDirectory()
+		"\0PROGRAM_FILES"             // 0x0026 C:\Program Files
+		"\0MYPICTURES"                // 0x0027 C:\Program Files\My Pictures
+		"\0PROFILE"                   // 0x0028 USERPROFILE
+		"\0SYSTEMX86"                 // 0x0029 x86 system directory on RISC
+		"\0PROGRAM_FILESX86"          // 0x002a x86 C:\Program Files on RISC
+		"\0PROGRAM_FILES_COMMON"      // 0x002b C:\Program Files\Common
+		"\0PROGRAM_FILES_COMMONX86"   // 0x002c x86 Program Files\Common on RISC
+		"\0COMMON_TEMPLATES"          // 0x002d All Users\Templates
+		"\0COMMON_DOCUMENTS"          // 0x002e All Users\Documents
+		"\0COMMON_ADMINTOOLS"         // 0x002f All Users\Start Menu\Programs\Administrative Tools
+		"\0ADMINTOOLS"                // 0x0030 <user name>\Start Menu\Programs\Administrative Tools
+		"\0CONNECTIONS"               // 0x0031 Network and Dial-up Connections
 
-	// --- other ---
-	"\0BLACKBOX"                  // 0x0032 BLACKBOX HOME
-	"\0CURRENTTHEME"              // 0x0033
+		// --- other ---
+		"\0BLACKBOX"                  // 0x0032 BLACKBOX HOME
+		"\0CURRENTTHEME"              // 0x0033
 
-	// --- xoblite aliases ---
-	"\0PROGRAMFILES"              // 0x0034
-	"\0USERAPPDATA"               // 0x0035
-	"\0COMMONSTARTMENU"           // 0x0036
-	"\0."
+		// --- xoblite aliases ---
+		"\0PROGRAMFILES"              // 0x0034
+		"\0USERAPPDATA"               // 0x0035
+		"\0COMMONSTARTMENU"           // 0x0036
+		"\0."
 	};
 
-	static const char xob_ids[] = {
+	static const char xob_ids[] =
+	{
 		CSIDL_PROGRAM_FILES,
 		CSIDL_APPDATA,
 		CSIDL_COMMON_STARTMENU
@@ -410,8 +417,10 @@ int get_csidl(const char **pPath)
 		l-=2;
 	}
 	// search the list above
-	const char *cp = idl; int id = CSIDL_DESKTOP;
-	do {
+	const char *cp = idl;
+	int id = CSIDL_DESKTOP;
+	do
+	{
 		int k = strlen(cp);
 		if (k == l && 0 == memcmp(s, cp, k))
 		{
@@ -420,7 +429,8 @@ int get_csidl(const char **pPath)
 			return xob_ids[id - LAST_CSIDL];
 		}
 		id ++, cp += k+1;
-	} while ('.' != *cp);
+	}
+	while ('.' != *cp);
 
 	return NO_CSIDL; // not found
 }
@@ -519,7 +529,7 @@ struct pidl_node *copy_pidl_list(const struct pidl_node *old_pidl_list)
 	const struct pidl_node *p;
 	struct pidl_node *new_pidl_list = NULL;
 	dolist (p, old_pidl_list)
-		append_node(&new_pidl_list, new_node(duplicateIDlist(p->v)));
+	append_node(&new_pidl_list, new_node(duplicateIDlist(p->v)));
 	return new_pidl_list;
 }
 
@@ -545,32 +555,32 @@ char *replace_shellfolders(char *buffer, const char *path, bool search_path)
 		buffer[strlen(buffer)-1] = 0;
 	}
 	else
-	if (NO_CSIDL == id)
-	{
-		if (search_path)
+		if (NO_CSIDL == id)
 		{
-			if (SearchPath(NULL, temp, ".exe", MAX_PATH, buffer, NULL))
-				return buffer;
-			else
+			if (search_path)
+			{
+				if (SearchPath(NULL, temp, ".exe", MAX_PATH, buffer, NULL))
+					return buffer;
+				else
+					return strcpy(buffer, temp);
+			}
+			GetBlackboxPath(buffer, MAX_PATH);
+		}
+		else
+		{
+			// special folders, like CONTROLS
+			LPITEMIDLIST pID;
+			HRESULT hr = SHGetSpecialFolderLocation(NULL, id, &pID);
+			if (NOERROR != hr)
+				return strcpy(buffer, temp);
+
+			// returns also things like "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"
+			// (unlike SHGetPathFromIDList)
+			BOOL result = sh_get_displayname(NULL, pID, SHGDN_FORPARSING, buffer);
+			SHMalloc_Free(pID);
+			if (FALSE == result)
 				return strcpy(buffer, temp);
 		}
-		GetBlackboxPath(buffer, MAX_PATH);
-	}
-	else
-	{
-		// special folders, like CONTROLS
-		LPITEMIDLIST pID;
-		HRESULT hr = SHGetSpecialFolderLocation(NULL, id, &pID);
-		if (NOERROR != hr)
-			return strcpy(buffer, temp);
-
-		// returns also things like "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"
-		// (unlike SHGetPathFromIDList)
-		BOOL result = sh_get_displayname(NULL, pID, SHGDN_FORPARSING, buffer);
-		SHMalloc_Free(pID);
-		if (FALSE == result)
-			return strcpy(buffer, temp);
-	}
 
 	if (p) strcat(buffer, p);
 	return buffer;

@@ -38,7 +38,8 @@ public:
 
 		if (pSI->parentRelative)
 		{
-			COLORREF borderColor; int borderWidth;
+			COLORREF borderColor;
+			int borderWidth;
 			if (borderMode)
 			{
 				if (is_bblean && pSI->nVersion >= 2 && pSI->borderWidth)
@@ -61,11 +62,11 @@ public:
 
 		struct Bmp * B;
 		dolist (B, g_Buffers)
-			if (B->r.right == width
-			 && B->r.bottom == height
-			 && B->borderMode == borderMode
-			 && 0 == memcmp(pSI, &B->s_SI, sizeof B->s_SI)
-			 ) break;
+		if (B->r.right == width
+				&& B->r.bottom == height
+				&& B->borderMode == borderMode
+				&& 0 == memcmp(pSI, &B->s_SI, sizeof B->s_SI)
+		   ) break;
 
 		HDC buf = CreateCompatibleDC(NULL);
 		HGDIOBJ other;
@@ -74,7 +75,7 @@ public:
 		{
 			B = new struct Bmp;
 			B->r.left =
-			B->r.top = 0;
+				B->r.top = 0;
 			B->r.right = width;
 			B->r.bottom = height;
 			B->borderMode = borderMode;

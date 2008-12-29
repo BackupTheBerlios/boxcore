@@ -104,10 +104,10 @@ static int check_block(const char *msg, struct alloc_block *ab)
 	if (x != ab->check)
 		sprintf(buffer, "%s: block is unknown", msg);
 	else
-	if (x != ((struct alloc_block *)((char *)ab + n))->content)
-		sprintf(buffer, "%s: block is corrupted", msg);
-	else
-		return 1;
+		if (x != ((struct alloc_block *)((char *)ab + n))->content)
+			sprintf(buffer, "%s: block is corrupted", msg);
+		else
+			return 1;
 
 	mem_error_msg(buffer, ab);
 	return 0;
@@ -151,7 +151,7 @@ void m_alloc_dump_memory(void)
 		"size \t%d\t(max: %d)\n\n",
 		alloc_count,  alloc_count_max,
 		alloc_size, alloc_size_max
-		);
+	);
 	for (i = 0; i < HASH_SIZE; i++)
 	{
 		struct alloc_block *ab = SA[i];
@@ -162,27 +162,28 @@ void m_alloc_dump_memory(void)
 			if ((x^n)!=0x12345678)
 			{
 				m_alloc_printf("Error: %s:%d: %s (%d bytes)\n\n",
-					ab->file,
-					ab->line,
-					"block corrupted",
-					ab->size
-					);
+							   ab->file,
+							   ab->line,
+							   "block corrupted",
+							   ab->size
+							  );
 				break;
 			}
 			else
 			{
 				m_alloc_printf("Error: %s:%d: %s (%d bytes)\n",
-					ab->file,
-					ab->line,
-					"block is ok",
-					ab->size
-					);
+							   ab->file,
+							   ab->line,
+							   "block is ok",
+							   ab->size
+							  );
 				m_alloc_printf("content: <%s>\n\n", &ab->content);
 			}
 			ab = ab->next;
 		}
 	}
-	fclose(alloc_fp); alloc_fp = NULL;
+	fclose(alloc_fp);
+	alloc_fp = NULL;
 }
 
 void m_alloc_check_memory(void)
@@ -201,14 +202,17 @@ void m_alloc_check_memory(void)
 
 void *_m_alloc_raw(unsigned n, const char *file, int line)
 {
-	struct alloc_block *ab; unsigned l; const char *s;
+	struct alloc_block *ab;
+	unsigned l;
+	const char *s;
 
 	if (n==0) return NULL;
 
 	ab=(struct alloc_block*)malloc(sizeof(*ab) + n);
 	//ab=(struct alloc_block*)GlobalAlloc(GMEM_FIXED, sizeof(*ab) + n);
 
-	if (NULL==ab) {
+	if (NULL==ab)
+	{
 		mem_error_msg("m_alloc failed", ab);
 		return ab;
 	}
@@ -222,7 +226,8 @@ void *_m_alloc_raw(unsigned n, const char *file, int line)
 #if 1
 	s = strrchr(file, '/');
 	if (NULL == s) s = strrchr(file, '\\');
-	if (NULL == s) s = file; else s++;
+	if (NULL == s) s = file;
+	else s++;
 #endif
 
 	l = strlen(s);
@@ -233,7 +238,7 @@ void *_m_alloc_raw(unsigned n, const char *file, int line)
 	ab->file[l] = 0;
 
 	((struct alloc_block *)((char *)ab + n))->content =
-	ab->check = 0x12345678^n;
+		ab->check = 0x12345678^n;
 
 	alloc_size+=n;
 	++alloc_count;
@@ -279,13 +284,17 @@ void _m_free(void *v)
 
 void *_m_realloc (void *v, unsigned s, const char *file, int line)
 {
-	struct alloc_block *ab; void *v2;
+	struct alloc_block *ab;
+	void *v2;
 
-	if (v==NULL) {
+	if (v==NULL)
+	{
 		return _m_alloc(s,file,line);
 	}
-	if (s==0) {
-		_m_free(v); return NULL;
+	if (s==0)
+	{
+		_m_free(v);
+		return NULL;
 	}
 
 	ab = (struct alloc_block *)((char *)v - (unsigned)&((struct alloc_block*)NULL)->content);
@@ -318,7 +327,7 @@ void * operator new (unsigned n)
 
 void operator delete (void *v)
 {
-	 _m_free(v);
+	_m_free(v);
 }
 
 void * operator new[] (unsigned n)
@@ -328,7 +337,7 @@ void * operator new[] (unsigned n)
 
 void operator delete[] (void *v)
 {
-	 _m_free(v);
+	_m_free(v);
 }
 
 //===========================================================================
@@ -341,7 +350,7 @@ void * operator new (size_t n)
 }
 void operator delete (void *v)
 {
-	 free(v);
+	free(v);
 }
 void * operator new[] (size_t n)
 {
@@ -349,7 +358,7 @@ void * operator new[] (size_t n)
 }
 void operator delete[] (void *v)
 {
-	 free(v);
+	free(v);
 }
 #endif
 #endif

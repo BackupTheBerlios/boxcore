@@ -24,20 +24,20 @@ void clsLabelItem::calculateSizes(bool pSizeGiven)
 	bool enlarged = false;
 	if (textSize.cx + 10 > minSizeX)
 	{
-	minSizeX = textSize.cx + 10;
-	enlarged = true;
+		minSizeX = textSize.cx + 10;
+		enlarged = true;
 	}
 	if (textSize.cy + 2>minSizeY)
 	{
-	minSizeY = textSize.cy + 2;
-	enlarged=true;
+		minSizeY = textSize.cy + 2;
+		enlarged=true;
 	}
 	if (enlarged)
 	{
-	resize(minSizeX, minSizeY);
-	PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
-	InvalidateRect(barWnd, &itemArea, TRUE);
-	PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
+		resize(minSizeX, minSizeY);
+		PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+		InvalidateRect(barWnd, &itemArea, TRUE);
+		PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 	}
 }
 

@@ -31,16 +31,16 @@ LRESULT clsWorkspaceLabel::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 	switch (msg)
 	{
 	case BB_DESKTOPINFO:
-		{
-			DesktopInfo *deskinfo = (DesktopInfo *)lParam;
+	{
+		DesktopInfo *deskinfo = (DesktopInfo *)lParam;
 #ifdef UNICODE
-			MultiByteToWideChar(CP_ACP, 0, deskinfo->name, -1, text, 256);
+		MultiByteToWideChar(CP_ACP, 0, deskinfo->name, -1, text, 256);
 #else
-			strcpy(text, deskinfo->name);
+		strcpy(text, deskinfo->name);
 #endif
-			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
-			return 0;
-		}
+		PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+		return 0;
+	}
 	}
 	return clsLabelItem::wndProc(hWnd, msg, wParam, lParam);
 }

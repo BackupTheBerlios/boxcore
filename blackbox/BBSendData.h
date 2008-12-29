@@ -22,7 +22,7 @@ BOOL BBSendData(
 	WPARAM wParam,      // wParam
 	LPCVOID lParam,     // lParam
 	int lParam_size     // size of the data referenced by lParam
-	)
+)
 {
 	if (NULL == BBhwnd) return FALSE;
 	struct bb_senddata BBSD, *pBBSD;

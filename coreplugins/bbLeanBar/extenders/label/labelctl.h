@@ -34,22 +34,22 @@
 //
 class barLabel
 {
-	public:
-		barLabel();		// Constructor
-		~barLabel();	// Destructor
-		bool Initialize(const char* configString);
-		HWND getLabelHandle();
+public:
+	barLabel();		// Constructor
+	~barLabel();	// Destructor
+	bool Initialize(const char* configString);
+	HWND getLabelHandle();
 
-	private:
-		HWND CreateExtenderWindow();
-		HWND hWndLabel;	// Window handle of our label
+private:
+	HWND CreateExtenderWindow();
+	HWND hWndLabel;	// Window handle of our label
 
-		// Options
-		std::string barCaption;
-		std::string barOnClick;
-		std::string barWidth;
-		std::string barID;
-		std::string barStyle;
+	// Options
+	std::string barCaption;
+	std::string barOnClick;
+	std::string barWidth;
+	std::string barID;
+	std::string barStyle;
 };
 
 //

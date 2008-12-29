@@ -68,7 +68,7 @@ CImpIDropSource::~CImpIDropSource()
 
 STDMETHODIMP CImpIDropSource::QueryInterface(REFIID iid, void ** ppv)
 {
-	if(IsEqualIID(iid, IID_IUnknown) || IsEqualIID(iid, IID_IDropSource))
+	if (IsEqualIID(iid, IID_IUnknown) || IsEqualIID(iid, IID_IDropSource))
 	{
 		*ppv=this;
 		AddRef();
@@ -87,8 +87,8 @@ STDMETHODIMP_(ULONG) CImpIDropSource::Release(void)
 {
 	long tempCount;
 	tempCount = --m_cRefCount;
-	if(tempCount==0) delete this;
-	return tempCount; 
+	if (tempCount==0) delete this;
+	return tempCount;
 }
 
 STDMETHODIMP CImpIDropSource::GiveFeedback(DWORD dwEffect)

@@ -50,7 +50,8 @@ int BBDrawText(HDC hDC, LPCTSTR lpString, int nCount, LPRECT lpRect, UINT uForma
 
 void dbg_printf (const char *fmt, ...)
 {
-	char buffer[256]; va_list arg;
+	char buffer[256];
+	va_list arg;
 	va_start(arg, fmt);
 	vsprintf (buffer, fmt, arg);
 	strcat(buffer, "\n");
@@ -64,8 +65,8 @@ void EnumTasks (TASKENUMPROC lpEnumFunc, LPARAM lParam)
 {
 	struct tasklist *tl;
 	dolist (tl, GetTaskListPtr())
-		if (FALSE == lpEnumFunc(tl, lParam))
-			break;
+	if (FALSE == lpEnumFunc(tl, lParam))
+		break;
 }
 #endif
 

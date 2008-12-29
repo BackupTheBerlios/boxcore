@@ -10,30 +10,33 @@
 
 class clsTaskItem : public clsItemCollection
 {
-	public:
-		clsTaskItem(tasklist *pTask, bool pVertical);
-		~clsTaskItem();
+public:
+	clsTaskItem(tasklist *pTask, bool pVertical);
+	~clsTaskItem();
 
-		virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-		virtual void readSettings();
-		virtual void configMenu(Menu *pMenu);
+	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	virtual void readSettings();
+	virtual void configMenu(Menu *pMenu);
 
-		const HWND GetTaskWnd() {return taskWnd;}
-	protected:
-		HWND taskWnd;
-		TCHAR caption[256];
+	const HWND GetTaskWnd()
+	{
+		return taskWnd;
+	}
+protected:
+	HWND taskWnd;
+	TCHAR caption[256];
 
-		UINT iconSize;
+	UINT iconSize;
 
-		clsTextItem *captionItem;
-		clsIconItem *iconItem;
+	clsTextItem *captionItem;
+	clsIconItem *iconItem;
 
-		static int inactiveStyle;
-		static int activeStyle;
-		static int activeAlpha;
-		static int inactiveAlpha;
-	private:
-		static void activateTask(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
+	static int inactiveStyle;
+	static int activeStyle;
+	static int activeAlpha;
+	static int inactiveAlpha;
+private:
+	static void activateTask(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
 };
 
 #endif // CLSTASKITEM_H

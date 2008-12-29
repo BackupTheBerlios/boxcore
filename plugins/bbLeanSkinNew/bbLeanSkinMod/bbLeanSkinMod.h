@@ -38,18 +38,18 @@
 
 // bbLean BBAPI.h proprietary defines (if not already defined)
 #ifndef BB_REDRAWGUI
-  #define BB_REDRAWGUI            10881
+#define BB_REDRAWGUI            10881
 
-  #define BBRG_TOOLBAR (1<<0)
-  #define BBRG_MENU    (1<<1)
-  #define BBRG_WINDOW  (1<<2)
-  #define BBRG_DESK    (1<<3)
-  #define BBRG_FOCUS   (1<<4)
-  #define BBRG_PRESSED (1<<5)
-  #define BBRG_STICKY  (1<<6)
-  #define BBRG_FOLDER  (1<<7)
+#define BBRG_TOOLBAR (1<<0)
+#define BBRG_MENU    (1<<1)
+#define BBRG_WINDOW  (1<<2)
+#define BBRG_DESK    (1<<3)
+#define BBRG_FOCUS   (1<<4)
+#define BBRG_PRESSED (1<<5)
+#define BBRG_STICKY  (1<<6)
+#define BBRG_FOLDER  (1<<7)
 
-  #define VALID_MARGIN        (1<<9)
+#define VALID_MARGIN        (1<<9)
 #endif
 
 //============================================================================
@@ -58,70 +58,70 @@
 #if 0
 extern "C"
 {
-    DLL_EXPORT void startEngine();
-    DLL_EXPORT void stopEngine();
-    DLL_EXPORT void reconfigureEngine(void);
-    DLL_EXPORT const char* engineInfo(int field);
-    DLL_EXPORT void setEngineOption(UINT id);
+	DLL_EXPORT void startEngine();
+	DLL_EXPORT void stopEngine();
+	DLL_EXPORT void reconfigureEngine(void);
+	DLL_EXPORT const char* engineInfo(int field);
+	DLL_EXPORT void setEngineOption(UINT id);
 };
 #endif
 
 //============================================================================
 
-	// blackbox and logwindow stuff
-    HINSTANCE hInstance;
-    HWND BBhwnd;
-    int BBVersion;
-    HWND m_hwnd;
-    HWND hwndLog;
-    bool is_plugin;
-    bool enableLog;
+// blackbox and logwindow stuff
+HINSTANCE hInstance;
+HWND BBhwnd;
+int BBVersion;
+HWND m_hwnd;
+HWND hwndLog;
+bool is_plugin;
+bool enableLog;
 
-	// settings
-    bool applyToOpen;
-    bool adjustCaptionHeight;
-    char rcpath[MAX_PATH];
+// settings
+bool applyToOpen;
+bool adjustCaptionHeight;
+char rcpath[MAX_PATH];
 
-	// additional windows options
-    char windows_menu_fontFace[120];
-    int windows_menu_fontHeight;
-    int ScrollbarSize;
-    int MenuHeight;
-    bool setTTColor;
+// additional windows options
+char windows_menu_fontFace[120];
+int windows_menu_fontHeight;
+int ScrollbarSize;
+int MenuHeight;
+bool setTTColor;
 
-	// skin info passed via shared mem
-    UINT bbSkinMsg;
-    SkinStruct mSkin;
+// skin info passed via shared mem
+UINT bbSkinMsg;
+SkinStruct mSkin;
 
-	// for the shared memory
-    HANDLE hMapObject;
-    SkinStruct *lpvMem;
+// for the shared memory
+HANDLE hMapObject;
+SkinStruct *lpvMem;
 
-	// skinner dll
-    bool engine_running;
+// skinner dll
+bool engine_running;
 
-	//====================
+//====================
 
-	// forward declaration
+// forward declaration
 
-	BOOL CreateSharedMem(int size);
-	void DestroySharedMem();
+BOOL CreateSharedMem(int size);
+void DestroySharedMem();
 
-    void refreshStyle(void);
+void refreshStyle(void);
 
-    void startEngine();
-    void stopEngine();
-    void reconfigureEngine(void);
-    const char* engineInfo(int field);
-    void setEngineOption(UINT id);
+void startEngine();
+void stopEngine();
+void reconfigureEngine(void);
+const char* engineInfo(int field);
+void setEngineOption(UINT id);
 
-    void free_dll(void);
-    bool load_dll(void);
+void free_dll(void);
+bool load_dll(void);
 
-	void compatibleReadStyle();
-	void ReadStyleElement(LPSTR styleFile, GradientItem* gradientItem, LPSTR paramString);
-	void ReadFont(LPSTR styleFile);
-	static int CALLBACK EnumFontFamProc(ENUMLOGFONT *lpelf, NEWTEXTMETRIC *lpntm, int FontType, LPARAM lParam);
+void compatibleReadStyle();
+void ReadStyleElement(LPSTR styleFile, GradientItem* gradientItem, LPSTR paramString);
+void ReadFont(LPSTR styleFile);
+static int CALLBACK EnumFontFamProc(ENUMLOGFONT *lpelf, NEWTEXTMETRIC *lpntm, int FontType, LPARAM lParam);
 
 //===========================================================================
 

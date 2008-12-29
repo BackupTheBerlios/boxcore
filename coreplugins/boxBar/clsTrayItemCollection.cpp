@@ -18,24 +18,24 @@ LRESULT clsTrayItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 {
 	switch (msg)
 	{
-		case BB_RECONFIGURE:
+	case BB_RECONFIGURE:
 		readSettings();
 		PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 		break;
-		case BB_TRAYUPDATE:
-			switch(lParam)
-			{
-				case TRAYICON_ADDED:
-				case TRAYICON_REMOVED:
-					populateTray();
-					PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
-					return 0;
-				case TRAYICON_MODIFIED:
-					return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
-			}
-			break;
-		default:
+	case BB_TRAYUPDATE:
+		switch (lParam)
+		{
+		case TRAYICON_ADDED:
+		case TRAYICON_REMOVED:
+			populateTray();
+			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+			return 0;
+		case TRAYICON_MODIFIED:
 			return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
+		}
+		break;
+	default:
+		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
 	}
 
 	return 0;
@@ -54,11 +54,11 @@ void clsTrayItemCollection::populateTray()
 	itemList.clear();
 	if (numRowCols > 0)
 	{
-		for(int i=0;i<numRowCols;++i)
+		for (int i=0;i<numRowCols;++i)
 			addItem(new clsItemCollection(!vertical));
 	}
 	list<clsItem*>::iterator column = itemList.begin();
-	for(int i = 0; i < GetTraySize(); ++i)
+	for (int i = 0; i < GetTraySize(); ++i)
 	{
 		systemTray *trayItem = GetTrayIcon(i);
 		if (numRowCols > 0)
@@ -73,13 +73,13 @@ void clsTrayItemCollection::populateTray()
 	}
 	if (numRowCols > 0)
 	{
-	for(int i=GetTraySize(); (i % numRowCols) != 0; ++i)
-	{
-		((clsItemCollection*)(*column))->addItem(new clsIconItem(NULL, iconSize, vertical));
+		for (int i=GetTraySize(); (i % numRowCols) != 0; ++i)
+		{
+			((clsItemCollection*)(*column))->addItem(new clsIconItem(NULL, iconSize, vertical));
 			column++;
 			if (column == itemList.end())
 				column = itemList.begin();
-	}
+		}
 	}
 }
 

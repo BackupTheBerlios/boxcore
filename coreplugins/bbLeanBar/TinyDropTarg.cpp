@@ -31,7 +31,7 @@ public:
 	STDMETHOD(QueryInterface)(REFIID iid, void** ppvObject)
 	{
 		*ppvObject = NULL;
-		if(IsEqualIID(iid, IID_IUnknown) || IsEqualIID(iid, IID_IDropTarget))
+		if (IsEqualIID(iid, IID_IUnknown) || IsEqualIID(iid, IID_IDropTarget))
 		{
 			*ppvObject = this;
 			AddRef();
@@ -47,28 +47,28 @@ public:
 	}
 
 	STDMETHOD_(ULONG, Release)()
-	{ 
+	{
 		int tempCount = --m_dwRef;
 		//dbg_printf("decref %d", tempCount);
-		if(tempCount==0)
+		if (tempCount==0)
 		{
 			delete this;
 		}
-		return tempCount; 
+		return tempCount;
 	}
 
 	STDMETHOD (DragEnter) (LPDATAOBJECT pDataObject, DWORD grfKeyState, POINTL pt, LPDWORD pdwEffect)
 	{
 		AddRef();
-	/*
-		FORMATETC fmte;
-		fmte.cfFormat   = CF_HDROP;
-		fmte.ptd        = NULL;
-		fmte.dwAspect   = DVASPECT_CONTENT;  
-		fmte.lindex     = -1;
-		fmte.tymed      = TYMED_HGLOBAL;       
-		valid_data      = S_OK == pDataObject->QueryGetData(&fmte);
-	*/
+		/*
+			FORMATETC fmte;
+			fmte.cfFormat   = CF_HDROP;
+			fmte.ptd        = NULL;
+			fmte.dwAspect   = DVASPECT_CONTENT;
+			fmte.lindex     = -1;
+			fmte.tymed      = TYMED_HGLOBAL;
+			valid_data      = S_OK == pDataObject->QueryGetData(&fmte);
+		*/
 		*pdwEffect  = DROPEFFECT_NONE;
 		task_over = NULL;
 		return S_OK;
@@ -100,50 +100,50 @@ public:
 	STDMETHOD(Drop)(LPDATAOBJECT pDataObject, DWORD grfKeyState, POINTL pt, LPDWORD pdwEffect)
 	{
 		*pdwEffect = DROPEFFECT_NONE;
-/*
-		if (valid_data)
-		{
-			*pdwEffect = DROPEFFECT_COPY;
-			if (pDataObject)
-			{
-				FORMATETC fmte;
-				STGMEDIUM medium;
-				fmte.cfFormat   = CF_HDROP;
-				fmte.ptd        = NULL;
-				fmte.dwAspect   = DVASPECT_CONTENT;  
-				fmte.lindex     = -1;
-				fmte.tymed      = TYMED_HGLOBAL;
-				if (SUCCEEDED(pDataObject->GetData(&fmte, &medium)))
+		/*
+				if (valid_data)
 				{
-					HDROP hdrop = (HDROP)medium.hGlobal;
+					*pdwEffect = DROPEFFECT_COPY;
+					if (pDataObject)
+					{
+						FORMATETC fmte;
+						STGMEDIUM medium;
+						fmte.cfFormat   = CF_HDROP;
+						fmte.ptd        = NULL;
+						fmte.dwAspect   = DVASPECT_CONTENT;
+						fmte.lindex     = -1;
+						fmte.tymed      = TYMED_HGLOBAL;
+						if (SUCCEEDED(pDataObject->GetData(&fmte, &medium)))
+						{
+							HDROP hdrop = (HDROP)medium.hGlobal;
 
-					char filename[MAX_PATH]; filename[0]=0;
-					DragQueryFile(hdrop, 0, filename, sizeof(filename));
-					ReleaseStgMedium(&medium);
-					SendMessage(GetBBWnd(), BB_SETSTYLE, 1, (LPARAM)filename);
+							char filename[MAX_PATH]; filename[0]=0;
+							DragQueryFile(hdrop, 0, filename, sizeof(filename));
+							ReleaseStgMedium(&medium);
+							SendMessage(GetBBWnd(), BB_SETSTYLE, 1, (LPARAM)filename);
+						}
+					}
 				}
-			}
-		}
-*/
+		*/
 		Release();
 		return S_OK;
 	}
 
-   void handle_task_timer(void)
-   {
-	   KillTimer(m_hwnd, TASK_RISE_TIMER);
-	   if (NULL == task_over) return;
+	void handle_task_timer(void)
+	{
+		KillTimer(m_hwnd, TASK_RISE_TIMER);
+		if (NULL == task_over) return;
 
-	   DWORD ThreadID1 = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
-	   DWORD ThreadID2 = GetCurrentThreadId();
-	   if (ThreadID1 != ThreadID2)
-	   {
-		   AttachThreadInput(ThreadID1, ThreadID2, TRUE);
-		   SetForegroundWindow(m_hwnd);
-		   AttachThreadInput(ThreadID1, ThreadID2, FALSE);
-	   }
-	   PostMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)task_over);
-   }
+		DWORD ThreadID1 = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
+		DWORD ThreadID2 = GetCurrentThreadId();
+		if (ThreadID1 != ThreadID2)
+		{
+			AttachThreadInput(ThreadID1, ThreadID2, TRUE);
+			SetForegroundWindow(m_hwnd);
+			AttachThreadInput(ThreadID1, ThreadID2, FALSE);
+		}
+		PostMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)task_over);
+	}
 
 };
 

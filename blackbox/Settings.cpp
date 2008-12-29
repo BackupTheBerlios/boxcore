@@ -47,7 +47,7 @@ static int CALLBACK EnumFontFamProc(
 	NEWTEXTMETRIC FAR *lpntm,   // pointer to physical-font data
 	int FontType,               // type of font
 	LPARAM lParam               // address of application-defined data
-   )
+)
 {
 	(*(int*)lParam)++;
 	return 0;
@@ -73,10 +73,11 @@ static int checkfont (char *face)
 
 static int getweight (const char *p)
 {
-	static const char *fontweightstrings[] = {
-	"thin", "extralight", "light", "normal",
-	"medium", "demibold", "bold", "extrabold",
-	"heavy", "regular", "semibold", NULL
+	static const char *fontweightstrings[] =
+	{
+		"thin", "extralight", "light", "normal",
+		"medium", "demibold", "bold", "extrabold",
+		"heavy", "regular", "semibold", NULL
 	};
 	int i = get_string_index(p, fontweightstrings) + 1;
 	if (i==0 || i==10) i = 4;
@@ -119,7 +120,9 @@ static void parse_font(StyleItem *si, const char *font)
 		"edges" ,
 	};
 
-	char fontstring[256]; char *p[16]; char *b;
+	char fontstring[256];
+	char *p[16];
+	char *b;
 	if ('-' == *font)
 	{
 		tokenize_string(fontstring, p, font+1, 16, "-");
@@ -138,46 +141,46 @@ static void parse_font(StyleItem *si, const char *font)
 			si->validated |= VALID_FONTHEIGHT;
 		}
 		else
-		if (*(b = p[7])>='1' && *b<='9')
-		{
-			si->FontHeight = atoi(b) * 12 / 100;
-			si->validated |= VALID_FONTHEIGHT;
-		}
+			if (*(b = p[7])>='1' && *b<='9')
+			{
+				si->FontHeight = atoi(b) * 12 / 100;
+				si->validated |= VALID_FONTHEIGHT;
+			}
 	}
 	else
-	if (strchr(font, '/'))
-	{
-		tokenize_string(fontstring, p, font, 3, "/");
-		strcpy(si->Font, p[0]);
-		if (*(b = p[1]))
+		if (strchr(font, '/'))
 		{
-			si->FontHeight = atoi(b);
-			si->validated |= VALID_FONTHEIGHT;
-		}
-
-		if (*(b = p[2]))
-		{
-			if (stristr(b, "shadow"))
-				si->FontShadow = true;
-			if (stristr(b, "bold"))
+			tokenize_string(fontstring, p, font, 3, "/");
+			strcpy(si->Font, p[0]);
+			if (*(b = p[1]))
 			{
-				si->FontWeight = FW_BOLD;
-				si->validated |= VALID_FONTWEIGHT;
+				si->FontHeight = atoi(b);
+				si->validated |= VALID_FONTHEIGHT;
+			}
+
+			if (*(b = p[2]))
+			{
+				if (stristr(b, "shadow"))
+					si->FontShadow = true;
+				if (stristr(b, "bold"))
+				{
+					si->FontWeight = FW_BOLD;
+					si->validated |= VALID_FONTWEIGHT;
+				}
+			}
+
+			//dbg_printf("<%s> <%s> <%s>", p[0], p[1], p[2]);
+			//dbg_printf("<%s> %d %d", si->Font, si->FontHeight, si->FontWeight);
+		}
+		else
+		{
+			strcpy(si->Font, font);
+			b = strlwr(strcpy(fontstring, font));
+			if (strstr(b, "lucidasans"))
+			{
+				strcpy(si->Font, "gelly");
 			}
 		}
-
-		//dbg_printf("<%s> <%s> <%s>", p[0], p[1], p[2]);
-		//dbg_printf("<%s> %d %d", si->Font, si->FontHeight, si->FontWeight);
-	}
-	else
-	{
-		strcpy(si->Font, font);
-		b = strlwr(strcpy(fontstring, font));
-		if (strstr(b, "lucidasans"))
-		{
-			strcpy(si->Font, "gelly");
-		}
-	}
 
 	if (0 == checkfont(si->Font))
 	{
@@ -195,17 +198,17 @@ static void parse_font(StyleItem *si, const char *font)
 HFONT CreateStyleFont(StyleItem * si)
 {
 	return CreateFont(
-		si->FontHeight,
-		0, 0, 0,
-		si->FontWeight,
-		false, false, false,
-		DEFAULT_CHARSET,
-		OUT_DEFAULT_PRECIS,
-		CLIP_DEFAULT_PRECIS,
-		DEFAULT_QUALITY,
-		DEFAULT_PITCH|FF_DONTCARE,
-		si->Font
-		);
+			   si->FontHeight,
+			   0, 0, 0,
+			   si->FontWeight,
+			   false, false, false,
+			   DEFAULT_CHARSET,
+			   OUT_DEFAULT_PRECIS,
+			   CLIP_DEFAULT_PRECIS,
+			   DEFAULT_QUALITY,
+			   DEFAULT_PITCH|FF_DONTCARE,
+			   si->Font
+		   );
 }
 
 //===========================================================================
@@ -275,7 +278,14 @@ static ShortStyleItem DefStyleB =
 static COLORREF DefBorderColor = 0x777777;
 
 //===========================================================================
-struct items { void *v; const char * rc_string; void *def; unsigned short id; unsigned flags; };
+struct items
+{
+	void *v;
+	const char * rc_string;
+	void *def;
+	unsigned short id;
+	unsigned flags;
+};
 
 #define HAS_TEXTURE (VALID_TEXTURE|VALID_COLORFROM|VALID_COLORTO|VALID_BORDER|VALID_BORDERCOLOR)
 #define HAS_FONT (VALID_FONT|VALID_FONTHEIGHT|VALID_FONTWEIGHT)
@@ -283,56 +293,57 @@ struct items { void *v; const char * rc_string; void *def; unsigned short id; un
 #define DEFAULT_MARGIN (1<<30)
 #define DEFAULT_BORDER (1<<31)
 
-static struct items StyleItems[] = {
-{   &mStyle.borderWidth         , "borderWidth:",           (void*) 1,                      C_INT, 0 },
-{   &mStyle.borderColor         , "borderColor:",           (void*) &DefBorderColor,        C_COL, 0 },
-{   &mStyle.bevelWidth          , "bevelWidth:",            (void*) 1,                      C_INT, 0 },
-{   &mStyle.handleHeight        , "handleWidth:",           (void*) 5,                      C_INT, 0 },
-{   &mStyle.rootCommand         , "rootCommand:",           (void*) "",                      C_STR, sizeof mStyle.rootCommand },
+static struct items StyleItems[] =
+{
+	{   &mStyle.borderWidth         , "borderWidth:",           (void*) 1,                      C_INT, 0 },
+	{   &mStyle.borderColor         , "borderColor:",           (void*) &DefBorderColor,        C_COL, 0 },
+	{   &mStyle.bevelWidth          , "bevelWidth:",            (void*) 1,                      C_INT, 0 },
+	{   &mStyle.handleHeight        , "handleWidth:",           (void*) 5,                      C_INT, 0 },
+	{   &mStyle.rootCommand         , "rootCommand:",           (void*) "",                      C_STR, sizeof mStyle.rootCommand },
 
-{   &mStyle.Toolbar             , "toolbar",                (void*) &DefStyleA, C_STY,  HAS_TEXTURE|HAS_SHADOW|VALID_TEXTCOLOR|VALID_MARGIN|HAS_FONT|VALID_JUSTIFY|DEFAULT_BORDER|DEFAULT_MARGIN },
-{   &mStyle.ToolbarButton       , "toolbar.button",         (void*) &DefStyleB, C_STY,  HAS_TEXTURE|VALID_PICCOLOR|VALID_MARGIN },
-{   &mStyle.ToolbarButtonPressed, "toolbar.button.pressed", (void*) &DefStyleA, C_STY,  HAS_TEXTURE|VALID_PICCOLOR },
-{   &mStyle.ToolbarLabel        , "toolbar.label",          (void*) &DefStyleB, C_STY,  HAS_TEXTURE|HAS_SHADOW|VALID_TEXTCOLOR|VALID_MARGIN },
-{   &mStyle.ToolbarWindowLabel  , "toolbar.windowLabel",    (void*) &DefStyleA, C_STY,  HAS_TEXTURE|HAS_SHADOW|VALID_TEXTCOLOR },
-{   &mStyle.ToolbarClock        , "toolbar.clock",          (void*) &DefStyleB, C_STY,  HAS_TEXTURE|HAS_SHADOW|VALID_TEXTCOLOR },
+	{   &mStyle.Toolbar             , "toolbar",                (void*) &DefStyleA, C_STY,  HAS_TEXTURE|HAS_SHADOW|VALID_TEXTCOLOR|VALID_MARGIN|HAS_FONT|VALID_JUSTIFY|DEFAULT_BORDER|DEFAULT_MARGIN },
+	{   &mStyle.ToolbarButton       , "toolbar.button",         (void*) &DefStyleB, C_STY,  HAS_TEXTURE|VALID_PICCOLOR|VALID_MARGIN },
+	{   &mStyle.ToolbarButtonPressed, "toolbar.button.pressed", (void*) &DefStyleA, C_STY,  HAS_TEXTURE|VALID_PICCOLOR },
+	{   &mStyle.ToolbarLabel        , "toolbar.label",          (void*) &DefStyleB, C_STY,  HAS_TEXTURE|HAS_SHADOW|VALID_TEXTCOLOR|VALID_MARGIN },
+	{   &mStyle.ToolbarWindowLabel  , "toolbar.windowLabel",    (void*) &DefStyleA, C_STY,  HAS_TEXTURE|HAS_SHADOW|VALID_TEXTCOLOR },
+	{   &mStyle.ToolbarClock        , "toolbar.clock",          (void*) &DefStyleB, C_STY,  HAS_TEXTURE|HAS_SHADOW|VALID_TEXTCOLOR },
 
-{   &mStyle.MenuTitle           , "menu.title",             (void*) &DefStyleB, C_STY,  HAS_TEXTURE|HAS_SHADOW|VALID_TEXTCOLOR|VALID_MARGIN|HAS_FONT|VALID_JUSTIFY|DEFAULT_MARGIN },
-{   &mStyle.MenuFrame           , "menu.frame",             (void*) &DefStyleA, C_STY,  HAS_TEXTURE|HAS_SHADOW|VALID_TEXTCOLOR|VALID_PICCOLOR|VALID_MARGIN|HAS_FONT|VALID_JUSTIFY|DEFAULT_BORDER },
-{   &mStyle.MenuHilite          , "menu.hilite",            (void*) &DefStyleB, C_STY,  HAS_TEXTURE|HAS_SHADOW|VALID_TEXTCOLOR|VALID_PICCOLOR },
+	{   &mStyle.MenuTitle           , "menu.title",             (void*) &DefStyleB, C_STY,  HAS_TEXTURE|HAS_SHADOW|VALID_TEXTCOLOR|VALID_MARGIN|HAS_FONT|VALID_JUSTIFY|DEFAULT_MARGIN },
+	{   &mStyle.MenuFrame           , "menu.frame",             (void*) &DefStyleA, C_STY,  HAS_TEXTURE|HAS_SHADOW|VALID_TEXTCOLOR|VALID_PICCOLOR|VALID_MARGIN|HAS_FONT|VALID_JUSTIFY|DEFAULT_BORDER },
+	{   &mStyle.MenuHilite          , "menu.hilite",            (void*) &DefStyleB, C_STY,  HAS_TEXTURE|HAS_SHADOW|VALID_TEXTCOLOR|VALID_PICCOLOR },
 // menu.item.marginWidth:
-{   &mStyle.MenuHilite          , "menu.item",              (void*) &DefStyleB, C_STY,  VALID_MARGIN },
-{   &mStyle.MenuSepMargin       , "menu.separator.margin:", (void*) 4, C_INT, 0 },
-{   &mStyle.MenuSepColor        , "menu.separator.color:",  (void*) &mStyle.MenuFrame.TextColor, C_COL, 0 },
-{   &mStyle.MenuVolume          , "menu.volume",            (void*) &mStyle.MenuHilite, C_STY,  HAS_TEXTURE|HAS_SHADOW|VALID_TEXTCOLOR|VALID_PICCOLOR },
+	{   &mStyle.MenuHilite          , "menu.item",              (void*) &DefStyleB, C_STY,  VALID_MARGIN },
+	{   &mStyle.MenuSepMargin       , "menu.separator.margin:", (void*) 4, C_INT, 0 },
+	{   &mStyle.MenuSepColor        , "menu.separator.color:",  (void*) &mStyle.MenuFrame.TextColor, C_COL, 0 },
+	{   &mStyle.MenuVolume          , "menu.volume",            (void*) &mStyle.MenuHilite, C_STY,  HAS_TEXTURE|HAS_SHADOW|VALID_TEXTCOLOR|VALID_PICCOLOR },
 
-{   &mStyle.menuBullet          , "menu.bullet:",           (void*) "triangle", C_STR, sizeof mStyle.menuBullet  },
-{   &mStyle.menuBulletPosition  , "menu.bullet.position:",  (void*) "right",  C_STR, sizeof mStyle.menuBulletPosition  },
+	{   &mStyle.menuBullet          , "menu.bullet:",           (void*) "triangle", C_STR, sizeof mStyle.menuBullet  },
+	{   &mStyle.menuBulletPosition  , "menu.bullet.position:",  (void*) "right",  C_STR, sizeof mStyle.menuBulletPosition  },
 
-{   &mStyle.MenuFrame.disabledColor , "menu.frame.disableColor:", (void*) &mStyle.MenuFrame.TextColor, C_COL, 0 },
+	{   &mStyle.MenuFrame.disabledColor , "menu.frame.disableColor:", (void*) &mStyle.MenuFrame.TextColor, C_COL, 0 },
 
 #ifndef BBSETTING_NOWINDOW
 // window.font:
-{   &mStyle.windowLabelFocus    , "window",                 (void*) &mStyle.Toolbar,                C_STY,  HAS_FONT|HAS_SHADOW|VALID_JUSTIFY },
+	{   &mStyle.windowLabelFocus    , "window",                 (void*) &mStyle.Toolbar,                C_STY,  HAS_FONT|HAS_SHADOW|VALID_JUSTIFY },
 
-{   &mStyle.windowTitleFocus    , "window.title.focus",     (void*) &mStyle.Toolbar,                C_STY,  HAS_TEXTURE|DEFAULT_BORDER },
-{   &mStyle.windowLabelFocus    , "window.label.focus",     (void*) &mStyle.ToolbarWindowLabel,     C_STY,  HAS_TEXTURE|HAS_SHADOW|VALID_TEXTCOLOR|HAS_FONT|VALID_JUSTIFY },
-{   &mStyle.windowHandleFocus   , "window.handle.focus",    (void*) &mStyle.Toolbar,                C_STY,  HAS_TEXTURE|DEFAULT_BORDER },
-{   &mStyle.windowGripFocus     , "window.grip.focus",      (void*) &mStyle.ToolbarWindowLabel,     C_STY,  HAS_TEXTURE|DEFAULT_BORDER },
-{   &mStyle.windowButtonFocus   , "window.button.focus",    (void*) &mStyle.ToolbarButton,          C_STY,  HAS_TEXTURE|VALID_PICCOLOR },
-{   &mStyle.windowButtonPressed , "window.button.pressed",  (void*) &mStyle.ToolbarButtonPressed,   C_STY,  HAS_TEXTURE|VALID_PICCOLOR },
+	{   &mStyle.windowTitleFocus    , "window.title.focus",     (void*) &mStyle.Toolbar,                C_STY,  HAS_TEXTURE|DEFAULT_BORDER },
+	{   &mStyle.windowLabelFocus    , "window.label.focus",     (void*) &mStyle.ToolbarWindowLabel,     C_STY,  HAS_TEXTURE|HAS_SHADOW|VALID_TEXTCOLOR|HAS_FONT|VALID_JUSTIFY },
+	{   &mStyle.windowHandleFocus   , "window.handle.focus",    (void*) &mStyle.Toolbar,                C_STY,  HAS_TEXTURE|DEFAULT_BORDER },
+	{   &mStyle.windowGripFocus     , "window.grip.focus",      (void*) &mStyle.ToolbarWindowLabel,     C_STY,  HAS_TEXTURE|DEFAULT_BORDER },
+	{   &mStyle.windowButtonFocus   , "window.button.focus",    (void*) &mStyle.ToolbarButton,          C_STY,  HAS_TEXTURE|VALID_PICCOLOR },
+	{   &mStyle.windowButtonPressed , "window.button.pressed",  (void*) &mStyle.ToolbarButtonPressed,   C_STY,  HAS_TEXTURE|VALID_PICCOLOR },
 
-{   &mStyle.windowTitleUnfocus  , "window.title.unfocus",   (void*) &mStyle.Toolbar,                C_STY,  HAS_TEXTURE|DEFAULT_BORDER  },
-{   &mStyle.windowLabelUnfocus  , "window.label.unfocus",   (void*) &mStyle.Toolbar,                C_STY,  HAS_TEXTURE|HAS_SHADOW|VALID_TEXTCOLOR },
-{   &mStyle.windowHandleUnfocus , "window.handle.unfocus",  (void*) &mStyle.Toolbar,                C_STY,  HAS_TEXTURE|DEFAULT_BORDER },
-{   &mStyle.windowGripUnfocus   , "window.grip.unfocus",    (void*) &mStyle.ToolbarLabel,           C_STY,  HAS_TEXTURE|DEFAULT_BORDER },
-{   &mStyle.windowButtonUnfocus , "window.button.unfocus",  (void*) &mStyle.ToolbarButton,          C_STY,  HAS_TEXTURE|VALID_PICCOLOR },
+	{   &mStyle.windowTitleUnfocus  , "window.title.unfocus",   (void*) &mStyle.Toolbar,                C_STY,  HAS_TEXTURE|DEFAULT_BORDER  },
+	{   &mStyle.windowLabelUnfocus  , "window.label.unfocus",   (void*) &mStyle.Toolbar,                C_STY,  HAS_TEXTURE|HAS_SHADOW|VALID_TEXTCOLOR },
+	{   &mStyle.windowHandleUnfocus , "window.handle.unfocus",  (void*) &mStyle.Toolbar,                C_STY,  HAS_TEXTURE|DEFAULT_BORDER },
+	{   &mStyle.windowGripUnfocus   , "window.grip.unfocus",    (void*) &mStyle.ToolbarLabel,           C_STY,  HAS_TEXTURE|DEFAULT_BORDER },
+	{   &mStyle.windowButtonUnfocus , "window.button.unfocus",  (void*) &mStyle.ToolbarButton,          C_STY,  HAS_TEXTURE|VALID_PICCOLOR },
 
 // new bb4nix 070 style props
-{   &mStyle.handleHeight            , "window.handleHeight:"                , (void*) &mStyle.handleHeight, C_INT, 0 },
-{   &mStyle.frameWidth              , "window.frame.borderWidth:"           , (void*) &mStyle.borderWidth, C_INT, 0 },
-{   &mStyle.windowFrameFocusColor   , "window.frame.focus.borderColor:"     , (void*) &mStyle.borderColor, C_COL, 0 },
-{   &mStyle.windowFrameUnfocusColor , "window.frame.unfocus.borderColor:"   , (void*) &mStyle.borderColor, C_COL, 0 },
+	{   &mStyle.handleHeight            , "window.handleHeight:"                , (void*) &mStyle.handleHeight, C_INT, 0 },
+	{   &mStyle.frameWidth              , "window.frame.borderWidth:"           , (void*) &mStyle.borderWidth, C_INT, 0 },
+	{   &mStyle.windowFrameFocusColor   , "window.frame.focus.borderColor:"     , (void*) &mStyle.borderColor, C_COL, 0 },
+	{   &mStyle.windowFrameUnfocusColor , "window.frame.unfocus.borderColor:"   , (void*) &mStyle.borderColor, C_COL, 0 },
 
 // bb4nix 0.65 style props, ignored in bb4win
 //{   &mStyle.frameWidth              , "frameWidth:"                   , (void*) &mStyle.borderWidth, C_INT, 0 },
@@ -340,12 +351,12 @@ static struct items StyleItems[] = {
 //{   &mStyle.windowFrameUnfocusColor , "window.frame.unfocusColor:"    , (void*) &mStyle.borderColor, C_COL, 0 },
 
 // window margins
-{   &mStyle.windowTitleFocus    , "window.title",           (void*) &mStyle.Toolbar,                C_STY,  VALID_MARGIN|DEFAULT_MARGIN },
-{   &mStyle.windowLabelFocus    , "window.label",           (void*) &mStyle.ToolbarLabel,           C_STY,  VALID_MARGIN },
-{   &mStyle.windowButtonFocus   , "window.button",          (void*) &mStyle.ToolbarButton,          C_STY,  VALID_MARGIN },
+	{   &mStyle.windowTitleFocus    , "window.title",           (void*) &mStyle.Toolbar,                C_STY,  VALID_MARGIN|DEFAULT_MARGIN },
+	{   &mStyle.windowLabelFocus    , "window.label",           (void*) &mStyle.ToolbarLabel,           C_STY,  VALID_MARGIN },
+	{   &mStyle.windowButtonFocus   , "window.button",          (void*) &mStyle.ToolbarButton,          C_STY,  VALID_MARGIN },
 #endif
 
-{ NULL, NULL, NULL, 0, 0 }
+	{ NULL, NULL, NULL, 0, 0 }
 };
 
 //===========================================================================
@@ -353,62 +364,102 @@ static struct items StyleItems[] = {
 
 void * GetSettingPtr(int i)
 {
-	switch (i) {
+	switch (i)
+	{
 
-	case SN_STYLESTRUCT             : return &mStyle;
+	case SN_STYLESTRUCT             :
+		return &mStyle;
 
-	case SN_TOOLBAR                 : return &mStyle.Toolbar                ;
-	case SN_TOOLBARBUTTON           : return &mStyle.ToolbarButton          ;
-	case SN_TOOLBARBUTTONP          : return &mStyle.ToolbarButtonPressed   ;
-	case SN_TOOLBARLABEL            : return &mStyle.ToolbarLabel           ;
-	case SN_TOOLBARWINDOWLABEL      : return &mStyle.ToolbarWindowLabel     ;
-	case SN_TOOLBARCLOCK            : return &mStyle.ToolbarClock           ;
-	case SN_MENUTITLE               : return &mStyle.MenuTitle              ;
-	case SN_MENUFRAME               : return &mStyle.MenuFrame              ;
-	case SN_MENUHILITE              : return &mStyle.MenuHilite             ;
+	case SN_TOOLBAR                 :
+		return &mStyle.Toolbar                ;
+	case SN_TOOLBARBUTTON           :
+		return &mStyle.ToolbarButton          ;
+	case SN_TOOLBARBUTTONP          :
+		return &mStyle.ToolbarButtonPressed   ;
+	case SN_TOOLBARLABEL            :
+		return &mStyle.ToolbarLabel           ;
+	case SN_TOOLBARWINDOWLABEL      :
+		return &mStyle.ToolbarWindowLabel     ;
+	case SN_TOOLBARCLOCK            :
+		return &mStyle.ToolbarClock           ;
+	case SN_MENUTITLE               :
+		return &mStyle.MenuTitle              ;
+	case SN_MENUFRAME               :
+		return &mStyle.MenuFrame              ;
+	case SN_MENUHILITE              :
+		return &mStyle.MenuHilite             ;
 
-	case SN_MENUBULLET              : return &mStyle.menuBullet             ;
-	case SN_MENUBULLETPOS           : return &mStyle.menuBulletPosition     ;
+	case SN_MENUBULLET              :
+		return &mStyle.menuBullet             ;
+	case SN_MENUBULLETPOS           :
+		return &mStyle.menuBulletPosition     ;
 
-	case SN_BORDERWIDTH             : return &mStyle.borderWidth            ;
-	case SN_BORDERCOLOR             : return &mStyle.borderColor            ;
-	case SN_BEVELWIDTH              : return &mStyle.bevelWidth             ;
-	case SN_FRAMEWIDTH              : return &mStyle.frameWidth             ;
-	case SN_HANDLEHEIGHT            : return &mStyle.handleHeight           ;
-	case SN_ROOTCOMMAND             : return &mStyle.rootCommand            ;
+	case SN_BORDERWIDTH             :
+		return &mStyle.borderWidth            ;
+	case SN_BORDERCOLOR             :
+		return &mStyle.borderColor            ;
+	case SN_BEVELWIDTH              :
+		return &mStyle.bevelWidth             ;
+	case SN_FRAMEWIDTH              :
+		return &mStyle.frameWidth             ;
+	case SN_HANDLEHEIGHT            :
+		return &mStyle.handleHeight           ;
+	case SN_ROOTCOMMAND             :
+		return &mStyle.rootCommand            ;
 
-	case SN_MENUALPHA               : return &Settings_menuAlpha            ;
-	case SN_TOOLBARALPHA            : return &Settings_toolbarAlpha         ;
-	case SN_METRICSUNIX             : return &mStyle.metricsUnix            ;
-	case SN_BULLETUNIX              : return &mStyle.bulletUnix             ;
+	case SN_MENUALPHA               :
+		return &Settings_menuAlpha            ;
+	case SN_TOOLBARALPHA            :
+		return &Settings_toolbarAlpha         ;
+	case SN_METRICSUNIX             :
+		return &mStyle.metricsUnix            ;
+	case SN_BULLETUNIX              :
+		return &mStyle.bulletUnix             ;
 
-	case SN_WINFOCUS_TITLE          : return &mStyle.windowTitleFocus       ;
-	case SN_WINFOCUS_LABEL          : return &mStyle.windowLabelFocus       ;
-	case SN_WINFOCUS_HANDLE         : return &mStyle.windowHandleFocus      ;
-	case SN_WINFOCUS_GRIP           : return &mStyle.windowGripFocus        ;
-	case SN_WINFOCUS_BUTTON         : return &mStyle.windowButtonFocus      ;
-	case SN_WINFOCUS_BUTTONP        : return &mStyle.windowButtonPressed    ;
-	case SN_WINUNFOCUS_TITLE        : return &mStyle.windowTitleUnfocus     ;
-	case SN_WINUNFOCUS_LABEL        : return &mStyle.windowLabelUnfocus     ;
-	case SN_WINUNFOCUS_HANDLE       : return &mStyle.windowHandleUnfocus    ;
-	case SN_WINUNFOCUS_GRIP         : return &mStyle.windowGripUnfocus      ;
-	case SN_WINUNFOCUS_BUTTON       : return &mStyle.windowButtonUnfocus    ;
+	case SN_WINFOCUS_TITLE          :
+		return &mStyle.windowTitleFocus       ;
+	case SN_WINFOCUS_LABEL          :
+		return &mStyle.windowLabelFocus       ;
+	case SN_WINFOCUS_HANDLE         :
+		return &mStyle.windowHandleFocus      ;
+	case SN_WINFOCUS_GRIP           :
+		return &mStyle.windowGripFocus        ;
+	case SN_WINFOCUS_BUTTON         :
+		return &mStyle.windowButtonFocus      ;
+	case SN_WINFOCUS_BUTTONP        :
+		return &mStyle.windowButtonPressed    ;
+	case SN_WINUNFOCUS_TITLE        :
+		return &mStyle.windowTitleUnfocus     ;
+	case SN_WINUNFOCUS_LABEL        :
+		return &mStyle.windowLabelUnfocus     ;
+	case SN_WINUNFOCUS_HANDLE       :
+		return &mStyle.windowHandleUnfocus    ;
+	case SN_WINUNFOCUS_GRIP         :
+		return &mStyle.windowGripUnfocus      ;
+	case SN_WINUNFOCUS_BUTTON       :
+		return &mStyle.windowButtonUnfocus    ;
 
-	case SN_WINFOCUS_FRAME_COLOR    : return &mStyle.windowFrameFocusColor  ;
-	case SN_WINUNFOCUS_FRAME_COLOR  : return &mStyle.windowFrameUnfocusColor;
+	case SN_WINFOCUS_FRAME_COLOR    :
+		return &mStyle.windowFrameFocusColor  ;
+	case SN_WINUNFOCUS_FRAME_COLOR  :
+		return &mStyle.windowFrameUnfocusColor;
 
-	case SN_NEWMETRICS              : return (void*)Settings_newMetrics;
+	case SN_NEWMETRICS              :
+		return (void*)Settings_newMetrics;
 
-	default                         : return NULL;
+	default                         :
+		return NULL;
 	}
 }
 
 //===========================================================================
 int Settings_ItemSize(int i)
 {
-	switch (i) {
+	switch (i)
+	{
 
-	case SN_STYLESTRUCT             : return sizeof (StyleStruct);
+	case SN_STYLESTRUCT             :
+		return sizeof (StyleStruct);
 
 	case SN_TOOLBAR                 :
 	case SN_TOOLBARBUTTON           :
@@ -418,22 +469,34 @@ int Settings_ItemSize(int i)
 	case SN_TOOLBARCLOCK            :
 	case SN_MENUTITLE               :
 	case SN_MENUFRAME               :
-	case SN_MENUHILITE              : return sizeof (StyleItem);
+	case SN_MENUHILITE              :
+		return sizeof (StyleItem);
 
 	case SN_MENUBULLET              :
-	case SN_MENUBULLETPOS           : return -1; // string, have to take strlen
+	case SN_MENUBULLETPOS           :
+		return -1; // string, have to take strlen
 
-	case SN_BORDERWIDTH             : return sizeof (int);
-	case SN_BORDERCOLOR             : return sizeof (COLORREF);
-	case SN_BEVELWIDTH              : return sizeof (int);
-	case SN_FRAMEWIDTH              : return sizeof (int);
-	case SN_HANDLEHEIGHT            : return sizeof (int);
-	case SN_ROOTCOMMAND             : return -1; // string, have to take strlen
+	case SN_BORDERWIDTH             :
+		return sizeof (int);
+	case SN_BORDERCOLOR             :
+		return sizeof (COLORREF);
+	case SN_BEVELWIDTH              :
+		return sizeof (int);
+	case SN_FRAMEWIDTH              :
+		return sizeof (int);
+	case SN_HANDLEHEIGHT            :
+		return sizeof (int);
+	case SN_ROOTCOMMAND             :
+		return -1; // string, have to take strlen
 
-	case SN_MENUALPHA               : return sizeof (int);
-	case SN_TOOLBARALPHA            : return sizeof (int);
-	case SN_METRICSUNIX             : return sizeof (bool);
-	case SN_BULLETUNIX              : return sizeof (bool);
+	case SN_MENUALPHA               :
+		return sizeof (int);
+	case SN_TOOLBARALPHA            :
+		return sizeof (int);
+	case SN_METRICSUNIX             :
+		return sizeof (bool);
+	case SN_BULLETUNIX              :
+		return sizeof (bool);
 
 	case SN_WINFOCUS_TITLE          :
 	case SN_WINFOCUS_LABEL          :
@@ -445,12 +508,15 @@ int Settings_ItemSize(int i)
 	case SN_WINUNFOCUS_LABEL        :
 	case SN_WINUNFOCUS_HANDLE       :
 	case SN_WINUNFOCUS_GRIP         :
-	case SN_WINUNFOCUS_BUTTON       : return sizeof (StyleItem);
+	case SN_WINUNFOCUS_BUTTON       :
+		return sizeof (StyleItem);
 
 	case SN_WINFOCUS_FRAME_COLOR    :
-	case SN_WINUNFOCUS_FRAME_COLOR  : return sizeof (COLORREF);
+	case SN_WINUNFOCUS_FRAME_COLOR  :
+		return sizeof (COLORREF);
 
-	default                         : return 0;
+	default                         :
+		return 0;
 	}
 }
 
@@ -480,39 +546,46 @@ static const char *check_global_font(const char *p, const char *fullkey)
 
 static void read_style_item (const char * style, StyleItem *si, const char *key, int v,  StyleItem *def)
 {
-	static struct s_prop { const char *k; char mode; short v; } s_prop[]= {
+	static struct s_prop
+	{
+		const char *k;
+		char mode;
+		short v;
+	} s_prop[]=
+	{
 
-	// texture type
-	{ ":",                  C_TEX  , VALID_TEXTURE },
-	// colors, from, to, text, pics, shadow
-	{ ".color:",            C_CO1  , VALID_COLORFROM },
-	{ ".colorTo:",          C_CO2  , VALID_COLORTO },
-	{ ".textColor:",        C_CO3  , VALID_TEXTCOLOR },
-	{ ".picColor:",         C_CO4  , VALID_PICCOLOR },
-	{ ".shadowColor:",      C_CO5  , VALID_SHADOWCOLOR },
-	// font settings
-	{ ".font:",             C_FONT , VALID_FONT },
-	{ ".fontHeight:",       C_FHEI , VALID_FONTHEIGHT },
-	{ ".fontWeight:",       C_FWEI , VALID_FONTWEIGHT },
-	{ ".justify:",          C_JUST , VALID_JUSTIFY },
-	{ ".shadowX:",          C_SHAX , VALID_SHADOWX },
-	{ ".shadowY:",          C_SHAY , VALID_SHADOWY },
-	// _new in BBNix 0.70
-	{ ".borderWidth:",      C_BOWD , VALID_BORDER },
-	{ ".borderColor:",      C_BOCO , VALID_BORDERCOLOR },
-	{ ".marginWidth:",      C_MARG , VALID_MARGIN },
-	// xoblite
-	{ ".bulletColor:",      C_CO4  , VALID_PICCOLOR },
-    // OpenBox
-    { ".color.splitTo:",    C_CST  , VALID_COLORFROM },
-    { ".colorTo.splitTo:",  C_CTST , VALID_COLORTO },
-	{ NULL, 0, 0}
+		// texture type
+		{ ":",                  C_TEX  , VALID_TEXTURE },
+		// colors, from, to, text, pics, shadow
+		{ ".color:",            C_CO1  , VALID_COLORFROM },
+		{ ".colorTo:",          C_CO2  , VALID_COLORTO },
+		{ ".textColor:",        C_CO3  , VALID_TEXTCOLOR },
+		{ ".picColor:",         C_CO4  , VALID_PICCOLOR },
+		{ ".shadowColor:",      C_CO5  , VALID_SHADOWCOLOR },
+		// font settings
+		{ ".font:",             C_FONT , VALID_FONT },
+		{ ".fontHeight:",       C_FHEI , VALID_FONTHEIGHT },
+		{ ".fontWeight:",       C_FWEI , VALID_FONTWEIGHT },
+		{ ".justify:",          C_JUST , VALID_JUSTIFY },
+		{ ".shadowX:",          C_SHAX , VALID_SHADOWX },
+		{ ".shadowY:",          C_SHAY , VALID_SHADOWY },
+		// _new in BBNix 0.70
+		{ ".borderWidth:",      C_BOWD , VALID_BORDER },
+		{ ".borderColor:",      C_BOCO , VALID_BORDERCOLOR },
+		{ ".marginWidth:",      C_MARG , VALID_MARGIN },
+		// xoblite
+		{ ".bulletColor:",      C_CO4  , VALID_PICCOLOR },
+		// OpenBox
+		{ ".color.splitTo:",    C_CST  , VALID_COLORFROM },
+		{ ".colorTo.splitTo:",  C_CTST , VALID_COLORTO },
+		{ NULL, 0, 0}
 	};
 
 	COLORREF cr;
 	int l = strlen(key);
 	struct s_prop *cp = s_prop;
-	char fullkey[80]; memcpy(fullkey, key, l);
+	char fullkey[80];
+	memcpy(fullkey, key, l);
 
 	si->nVersion = 2;
 
@@ -528,7 +601,7 @@ static void read_style_item (const char * style, StyleItem *si, const char *key,
 
 			switch (cp->mode)
 			{
-			// --- textture ---
+				// --- textture ---
 			case C_TEX:
 				if (p)
 				{
@@ -539,7 +612,7 @@ static void read_style_item (const char * style, StyleItem *si, const char *key,
 					memcpy(si, def, sizeof(ShortStyleItem));
 				break;
 
-			// --- colors ---
+				// --- colors ---
 			case C_CO1:
 				cr = ReadColorFromString(p);
 				si->Color = ((COLORREF)-1) != cr ? cr : def ->Color;
@@ -568,7 +641,7 @@ static void read_style_item (const char * style, StyleItem *si, const char *key,
 				si->ShadowColor = ReadColorFromString(p);
 				break;
 
-			// --- Border & margin ---
+				// --- Border & margin ---
 			case C_BOCO:
 				cr = ReadColorFromString(p);
 				si->borderColor = ((COLORREF)-1) != cr ? cr : mStyle.borderColor;
@@ -591,13 +664,13 @@ static void read_style_item (const char * style, StyleItem *si, const char *key,
 				if (p)
 					si->marginWidth = atoi(p);
 				else
-				if (v & DEFAULT_MARGIN)
-					si->marginWidth = mStyle.bevelWidth;
-				else
-					si->marginWidth = 0;
+					if (v & DEFAULT_MARGIN)
+						si->marginWidth = mStyle.bevelWidth;
+					else
+						si->marginWidth = 0;
 				break;
 
-			// --- Font ---
+				// --- Font ---
 			case C_FONT:
 				p = check_global_font(p, fullkey);
 				if (p) parse_font(si, p);
@@ -608,16 +681,16 @@ static void read_style_item (const char * style, StyleItem *si, const char *key,
 				p = check_global_font(p, fullkey);
 				if (p) si->FontHeight = atoi(p);
 				else
-				if (si->validated & VALID_FONT) si->FontHeight = 12;
-				else si->FontHeight = def->FontHeight;
+					if (si->validated & VALID_FONT) si->FontHeight = 12;
+					else si->FontHeight = def->FontHeight;
 				break;
 
 			case C_FWEI:
 				p = check_global_font(p, fullkey);
 				if (p) si->FontWeight = getweight(p);
 				else
-				if (si->validated & VALID_FONT) si->FontWeight = FW_NORMAL;
-				else si->FontWeight = def->FontWeight;
+					if (si->validated & VALID_FONT) si->FontWeight = FW_NORMAL;
+					else si->FontWeight = def->FontWeight;
 				break;
 
 			case C_SHAX:
@@ -628,7 +701,7 @@ static void read_style_item (const char * style, StyleItem *si, const char *key,
 				si->ShadowY = p ? atoi(p) : 0;
 				break;
 
-			// --- Alignment ---
+				// --- Alignment ---
 			case C_JUST:
 				if (p) si->Justify = ParseJustify(p);
 				else si->Justify = def->Justify;
@@ -651,46 +724,57 @@ static void ReadStyle(const char *style)
 	struct items *p = StyleItems;
 	do
 	{
-		void *def = p->def; int n; bool b; COLORREF cr;
+		void *def = p->def;
+		int n;
+		bool b;
+		COLORREF cr;
 		switch (p->id)
 		{
-			case C_STY:
-				read_style_item (style, (StyleItem*)p->v, p->rc_string, p->flags, (StyleItem*)p->def);
-				break;
+		case C_STY:
+			read_style_item (style, (StyleItem*)p->v, p->rc_string, p->flags, (StyleItem*)p->def);
+			break;
 
-			case C_INT:
-				n = HIWORD(def) ? *(int*)def : (INT_PTR) def;
-				*(int*)p->v = ReadInt(style, p->rc_string, n);
-				break;
+		case C_INT:
+			n = HIWORD(def) ? *(int*)def : (INT_PTR) def;
+			*(int*)p->v = ReadInt(style, p->rc_string, n);
+			break;
 
-			case C_BOL:
-				b = HIWORD(def) ? *(bool*)def : (bool)def;
-				*(bool*)p->v = ReadBool(style, p->rc_string, b);
-				break;
+		case C_BOL:
+			b = HIWORD(def) ? *(bool*)def : (bool)def;
+			*(bool*)p->v = ReadBool(style, p->rc_string, b);
+			break;
 
-			case C_ALPHA:
-				n = HIWORD(def) ? *(int*)def : (INT_PTR) def;
-				*(BYTE*)p->v = ReadInt(style, p->rc_string, n);
-				break;
+		case C_ALPHA:
+			n = HIWORD(def) ? *(int*)def : (INT_PTR) def;
+			*(BYTE*)p->v = ReadInt(style, p->rc_string, n);
+			break;
 
-			case C_COL:
-				cr = ReadColorFromString(ReadValue(style, p->rc_string, NULL));
-				*(COLORREF*)p->v = ((COLORREF)-1) != cr ? cr : *(COLORREF*)def;
-				break;
+		case C_COL:
+			cr = ReadColorFromString(ReadValue(style, p->rc_string, NULL));
+			*(COLORREF*)p->v = ((COLORREF)-1) != cr ? cr : *(COLORREF*)def;
+			break;
 
-			case C_STR:
-				strcpy_max((char*)p->v, ReadString(style, p->rc_string, (char*)def), p->flags);
-				break;
+		case C_STR:
+			strcpy_max((char*)p->v, ReadString(style, p->rc_string, (char*)def), p->flags);
+			break;
 		}
-	} while ((++p)->v);
+	}
+	while ((++p)->v);
 }
 
 //===========================================================================
 #ifndef BBSETTING_STYLEREADER_ONLY
 //===========================================================================
-struct rccfg { const char *key; char mode; void *def; void *ptr; };
+struct rccfg
+{
+	const char *key;
+	char mode;
+	void *def;
+	void *ptr;
+};
 
-static struct rccfg ext_rccfg[] = {
+static struct rccfg ext_rccfg[] =
+{
 
 	//{ "blackbox.appearance.metrics.unix:",      C_BOL, (void*)true,     &Settings_newMetrics },
 
@@ -723,9 +807,9 @@ static struct rccfg ext_rccfg[] = {
 	{ "blackbox.global.fonts.enabled:",         C_BOL, (void*)false,    &Settings_globalFonts },
 	{ "blackbox.editor:",                       C_STR, (void*)"notepad.exe", Settings_preferredEditor },
 
-    { "blackbox.menu.VolumeWidth:",             C_INT, (void*)25,       &Settings_VolumeWidth },
-    { "blackbox.menu.VolumeHeight:",            C_INT, (void*)6,        &Settings_VolumeHeight },
-    { "blackbox.menu.VolumeHilite:",            C_BOL, (void*)true,     &Settings_VolumeHilite },
+	{ "blackbox.menu.VolumeWidth:",             C_INT, (void*)25,       &Settings_VolumeWidth },
+	{ "blackbox.menu.VolumeHeight:",            C_INT, (void*)6,        &Settings_VolumeHeight },
+	{ "blackbox.menu.VolumeHilite:",            C_BOL, (void*)true,     &Settings_VolumeHilite },
 
 	{ "blackbox.tweaks.noOleUnInit:",           C_BOL, (void*)false,    &Settings_noOleUninit },
 
@@ -737,7 +821,8 @@ static struct rccfg ext_rccfg[] = {
 };
 
 //===========================================================================
-static struct rccfg rccfg[] = {
+static struct rccfg rccfg[] =
+{
 	{ "#toolbar.enabled:",          C_BOL, (void*)true,     &Settings_toolbarEnabled },
 	{ "#toolbar.placement:",        C_STR, (void*)"TopCenter", Settings_toolbarPlacement },
 	{ "#toolbar.widthPercent:",     C_INT, (void*)66,       &Settings_toolbarWidthPercent },
@@ -808,39 +893,43 @@ static const char * makekey(char *buff, struct rccfg * cp)
 	if (k[0]=='.')
 		sprintf(buff, "session%s", k);
 	else
-	if (k[0]=='#')
-		sprintf(buff, "session.screen%d.%s", screenNumber, k+1);
-	else
-		return k;
+		if (k[0]=='#')
+			sprintf(buff, "session.screen%d.%s", screenNumber, k+1);
+		else
+			return k;
 	return buff;
 }
 
 static void Settings_ReadSettings(const char *bbrc, struct rccfg * cp)
 {
-	do {
-		char keystr[80]; const char *key = makekey(keystr, cp);
+	do
+	{
+		char keystr[80];
+		const char *key = makekey(keystr, cp);
 		switch (cp->mode)
 		{
-			case C_INT:
-				*(int*) cp->ptr = ReadInt(bbrc, key, (INT_PTR) cp->def);
-				break;
-			case C_BOL:
-				*(bool*) cp->ptr = ReadBool (bbrc, key, (bool) cp->def);
-				break;
-			case C_STR:
-				strcpy((char*)cp->ptr, ReadString (bbrc, key, (char*) cp->def));
-				break;
+		case C_INT:
+			*(int*) cp->ptr = ReadInt(bbrc, key, (INT_PTR) cp->def);
+			break;
+		case C_BOL:
+			*(bool*) cp->ptr = ReadBool (bbrc, key, (bool) cp->def);
+			break;
+		case C_STR:
+			strcpy((char*)cp->ptr, ReadString (bbrc, key, (char*) cp->def));
+			break;
 		}
-	} while ((++cp)->key);
+	}
+	while ((++cp)->key);
 }
 
 static bool Settings_WriteSetting(const char *bbrc, struct rccfg * cp, const void *v)
 {
 	do if (NULL == v || cp->ptr == v)
-	{
-		char keystr[80]; const char *key = makekey(keystr, cp);
-		switch (cp->mode)
 		{
+			char keystr[80];
+			const char *key = makekey(keystr, cp);
+			switch (cp->mode)
+			{
 			case C_INT:
 				WriteInt (bbrc, key, *(int*) cp->ptr);
 				break;
@@ -850,9 +939,10 @@ static bool Settings_WriteSetting(const char *bbrc, struct rccfg * cp, const voi
 			case C_STR:
 				WriteString (bbrc, key, (char*) cp->ptr);
 				break;
+			}
+			if (v) return true;
 		}
-		if (v) return true;
-	} while ((++cp)->key);
+	while ((++cp)->key);
 	return false;
 }
 
@@ -920,28 +1010,28 @@ void Settings_ReadStyleSettings()
 			mStyle.Toolbar.ShadowColor = mStyle.ToolbarLabel.ShadowColor;
 		}
 		else
-		if (mStyle.ToolbarClock.parentRelative)
-		{
-			mStyle.Toolbar.TextColor   = mStyle.ToolbarClock.TextColor;
-			mStyle.Toolbar.ShadowX     = mStyle.ToolbarClock.ShadowX;
-			mStyle.Toolbar.ShadowY     = mStyle.ToolbarClock.ShadowY;
-			mStyle.Toolbar.ShadowColor = mStyle.ToolbarClock.ShadowColor;
-		}
-		else
-		if (mStyle.ToolbarWindowLabel.parentRelative)
-		{
-			mStyle.Toolbar.TextColor   = mStyle.ToolbarWindowLabel.TextColor;
-			mStyle.Toolbar.ShadowX     = mStyle.ToolbarWindowLabel.ShadowX;
-			mStyle.Toolbar.ShadowY     = mStyle.ToolbarWindowLabel.ShadowY;
-			mStyle.Toolbar.ShadowColor = mStyle.ToolbarWindowLabel.ShadowColor;
-		}
-		else
-		{
-			mStyle.Toolbar.TextColor   = mStyle.ToolbarLabel.TextColor;
-			mStyle.Toolbar.ShadowX     = mStyle.ToolbarLabel.ShadowX;
-			mStyle.Toolbar.ShadowY     = mStyle.ToolbarLabel.ShadowY;
-			mStyle.Toolbar.ShadowColor = mStyle.ToolbarLabel.ShadowColor;
-		}
+			if (mStyle.ToolbarClock.parentRelative)
+			{
+				mStyle.Toolbar.TextColor   = mStyle.ToolbarClock.TextColor;
+				mStyle.Toolbar.ShadowX     = mStyle.ToolbarClock.ShadowX;
+				mStyle.Toolbar.ShadowY     = mStyle.ToolbarClock.ShadowY;
+				mStyle.Toolbar.ShadowColor = mStyle.ToolbarClock.ShadowColor;
+			}
+			else
+				if (mStyle.ToolbarWindowLabel.parentRelative)
+				{
+					mStyle.Toolbar.TextColor   = mStyle.ToolbarWindowLabel.TextColor;
+					mStyle.Toolbar.ShadowX     = mStyle.ToolbarWindowLabel.ShadowX;
+					mStyle.Toolbar.ShadowY     = mStyle.ToolbarWindowLabel.ShadowY;
+					mStyle.Toolbar.ShadowColor = mStyle.ToolbarWindowLabel.ShadowColor;
+				}
+				else
+				{
+					mStyle.Toolbar.TextColor   = mStyle.ToolbarLabel.TextColor;
+					mStyle.Toolbar.ShadowX     = mStyle.ToolbarLabel.ShadowX;
+					mStyle.Toolbar.ShadowY     = mStyle.ToolbarLabel.ShadowY;
+					mStyle.Toolbar.ShadowColor = mStyle.ToolbarLabel.ShadowColor;
+				}
 	}
 
 	if (0==(mStyle.ToolbarButtonPressed.validated & VALID_PICCOLOR))
@@ -955,7 +1045,7 @@ void Settings_ReadStyleSettings()
 			mStyle.ToolbarWindowLabel = mStyle.ToolbarLabel;
 
 	if (0 == (mStyle.MenuFrame.validated & VALID_TEXTURE)
-	 && 0 == mStyle.rootCommand[0])
+			&& 0 == mStyle.rootCommand[0])
 		strcpy(mStyle.rootCommand, "bsetroot -mod 4 4 -fg grey55 -bg grey60");
 #endif
 }

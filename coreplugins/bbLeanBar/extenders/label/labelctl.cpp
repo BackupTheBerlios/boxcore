@@ -117,40 +117,40 @@ HWND barLabel::getLabelHandle()
 
 HWND barLabel::CreateExtenderWindow()
 {
-    WNDCLASSEX wc;
-    HWND hwnd;
+	WNDCLASSEX wc;
+	HWND hwnd;
 
-    //Step 1: Registering the Window Class
-    wc.cbSize        = sizeof(WNDCLASSEX);
-    wc.style         = 0;
-    wc.lpfnWndProc   = WndProc;
-    wc.cbClsExtra    = 0;
-    wc.cbWndExtra    = 0;
-    wc.hInstance     = 0;
-    wc.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
-    wc.hCursor       = LoadCursor(NULL, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
-    wc.lpszMenuName  = NULL;
-    wc.lpszClassName = g_szClassName;
-    wc.hIconSm       = LoadIcon(NULL, IDI_APPLICATION);
-    if(!RegisterClassEx(&wc)) return(0);
+	//Step 1: Registering the Window Class
+	wc.cbSize        = sizeof(WNDCLASSEX);
+	wc.style         = 0;
+	wc.lpfnWndProc   = WndProc;
+	wc.cbClsExtra    = 0;
+	wc.cbWndExtra    = 0;
+	wc.hInstance     = 0;
+	wc.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+	wc.hCursor       = LoadCursor(NULL, IDC_ARROW);
+	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+	wc.lpszMenuName  = NULL;
+	wc.lpszClassName = g_szClassName;
+	wc.hIconSm       = LoadIcon(NULL, IDI_APPLICATION);
+	if (!RegisterClassEx(&wc)) return(0);
 
-    hwnd = CreateWindowEx(
-        0,
-        g_szClassName,
-        "Extender Label",
-        0,
-        CW_USEDEFAULT, CW_USEDEFAULT, 240, 120,
-        NULL, NULL, 0, NULL);
-    if(hwnd == NULL) return(0);
+	hwnd = CreateWindowEx(
+			   0,
+			   g_szClassName,
+			   "Extender Label",
+			   0,
+			   CW_USEDEFAULT, CW_USEDEFAULT, 240, 120,
+			   NULL, NULL, 0, NULL);
+	if (hwnd == NULL) return(0);
 
 	// Window shouldn't be displayed by the plugin, leave this to the leanbar
-    /*
-    ShowWindow(hwnd, 1);
-    UpdateWindow(hwnd);
-    */
+	/*
+	ShowWindow(hwnd, 1);
+	UpdateWindow(hwnd);
+	*/
 
-    return(hwnd);
+	return(hwnd);
 }
 
 /*
@@ -161,103 +161,106 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	HDC hdc;
 	HDC buf;
 
-    switch(msg)
-    {
+	switch (msg)
+	{
 		//
 		//  On creation, fetch the style settings
 		//
-		case WM_CREATE:
-			GetStyleSettings();
-			break;
+	case WM_CREATE:
+		GetStyleSettings();
+		break;
 
 		//
 		//  Paint routine
 		//
-        case WM_PAINT:
-			PAINTSTRUCT ps;
-			hdc = BeginPaint(hwnd, &ps);
+	case WM_PAINT:
+		PAINTSTRUCT ps;
+		hdc = BeginPaint(hwnd, &ps);
 
-			// create a DC for the buffer
-			buf = CreateCompatibleDC(hdc);
-			HGDIOBJ otherbmp;
+		// create a DC for the buffer
+		buf = CreateCompatibleDC(hdc);
+		HGDIOBJ otherbmp;
 
-			if (NULL == my.bufbmp) // No bitmap yet?
+		if (NULL == my.bufbmp) // No bitmap yet?
+		{
+			// Generate it and paint everything
+			my.bufbmp = CreateCompatibleBitmap(hdc, my.width, my.height);
+
+			// Select it into the DC, storing the previous default.
+			otherbmp = SelectObject(buf, my.bufbmp);
+
+			// Setup the rectangle
+			RECT r;
+			r.left = r.top = 0;
+			r.right = my.width;
+			r.bottom =  my.height;
+
+			// and draw the frame
+			MakeStyleGradient(buf, &r, &style_info.Frame, my.drawBorder);
+
+			if (my.window_text[0])
 			{
-				// Generate it and paint everything
-				my.bufbmp = CreateCompatibleBitmap(hdc, my.width, my.height);
+				// Set the font, storing the default..
+				HGDIOBJ otherfont = SelectObject(buf, my.hFont);
 
-				// Select it into the DC, storing the previous default.
-				otherbmp = SelectObject(buf, my.bufbmp);
+				SetTextColor(buf, style_info.Frame.TextColor);
+				SetBkMode(buf, TRANSPARENT);
 
-				// Setup the rectangle
-				RECT r; r.left = r.top = 0; r.right = my.width; r.bottom =  my.height;
+				// adjust the rectangle
+				int margin = style_info.bevelWidth;
+				if (my.drawBorder) margin += style_info.borderWidth;
+				r.left  += margin;
+				r.top   += margin;
+				r.right -= margin;
+				r.bottom -= margin;
 
-				// and draw the frame
-				MakeStyleGradient(buf, &r, &style_info.Frame, my.drawBorder);
+				// draw the text
+				DrawText(buf, my.window_text, -1, &r, DT_CENTER|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
 
-				if (my.window_text[0])
-				{
-					// Set the font, storing the default..
-					HGDIOBJ otherfont = SelectObject(buf, my.hFont);
-
-					SetTextColor(buf, style_info.Frame.TextColor);
-					SetBkMode(buf, TRANSPARENT);
-
-					// adjust the rectangle
-					int margin = style_info.bevelWidth;
-					if (my.drawBorder) margin += style_info.borderWidth;
-					r.left  += margin;
-					r.top   += margin;
-					r.right -= margin;
-					r.bottom -= margin;
-
-					// draw the text
-					DrawText(buf, my.window_text, -1, &r, DT_CENTER|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
-
-					// Put back the previous default font.
-					SelectObject(buf, otherfont);
-				}
+				// Put back the previous default font.
+				SelectObject(buf, otherfont);
 			}
-			else
-			{
-				// Otherwise it has been painted previously,
-				// so just select it into the DC
-				otherbmp = SelectObject(buf, my.bufbmp);
-			}
+		}
+		else
+		{
+			// Otherwise it has been painted previously,
+			// so just select it into the DC
+			otherbmp = SelectObject(buf, my.bufbmp);
+		}
 
-			// ... and copy the buffer on the screen:
-			BitBlt(hdc,
-				ps.rcPaint.left,
-				ps.rcPaint.top,
-				ps.rcPaint.right  - ps.rcPaint.left,
-				ps.rcPaint.bottom - ps.rcPaint.top,
-				buf,
-				ps.rcPaint.left,
-				ps.rcPaint.top,
-				SRCCOPY
-				);
+		// ... and copy the buffer on the screen:
+		BitBlt(hdc,
+			   ps.rcPaint.left,
+			   ps.rcPaint.top,
+			   ps.rcPaint.right  - ps.rcPaint.left,
+			   ps.rcPaint.bottom - ps.rcPaint.top,
+			   buf,
+			   ps.rcPaint.left,
+			   ps.rcPaint.top,
+			   SRCCOPY
+			  );
 
-			// Put back the previous default bitmap
-			SelectObject(buf, otherbmp);
+		// Put back the previous default bitmap
+		SelectObject(buf, otherbmp);
 
-			// clean up
-			DeleteDC(buf);
+		// clean up
+		DeleteDC(buf);
 
-			// Done.
-			EndPaint(hwnd, &ps);
-			break;
+		// Done.
+		EndPaint(hwnd, &ps);
+		break;
 
 		//
 		//  OnClick - Do something user defined here ;)
 		//
-		case WM_LBUTTONUP:
-			// Invoke the onclick event here
-			break;
+	case WM_LBUTTONUP:
+		// Invoke the onclick event here
+		break;
 
-        default:
-            return DefWindowProc(hwnd, msg, wParam, lParam);
-    }
-    return 0;
+	default:
+		return DefWindowProc(hwnd, msg, wParam, lParam);
+	}
+	return 0;
 }
 
 

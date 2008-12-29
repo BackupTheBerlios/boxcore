@@ -23,7 +23,12 @@ static Menu *copymenu (HWND hwnd, HMENU hm, const char *title)
 		char item_string[128];
 		GetMenuString(hm, n, item_string, sizeof item_string, MF_BYPOSITION);
 		//dbg_printf("string: <%s>", item_string);
-		char *p = item_string; while (*p) { if ('\t' == *p) *p = ' '; p++; }
+		char *p = item_string;
+		while (*p)
+		{
+			if ('\t' == *p) *p = ' ';
+			p++;
+		}
 
 
 		if (info.hSubMenu)
@@ -33,17 +38,17 @@ static Menu *copymenu (HWND hwnd, HMENU hm, const char *title)
 			MakeSubmenu(m, s, item_string);
 		}
 		else
-		if (info.fType & MFT_SEPARATOR)
-		{
-			MakeMenuNOP(m, NULL);
-		}
-		else
-		if (!(info.fState & MFS_DISABLED) && !(info.fState & MFS_GRAYED))
-		{
-			char broam[256];
-			sprintf(broam, "@BBLeanbar.SysCommand <%d> <%d>", (INT_PTR)hwnd, info.wID);
-			MakeMenuItem(m, item_string, broam, false);
-		}
+			if (info.fType & MFT_SEPARATOR)
+			{
+				MakeMenuNOP(m, NULL);
+			}
+			else
+				if (!(info.fState & MFS_DISABLED) && !(info.fState & MFS_GRAYED))
+				{
+					char broam[256];
+					sprintf(broam, "@BBLeanbar.SysCommand <%d> <%d>", (INT_PTR)hwnd, info.wID);
+					MakeMenuItem(m, item_string, broam, false);
+				}
 	}
 	return m;
 }
@@ -64,23 +69,23 @@ void ShowSysmenu(HWND Window, HWND Owner)
 
 	// restore is enabled only if minimized or maximized (not normal)
 	EnableMenuItem(systemMenu, SC_RESTORE, MF_BYCOMMAND |
-		(iconic || zoomed ? MF_ENABLED : MF_GRAYED));
+				   (iconic || zoomed ? MF_ENABLED : MF_GRAYED));
 
 	// move is enabled only if normal
 	EnableMenuItem(systemMenu, SC_MOVE, MF_BYCOMMAND |
-		(!(iconic || zoomed) ? MF_ENABLED : MF_GRAYED));
+				   (!(iconic || zoomed) ? MF_ENABLED : MF_GRAYED));
 
 	// size is enabled only if normal
 	EnableMenuItem(systemMenu, SC_SIZE, MF_BYCOMMAND |
-		(!(iconic || zoomed) && (style & WS_SIZEBOX) ? MF_ENABLED : MF_GRAYED));
+				   (!(iconic || zoomed) && (style & WS_SIZEBOX) ? MF_ENABLED : MF_GRAYED));
 
 	// minimize is enabled only if not minimized
 	EnableMenuItem(systemMenu, SC_MINIMIZE, MF_BYCOMMAND |
-		(!iconic && (style & WS_MINIMIZEBOX)? MF_ENABLED : MF_GRAYED));
+				   (!iconic && (style & WS_MINIMIZEBOX)? MF_ENABLED : MF_GRAYED));
 
 	// maximize is enabled only if not maximized
 	EnableMenuItem(systemMenu, SC_MAXIMIZE, MF_BYCOMMAND |
-		(!zoomed && (style & WS_MAXIMIZEBOX) ? MF_ENABLED : MF_GRAYED));
+				   (!zoomed && (style & WS_MAXIMIZEBOX) ? MF_ENABLED : MF_GRAYED));
 
 	// let application modify menu
 	SendMessage(Window, WM_INITMENU, (WPARAM)systemMenu, 0);
@@ -100,7 +105,8 @@ void ShowSysmenu(HWND Window, HWND Owner)
 	}
 
 	// display the menu
-	POINT pt; GetCursorPos(&pt);
+	POINT pt;
+	GetCursorPos(&pt);
 	int command =
 		TrackPopupMenu(
 			systemMenu,
@@ -109,7 +115,7 @@ void ShowSysmenu(HWND Window, HWND Owner)
 			0,
 			Owner,
 			NULL
-			);
+		);
 
 	if (command)
 	{

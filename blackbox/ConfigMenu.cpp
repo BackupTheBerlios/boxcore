@@ -40,7 +40,12 @@
 #define SUB_PLUGIN_SLIT 2
 
 //===========================================================================
-static struct int_item { int *v; short minval, maxval, offval; }  int_items[] = {
+static struct int_item
+{
+	int *v;
+	short minval, maxval, offval;
+}  int_items[] =
+{
 	{ &Settings_menuMousewheelfac          ,  1,  10,   -2  },
 	{ &Settings_menuPopupDelay             ,  0, 400,   -2  },
 	{ &Settings_menuMaxWidth               ,100, 600,   -2  },
@@ -71,18 +76,18 @@ static struct int_item *get_int_item(const void *v)
 static bool is_string_item(const void *v)
 {
 	return v == &Settings_preferredEditor
-		|| v == Settings_toolbarStrftimeFormat
-	;
+		   || v == Settings_toolbarStrftimeFormat
+		   ;
 }
 
 static bool is_fixed_string(const void *v)
 {
 	return v == Settings_focusModel
-		|| v == Settings_menuBulletPosition_cfg
-		|| v == Settings_menuScrollPosition_cfg
-		|| v == Settings_toolbarPlacement
-		|| v == Settings_menuSeparatorStyle
-		;
+		   || v == Settings_menuBulletPosition_cfg
+		   || v == Settings_menuScrollPosition_cfg
+		   || v == Settings_toolbarPlacement
+		   || v == Settings_menuSeparatorStyle
+		   ;
 }
 
 //===========================================================================
@@ -110,43 +115,45 @@ static Menu * GetPluginMenu(
 			if (0 == stricmp(command, "nop"))
 				MakeMenuNOP(pMenu, label);
 			else
-			if (0 == stricmp(command, "submenu") && *label)
-			{
-				sprintf(save_id, "_%s", label);
-				MakeSubmenu(pMenu, GetPluginMenu(label, menu_id, pop, mode, qp), label);
-			}
-			else
-			if (0 == stricmp(command, "end"))
-				break;
+				if (0 == stricmp(command, "submenu") && *label)
+				{
+					sprintf(save_id, "_%s", label);
+					MakeSubmenu(pMenu, GetPluginMenu(label, menu_id, pop, mode, qp), label);
+				}
+				else
+					if (0 == stricmp(command, "end"))
+						break;
 
 			continue;
 		}
 
-		bool checked; const char *cmd;
+		bool checked;
+		const char *cmd;
 		if (mode == SUB_PLUGIN_LOAD)
 		{
 			cmd = "@BBCfg.plugin.load %s";
 			checked = q->enabled;
 		}
 		else
-		if (mode == SUB_PLUGIN_SLIT)
-		{
-			if (false == q->enabled)
+			if (mode == SUB_PLUGIN_SLIT)
+			{
+				if (false == q->enabled)
+					continue;
+
+				if (NULL == hSlit)
+					continue;
+
+				if (NULL == q->beginSlitPlugin && NULL == q->beginPluginEx)
+					continue;
+
+				cmd = "@BBCfg.plugin.inslit %s";
+				checked = q->useslit;
+			}
+			else
 				continue;
 
-			if (NULL == hSlit)
-				continue;
-
-			if (NULL == q->beginSlitPlugin && NULL == q->beginPluginEx)
-				continue;
-
-			cmd = "@BBCfg.plugin.inslit %s";
-			checked = q->useslit;
-		}
-		else
-			continue;
-
-		char buf[80]; sprintf(buf, cmd, q->name); //, false_true_string(false==checked));
+		char buf[80];
+		sprintf(buf, cmd, q->name); //, false_true_string(false==checked));
 		MakeMenuItem(pMenu, q->name, buf, checked);
 	}
 	*save_id = 0;
@@ -166,7 +173,8 @@ Menu *CfgMenuMaker(const char *title, const struct cfgmenu *pm, bool pop, char *
 	char *save_id = strchr(menu_id, 0);
 	Menu *pMenu = MakeNamedMenu(title, menu_id, pop);
 
-	char buf[80]; strcpy(buf, "@BBCfg.");
+	char buf[80];
+	strcpy(buf, "@BBCfg.");
 	while (pm->text)
 	{
 		const char *item_text = pm->text;
@@ -178,36 +186,36 @@ Menu *CfgMenuMaker(const char *title, const struct cfgmenu *pm, bool pop, char *
 			if (iip)
 			{
 				MenuItem *pItem = MakeMenuItemInt(
-					pMenu, item_text, cmd, *iip->v, iip->minval, iip->maxval);
+									  pMenu, item_text, cmd, *iip->v, iip->minval, iip->maxval);
 				if (-2 != iip->offval)
 					MenuItemInt_SetOffValue(
 						pItem, iip->offval, 10000 == iip->maxval ? "auto" : NULL);
 			}
 			else
-			if (is_string_item(pm->pvalue))
-			{
-				MakeMenuItemString(pMenu, item_text, cmd, (LPCSTR)pm->pvalue);
-			}
-			else
-			{
-				bool checked = false;
-				if (is_fixed_string(pm->pvalue))
-					checked = 0==stricmp((const char *)pm->pvalue, strrchr(cmd, ' ')+1);
-				else
-				if (pm->pvalue)
-					checked = *(bool*)pm->pvalue;
-
-				bool disabled = false;
-				if (pm->pvalue == &Settings_smartWallpaper)
+				if (is_string_item(pm->pvalue))
 				{
-					if (Settings_desktopHook || false == Settings_background_enabled)
-						disabled = true;
+					MakeMenuItemString(pMenu, item_text, cmd, (LPCSTR)pm->pvalue);
 				}
+				else
+				{
+					bool checked = false;
+					if (is_fixed_string(pm->pvalue))
+						checked = 0==stricmp((const char *)pm->pvalue, strrchr(cmd, ' ')+1);
+					else
+						if (pm->pvalue)
+							checked = *(bool*)pm->pvalue;
 
-				MakeMenuItem(pMenu, item_text, cmd, checked && false == disabled);
-				if (disabled) DisableLastItem(pMenu);
+					bool disabled = false;
+					if (pm->pvalue == &Settings_smartWallpaper)
+					{
+						if (Settings_desktopHook || false == Settings_background_enabled)
+							disabled = true;
+					}
 
-			}
+					MakeMenuItem(pMenu, item_text, cmd, checked && false == disabled);
+					if (disabled) DisableLastItem(pMenu);
+
+				}
 		}
 		else
 		{
@@ -258,7 +266,8 @@ Menu *MakeConfigMenu(bool popup)
 	return m;
 }
 
-const struct cfgmenu cfg_main[] = {
+const struct cfgmenu cfg_main[] =
+{
 	{ NLS0("Plugins"),            NULL, cfg_sub_plugins },
 	{ NLS0("Menus"),              NULL, cfg_sub_menu },
 	{ NLS0("Graphics"),           NULL, cfg_sub_graphics },
@@ -267,7 +276,8 @@ const struct cfgmenu cfg_main[] = {
 	{ NULL }
 };
 
-const struct cfgmenu cfg_sub_plugins[] = {
+const struct cfgmenu cfg_sub_plugins[] =
+{
 	{ NLS0("Load/Unload"),        NULL, (void*)SUB_PLUGIN_LOAD },
 	{ NLS0("In Slit"),            NULL, (void*)SUB_PLUGIN_SLIT },
 	{ NLS0("Add Plugin..."),      "plugin.add", NULL },
@@ -276,12 +286,14 @@ const struct cfgmenu cfg_sub_plugins[] = {
 	{ NULL }
 };
 
-const struct cfgmenu cfg_sub_session[] = {
+const struct cfgmenu cfg_sub_session[] =
+{
 	{ NLS0("Enable Screensaver"),   "toggleScreensaver", &Session_screensaverEnabled},
 	{ NULL }
 };
 
-const struct cfgmenu cfg_sub_menu[] = {
+const struct cfgmenu cfg_sub_menu[] =
+{
 	{ NLS0("Bullet Position"),    NULL, cfg_sub_menubullet },
 	{ NLS0("Scroll Position"),    NULL, cfg_sub_menuscroll },
 	{ NLS0("Maximal Width"),      "menu.maxWidth",        &Settings_menuMaxWidth  },
@@ -307,14 +319,16 @@ const struct cfgmenu cfg_sub_menu[] = {
 	{ NULL }
 };
 
-const struct cfgmenu cfg_sub_menubullet[] = {
+const struct cfgmenu cfg_sub_menubullet[] =
+{
 	{ NLS0("Default"),            "menu.bulletPosition default", Settings_menuBulletPosition_cfg },
 	{ NLS0("Left"),               "menu.bulletPosition left",    Settings_menuBulletPosition_cfg },
 	{ NLS0("Right"),              "menu.bulletPosition right",   Settings_menuBulletPosition_cfg },
 	{ NULL }
 };
 
-const struct cfgmenu cfg_sub_menuseparatorstyle[] = {
+const struct cfgmenu cfg_sub_menuseparatorstyle[] =
+{
 	{ NLS0("Gradient"),           "menu.separatorStyle gradient", Settings_menuSeparatorStyle },
 	{ NLS0("Flat"),               "menu.separatorStyle flat",     Settings_menuSeparatorStyle },
 	{ NLS0("Bevel"),              "menu.separatorStyle bevel",    Settings_menuSeparatorStyle },
@@ -325,14 +339,16 @@ const struct cfgmenu cfg_sub_menuseparatorstyle[] = {
 	{ NULL }
 };
 
-const struct cfgmenu cfg_sub_menuscroll[] = {
+const struct cfgmenu cfg_sub_menuscroll[] =
+{
 	{ NLS0("Default"),            "menu.scrollPosition default", Settings_menuScrollPosition_cfg },
 	{ NLS0("Left"),               "menu.scrollPosition left",    Settings_menuScrollPosition_cfg },
 	{ NLS0("Right"),              "menu.scrollPosition right",   Settings_menuScrollPosition_cfg },
 	{ NULL }
 };
 
-const struct cfgmenu cfg_sub_graphics[] = {
+const struct cfgmenu cfg_sub_graphics[] =
+{
 	{ NLS0("Enable Background"),  "enableBackground",   &Settings_background_enabled },
 	{ NLS0("Smart Wallpaper"),    "smartWallpaper",     &Settings_smartWallpaper  },
 	{ "", NULL, NULL },
@@ -345,7 +361,8 @@ const struct cfgmenu cfg_sub_graphics[] = {
 	{ NULL }
 };
 
-const struct cfgmenu cfg_sub_misc[] = {
+const struct cfgmenu cfg_sub_misc[] =
+{
 	{ NLS0("Desktop Margins"),    NULL, cfg_sub_dm },
 	{ NLS0("Focus Model"),        NULL, cfg_sub_focusmodel },
 	{ NLS0("Snap"),               NULL, cfg_sub_snap },
@@ -359,7 +376,8 @@ const struct cfgmenu cfg_sub_misc[] = {
 	{ NULL }
 };
 
-const struct cfgmenu cfg_sub_dm[] = {
+const struct cfgmenu cfg_sub_dm[] =
+{
 	{ NLS0("Top"),                "desktop.marginTop",    &Settings_desktopMargin.top  },
 	{ NLS0("Bottom"),             "desktop.marginBottom", &Settings_desktopMargin.bottom  },
 	{ NLS0("Left"),               "desktop.marginLeft",   &Settings_desktopMargin.left  },
@@ -368,21 +386,24 @@ const struct cfgmenu cfg_sub_dm[] = {
 	{ NULL }
 };
 
-const struct cfgmenu cfg_sub_focusmodel[] = {
+const struct cfgmenu cfg_sub_focusmodel[] =
+{
 	{ NLS0("Click To Focus"),     "focusModel ClickToFocus", Settings_focusModel },
 	{ NLS0("Sloppy Focus"),       "focusModel SloppyFocus",  Settings_focusModel },
 	{ NLS0("Auto Raise"),         "focusModel AutoRaise",    Settings_focusModel },
 	{ NULL }
 };
 
-const struct cfgmenu cfg_sub_snap[] = {
+const struct cfgmenu cfg_sub_snap[] =
+{
 	{ NLS0("Snap To Plugins"),    "snap.plugins", &Settings_edgeSnapPlugins },
 	{ NLS0("Padding"),            "snap.padding",  &Settings_edgeSnapPadding },
 	{ NLS0("Threshold"),          "snap.threshold", &Settings_edgeSnapThreshold },
 	{ NULL }
 };
 
-const struct cfgmenu cfg_sub_workspace[] = {
+const struct cfgmenu cfg_sub_workspace[] =
+{
 	{ NLS0("Follow Active Task"), "workspaces.followActive",    &Settings_followActive },
 	{ NLS0("Follow Moved Task"),  "workspaces.followMoved",      &Settings_followMoved },
 	{ NLS0("Restore To Current"), "workspaces.restoreToCurrent", &Settings_restoreToCurrent },
@@ -400,7 +421,7 @@ void RedrawConfigMenu(void)
 //===========================================================================
 
 static const struct cfgmenu * find_cfg_item(
-	const char *cmd, const struct cfgmenu *pmenu, const struct cfgmenu **pp_menu)
+				const char *cmd, const struct cfgmenu *pmenu, const struct cfgmenu **pp_menu)
 {
 	const struct cfgmenu *p;
 	for (p = pmenu; p->text; ++p)
@@ -411,17 +432,17 @@ static const struct cfgmenu * find_cfg_item(
 				return psub;
 		}
 		else
-		if (0==memicmp(cmd, p->command, strlen(p->command)))
-		{
-			*pp_menu = pmenu;
-			return p;
-		}
+			if (0==memicmp(cmd, p->command, strlen(p->command)))
+			{
+				*pp_menu = pmenu;
+				return p;
+			}
 	return NULL;
 }
 
 const void *exec_internal_broam(
-		const char *argument, const struct cfgmenu *menu_root,
-		const struct cfgmenu **p_menu, const struct cfgmenu**p_item)
+	const char *argument, const struct cfgmenu *menu_root,
+	const struct cfgmenu **p_menu, const struct cfgmenu**p_item)
 {
 	const void *v = NULL;
 
@@ -441,14 +462,14 @@ const void *exec_internal_broam(
 		strcpy((char *)v, argument);
 	}
 	else
-	if (get_int_item(v))
-	{
-		if (*argument) *(int*)v = atoi(argument);
-	}
-	else
-	{
-		set_bool((bool*)v, argument);
-	}
+		if (get_int_item(v))
+		{
+			if (*argument) *(int*)v = atoi(argument);
+		}
+		else
+		{
+			set_bool((bool*)v, argument);
+		}
 
 	// write to blackbox.rc or extensions.rc (automatic)
 	Settings_WriteRCSetting(v);
@@ -482,45 +503,45 @@ void exec_cfg_command(const char *argument)
 			PostMessage(BBhwnd, BB_REDRAWGUI, BBRG_MENU, 0);
 	}
 	else
-	if (cfg_sub_graphics == p_menu)
-	{
-		PostMessage(BBhwnd, BB_RECONFIGURE, 0, 0);
-		if (v == &Settings_smartWallpaper)
-			Desk_reset_rootCommand();
-	}
-	else
-	if (cfg_sub_dm == p_menu)
-	{
-		SetDesktopMargin(NULL, BB_DM_REFRESH, 0);
-	}
-	else
-	if (cfg_sub_workspace == p_menu)
-	{
-		Workspaces_Reconfigure();
-	}
-	else
-	if (v == Settings_focusModel)
-	{
-		set_focus_model(Settings_focusModel);
-	}
-	else
-	if (v == &Settings_opaqueMove)
-	{
-		set_opaquemove();
-	}
-	else
-	if (v == &Session_screensaverEnabled)
-	{
-		SetScreenSaverActive(Session_screensaverEnabled);
-	}
-	else
-	if (v == &Settings_toolbarEnabled)
-	{
-		if (Settings_toolbarEnabled)
-			beginToolbar(hMainInstance);
+		if (cfg_sub_graphics == p_menu)
+		{
+			PostMessage(BBhwnd, BB_RECONFIGURE, 0, 0);
+			if (v == &Settings_smartWallpaper)
+				Desk_reset_rootCommand();
+		}
 		else
-			endToolbar(hMainInstance);
-	}
+			if (cfg_sub_dm == p_menu)
+			{
+				SetDesktopMargin(NULL, BB_DM_REFRESH, 0);
+			}
+			else
+				if (cfg_sub_workspace == p_menu)
+				{
+					Workspaces_Reconfigure();
+				}
+				else
+					if (v == Settings_focusModel)
+					{
+						set_focus_model(Settings_focusModel);
+					}
+					else
+						if (v == &Settings_opaqueMove)
+						{
+							set_opaquemove();
+						}
+						else
+							if (v == &Session_screensaverEnabled)
+							{
+								SetScreenSaverActive(Session_screensaverEnabled);
+							}
+							else
+								if (v == &Settings_toolbarEnabled)
+								{
+									if (Settings_toolbarEnabled)
+										beginToolbar(hMainInstance);
+									else
+										endToolbar(hMainInstance);
+								}
 }
 
 //===========================================================================

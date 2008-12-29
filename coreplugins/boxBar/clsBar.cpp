@@ -133,7 +133,7 @@ clsBar::~clsBar()
 	DeleteObject(brushBitmap);
 	DeleteDC(buffer);
 	if (inSlit)
-			PostMessage(slitWnd, SLIT_REMOVE, 0, (LPARAM)barWnd);
+		PostMessage(slitWnd, SLIT_REMOVE, 0, (LPARAM)barWnd);
 	DestroyWindow(barWnd);
 	UnregisterClass(className, hInstance);
 }
@@ -198,44 +198,44 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		// Painting with a cached double-buffer.
 	case BOXBAR_REDRAW:
 	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hWnd, &ps);
+
+		if (!style)
 		{
-			PAINTSTRUCT ps;
-			HDC hdc = BeginPaint(hWnd, &ps);
-
-			if (!style)
-			{
-				FillRect(buffer, &itemArea, eraseBrush);
-			}
-
-			draw(buffer);
-			POINT dcPoint;
-			dcPoint.x = 0;
-			dcPoint.y = 0;
-			RECT windowRect;
-			GetWindowRect(barWnd, &windowRect);
-			POINT drawPoint;
-			drawPoint.x = windowRect.left;
-			drawPoint.y = windowRect.top;
-			SIZE drawSize;
-			drawSize.cx = windowRect.right - windowRect.left;
-			drawSize.cy = windowRect.bottom - windowRect.top;
-			if (user32.UpdateLayeredWindow && enableTransparency)
-			{
-				if (!user32.UpdateLayeredWindow(hWnd, GetDC(NULL), &drawPoint, &drawSize, buffer, &dcPoint, RGB(255, 0, 255), &barBlend, alphaDraw ? ULW_ALPHA : ULW_OPAQUE))
-				{
-					style = SN_TOOLBAR;
-					enableTransparency = false;
-				}
-			}
-			else
-				BitBlt(hdc, itemArea.left, itemArea.top,
-					   itemArea.right - itemArea.left, itemArea.bottom - itemArea.top,
-					   buffer, itemArea.left, itemArea.top, SRCCOPY);
-			EndPaint(hWnd, &ps);
-			break;
+			FillRect(buffer, &itemArea, eraseBrush);
 		}
 
-		//Taken from bbleanbar
+		draw(buffer);
+		POINT dcPoint;
+		dcPoint.x = 0;
+		dcPoint.y = 0;
+		RECT windowRect;
+		GetWindowRect(barWnd, &windowRect);
+		POINT drawPoint;
+		drawPoint.x = windowRect.left;
+		drawPoint.y = windowRect.top;
+		SIZE drawSize;
+		drawSize.cx = windowRect.right - windowRect.left;
+		drawSize.cy = windowRect.bottom - windowRect.top;
+		if (user32.UpdateLayeredWindow && enableTransparency)
+		{
+			if (!user32.UpdateLayeredWindow(hWnd, GetDC(NULL), &drawPoint, &drawSize, buffer, &dcPoint, RGB(255, 0, 255), &barBlend, alphaDraw ? ULW_ALPHA : ULW_OPAQUE))
+			{
+				style = SN_TOOLBAR;
+				enableTransparency = false;
+			}
+		}
+		else
+			BitBlt(hdc, itemArea.left, itemArea.top,
+				   itemArea.right - itemArea.left, itemArea.bottom - itemArea.top,
+				   buffer, itemArea.left, itemArea.top, SRCCOPY);
+		EndPaint(hWnd, &ps);
+		break;
+	}
+
+	//Taken from bbleanbar
 	case WM_MOUSEACTIVATE:
 		return MA_NOACTIVATE;
 
@@ -252,131 +252,131 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		// Blackbox sends Broams to all windows...
 
 	case BB_BROADCAST:
+	{
+		const char *msg_string = (LPCSTR)lParam;
+		TRACE(msg_string);
+		if (!strnicmp(msg_string, "@boxBar.percentage", strlen("@boxBar.percentage")))
 		{
-			const char *msg_string = (LPCSTR)lParam;
-			TRACE(msg_string);
-			if (!strnicmp(msg_string, "@boxBar.percentage", strlen("@boxBar.percentage")))
-			{
-				sizePercentage = atoi(msg_string + strlen("@boxBar.percentage"));
-				WriteInt(configFile, "boxBar.percentage:", sizePercentage);
-				calculateSizes();
-			}
-			else if (!strnicmp(msg_string, "@boxBar.vertical", strlen("@boxBar.vertical")))
-			{
-				vertical = !vertical;
-				WriteBool(configFile, "boxBar.vertical:", vertical);
-				resize(1, 1);
-				populateBar();
-				RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
-				PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
-			}
-			else if (toggleWithPlugins && (!stricmp(msg_string, "@BBHidePlugins")))
-			{
-				ShowWindow(barWnd, SW_HIDE);
-				SetDesktopMargin(hWnd, 0, 0);
-			}
-			else if (toggleWithPlugins && (!stricmp(msg_string, "@BBShowPlugins")))
-			{
-				ShowWindow(barWnd, SW_SHOW);
-				if (margin)
-					SetDesktopMargin(barWnd, marginEdge, margin);
-			}
-			break;
+			sizePercentage = atoi(msg_string + strlen("@boxBar.percentage"));
+			WriteInt(configFile, "boxBar.percentage:", sizePercentage);
+			calculateSizes();
 		}
-		// check general broams
-		/*if (!stricmp(msg_string, "@BBShowPlugins"))
+		else if (!strnicmp(msg_string, "@boxBar.vertical", strlen("@boxBar.vertical")))
 		{
-			if (my.is_hidden)
-			{
-				my.is_hidden = false;
-				ShowWindow(hwnd, SW_SHOWNA);
-			}
-			break;
+			vertical = !vertical;
+			WriteBool(configFile, "boxBar.vertical:", vertical);
+			resize(1, 1);
+			populateBar();
+			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
+			PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 		}
-
-		if (!stricmp(msg_string, "@BBHidePlugins"))
+		else if (toggleWithPlugins && (!stricmp(msg_string, "@BBHidePlugins")))
 		{
-			if (my.pluginToggle && NULL == my.hSlit)
-			{
-				my.is_hidden = true;
-				ShowWindow(hwnd, SW_HIDE);
-			}
-			break;
+			ShowWindow(barWnd, SW_HIDE);
+			SetDesktopMargin(hWnd, 0, 0);
 		}
-
-		// Our broadcast message prefix:
-		const char broam_prefix[] = "@bbSDK.";
-		const int broam_prefix_len = sizeof broam_prefix - 1; // minus terminating \0
-
-		// check broams sent from our own menu
-		if (!memicmp(msg_string, broam_prefix, broam_prefix_len))
+		else if (toggleWithPlugins && (!stricmp(msg_string, "@BBShowPlugins")))
 		{
-			msg_string += broam_prefix_len;
-			if (!stricmp(msg_string, "useSlit"))
-			{
-				eval_menu_cmd(M_BOL, &my.useSlit, msg_string);
-				break;
-			}
-
-			if (!stricmp(msg_string, "alwaysOnTop"))
-			{
-				eval_menu_cmd(M_BOL, &my.alwaysOnTop, msg_string);
-				break;
-			}
-
-			if (!stricmp(msg_string, "drawBorder"))
-			{
-				eval_menu_cmd(M_BOL, &my.drawBorder, msg_string);
-				break;
-			}
-
-			if (!stricmp(msg_string, "snapWindow"))
-			{
-				eval_menu_cmd(M_BOL, &my.snapWindow, msg_string);
-				break;
-			}
-
-			if (!stricmp(msg_string, "alphaEnabled"))
-			{
-				eval_menu_cmd(M_BOL, &my.alphaEnabled, msg_string);
-				break;
-			}
-
-			if (!my_substr_icmp(msg_string, "alphaValue"))
-			{
-				eval_menu_cmd(M_INT, &my.alphaValue, msg_string);
-				break;
-			}
-
-			if (!stricmp(msg_string, "pluginToggle"))
-			{
-				eval_menu_cmd(M_BOL, &my.pluginToggle, msg_string);
-				break;
-			}
-
-			if (!my_substr_icmp(msg_string, "windowText"))
-			{
-				eval_menu_cmd(M_STR, &my.window_text, msg_string);
-				break;
-			}
-
-			if (!stricmp(msg_string, "editRC"))
-			{
-				SendMessage(BBhwnd, BB_EDITFILE, (WPARAM) - 1, (LPARAM)rcpath);
-				break;
-			}
-
-			if (!stricmp(msg_string, "About"))
-			{
-				about_box();
-				break;
-			}
+			ShowWindow(barWnd, SW_SHOW);
+			if (margin)
+				SetDesktopMargin(barWnd, marginEdge, margin);
 		}
 		break;
+	}
+	// check general broams
+	/*if (!stricmp(msg_string, "@BBShowPlugins"))
+	{
+		if (my.is_hidden)
+		{
+			my.is_hidden = false;
+			ShowWindow(hwnd, SW_SHOWNA);
 		}
-		*/
-		// ----------------------------------------------------------
-		// prevent the user from closing the plugin with alt-F4
+		break;
+	}
+
+	if (!stricmp(msg_string, "@BBHidePlugins"))
+	{
+		if (my.pluginToggle && NULL == my.hSlit)
+		{
+			my.is_hidden = true;
+			ShowWindow(hwnd, SW_HIDE);
+		}
+		break;
+	}
+
+	// Our broadcast message prefix:
+	const char broam_prefix[] = "@bbSDK.";
+	const int broam_prefix_len = sizeof broam_prefix - 1; // minus terminating \0
+
+	// check broams sent from our own menu
+	if (!memicmp(msg_string, broam_prefix, broam_prefix_len))
+	{
+		msg_string += broam_prefix_len;
+		if (!stricmp(msg_string, "useSlit"))
+		{
+			eval_menu_cmd(M_BOL, &my.useSlit, msg_string);
+			break;
+		}
+
+		if (!stricmp(msg_string, "alwaysOnTop"))
+		{
+			eval_menu_cmd(M_BOL, &my.alwaysOnTop, msg_string);
+			break;
+		}
+
+		if (!stricmp(msg_string, "drawBorder"))
+		{
+			eval_menu_cmd(M_BOL, &my.drawBorder, msg_string);
+			break;
+		}
+
+		if (!stricmp(msg_string, "snapWindow"))
+		{
+			eval_menu_cmd(M_BOL, &my.snapWindow, msg_string);
+			break;
+		}
+
+		if (!stricmp(msg_string, "alphaEnabled"))
+		{
+			eval_menu_cmd(M_BOL, &my.alphaEnabled, msg_string);
+			break;
+		}
+
+		if (!my_substr_icmp(msg_string, "alphaValue"))
+		{
+			eval_menu_cmd(M_INT, &my.alphaValue, msg_string);
+			break;
+		}
+
+		if (!stricmp(msg_string, "pluginToggle"))
+		{
+			eval_menu_cmd(M_BOL, &my.pluginToggle, msg_string);
+			break;
+		}
+
+		if (!my_substr_icmp(msg_string, "windowText"))
+		{
+			eval_menu_cmd(M_STR, &my.window_text, msg_string);
+			break;
+		}
+
+		if (!stricmp(msg_string, "editRC"))
+		{
+			SendMessage(BBhwnd, BB_EDITFILE, (WPARAM) - 1, (LPARAM)rcpath);
+			break;
+		}
+
+		if (!stricmp(msg_string, "About"))
+		{
+			about_box();
+			break;
+		}
+	}
+	break;
+	}
+	*/
+	// ----------------------------------------------------------
+	// prevent the user from closing the plugin with alt-F4
 
 	case WM_CLOSE:
 		break;
@@ -388,113 +388,113 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_WINDOWPOSCHANGING:
-		{
-			WINDOWPOS* wp = (WINDOWPOS*)lParam;
-			SnapWindowToEdge(wp, 10, moving ? SNAP_FULLSCREEN : SNAP_FULLSCREEN | SNAP_SIZING);
-		}
-		break;
+	{
+		WINDOWPOS* wp = (WINDOWPOS*)lParam;
+		SnapWindowToEdge(wp, 10, moving ? SNAP_FULLSCREEN : SNAP_FULLSCREEN | SNAP_SIZING);
+	}
+	break;
 
 	case WM_WINDOWPOSCHANGED:
+	{
+		WINDOWPOS* wp = (WINDOWPOS*)lParam;
+		RECT monRect;
+		GetMonitorRect(hWnd, &monRect, GETMON_FROM_WINDOW);
+		int leftthirdX = (monRect.right + 2 * monRect.left) / 3;
+		int rightthirdX = (2 * monRect.right + monRect.left) / 3;
+		if ((wp->x > rightthirdX) || ((wp->x + wp->cx) == monRect.right))
 		{
-			WINDOWPOS* wp = (WINDOWPOS*)lParam;
-			RECT monRect;
-			GetMonitorRect(hWnd, &monRect, GETMON_FROM_WINDOW);
-			int leftthirdX = (monRect.right + 2 * monRect.left) / 3;
-			int rightthirdX = (2 * monRect.right + monRect.left) / 3;
-			if ((wp->x > rightthirdX) || ((wp->x + wp->cx) == monRect.right))
+			barLocation = POS_RIGHT;
+			WriteInt(configFile, "boxBar.x:", wp->x + wp->cx);
+		}
+		else
+		{
+			if (wp->x > leftthirdX)
 			{
-				barLocation = POS_RIGHT;
-				WriteInt(configFile, "boxBar.x:", wp->x + wp->cx);
+				barLocation = POS_CENTER;
+				WriteInt(configFile, "boxBar.x:", wp->x + wp->cx / 2);
 			}
 			else
 			{
-				if (wp->x > leftthirdX)
-				{
-					barLocation = POS_CENTER;
-					WriteInt(configFile, "boxBar.x:", wp->x + wp->cx / 2);
-				}
-				else
-				{
-					barLocation = POS_LEFT;
-					WriteInt(configFile, "boxBar.x:", wp->x);
-				}
+				barLocation = POS_LEFT;
+				WriteInt(configFile, "boxBar.x:", wp->x);
 			}
-			int third1Y = (monRect.bottom + 2 * monRect.top) / 3;
-			int third2Y = (2 * monRect.bottom + monRect.top) / 3;
-			if ((wp->y > third2Y) || ((wp->y + wp->cy) == monRect.bottom))
+		}
+		int third1Y = (monRect.bottom + 2 * monRect.top) / 3;
+		int third2Y = (2 * monRect.bottom + monRect.top) / 3;
+		if ((wp->y > third2Y) || ((wp->y + wp->cy) == monRect.bottom))
+		{
+			barLocation += POS_BOTTOM;
+			WriteInt(configFile, "boxBar.y:", wp->y + wp->cy);
+		}
+		else
+		{
+			if (wp->y > third1Y)
 			{
-				barLocation += POS_BOTTOM;
-				WriteInt(configFile, "boxBar.y:", wp->y + wp->cy);
+				barLocation += POS_VCENTER;
+				WriteInt(configFile, "boxBar.y:", wp->y + wp->cy / 2);
 			}
 			else
 			{
-				if (wp->y > third1Y)
-				{
-					barLocation += POS_VCENTER;
-					WriteInt(configFile, "boxBar.y:", wp->y + wp->cy / 2);
-				}
-				else
-				{
-					barLocation += POS_TOP;
-					WriteInt(configFile, "boxBar.y:", wp->y);
-				}
+				barLocation += POS_TOP;
+				WriteInt(configFile, "boxBar.y:", wp->y);
 			}
-			if (setMargin)
-			{
-				if (vertical)
-				{
-					if (barLocation & POS_RIGHT)
-					{
-						margin = monRect.right - wp->x;
-						marginEdge = BB_DM_RIGHT;
-					}
-					else if (barLocation & POS_LEFT)
-					{
-						margin = wp->x + wp->cx;
-						marginEdge = BB_DM_LEFT;
-					}
-					else
-						margin = 0;
-				}
-				else
-				{
-					if (barLocation & POS_BOTTOM)
-					{
-						margin = monRect.bottom - wp->y;
-						marginEdge = BB_DM_BOTTOM;
-					}
-					else if (barLocation & POS_TOP)
-					{
-						margin = wp->y + wp->cy;
-						marginEdge = BB_DM_TOP;
-					}
-					else
-						margin = 0;
-				}
-				//if (margin)
-				//	SetDesktopMargin(barWnd, marginEdge, margin);
-			}
-			UINT barEdge;
+		}
+		if (setMargin)
+		{
 			if (vertical)
 			{
-				int mid = (monRect.right + monRect.left) / 2;
-				if (wp->x > mid)
-					barEdge = ABE_RIGHT;
+				if (barLocation & POS_RIGHT)
+				{
+					margin = monRect.right - wp->x;
+					marginEdge = BB_DM_RIGHT;
+				}
+				else if (barLocation & POS_LEFT)
+				{
+					margin = wp->x + wp->cx;
+					marginEdge = BB_DM_LEFT;
+				}
 				else
-					barEdge = ABE_LEFT;
+					margin = 0;
 			}
 			else
 			{
-				int mid = (monRect.bottom + monRect.top) / 2;
-				if (wp->y > mid)
-					barEdge = ABE_BOTTOM;
+				if (barLocation & POS_BOTTOM)
+				{
+					margin = monRect.bottom - wp->y;
+					marginEdge = BB_DM_BOTTOM;
+				}
+				else if (barLocation & POS_TOP)
+				{
+					margin = wp->y + wp->cy;
+					marginEdge = BB_DM_TOP;
+				}
 				else
-					barEdge = ABE_TOP;
+					margin = 0;
 			}
-			if (hasTray && SetTaskbarPos)
-				SetTaskbarPos(wp->x, wp->y, wp->x + wp->cx, wp->y + wp->cy, barEdge);
+			//if (margin)
+			//	SetDesktopMargin(barWnd, marginEdge, margin);
 		}
-		break;
+		UINT barEdge;
+		if (vertical)
+		{
+			int mid = (monRect.right + monRect.left) / 2;
+			if (wp->x > mid)
+				barEdge = ABE_RIGHT;
+			else
+				barEdge = ABE_LEFT;
+		}
+		else
+		{
+			int mid = (monRect.bottom + monRect.top) / 2;
+			if (wp->y > mid)
+				barEdge = ABE_BOTTOM;
+			else
+				barEdge = ABE_TOP;
+		}
+		if (hasTray && SetTaskbarPos)
+			SetTaskbarPos(wp->x, wp->y, wp->x + wp->cx, wp->y + wp->cy, barEdge);
+	}
+	break;
 	case WM_LBUTTONDOWN:
 		if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
 		{

@@ -45,23 +45,23 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_RBUTTONDBLCLK:
 	case WM_MBUTTONDBLCLK:
 	case WM_MOUSELEAVE:
+	{
+		if (msg == WM_MOUSELEAVE)
+			popupVisible = false;
+		POINT mousePos;
+		mousePos.x = LOWORD(lParam);
+		mousePos.y = HIWORD(lParam);
+		ClientToScreen(hWnd, &mousePos);
+		LPARAM lParamNew = MAKELPARAM(mousePos.x, mousePos.y);
+		if (TrayIconEvent)
+			return TrayIconEvent(iconWnd, iconID, msg, wParam, lParamNew);
+		else
 		{
-			if (msg == WM_MOUSELEAVE)
-				popupVisible = false;
-			POINT mousePos;
-			mousePos.x = LOWORD(lParam);
-			mousePos.y = HIWORD(lParam);
-			ClientToScreen(hWnd, &mousePos);
-			LPARAM lParamNew = MAKELPARAM(mousePos.x, mousePos.y);
-			if (TrayIconEvent)
-				return TrayIconEvent(iconWnd, iconID, msg, wParam, lParamNew);
-			else
-			{
-				SendNotifyMessage(iconWnd, iconCallback, iconID, msg);
+			SendNotifyMessage(iconWnd, iconCallback, iconID, msg);
 //				dbg_printf("No TrayIconEvent");
-				return 0;
-			}
+			return 0;
 		}
+	}
 	case BB_TRAYUPDATE:
 		switch (lParam)
 		{

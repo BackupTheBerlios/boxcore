@@ -75,8 +75,14 @@ public:
 	ShellContext(BOOL *, LPCITEMIDLIST);
 	int ShellMenu(void);
 	void Invoke(int nCmd);
-	void decref(void) { if (0==--refc) delete this; }
-	void addref(void) { ++refc; }
+	void decref(void)
+	{
+		if (0==--refc) delete this;
+	}
+	void addref(void)
+	{
+		++refc;
+	}
 	HRESULT HandleMenuMsg(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		return ((LPCONTEXTMENU2)pContextMenu)->HandleMenuMsg(uMsg, wParam, lParam);
@@ -108,9 +114,9 @@ ShellContext::ShellContext(BOOL *r, LPCITEMIDLIST pidl)
 	{
 		hMenu = CreatePopupMenu();
 		HRESULT hr = pContextMenu->QueryContextMenu(
-			hMenu, 0, MIN_SHELL_ID, MAX_SHELL_ID,
-			CMF_EXPLORE|CMF_CANRENAME//|CMF_EXTENDEDVERBS
-			);
+						 hMenu, 0, MIN_SHELL_ID, MAX_SHELL_ID,
+						 CMF_EXPLORE|CMF_CANRENAME//|CMF_EXTENDEDVERBS
+					 );
 
 		if (SUCCEEDED(hr))
 		{
@@ -134,7 +140,9 @@ void ShellContext::Invoke(int nCmd)
 	HRESULT hr = S_OK;
 	if (19 == nCmd) // rename
 	{
-		char oldName[256]; char newName[256]; WCHAR newNameW[256];
+		char oldName[256];
+		char newName[256];
+		WCHAR newNameW[256];
 		sh_get_displayname(psfFolder, pidlItem, SHGDN_NORMAL, oldName);
 		if (IDOK == EditBox("bbLean", "Enter new name:", oldName, newName))
 		{
@@ -181,11 +189,11 @@ int ShellContext::ShellMenu()
 	g_pOldWndProc = (WNDPROC)SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)HookWndProc);
 
 	int nCmd = TrackPopupMenu (hMenu,
-		  TPM_LEFTALIGN
-		| TPM_LEFTBUTTON
-		| TPM_RIGHTBUTTON
-		| TPM_RETURNCMD,
-		point.x, point.y, 0, hwnd, NULL);
+							   TPM_LEFTALIGN
+							   | TPM_LEFTBUTTON
+							   | TPM_RIGHTBUTTON
+							   | TPM_RETURNCMD,
+							   point.x, point.y, 0, hwnd, NULL);
 
 	SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)g_pOldWndProc);
 	return nCmd;
@@ -193,19 +201,19 @@ int ShellContext::ShellMenu()
 
 LRESULT CALLBACK ShellContext::HookWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-   switch (msg)
-   {
-	   case WM_DRAWITEM:
-	   case WM_MEASUREITEM:
-			if(wParam) break; // not menu related
-			g_pIContext2->HandleMenuMsg(msg, wParam, lParam);
-			return TRUE; // handled
+	switch (msg)
+	{
+	case WM_DRAWITEM:
+	case WM_MEASUREITEM:
+		if (wParam) break; // not menu related
+		g_pIContext2->HandleMenuMsg(msg, wParam, lParam);
+		return TRUE; // handled
 
-	   case WM_INITMENUPOPUP: // this will fill the "open with" / "send to" menus
-			g_pIContext2->HandleMenuMsg(msg, wParam, lParam);
-			return 0;
-   }
-   return CallWindowProc(g_pOldWndProc, hWnd, msg, wParam, lParam);
+	case WM_INITMENUPOPUP: // this will fill the "open with" / "send to" menus
+		g_pIContext2->HandleMenuMsg(msg, wParam, lParam);
+		return 0;
+	}
+	return CallWindowProc(g_pOldWndProc, hWnd, msg, wParam, lParam);
 }
 
 //===========================================================================
@@ -295,7 +303,8 @@ void ODTitleItem::Measure(HDC hDC, SIZE *size)
 	SelectObject(buf, MenuInfo.hTitleFont);
 	HBRUSH hbr;
 
-	dis.rcItem.top = 0; dis.rcItem.bottom = h;
+	dis.rcItem.top = 0;
+	dis.rcItem.bottom = h;
 	SetBkColor(buf, CR_BLACK);
 	SetTextColor(buf, CR_WHITE);
 	hbr = CreateSolidBrush(CR_BLACK);
@@ -303,7 +312,8 @@ void ODTitleItem::Measure(HDC hDC, SIZE *size)
 	DeleteObject(hbr);
 	Ctxt->wc->HandleMenuMsg(WM_DRAWITEM, 0, (LPARAM)&dis);
 
-	dis.rcItem.top = h; dis.rcItem.bottom = h * 2;
+	dis.rcItem.top = h;
+	dis.rcItem.bottom = h * 2;
 	SetBkColor(buf, CR_BLACK);
 	SetTextColor(buf, CR_BLACK);
 	hbr = CreateSolidBrush(CR_BLACK);
@@ -359,20 +369,23 @@ void ODTitleItem::DrawTextFromBitmap(HDC buf, HDC hDC, COLORREF cr_txt, int left
 			{
 				int leftx = left + x;
 				int topy = top + y;
-				if(CR_WHITE == cr_srcB && CR_BLACK == cr_srcW)
+				if (CR_WHITE == cr_srcB && CR_BLACK == cr_srcW)
 					SetPixel(hDC, leftx, topy, cr_txt);
 				else
 				{
 					COLORREF cr_des = GetPixel(hDC, leftx, topy);
 					int hue, red, green, blue;
 
-					hue = GetRValue(cr_srcW); hue -= (hue + GetRValue(cr_srcB) - 255) * grayS / 0x2FD;
+					hue = GetRValue(cr_srcW);
+					hue -= (hue + GetRValue(cr_srcB) - 255) * grayS / 0x2FD;
 					red = (redS * (255 - hue) + GetRValue(cr_des) * hue) / 255;
 
-					hue = GetGValue(cr_srcW); hue -= (hue + GetGValue(cr_srcB) - 255) * grayS / 0x2FD;
+					hue = GetGValue(cr_srcW);
+					hue -= (hue + GetGValue(cr_srcB) - 255) * grayS / 0x2FD;
 					green = (greenS * (255 - hue) + GetGValue(cr_des) * hue) / 255;
 
-					hue = GetBValue(cr_srcW); hue -= (hue + GetBValue(cr_srcB) - 255) * grayS / 0x2FD;
+					hue = GetBValue(cr_srcW);
+					hue -= (hue + GetBValue(cr_srcB) - 255) * grayS / 0x2FD;
 					blue = (blueS * (255 - hue) + GetBValue(cr_des) * hue) / 255;
 
 					SetPixel(hDC, leftx, topy, RGB(red, green, blue));
@@ -385,7 +398,8 @@ void ODTitleItem::Paint(HDC hDC)
 {
 	TitleItem::Paint(hDC);
 
-	RECT r; GetItemRect(&r);
+	RECT r;
+	GetItemRect(&r);
 	int w =  r.right  - r.left;
 	int h =  r.bottom - r.top;
 	// the remaining margin
@@ -399,8 +413,8 @@ void ODTitleItem::Paint(HDC hDC)
 	if (mStyle.MenuTitle.Justify == DT_CENTER)
 		m /= 2;
 	else
-	if (mStyle.MenuTitle.Justify != DT_RIGHT)
-		m = 0;
+		if (mStyle.MenuTitle.Justify != DT_RIGHT)
+			m = 0;
 
 	if (mStyle.MenuTitle.ShadowXY)
 		DrawTextFromBitmap(buf, hDC, mStyle.MenuTitle.ShadowColor, r.left + m + mStyle.MenuTitle.ShadowX, r.top + mStyle.MenuTitle.ShadowY, tw, h);
@@ -411,7 +425,7 @@ void ODTitleItem::Paint(HDC hDC)
 }
 
 ContextMenu::ContextMenu (LPCSTR title, class ShellContext* w, HMENU hm, int m, int id, DWORD data)
-	: Menu (title)
+		: Menu (title)
 {
 	m_MenuID = MENU_ID_SHCONTEXT;
 	(wc=w)->addref();
@@ -432,7 +446,7 @@ ContextMenu::~ContextMenu()
 }
 
 ContextItem::ContextItem(Menu *m, LPSTR pszTitle, int id, DWORD data, UINT type)
-	: FolderItem(m, pszTitle)
+		: FolderItem(m, pszTitle)
 {
 	m_id   = id;
 	m_data = data;
@@ -453,7 +467,8 @@ ContextItem::~ContextItem()
 //===========================================================================
 void ContextMenu::Copymenu (HMENU hm)
 {
-	char text_string[256]; int n, c = GetMenuItemCount (hm);
+	char text_string[256];
+	int n, c = GetMenuItemCount (hm);
 	for (n = 0; n < c; n++)
 	{
 		MENUITEMINFO info;
@@ -476,11 +491,11 @@ void ContextMenu::Copymenu (HMENU hm)
 			CM = new ContextMenu(text_string, wc, info.hSubMenu, 0, id, info.dwItemData);
 		}
 		else
-		if (info.fType & MFT_SEPARATOR)
-		{
-			MakeMenuNOP(this, NULL)->m_isNOP = MI_NOP_SEP | MI_NOP_LINE;
-			continue;
-		}
+			if (info.fType & MFT_SEPARATOR)
+			{
+				MakeMenuNOP(this, NULL)->m_isNOP = MI_NOP_SEP | MI_NOP_LINE;
+				continue;
+			}
 
 		MenuItem *CI = new ContextItem(CM, text_string, id, info.dwItemData, info.fType);
 		AddMenuItem(CI);
@@ -539,16 +554,20 @@ void ContextItem::DrawItemToBitmap(HDC buf, int w, int h, bool active)
 	int y = 0;
 	HGDIOBJ otherfont = SelectObject(buf, MenuInfo.hFrameFont);
 
-	dis.rcItem.top = y; dis.rcItem.bottom = y += h;
+	dis.rcItem.top = y;
+	dis.rcItem.bottom = y += h;
 	DrawItem(buf, Ctxt, &dis, CR_BLACK, CR_WHITE);
 
-	dis.rcItem.top = y; dis.rcItem.bottom = y += h;
+	dis.rcItem.top = y;
+	dis.rcItem.bottom = y += h;
 	DrawItem(buf, Ctxt, &dis, CR_BLACK, CR_BLACK);
 
-	dis.rcItem.top = y; dis.rcItem.bottom = y += h;
+	dis.rcItem.top = y;
+	dis.rcItem.bottom = y += h;
 	DrawItem(buf, Ctxt, &dis, CR_WHITE, CR_BLACK);
 
-	dis.rcItem.top = y; dis.rcItem.bottom = y + h;
+	dis.rcItem.top = y;
+	dis.rcItem.bottom = y + h;
 	DrawItem(buf, Ctxt, &dis, CR_WHITE, CR_WHITE);
 
 	SelectObject(buf, otherfont);
@@ -616,14 +635,14 @@ void ContextItem::Measure(HDC hDC, SIZE *size)
 	for (x = MAX_ICONMARGE, ok = true; ok && --x;)
 		for (y = h; ok && y < h2 ; ++y)
 			ok = CR_BLACK == GetPixel(buf, x, y)
-			  && CR_WHITE == GetPixel(buf, x, y + h2);
+				 && CR_WHITE == GetPixel(buf, x, y + h2);
 	right = x + 1;
 
 	// find left border of icon
 	for (ok = true, x = 0; ok && (x < right); ++x)
 		for (y = h; ok && y < h2 ; ++y)
 			ok = CR_BLACK == GetPixel(buf, x, y)
-			  && CR_WHITE == GetPixel(buf, x, y + h2);
+				 && CR_WHITE == GetPixel(buf, x, y + h2);
 	left = --x;
 
 	// find offset of text
@@ -638,13 +657,13 @@ void ContextItem::Measure(HDC hDC, SIZE *size)
 		for (ok = true, y = h; ok && y < h2; ++y)
 			for (x = left; ok && x < right ; ++x)
 				ok = CR_BLACK == GetPixel(buf, x, y)
-				  && CR_WHITE == GetPixel(buf, x, y + h2);
+					 && CR_WHITE == GetPixel(buf, x, y + h2);
 		top = --y;
 
 		for (ok = true, y = h2 - 1; ok && y > top; --y)
 			for (x = left; ok && x < right ; ++x)
 				ok = CR_BLACK == GetPixel(buf, x, y)
-				  && CR_WHITE == GetPixel(buf, x, y + h2);
+					 && CR_WHITE == GetPixel(buf, x, y + h2);
 		bottom = y + 2;
 
 		height = bottom - top;
@@ -657,9 +676,9 @@ void ContextItem::Measure(HDC hDC, SIZE *size)
 		m_rIcon.right  = right + stretchWidth;
 		m_rIcon.bottom = h + stretchHeight;
 		StretchBlt(buf, right, h, stretchWidth, stretchHeight,
-			buf, left, top, width, height, SRCCOPY);
+				   buf, left, top, width, height, SRCCOPY);
 		StretchBlt(buf, right, h3, stretchWidth, stretchHeight,
-			buf, left, top + h2, width, height, SRCCOPY);
+				   buf, left, top + h2, width, height, SRCCOPY);
 	}
 
 	SelectObject(buf, other_bmp);
@@ -691,20 +710,23 @@ void ContextItem::DrawTextFromBitmap(HDC buf, HDC hDC, COLORREF cr_txt, int left
 			{
 				int leftx = left + x;
 				int topy = top + y;
-				if(CR_WHITE == cr_srcB && CR_BLACK == cr_srcW)
+				if (CR_WHITE == cr_srcB && CR_BLACK == cr_srcW)
 					SetPixel(hDC, leftx, topy, cr_txt);
 				else
 				{
 					COLORREF cr_des = GetPixel(hDC, leftx, topy);
 					int hue, red, green, blue;
 
-					hue = GetRValue(cr_srcW); hue -= (hue + GetRValue(cr_srcB) - 255) * grayS / 0x2FD;
+					hue = GetRValue(cr_srcW);
+					hue -= (hue + GetRValue(cr_srcB) - 255) * grayS / 0x2FD;
 					red = (redS * (255 - hue) + GetRValue(cr_des) * hue) / 255;
 
-					hue = GetGValue(cr_srcW); hue -= (hue + GetGValue(cr_srcB) - 255) * grayS / 0x2FD;
+					hue = GetGValue(cr_srcW);
+					hue -= (hue + GetGValue(cr_srcB) - 255) * grayS / 0x2FD;
 					green = (greenS * (255 - hue) + GetGValue(cr_des) * hue) / 255;
 
-					hue = GetBValue(cr_srcW); hue -= (hue + GetBValue(cr_srcB) - 255) * grayS / 0x2FD;
+					hue = GetBValue(cr_srcW);
+					hue -= (hue + GetBValue(cr_srcB) - 255) * grayS / 0x2FD;
 					blue = (blueS * (255 - hue) + GetBValue(cr_des) * hue) / 255;
 
 					SetPixel(hDC, leftx, topy, RGB(red, green, blue));
@@ -777,7 +799,8 @@ void ContextItem::Paint(HDC hDC)
 
 	int is = m_pMenu->m_iconSize;
 	if (-2 == is) is = MenuInfo.nIconSize;
-	RECT r; GetTextRect(&r, is);
+	RECT r;
+	GetTextRect(&r, is);
 	int w =  r.right  - r.left;
 	int h =  r.bottom - r.top;
 	// the remaining margin
@@ -791,15 +814,15 @@ void ContextItem::Paint(HDC hDC)
 	if (mStyle.MenuFrame.Justify == DT_CENTER)
 		m /= 2;
 	else
-	if (mStyle.MenuFrame.Justify != DT_RIGHT)
-		m = 0;
+		if (mStyle.MenuFrame.Justify != DT_RIGHT)
+			m = 0;
 
 	// draw icon
 	if (is)
 		DrawIconFromBitmap(buf, hDC,
-			((DT_LEFT == FolderItem::m_nBulletPosition)? r.right : (r.left - MenuInfo.nItemIndent[is])) + (MenuInfo.nItemIndent[is] - m_rIcon.right + m_rIcon.left) / 2,
-			r.top + (h - m_rIcon.bottom + m_rIcon.top) / 2,
-			h);
+						   ((DT_LEFT == FolderItem::m_nBulletPosition)? r.right : (r.left - MenuInfo.nItemIndent[is])) + (MenuInfo.nItemIndent[is] - m_rIcon.right + m_rIcon.left) / 2,
+						   r.top + (h - m_rIcon.bottom + m_rIcon.top) / 2,
+						   h);
 
 	// draw text
 	StyleItem *pSI = m_bActive ? &mStyle.MenuHilite : &mStyle.MenuFrame;
@@ -829,8 +852,8 @@ Menu *GetContextMenu(LPCITEMIDLIST pidl)
 	ShellContext *wc = new ShellContext(&r, pidl);
 	if (FALSE==r)
 	{
-	   delete wc;
-	   return NULL;
+		delete wc;
+		return NULL;
 	}
 
 	if (Settings_shellContextMenu)
@@ -841,7 +864,8 @@ Menu *GetContextMenu(LPCITEMIDLIST pidl)
 		return NULL;
 	}
 
-	char buffer[MAX_PATH]; sh_getdisplayname(pidl, buffer);
+	char buffer[MAX_PATH];
+	sh_getdisplayname(pidl, buffer);
 	return new ContextMenu(buffer, wc, wc->hMenu, 1);
 }
 

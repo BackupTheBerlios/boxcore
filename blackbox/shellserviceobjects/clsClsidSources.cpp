@@ -117,11 +117,11 @@ CLSID clsClsidRegKeys::getNextCLSID()
 
 	do
 	{
-	if (ERROR_SUCCESS != RegEnumKeyExW(regKey, index, szCLSID, &cbCLSID, NULL, NULL, NULL, NULL))
-		return CLSID_NULL;
+		if (ERROR_SUCCESS != RegEnumKeyExW(regKey, index, szCLSID, &cbCLSID, NULL, NULL, NULL, NULL))
+			return CLSID_NULL;
 
-	CLSIDFromString(szCLSID, &clsid);
-	index++;
+		CLSIDFromString(szCLSID, &clsid);
+		index++;
 	}
 	while (!inWhitelist(clsid));
 

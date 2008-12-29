@@ -160,7 +160,12 @@ static const char *rtl_libs   [] =
 ////////////////////////////////////////////////////////
 void init_runtime_libs(void)
 {
-	struct proc_info { const char *lib; const char *procname; void *procadr; };
+	struct proc_info
+	{
+		const char *lib;
+		const char *procname;
+		void *procadr;
+	};
 
 	static struct proc_info rtl_list [] =
 	{
@@ -197,13 +202,15 @@ void init_runtime_libs(void)
 	struct proc_info *rtl_ptr = rtl_list;
 
 	if (underExplorer
-		|| FindWindow("Progman", NULL)
-		|| false == ReadBool(extensionsrcPath(), "blackbox.options.enableDDE:", true))
+			|| FindWindow("Progman", NULL)
+			|| false == ReadBool(extensionsrcPath(), "blackbox.options.enableDDE:", true))
 		++rtl_ptr; // skip 'ShellDDEInit'
 
-	do {
+	do
+	{
 		*(FARPROC*)rtl_ptr->procadr = GetProcAddress(LoadLibrary(rtl_ptr->lib), rtl_ptr->procname);
-	} while ((++rtl_ptr)->lib);
+	}
+	while ((++rtl_ptr)->lib);
 
 	if (pShellDDEInit) pShellDDEInit(TRUE);
 }
@@ -212,7 +219,8 @@ void exit_runtime_libs(void)
 {
 	if (pShellDDEInit) pShellDDEInit(FALSE);
 	const char **p = rtl_libs;
-	do FreeLibrary(GetModuleHandle(*p)); while (*++p);
+	do FreeLibrary(GetModuleHandle(*p));
+	while (*++p);
 }
 
 void register_shellhook(HWND hwnd)
@@ -258,25 +266,25 @@ void broadcastMod()
 void bb_about(void)
 {
 	BBMessageBox(MB_OK,
-	"%s - © 2003-2005 grischka, © 2008 carsomyr"
-	"\n%s",
-	GetBBVersion(),
-	NLS2("$BBAbout$",
-		"Based stylistically on the Blackbox window manager for Linux by Brad Hughes\n\n"
-		"Built at " __DATE__ " " __TIME__ "\n"
-		"\n"
-		"\nSwitches:"
-		"\n-help  \t\tShow this text"
-		"\n-install       \tInstall Blackbox as default shell"
-		"\n-uninstall     \tReset Explorer as default shell"
-		"\n-nostartup     \tDo not run startup programs"
-		"\n-rc <path>     \tSpecify alternate blackbox.rc path"
-		"\n-exec <broam>  \tSend broadcast message to running shell"
-		"\n"
-		"\nMore information about bbLean and Blackbox for Windows can be found here:"
-		"\nhttp://bb4win.sourceforge.net/bblean/"
-		"\nhttp://bb4win.org/"
-		));
+				 "%s - © 2003-2005 grischka, © 2008 carsomyr"
+				 "\n%s",
+				 GetBBVersion(),
+				 NLS2("$BBAbout$",
+					  "Based stylistically on the Blackbox window manager for Linux by Brad Hughes\n\n"
+					  "Built at " __DATE__ " " __TIME__ "\n"
+					  "\n"
+					  "\nSwitches:"
+					  "\n-help  \t\tShow this text"
+					  "\n-install       \tInstall Blackbox as default shell"
+					  "\n-uninstall     \tReset Explorer as default shell"
+					  "\n-nostartup     \tDo not run startup programs"
+					  "\n-rc <path>     \tSpecify alternate blackbox.rc path"
+					  "\n-exec <broam>  \tSend broadcast message to running shell"
+					  "\n"
+					  "\nMore information about bbLean and Blackbox for Windows can be found here:"
+					  "\nhttp://bb4win.sourceforge.net/bblean/"
+					  "\nhttp://bb4win.org/"
+					 ));
 
 }
 
@@ -295,10 +303,11 @@ bool check_options (LPCSTR lpCmdLine)
 			NULL
 		};
 
-		char option[MAX_PATH]; NextToken(option, &lpCmdLine);
+		char option[MAX_PATH];
+		NextToken(option, &lpCmdLine);
 
 		if (option[0] == '-') switch (get_string_index(&option[1], options))
-		{
+			{
 			case 0:
 				bb_about();
 				return true;
@@ -313,7 +322,8 @@ bool check_options (LPCSTR lpCmdLine)
 				const char *msg = "Blackbox not running.";
 				if (BBhwnd)
 				{
-					MSG m; PeekMessage(&m, NULL, 0, 0, PM_NOREMOVE);
+					MSG m;
+					PeekMessage(&m, NULL, 0, 0, PM_NOREMOVE);
 					if (BBSendData(BBhwnd, BB_EXECUTE, 0, lpCmdLine, -1))
 						return true;
 					msg = "No response from Blackbox.";
@@ -344,7 +354,7 @@ bool check_options (LPCSTR lpCmdLine)
 			case 9:
 				installBlackbox(true);
 				return true;
-		}
+			}
 		BBMessageBox(MB_OK, "Unknown commandline option: %s\t", option);
 		return true;
 	}
@@ -360,7 +370,7 @@ vector<ATOM> atomList;
 void InitApiExtensions()
 {
 	int numAtoms = sizeof(atomNames) / sizeof(wchar_t *);
-	for(int i=0;i<numAtoms;++i)
+	for (int i=0;i<numAtoms;++i)
 		atomList.push_back(GlobalAddAtomW(atomNames[i]));
 }
 
@@ -369,7 +379,7 @@ void InitApiExtensions()
   */
 void RemoveApiExtensions()
 {
-	for(unsigned int i = 0; i < atomList.size(); ++i)
+	for (unsigned int i = 0; i < atomList.size(); ++i)
 		GlobalDeleteAtom(atomList[i]);
 }
 
@@ -400,8 +410,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	while (BBhwnd)
 	{
 		if (IDCANCEL == BBMessageBox(MB_RETRYCANCEL,
-				NLS2("$BBError_StartedTwice$",
-					"***  Blackbox already running  ***")))
+									 NLS2("$BBError_StartedTwice$",
+										  "***  Blackbox already running  ***")))
 			return 0;
 		BBhwnd = FindWindow(szBlackboxClass, szBlackboxName);
 	}
@@ -431,10 +441,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	// ------------------------------------------
 	/* WinNT based systems only: */
-/*
-	if (false == underExplorer && pSetProcessShutdownParameters)
-		pSetProcessShutdownParameters(2, 0);
-*/
+	/*
+		if (false == underExplorer && pSetProcessShutdownParameters)
+			pSetProcessShutdownParameters(2, 0);
+	*/
 	// ------------------------------------------
 	/* get things going... */
 	HideExplorer();
@@ -456,10 +466,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	WPARAM RetCode;
 
-#ifdef BBOPT_STACKDUMP
-	__try {
-#endif
-
 	/* reset desktop margins */
 	SetDesktopMargin(NULL, BB_DM_RESET, 0);
 	MessageManager_Init();
@@ -478,7 +484,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		NULL,
 		hMainInstance,
 		NULL
-		);
+	);
 
 	// ------------------------------------------
 	/* This seems to inizialize some things and free some memory at startup. */
@@ -487,12 +493,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	/* Hack to terminate the XP welcome screen... */
 	HANDLE hSRE;
 	hSRE = OpenEvent(EVENT_MODIFY_STATE, FALSE, "Global\\msgina: ShellReadyEvent");
-	if (hSRE) { SetEvent(hSRE), CloseHandle(hSRE); }
+	if (hSRE)
+	{
+		SetEvent(hSRE), CloseHandle(hSRE);
+	}
 	hSRE = OpenEvent(EVENT_MODIFY_STATE, FALSE, "msgina: ShellReadyEvent");
-	if (hSRE) { SetEvent(hSRE), CloseHandle(hSRE); }
+	if (hSRE)
+	{
+		SetEvent(hSRE), CloseHandle(hSRE);
+	}
 	//Terminate the vista welcome screen?
 	hSRE = OpenEvent(EVENT_MODIFY_STATE, FALSE, "ShellDesktopSwitchEvent");
-	if (hSRE) { SetEvent(hSRE), CloseHandle(hSRE); }
+	if (hSRE)
+	{
+		SetEvent(hSRE), CloseHandle(hSRE);
+	}
 	/*hSRE = CreateEvent(NULL, 0, 0, "ShellReadyEvent");
 	if (hSRE) { SetEvent(hSRE); }*/
 
@@ -516,21 +531,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	if (!underExplorer)
 	{
-	if (SystemInfo.isOsVista())
-	{
-		clsClsidInjected vistaInject(L"{730F6CDC-2C86-11D2-8773-92E220524153}");
-		clsClsidRegKeys vistaKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\explorer\\ShellServiceObjects");
-		vector<wstring> vistaWhitelist;
-		vistaWhitelist.push_back(L"{7007ACCF-3202-11D1-AAD2-00805FC1270E}");
-		vistaKey.setWhitelist(vistaWhitelist);
-		ShellServiceObjectsManager.startServiceObjects(vistaInject);
-		ShellServiceObjectsManager.startServiceObjects(vistaKey);
-	}
-	else
-	{
-		clsClsidRegValues normalKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad");
-		ShellServiceObjectsManager.startServiceObjects(normalKey);
-	}
+		if (SystemInfo.isOsVista())
+		{
+			clsClsidInjected vistaInject(L"{730F6CDC-2C86-11D2-8773-92E220524153}");
+			clsClsidRegKeys vistaKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\explorer\\ShellServiceObjects");
+			vector<wstring> vistaWhitelist;
+			vistaWhitelist.push_back(L"{7007ACCF-3202-11D1-AAD2-00805FC1270E}");
+			vistaKey.setWhitelist(vistaWhitelist);
+			ShellServiceObjectsManager.startServiceObjects(vistaInject);
+			ShellServiceObjectsManager.startServiceObjects(vistaKey);
+		}
+		else
+		{
+			clsClsidRegValues normalKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad");
+			ShellServiceObjectsManager.startServiceObjects(normalKey);
+		}
 	}
 
 	InitApiExtensions();
@@ -555,7 +570,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ClearSticky();
 
 	// Noccy: New setting, blackbox.tweaks.noOleUnInit to bypass ole uninit
-	if (Settings_noOleUninit == false) {
+	if (Settings_noOleUninit == false)
+	{
 		OleUninitialize();
 	}
 	//exit_runtime_libs();
@@ -567,14 +583,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	m_alloc_check_leaks("Blackbox Core");
 
-#ifdef BBOPT_STACKDUMP
-	}
-	__except( except_filter( GetExceptionInformation() ) )
-	{
-		RetCode = -1;
-	}
-#endif
-
 	return RetCode;
 }
 
@@ -584,10 +592,10 @@ WPARAM message_loop(void)
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0) > 0)
 	{
-/*
-		char buffer[200]; GetClassName(msg.hwnd, buffer, sizeof buffer);
-		dbg_printf("hwnd %04x <%s>  msg %x  wp %08x  lp %08x", msg.hwnd, buffer, msg.message, msg.wParam, msg.lParam);
-*/
+		/*
+				char buffer[200]; GetClassName(msg.hwnd, buffer, sizeof buffer);
+				dbg_printf("hwnd %04x <%s>  msg %x  wp %08x  lp %08x", msg.hwnd, buffer, msg.message, msg.wParam, msg.lParam);
+		*/
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
@@ -647,18 +655,16 @@ void set_style(const char* filename, UINT flags)
 	{
 		MBoxErrorFile(fullpath);
 	}
-	else
-	if (is_stylefile(fullpath))
+	else if (is_stylefile(fullpath))
 	{
 		WriteString(bbrcPath(), "session.styleFile:", get_relative_path(fullpath));
 		reset_extended_rootCommand();
 	}
-	else
-	if (flags & 1)
+	else if (flags & 1)
 	{
 		BBMessageBox(MB_OK,
-			NLS2("$BBError_SetStyle$",
-				"Trying to fool me, eh? ...drag'n drop a style file instead!"));
+					 NLS2("$BBError_SetStyle$",
+						  "Trying to fool me, eh? ...drag'n drop a style file instead!"));
 	}
 	else
 	{
@@ -669,42 +675,42 @@ void set_style(const char* filename, UINT flags)
 void adjust_style(void) // temporary fix for bbStyleMaker 1.2
 {
 	mStyle.MenuTitle.marginWidth =
-	mStyle.Toolbar.marginWidth =
-	mStyle.windowTitleFocus.marginWidth =
-		mStyle.bevelWidth;
+		mStyle.Toolbar.marginWidth =
+			mStyle.windowTitleFocus.marginWidth =
+				mStyle.bevelWidth;
 
 	mStyle.MenuFrame.borderWidth =
-	mStyle.MenuTitle.borderWidth =
-	mStyle.Toolbar.borderWidth =
-	mStyle.windowTitleFocus.borderWidth =
-	mStyle.windowTitleUnfocus.borderWidth =
-	mStyle.windowHandleFocus.borderWidth =
-	mStyle.windowHandleUnfocus.borderWidth =
-	mStyle.windowGripFocus.borderWidth =
-	mStyle.windowGripUnfocus.borderWidth =
+		mStyle.MenuTitle.borderWidth =
+			mStyle.Toolbar.borderWidth =
+				mStyle.windowTitleFocus.borderWidth =
+					mStyle.windowTitleUnfocus.borderWidth =
+						mStyle.windowHandleFocus.borderWidth =
+							mStyle.windowHandleUnfocus.borderWidth =
+								mStyle.windowGripFocus.borderWidth =
+									mStyle.windowGripUnfocus.borderWidth =
 //	mStyle.frameWidth =
-		mStyle.borderWidth;
+										mStyle.borderWidth;
 
 	mStyle.MenuFrame.borderColor =
-	mStyle.MenuTitle.borderColor =
-	mStyle.Toolbar.borderColor =
-	mStyle.windowTitleFocus.borderColor =
-	mStyle.windowTitleUnfocus.borderColor =
-	mStyle.windowHandleFocus.borderColor =
-	mStyle.windowHandleUnfocus.borderColor =
-	mStyle.windowGripFocus.borderColor =
-	mStyle.windowGripUnfocus.borderColor =
-	mStyle.windowFrameFocusColor =
-	mStyle.windowFrameUnfocusColor =
-		mStyle.borderColor;
+		mStyle.MenuTitle.borderColor =
+			mStyle.Toolbar.borderColor =
+				mStyle.windowTitleFocus.borderColor =
+					mStyle.windowTitleUnfocus.borderColor =
+						mStyle.windowHandleFocus.borderColor =
+							mStyle.windowHandleUnfocus.borderColor =
+								mStyle.windowGripFocus.borderColor =
+									mStyle.windowGripUnfocus.borderColor =
+										mStyle.windowFrameFocusColor =
+											mStyle.windowFrameUnfocusColor =
+												mStyle.borderColor;
 
 	mStyle.MenuFrame.foregroundColor =
-	mStyle.MenuFrame.disabledColor =
-		mStyle.MenuFrame.TextColor;
+		mStyle.MenuFrame.disabledColor =
+			mStyle.MenuFrame.TextColor;
 
 	mStyle.MenuHilite.foregroundColor =
-	mStyle.MenuHilite.disabledColor =
-		mStyle.MenuHilite.TextColor;
+		mStyle.MenuHilite.disabledColor =
+			mStyle.MenuHilite.TextColor;
 
 }
 
@@ -723,382 +729,395 @@ LRESULT CALLBACK MainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		// first the BB_... internal messages
 		//===================================
 
-		case BB_QUIT:
-			// dont quit, if started as the main shell
-			if (false == underExplorer && 0 == lParam && IDOK!=BBMessageBox(MB_OKCANCEL,
-					NLS2("$BBQuitQuery$",
-						"Are you sure you want to terminate the main shell?")))
-				break;
+	case BB_QUIT:
+		// dont quit, if started as the main shell
+		if (false == underExplorer && 0 == lParam && IDOK!=BBMessageBox(MB_OKCANCEL,
+				NLS2("$BBQuitQuery$",
+					 "Are you sure you want to terminate the main shell?")))
+			break;
 bb_quit:
-			SendMessage(hwnd, BB_EXITTYPE, 0, 0);
-			Workspaces_GatherWindows();
-			shutdown_blackbox();
-			PostQuitMessage(0);
-			break;
+		SendMessage(hwnd, BB_EXITTYPE, 0, 0);
+		Workspaces_GatherWindows();
+		shutdown_blackbox();
+		PostQuitMessage(0);
+		break;
 
 		//====================
-		case BB_SHUTDOWN:
-			Menu_All_Hide();
-			ShutdownWindows(wParam, lParam);
-			break;
+	case BB_SHUTDOWN:
+		Menu_All_Hide();
+		ShutdownWindows(wParam, lParam);
+		break;
 
 		//====================
-		case BB_SETSTYLE:
-			if (lParam) set_style((const char*)lParam, wParam);
-			PostMessage(hwnd, BB_RECONFIGURE, 0, 0);
-			break;
+	case BB_SETSTYLE:
+		if (lParam) set_style((const char*)lParam, wParam);
+		PostMessage(hwnd, BB_RECONFIGURE, 0, 0);
+		break;
 
 		//====================
-		case BB_ABOUTPLUGINS:
-			PluginManager_aboutPlugins();
-			break;
+	case BB_ABOUTPLUGINS:
+		PluginManager_aboutPlugins();
+		break;
 
-		case BB_ABOUTSTYLE:
-			about_style();
-			break;
-
-		//====================
-		case BB_EDITFILE:
-			edit_file(wParam, (const char*)lParam);
-			break;
+	case BB_ABOUTSTYLE:
+		about_style();
+		break;
 
 		//====================
-		case BB_RUN:
-			pRunDlg(NULL, NULL, NULL, NULL, NULL, 0 );
-			break;
+	case BB_EDITFILE:
+		edit_file(wParam, (const char*)lParam);
+		break;
+
+		//====================
+	case BB_RUN:
+		pRunDlg(NULL, NULL, NULL, NULL, NULL, 0 );
+		break;
 
 		//====================
 		// Execute a string (shellcommand or broam)
-		case BB_EXECUTE:
-			if (lParam) exec_command((const char*)lParam);
-			break;
+	case BB_EXECUTE:
+		if (lParam) exec_command((const char*)lParam);
+		break;
 
-		case BB_EXECUTEASYNC: // for bbkeys etc.
-			post_command((const char*)lParam);
-			break;
+	case BB_EXECUTEASYNC: // for bbkeys etc.
+		post_command((const char*)lParam);
+		break;
 
-		case BB_POSTSTRING: // posted command-string, from menu click
-			exec_command((const char*)lParam);
-			m_free((char*)lParam);
-			break;
-
-		//====================
-		case BB_BROADCAST:
-			if (false == exec_broam((LPCSTR)lParam))
-				goto dispatch_bb_message;
-			break;
+	case BB_POSTSTRING: // posted command-string, from menu click
+		exec_command((const char*)lParam);
+		m_free((char*)lParam);
+		break;
 
 		//====================
-		case BB_TOGGLEPLUGINS:
-			SendMessage(BBhwnd, BB_BROADCAST, 0, (LPARAM)
-				(PluginsHidden ? "@BBShowPlugins" : "@BBHidePlugins"));
+	case BB_BROADCAST:
+		if (false == exec_broam((LPCSTR)lParam))
 			goto dispatch_bb_message;
+		break;
+
+		//====================
+	case BB_TOGGLEPLUGINS:
+		SendMessage(BBhwnd, BB_BROADCAST, 0, (LPARAM)
+					(PluginsHidden ? "@BBShowPlugins" : "@BBHidePlugins"));
+		goto dispatch_bb_message;
 
 		//====================
 		// Noccy 060607 -wParam holds buttons that has been pressed prior.
-		case BB_DESKCLICK:
-			if (0 == lParam)
-			{
-				Menu_All_Hide();
-				Menu_All_BringOnTop();
-				if (false == Menu_Activate_Last())
-					SetActiveWindow(hwnd);
-			}
-			Desk_mousebutton_event(lParam,wParam);
-			goto dispatch_bb_message;
+	case BB_DESKCLICK:
+		if (0 == lParam)
+		{
+			Menu_All_Hide();
+			Menu_All_BringOnTop();
+			if (false == Menu_Activate_Last())
+				SetActiveWindow(hwnd);
+		}
+		Desk_mousebutton_event(lParam,wParam);
+		goto dispatch_bb_message;
 
 		//====================
 		// Menu
 
-		case BB_MENU:
-			if (PluginsHidden)
-				Menu_All_Toggle(false);
+	case BB_MENU:
+		if (PluginsHidden)
+			Menu_All_Toggle(false);
 
-			if (MenuMaker_ShowMenu(wParam, lParam))
-				goto dispatch_bb_message;
-
-			break;
-
-		case BB_HIDEMENU:
-			Menu_All_Hide();
+		if (MenuMaker_ShowMenu(wParam, lParam))
 			goto dispatch_bb_message;
 
+		break;
+
+	case BB_HIDEMENU:
+		Menu_All_Hide();
+		goto dispatch_bb_message;
+
 
 		//======================================================
-		case BB_RESTART:
-		case_bb_restart:
-			kill_plugins();
-			if (GetAsyncKeyState(VK_SHIFT) & 0x8000)
-				BBMessageBox(MB_OK,
-					NLS2("$BBRestartPaused$",
-						"Restart paused, press OK to continue..."));
-			SendMessage(BBhwnd, BB_RECONFIGURE, 0, 1);
-			start_plugins();
-			RedrawConfigMenu();
-			break;
+	case BB_RESTART:
+case_bb_restart:
+		kill_plugins();
+		if (GetAsyncKeyState(VK_SHIFT) & 0x8000)
+			BBMessageBox(MB_OK,
+						 NLS2("$BBRestartPaused$",
+							  "Restart paused, press OK to continue..."));
+		SendMessage(BBhwnd, BB_RECONFIGURE, 0, 1);
+		start_plugins();
+		RedrawConfigMenu();
+		break;
 
 		//======================================================
-		case BB_RECONFIGURE:
-			if (check_filetime(plugrcPath(), &PluginManager_FT) && 0 == lParam)
-				goto case_bb_restart;
+	case BB_RECONFIGURE:
+		if (check_filetime(plugrcPath(), &PluginManager_FT) && 0 == lParam)
+			goto case_bb_restart;
 
-			free_nls();
-			Settings_ReadRCSettings();
-			/* Elitefore: set process priority */
-			SetProcessPriority();
-			/* end */
-			Settings_ReadStyleSettings();
-			Session_UpdateSession();
-			set_opaquemove();
-			Workspaces_Reconfigure();
-			Desk_new_background();
+		free_nls();
+		Settings_ReadRCSettings();
+		/* Elitefore: set process priority */
+		SetProcessPriority();
+		/* end */
+		Settings_ReadStyleSettings();
+		Session_UpdateSession();
+		set_opaquemove();
+		Workspaces_Reconfigure();
+		Desk_new_background();
+		MenuMaker_Configure();
+		Menu_All_Redraw(0);
+		if (false == Settings_toolbarEnabled) Toolbar_UpdatePosition();
+		goto dispatch_bb_message;
+
+		//====================
+	case BB_REDRAWGUI:
+		if (wParam & BBRG_MENU)
+		{
 			MenuMaker_Configure();
-			Menu_All_Redraw(0);
-			if (false == Settings_toolbarEnabled) Toolbar_UpdatePosition();
-			goto dispatch_bb_message;
-
-		//====================
-		case BB_REDRAWGUI:
-			if (wParam & BBRG_MENU)
-			{
-				MenuMaker_Configure();
-				Menu_All_Redraw(wParam);
-			}
-			goto dispatch_bb_message;
+			Menu_All_Redraw(wParam);
+		}
+		goto dispatch_bb_message;
 
 		//======================================================
-		case BB_WINDOWLOWER:
-		case BB_WINDOWRAISE:
-		case BB_WINDOWSHADE:
-		case BB_WINDOWGROWHEIGHT:
-		case BB_WINDOWGROWWIDTH:
-			if (0 == lParam && IsWindow((HWND)wParam))
-				lParam = wParam;
+	case BB_WINDOWLOWER:
+	case BB_WINDOWRAISE:
+	case BB_WINDOWSHADE:
+	case BB_WINDOWGROWHEIGHT:
+	case BB_WINDOWGROWWIDTH:
+		if (0 == lParam && IsWindow((HWND)wParam))
+			lParam = wParam;
 
-		case BB_WORKSPACE:
-		case BB_SWITCHTON:
-		case BB_LISTDESKTOPS:
+	case BB_WORKSPACE:
+	case BB_SWITCHTON:
+	case BB_LISTDESKTOPS:
 
-		case BB_BRINGTOFRONT:
-		case BB_WINDOWMINIMIZE:
-		case BB_WINDOWMAXIMIZE:
-		case BB_WINDOWRESTORE:
-		case BB_WINDOWCLOSE:
-		case BB_WINDOWMOVE:
-		case BB_WINDOWSIZE:
-			Workspaces_Command(uMsg, wParam, lParam);
-			goto dispatch_bb_message;
+	case BB_BRINGTOFRONT:
+	case BB_WINDOWMINIMIZE:
+	case BB_WINDOWMAXIMIZE:
+	case BB_WINDOWRESTORE:
+	case BB_WINDOWCLOSE:
+	case BB_WINDOWMOVE:
+	case BB_WINDOWSIZE:
+		Workspaces_Command(uMsg, wParam, lParam);
+		goto dispatch_bb_message;
 
 		//====================
-		case BB_DESKTOPINFO:
-		case BB_TASKSUPDATE:
-			Menu_All_Update(MENU_IS_TASKS);
-			goto dispatch_bb_message;
+	case BB_DESKTOPINFO:
+	case BB_TASKSUPDATE:
+		Menu_All_Update(MENU_IS_TASKS);
+		goto dispatch_bb_message;
 
 		//====================
 		// sent from the systembar on mouse over, if on mouseover
 		// a tray app's window turned out to be not valid anymore
-		case BB_CLEANTRAY:
-			SystemTrayManager.CleanTray();
-			break;
+	case BB_CLEANTRAY:
+		SystemTrayManager.CleanTray();
+		break;
 
 		//====================
-		case BB_REGISTERMESSAGE:
-			MessageManager_AddMessages((HWND)wParam, (UINT*)lParam);
-			break;
+	case BB_REGISTERMESSAGE:
+		MessageManager_AddMessages((HWND)wParam, (UINT*)lParam);
+		break;
 
-		case BB_UNREGISTERMESSAGE:
-			MessageManager_RemoveMessages((HWND)wParam, (UINT*)lParam);
-			break;
+	case BB_UNREGISTERMESSAGE:
+		MessageManager_RemoveMessages((HWND)wParam, (UINT*)lParam);
+		break;
 
 		// This one is registered as a workaround (see MenuMaker.cpp)
-		case BB_FOLDERCHANGED:
-			//dbg_printf("BB folder changed");
-			break;
+	case BB_FOLDERCHANGED:
+		//dbg_printf("BB folder changed");
+		break;
 
 		//==============================================================
 		// COPYDATA stuff, for passing information from/to other processes
 		// (i.e. bbStyleMaker, BBNote)
 
-		case BB_GETSTYLE:
-			return BBSendData((HWND)lParam, BB_SENDDATA, wParam, stylePath(), -1);
+	case BB_GETSTYLE:
+		return BBSendData((HWND)lParam, BB_SENDDATA, wParam, stylePath(), -1);
 
-		case BB_GETSTYLESTRUCT:
-			return BBSendData((HWND)lParam, BB_SENDDATA, wParam, &mStyle, sizeof mStyle);
+	case BB_GETSTYLESTRUCT:
+		return BBSendData((HWND)lParam, BB_SENDDATA, wParam, &mStyle, sizeof mStyle);
 
-		case BB_SETSTYLESTRUCT:
-			memcpy(&mStyle, (const void*)lParam, sizeof mStyle);
-			break;
+	case BB_SETSTYLESTRUCT:
+		memcpy(&mStyle, (const void*)lParam, sizeof mStyle);
+		break;
 
 		// ------------------------
 		// previous implementation:
 
-		case BB_GETSTYLE_OLD:
+	case BB_GETSTYLE_OLD:
+	{
+		COPYDATASTRUCT cds;
+		cds.dwData = 1;
+		cds.lpData = (void*)stylePath();
+		cds.cbData = 1+strlen((char*)cds.lpData);
+		return SendMessage ((HWND)lParam, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)&cds);
+	}
+
+	case BB_GETSTYLESTRUCT_OLD:
+	{
+		COPYDATASTRUCT cds;
+		if (SN_STYLESTRUCT != wParam) break;
+		cds.dwData = SN_STYLESTRUCT+100;
+		cds.cbData = sizeof(StyleStruct);
+		cds.lpData = GetSettingPtr(SN_STYLESTRUCT);
+		return SendMessage ((HWND)lParam, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)&cds);
+	}
+
+	case BB_SETSTYLESTRUCT_OLD:
+	{
+		if (SN_STYLESTRUCT != wParam) break;
+		memcpy(&mStyle, (const void*)lParam, sizeof mStyle);
+		adjust_style();
+		break;
+	}
+
+	// done with BB_messages,
+	//==============================================================
+
+	//==============================================================
+	// now for the WM_... messages
+
+	case WM_CREATE:
+		BBhwnd = hwnd;
+		MakeSticky(hwnd);
+		register_shellhook(hwnd);
+		RegisterHotKey(hwnd, ID_HOTKEY, MOD_CONTROL|MOD_ALT, VK_F1);
+		break;
+
+		//====================
+	case WM_DESTROY:
+		unregister_shellhook(hwnd);
+		RemoveSticky(hwnd);
+		break;
+
+		//====================
+	case WM_ENDSESSION:
+		if (wParam) shutdown_blackbox();
+		break;
+
+	case WM_QUERYENDSESSION:
+		Workspaces_GatherWindows();
+		return TRUE;
+
+	case WM_CLOSE:
+		break;
+
+		//====================
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hwnd, &ps);
+		PaintDesktop(hdc);
+		EndPaint(hwnd, &ps);
+		break;
+	}
+
+	//====================
+	case WM_HOTKEY:
+		//dbg_printf("HK = %d", wParam);
+		if (ID_HOTKEY == wParam)
+			goto bb_quit;
+		break;
+
+		//====================
+	case WM_MOUSEACTIVATE:
+		return MA_NOACTIVATE;
+
+		//====================
+	case WM_ACTIVATEAPP:
+	{
+		bool new_bbactive = 0 != wParam;
+		if (new_bbactive != bbactive)
 		{
-			COPYDATASTRUCT cds;
-			cds.dwData = 1;
-			cds.lpData = (void*)stylePath();
-			cds.cbData = 1+strlen((char*)cds.lpData);
-			return SendMessage ((HWND)lParam, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)&cds);
+			bbactive = new_bbactive;
+			if (false == new_bbactive) Menu_All_Hide();
 		}
+		break;
+	}
 
-		case BB_GETSTYLESTRUCT_OLD:
-		{
-			COPYDATASTRUCT cds;
-			if (SN_STYLESTRUCT != wParam) break;
-			cds.dwData = SN_STYLESTRUCT+100;
-			cds.cbData = sizeof(StyleStruct);
-			cds.lpData = GetSettingPtr(SN_STYLESTRUCT);
-			return SendMessage ((HWND)lParam, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)&cds);
-		}
-
-		case BB_SETSTYLESTRUCT_OLD:
-		{
-			if (SN_STYLESTRUCT != wParam) break;
-			memcpy(&mStyle, (const void*)lParam, sizeof mStyle);
-			adjust_style();
-			break;
-		}
-
-		// done with BB_messages,
-		//==============================================================
-
-		//==============================================================
-		// now for the WM_... messages
-
-		case WM_CREATE:
-			BBhwnd = hwnd;
-			MakeSticky(hwnd);
-			register_shellhook(hwnd);
-			RegisterHotKey(hwnd, ID_HOTKEY, MOD_CONTROL|MOD_ALT, VK_F1);
-			break;
+	//======================================================
+	case WM_DISPLAYCHANGE:
+		// disable this during shutdown
+		if ((unsigned)-1 == WM_ShellHook) break;
+		Desk_reset_rootCommand();
+		PostMessage(hwnd, BB_RECONFIGURE, 0,0);
+		break;
 
 		//====================
-		case WM_DESTROY:
-			unregister_shellhook(hwnd);
-			RemoveSticky(hwnd);
-			break;
-
-		//====================
-		case WM_ENDSESSION:
-			if (wParam) shutdown_blackbox();
-			break;
-
-		case WM_QUERYENDSESSION:
-			Workspaces_GatherWindows();
-			return TRUE;
-
-		case WM_CLOSE:
-			break;
-
-		//====================
-		case WM_PAINT:
+	case WM_TIMER:
+		if (BB_CHECKWINDOWS_TIMER == wParam)
 		{
-			PAINTSTRUCT ps;
-			HDC hdc = BeginPaint(hwnd, &ps);
-			PaintDesktop(hdc);
-			EndPaint(hwnd, &ps);
+			Workspaces_handletimer();
 			break;
 		}
-
-		//====================
-		case WM_HOTKEY:
-			//dbg_printf("HK = %d", wParam);
-			if (ID_HOTKEY == wParam)
-				goto bb_quit;
-			break;
-
-		//====================
-		case WM_MOUSEACTIVATE:
-			return MA_NOACTIVATE;
-
-		//====================
-		case WM_ACTIVATEAPP:
+		KillTimer(hwnd, wParam);
+		if (BB_WRITERC_TIMER == wParam)
 		{
-			bool new_bbactive = 0 != wParam;
-			if (new_bbactive != bbactive)
+			write_rcfiles();
+			break;
+		}
+		if (BB_RUNSTARTUP_TIMER == wParam)
+		{
+			RunStartupStuff();
+			break;
+		}
+		break;
+
+		//====================
+	case WM_KEYDOWN:
+		if (VK_TAB == wParam)
+			Menu_Tab_Next(NULL);
+		break;
+
+		//====================
+	case WM_COPYDATA:
+		return BBReceiveData(hwnd, lParam);
+
+	case WM_SETTEXT:
+		SendMessage(hwnd, BB_BROADCAST, 0, lParam);
+		return 1;
+
+		//====================
+	default:
+		if (uMsg == WM_ShellHook)
+		{
+			LPARAM extended = 0 != (wParam & 0x8000);
+			switch (wParam & 0x7fff)
 			{
-				bbactive = new_bbactive;
-				if (false == new_bbactive) Menu_All_Hide();
-			}
-			break;
-		}
+			case HSHELL_TASKMAN:
+				uMsg = BB_WINKEY;
+				lParam = (GetAsyncKeyState(VK_RWIN) & 1) ? VK_RWIN : VK_LWIN;
+				goto p2;
 
-		//======================================================
-		case WM_DISPLAYCHANGE:
-			// disable this during shutdown
-			if ((unsigned)-1 == WM_ShellHook) break;
-			Desk_reset_rootCommand();
-			PostMessage(hwnd, BB_RECONFIGURE, 0,0);
-			break;
-
-		//====================
-		case WM_TIMER:
-			if (BB_CHECKWINDOWS_TIMER == wParam)
-			{
-				Workspaces_handletimer();
+			case HSHELL_WINDOWCREATED:
+				uMsg = BB_ADDTASK;
 				break;
-			}
-			KillTimer(hwnd, wParam);
-			if (BB_WRITERC_TIMER == wParam)
-			{
-				write_rcfiles();
+			case HSHELL_WINDOWDESTROYED:
+				uMsg = BB_REMOVETASK;
 				break;
-			}
-			if (BB_RUNSTARTUP_TIMER == wParam)
-			{
-				RunStartupStuff();
+			case HSHELL_ACTIVATESHELLWINDOW:
+				uMsg = BB_ACTIVATESHELLWINDOW;
 				break;
+			case HSHELL_WINDOWACTIVATED:
+				uMsg = BB_ACTIVETASK;
+				break;
+			case HSHELL_GETMINRECT:
+				uMsg = BB_MINMAXTASK;
+				break;
+			case HSHELL_REDRAW:
+				uMsg = BB_REDRAWTASK;
+				break;
+			default:
+				return 0;
 			}
+			TaskWndProc(wParam, (HWND)lParam);
+p2:
+			PostMessage(hwnd, uMsg, lParam, extended);
 			break;
+		}
 
-		//====================
-		case WM_KEYDOWN:
-			if (VK_TAB == wParam)
-				Menu_Tab_Next(NULL);
-			break;
+		if (uMsg >= BB_MSGFIRST && uMsg < BB_MSGLAST)
+		{
+dispatch_bb_message:
+			return MessageManager_SendMessage(uMsg, wParam, lParam);
+		}
 
-		//====================
-		case WM_COPYDATA:
-			return BBReceiveData(hwnd, lParam);
-
-		case WM_SETTEXT:
-			SendMessage(hwnd, BB_BROADCAST, 0, lParam);
-			return 1;
-
-				//====================
-		default:
-			if (uMsg == WM_ShellHook)
-			{
-				LPARAM extended = 0 != (wParam & 0x8000);
-				switch (wParam & 0x7fff)
-				{
-					case HSHELL_TASKMAN:
-						uMsg = BB_WINKEY;
-						lParam = (GetAsyncKeyState(VK_RWIN) & 1) ? VK_RWIN : VK_LWIN;
-						goto p2;
-
-					case HSHELL_WINDOWCREATED:          uMsg = BB_ADDTASK;              break;
-					case HSHELL_WINDOWDESTROYED:        uMsg = BB_REMOVETASK;           break;
-					case HSHELL_ACTIVATESHELLWINDOW:    uMsg = BB_ACTIVATESHELLWINDOW;  break;
-					case HSHELL_WINDOWACTIVATED:        uMsg = BB_ACTIVETASK;           break;
-					case HSHELL_GETMINRECT:             uMsg = BB_MINMAXTASK;           break;
-					case HSHELL_REDRAW:                 uMsg = BB_REDRAWTASK;           break;
-					default: return 0;
-				}
-				TaskWndProc(wParam, (HWND)lParam);
-			p2:
-				PostMessage(hwnd, uMsg, lParam, extended);
-				break;
-			}
-
-			if (uMsg >= BB_MSGFIRST && uMsg < BB_MSGLAST)
-			{
-				dispatch_bb_message:
-				return MessageManager_SendMessage(uMsg, wParam, lParam);
-			}
-
-			return DefWindowProc(hwnd, uMsg, wParam, lParam);
+		return DefWindowProc(hwnd, uMsg, wParam, lParam);
 	}
 	return 0;
 }
@@ -1110,20 +1129,20 @@ void about_style(void)
 {
 	const char *cp = stylePath();
 	BBMessageBox(MB_OK,
-		"#bbLean - %s#"
-		"%s\t\t\t\t"
-		"\n%s %s"
-		"\n%s"
-		"\n%s"
-		"\n%s",
-		NLS2("$BBAboutStyle_Title$","Style Information"),
-		ReadString(cp, "style.name:", NLS2("$BBAboutStyle_no_name$", "[Style name not specified]")),
-		NLS2("$BBAboutStyle_by$", "by"),
-		ReadString(cp, "style.author:", NLS2("$BBAboutStyle_no_author$", "[Author not specified]")),
-		ReadString(cp, "style.date:", ""),
-		ReadString(cp, "style.credits:", ""),
-		ReadString(cp, "style.comments:", "")
-		);
+				 "#bbLean - %s#"
+				 "%s\t\t\t\t"
+				 "\n%s %s"
+				 "\n%s"
+				 "\n%s"
+				 "\n%s",
+				 NLS2("$BBAboutStyle_Title$","Style Information"),
+				 ReadString(cp, "style.name:", NLS2("$BBAboutStyle_no_name$", "[Style name not specified]")),
+				 NLS2("$BBAboutStyle_by$", "by"),
+				 ReadString(cp, "style.author:", NLS2("$BBAboutStyle_no_author$", "[Author not specified]")),
+				 ReadString(cp, "style.date:", ""),
+				 ReadString(cp, "style.credits:", ""),
+				 ReadString(cp, "style.comments:", "")
+				);
 }
 
 //=====================================================
@@ -1133,13 +1152,24 @@ void edit_file(int id, const char* path)
 	char editor[MAX_PATH];
 	switch (id)
 	{
-		case 0:  path=stylePath();        goto edit;
-		case 1:  path=menuPath();         goto edit;
-		case 2:  path=plugrcPath();       goto edit;
-		case 3:  path=extensionsrcPath(); goto edit;
-		case 4:  path=bbrcPath();         goto edit;
-		case -1: FindConfigFile(fullpath, path, NULL), path = fullpath;
-	edit:
+	case 0:
+		path=stylePath();
+		goto edit;
+	case 1:
+		path=menuPath();
+		goto edit;
+	case 2:
+		path=plugrcPath();
+		goto edit;
+	case 3:
+		path=extensionsrcPath();
+		goto edit;
+	case 4:
+		path=bbrcPath();
+		goto edit;
+	case -1:
+		FindConfigFile(fullpath, path, NULL), path = fullpath;
+edit:
 		GetBlackboxEditor(editor);
 		BBExecute_command(editor, path, false);
 	}
@@ -1161,10 +1191,10 @@ void ShowAppnames(void)
 		x+=sprintf(buffer+x, "\n%-20s \"%s\"", appname, caption);
 	}
 	BBMessageBox(0, NLS2("$BBShowApps$",
-			"Current Applications:"
-			"\n(Use the name from first column for StickyWindows.ini)"
-			"\n%s"
-			), buffer);
+						 "Current Applications:"
+						 "\n(Use the name from first column for StickyWindows.ini)"
+						 "\n%s"
+						), buffer);
 }
 
 //===========================================================================
@@ -1182,7 +1212,8 @@ void post_command(const char *p)
 }
 
 //===========================================================================
-enum { // Shutdown modes;
+enum   // Shutdown modes;
+{
 	BBSD_SHUTDOWN   = 0,
 	BBSD_REBOOT     = 1,
 	BBSD_LOGOFF     = 2,
@@ -1191,7 +1222,8 @@ enum { // Shutdown modes;
 	BBSD_LOCKWS     = 5,
 	BBSD_EXITWIN    = 6
 };
-enum {
+enum
+{
 	e_rootCommand = 1,
 	e_Message,
 	e_ShowAppnames,
@@ -1207,9 +1239,11 @@ enum {
 //===========================================================================
 static const struct corebroam_table
 {
-	const char *str; unsigned short msg; short wParam;
+	const char *str;
+	unsigned short msg;
+	short wParam;
 }
-	corebroam_table [] =
+corebroam_table [] =
 {
 	{ "Raise",                      BB_WINDOWRAISE,     0 },
 	{ "RaiseWindow",                BB_WINDOWRAISE,     0 },
@@ -1326,7 +1360,8 @@ int get_workspace_number(const char *s)
 
 void exec_core_broam(const char *broam)
 {
-	char buffer[1024]; int n;
+	char buffer[1024];
+	int n;
 	const char *core_args = broam + 8; // skip "BBCore."
 	char *core_cmd = NextToken(buffer, &core_args);
 
@@ -1343,46 +1378,47 @@ void exec_core_broam(const char *broam)
 		if (-1 == (n = get_workspace_number(core_cmd)))
 		{
 			BBMessageBox(MB_OK, NLS2("$BBError_UnknownCoreBroam$",
-				"Error: Unknown Command:\n<%s>"), broam);
+									 "Error: Unknown Command:\n<%s>"), broam);
 			return;
 		}
 		lParam = n;
 	}
 	else
-	if (msg == BB_SHUTDOWN || msg == BB_QUIT)
-	{
-		// check for 'no confirmation' option
-		lParam = 0 == memicmp(core_args, "-quiet", 2);
-	}
-	else
-	if (msg & e_lparg) // needs argument
-	{
-		msg &= ~e_lparg; lParam = (LPARAM)core_args;
-	}
-	else
-	if (msg == BB_MENU && wParam == BB_MENU_ROOT && core_args[0])
-	{
-		// "@BBCore.ShowMenu <argument>"
-		wParam = BB_MENU_BYBROAM;
-		lParam = (LPARAM)core_args;
-	}
-	else
-	if (msg == BB_WORKSPACE)
-	{
-		if (wParam == BBWS_SWITCHTODESK)
-			lParam = atoi(core_args)-1;
+		if (msg == BB_SHUTDOWN || msg == BB_QUIT)
+		{
+			// check for 'no confirmation' option
+			lParam = 0 == memicmp(core_args, "-quiet", 2);
+		}
 		else
-		if (wParam == BBWS_MOVEWINDOWTOWS)
-			lParam = (LPARAM)core_args;
-		else
-		if (wParam & e_alt) // ...AllWorkspaces option
-			wParam &= ~e_alt, lParam = 1;
-	}
-	else
-	if (msg == BB_BRINGTOFRONT)
-	{
-		lParam = (LPARAM)GetTask(atoi(core_args)-1);
-	}
+			if (msg & e_lparg) // needs argument
+			{
+				msg &= ~e_lparg;
+				lParam = (LPARAM)core_args;
+			}
+			else
+				if (msg == BB_MENU && wParam == BB_MENU_ROOT && core_args[0])
+				{
+					// "@BBCore.ShowMenu <argument>"
+					wParam = BB_MENU_BYBROAM;
+					lParam = (LPARAM)core_args;
+				}
+				else
+					if (msg == BB_WORKSPACE)
+					{
+						if (wParam == BBWS_SWITCHTODESK)
+							lParam = atoi(core_args)-1;
+						else
+							if (wParam == BBWS_MOVEWINDOWTOWS)
+								lParam = (LPARAM)core_args;
+							else
+								if (wParam & e_alt) // ...AllWorkspaces option
+									wParam &= ~e_alt, lParam = 1;
+					}
+					else
+						if (msg == BB_BRINGTOFRONT)
+						{
+							lParam = (LPARAM)GetTask(atoi(core_args)-1);
+						}
 
 	if (msg)
 	{
@@ -1390,34 +1426,34 @@ void exec_core_broam(const char *broam)
 		return;
 	}
 
-	switch(wParam)
+	switch (wParam)
 	{
-		case e_rootCommand:
-			Desk_new_background(core_args);
-			Menu_All_Redraw(0);
-			break;
+	case e_rootCommand:
+		Desk_new_background(core_args);
+		Menu_All_Redraw(0);
+		break;
 
-		case e_Message:
-			BBMessageBox(MB_OK, "%s", core_args);
-			break;
+	case e_Message:
+		BBMessageBox(MB_OK, "%s", core_args);
+		break;
 
-		case e_ShowAppnames:
-			ShowAppnames();
-			break;
+	case e_ShowAppnames:
+		ShowAppnames();
+		break;
 
-		case e_About:
-			bb_about();
-			break;
+	case e_About:
+		bb_about();
+		break;
 
-		case e_Nop:
-			break;
+	case e_Nop:
+		break;
 
-		case e_Crash:
-			*(DWORD *)0x33333333 = 0x11111111;
-			break;
+	case e_Crash:
+		*(DWORD *)0x33333333 = 0x11111111;
+		break;
 
-		case e_Test:
-			break;
+	case e_Test:
+		break;
 	}
 }
 
@@ -1460,7 +1496,8 @@ bool exec_broam(const char *broam) // 'true' for done, 'false' for broadcast
 
 	if (0==memicmp(broam, "@Script", 7))
 	{
-		broam += 7 - 1; while (' ' == *++broam);
+		broam += 7 - 1;
+		while (' ' == *++broam);
 		exec_script(broam);
 		return true;
 	}
@@ -1468,45 +1505,45 @@ bool exec_broam(const char *broam) // 'true' for done, 'false' for broadcast
 	if (0==stricmp(broam, "@BBHidePlugins"))
 		Menu_All_Toggle(PluginsHidden = true);
 	else
-	if (0==stricmp(broam, "@BBShowPlugins"))
-		Menu_All_Toggle(PluginsHidden = false);
+		if (0==stricmp(broam, "@BBShowPlugins"))
+			Menu_All_Toggle(PluginsHidden = false);
 
-    if (0==memicmp(broam, "@VolumeAdd ",11))
+	if (0==memicmp(broam, "@VolumeAdd ",11))
 	{
-    	int nv;
-    	volume_set( nv=(volume_get() + atoi(broam+11)) );
-    	char tmp[128];
-    	sprintf(tmp, "Vol %d%%", nv);
-    	MessageManager_SendMessage(BB_SETTOOLBARLABEL, 0, (LPARAM)tmp);
-    	return true;
-    }
+		int nv;
+		volume_set( nv=(volume_get() + atoi(broam+11)) );
+		char tmp[128];
+		sprintf(tmp, "Vol %d%%", nv);
+		MessageManager_SendMessage(BB_SETTOOLBARLABEL, 0, (LPARAM)tmp);
+		return true;
+	}
 
-    if (0==stricmp(broam, "@VolumeMute"))
+	if (0==stricmp(broam, "@VolumeMute"))
 	{
-    	volume_mute(true);
-    	return true;
-    }
+		volume_mute(true);
+		return true;
+	}
 
 	// Noccy: Broams to control screen saver
 
-    if (0==stricmp(broam, "@DisableScreensaver"))
-    {
+	if (0==stricmp(broam, "@DisableScreensaver"))
+	{
 		SetScreenSaverActive(false);
 		return(true);
-    }
+	}
 
-    if (0==stricmp(broam, "@EnableScreensaver"))
-    {
+	if (0==stricmp(broam, "@EnableScreensaver"))
+	{
 		SetScreenSaverActive(true);
 		return(true);
-    }
+	}
 
-    if (0==stricmp(broam, "@ToggleScreensaver"))
-    {
+	if (0==stricmp(broam, "@ToggleScreensaver"))
+	{
 		Session_screensaverEnabled = (!GetScreenSaverActive());
 		SetScreenSaverActive(Session_screensaverEnabled);
 		return(true);
-    }
+	}
 
 
 	return false;
@@ -1546,28 +1583,30 @@ void ToggleScreenSaverActive()
 //
 //============================================================================
 
-void SetProcessPriority() {
+void SetProcessPriority()
+{
 	DWORD dwPriorityClass;
 
 	// 0 = idle, 1 = below normal, 2 = normal, 3 = above normal, 4 = high, everything else = disabled
-	switch (Settings_processPriority) {
-		case 0:
-			dwPriorityClass = IDLE_PRIORITY_CLASS;
-			break;
-		case 1:
-			dwPriorityClass = BELOW_NORMAL_PRIORITY_CLASS;
-			break;
-		case 2:
-			dwPriorityClass = NORMAL_PRIORITY_CLASS;
-			break;
-		case 3:
-			dwPriorityClass = ABOVE_NORMAL_PRIORITY_CLASS;
-			break;
-		case 4:
-			dwPriorityClass = HIGH_PRIORITY_CLASS;
-			break;
-		default:
-			return;
+	switch (Settings_processPriority)
+	{
+	case 0:
+		dwPriorityClass = IDLE_PRIORITY_CLASS;
+		break;
+	case 1:
+		dwPriorityClass = BELOW_NORMAL_PRIORITY_CLASS;
+		break;
+	case 2:
+		dwPriorityClass = NORMAL_PRIORITY_CLASS;
+		break;
+	case 3:
+		dwPriorityClass = ABOVE_NORMAL_PRIORITY_CLASS;
+		break;
+	case 4:
+		dwPriorityClass = HIGH_PRIORITY_CLASS;
+		break;
+	default:
+		return;
 	}
 
 	SetPriorityClass(GetCurrentProcess(), dwPriorityClass);
@@ -1594,32 +1633,33 @@ void ShutdownWindows(int mode, int no_msg)
 {
 	switch (mode)
 	{
-		case BBSD_LOCKWS:
-			BBExecute_string("rundll32.exe user32.dll,LockWorkStation", false);
-			return;
+	case BBSD_LOCKWS:
+		BBExecute_string("rundll32.exe user32.dll,LockWorkStation", false);
+		return;
 
-		case BBSD_EXITWIN: // Standard Windows shutdown menu
-			pMSWinShutdown(BBhwnd);
-			return;
+	case BBSD_EXITWIN: // Standard Windows shutdown menu
+		pMSWinShutdown(BBhwnd);
+		return;
 
-		case BBSD_SHUTDOWN  :
-		case BBSD_REBOOT    :
-		case BBSD_LOGOFF    :
-		case BBSD_HIBERNATE :
-		case BBSD_SUSPEND   :
-		{
-			if (0 == no_msg && IDYES != BBMessageBox(MB_YESNO ,
+	case BBSD_SHUTDOWN  :
+	case BBSD_REBOOT    :
+	case BBSD_LOGOFF    :
+	case BBSD_HIBERNATE :
+	case BBSD_SUSPEND   :
+	{
+		if (0 == no_msg && IDYES != BBMessageBox(MB_YESNO ,
 				NLS2("$BBShutdownQuery$", "Are you sure you want to %s?"),
 				NLS1(shutdn_cmds_display[mode])
-				)) return;
-			break;
-		}
-
-		default:
-			return;
+												)) return;
+		break;
 	}
 
-	DWORD tid; DWORD WINAPI ShutdownThread(void *pv);
+	default:
+		return;
+	}
+
+	DWORD tid;
+	DWORD WINAPI ShutdownThread(void *pv);
 	CloseHandle(CreateThread(NULL, 0, ShutdownThread, (LPVOID)mode, 0, &tid));
 }
 
@@ -1655,7 +1695,7 @@ DWORD WINAPI ShutdownThread(void *mode)
 		if (false == success)
 		{
 			BBMessageBox(MB_OK, NLS2("$BBError_AdjustPrivileges$",
-				"Error: Failed to adjust shutdown privileges."));
+									 "Error: Failed to adjust shutdown privileges."));
 			goto leave;
 		}
 
@@ -1663,38 +1703,38 @@ DWORD WINAPI ShutdownThread(void *mode)
 
 	switch ((INT_PTR)mode)
 	{
-		case BBSD_SHUTDOWN:
-			if (ExitWindowsEx(EWX_SHUTDOWN|EWX_POWEROFF, 0))
-				goto leave;
-			break;
+	case BBSD_SHUTDOWN:
+		if (ExitWindowsEx(EWX_SHUTDOWN|EWX_POWEROFF, 0))
+			goto leave;
+		break;
 
-		case BBSD_REBOOT:
-			if (ExitWindowsEx(EWX_REBOOT, 0))
-				goto leave;
-			break;
+	case BBSD_REBOOT:
+		if (ExitWindowsEx(EWX_REBOOT, 0))
+			goto leave;
+		break;
 
-		case BBSD_LOGOFF:
-			if (ExitWindowsEx(EWX_LOGOFF, 0))
-			{
-				PostMessage(BBhwnd, WM_QUIT, 1, 0);
-				// exicode 1 lets bbrestart terminate too
-				goto leave;
-			}
-			break;
+	case BBSD_LOGOFF:
+		if (ExitWindowsEx(EWX_LOGOFF, 0))
+		{
+			PostMessage(BBhwnd, WM_QUIT, 1, 0);
+			// exicode 1 lets bbrestart terminate too
+			goto leave;
+		}
+		break;
 
-		case BBSD_HIBERNATE:
-			if (SetSystemPowerState(FALSE, FALSE))
-				goto leave;
-			break;
+	case BBSD_HIBERNATE:
+		if (SetSystemPowerState(FALSE, FALSE))
+			goto leave;
+		break;
 
-		case BBSD_SUSPEND:
-			if (SetSystemPowerState(TRUE, FALSE))
-				goto leave;
-			break;
+	case BBSD_SUSPEND:
+		if (SetSystemPowerState(TRUE, FALSE))
+			goto leave;
+		break;
 	}
 
 	BBMessageBox(MB_OK, NLS2("$BBError_Shutdown$",
-		"Error: Failed to %s."), NLS1(shutdn_cmds_display[(INT_PTR)mode]));
+							 "Error: Failed to %s."), NLS1(shutdn_cmds_display[(INT_PTR)mode]));
 leave:
 	return 0;
 }
@@ -1710,12 +1750,15 @@ leave:
 
 bool RunEntriesIn (HKEY root_key, LPCSTR subpath, UINT flags)
 {
-	int index; HKEY hKey; bool ret = false; char path[100];
+	int index;
+	HKEY hKey;
+	bool ret = false;
+	char path[100];
 	typedef BOOL (WINAPI *LPFN_WOW64ENABLEREDIR)(BOOL);
 	LPFN_WOW64ENABLEREDIR fnEnableRedir = NULL;
 
 	sprintf(path, "Software\\Microsoft\\Windows\\CurrentVersion\\%s", subpath);
-	for(int i=0;i<(SystemInfo.isOs64Bits()?2:1);++i)
+	for (int i=0;i<(SystemInfo.isOs64Bits()?2:1);++i)
 	{
 		if (ERROR_SUCCESS != RegOpenKeyEx(root_key, path, 0, KEY_ALL_ACCESS|(i?KEY_WOW64_64KEY:KEY_WOW64_32KEY), &hKey))
 			return ret;
@@ -1730,16 +1773,17 @@ bool RunEntriesIn (HKEY root_key, LPCSTR subpath, UINT flags)
 		//log_printf(2, "\In Registry: %s\\%s", HKEY_CURRENT_USER == root_key ? "HKCU": "HKLM", path);
 		for (index=0;;++index)
 		{
-			char szNameBuffer[200]; char szValueBuffer[1000];
+			char szNameBuffer[200];
+			char szValueBuffer[1000];
 			DWORD dwNameSize = sizeof szNameBuffer;
 			DWORD dwValueSize = sizeof szValueBuffer;
 			DWORD dwType;
 
 			if (ERROR_SUCCESS != RegEnumValue(
-					hKey, index,
-					szNameBuffer, &dwNameSize,
-					NULL, &dwType,
-					(BYTE*)szValueBuffer, &dwValueSize
+						hKey, index,
+						szNameBuffer, &dwNameSize,
+						NULL, &dwType,
+						(BYTE*)szValueBuffer, &dwValueSize
 					)) break;
 
 			ret = true;
@@ -1774,15 +1818,15 @@ void RunFolderContents(LPCSTR szParams)
 
 	//log_printf(2, "\In startup folder: %s", szParams);
 	do if (0 == (findData.dwFileAttributes & (
-		FILE_ATTRIBUTE_SYSTEM
-		|FILE_ATTRIBUTE_DIRECTORY
-		|FILE_ATTRIBUTE_HIDDEN
-		)))
-	{
-		strcpy(szPath+x, findData.cFileName);
-		//log_printf(2, "\t\tRunning: %s", szPath);
-		ShellExecute(NULL, NULL, szPath, NULL, NULL, SW_SHOWNORMAL);
-	}
+						 FILE_ATTRIBUTE_SYSTEM
+						 |FILE_ATTRIBUTE_DIRECTORY
+						 |FILE_ATTRIBUTE_HIDDEN
+					 )))
+		{
+			strcpy(szPath+x, findData.cFileName);
+			//log_printf(2, "\t\tRunning: %s", szPath);
+			ShellExecute(NULL, NULL, szPath, NULL, NULL, SW_SHOWNORMAL);
+		}
 	while (FindNextFile(hSearch, &findData));
 	FindClose(hSearch);
 }
@@ -1795,26 +1839,28 @@ DWORD WINAPI RunStartupThread (void *pv)
 	static const char szRunOnce[] = "RunOnce";
 
 	//log_printf(2, "Now Running Startup Items.");
-/*
-	// RunOnceEx, any?
-	static const char szRunOnceEx[] = "RunOnceEx";
-	if (RunEntriesIn (HKEY_LOCAL_MACHINE, szRunOnceEx, RS_CHCK))
-		ShellCommand("RunDLL32.EXE iernonce.dll,RunOnceExProcess", NULL, true);
-*/
+	/*
+		// RunOnceEx, any?
+		static const char szRunOnceEx[] = "RunOnceEx";
+		if (RunEntriesIn (HKEY_LOCAL_MACHINE, szRunOnceEx, RS_CHCK))
+			ShellCommand("RunDLL32.EXE iernonce.dll,RunOnceExProcess", NULL, true);
+	*/
 
 	RunEntriesIn (HKEY_LOCAL_MACHINE, szRunOnce, RS_ONCE|RS_WAIT);
 	RunEntriesIn (HKEY_LOCAL_MACHINE, szRun, 0);
 	RunEntriesIn (HKEY_CURRENT_USER, szRun, 0);
 
 	// Run startup items
-	static const short startuptable[4] = {
+	static const short startuptable[4] =
+	{
 		CSIDL_COMMON_STARTUP,       //0x0018,
 		CSIDL_COMMON_ALTSTARTUP,    //0x001e,
 		CSIDL_STARTUP,              //0x0007,
 		CSIDL_ALTSTARTUP            //0x001d
 	};
 
-	char szPath[MAX_PATH]; int i;
+	char szPath[MAX_PATH];
+	int i;
 	for (i = 0; i < 4; ++i)
 		if (sh_getfolderpath(szPath, startuptable[i]))
 			RunFolderContents(szPath);

@@ -37,12 +37,18 @@ const char szDynamicWidth[] = "false";
 //
 // getExtenderInfo returns information about the extender to bbLeanBar.
 //
-DLLEXPORT LPCSTR getExtenderInfo(int field) {
-	switch(field) {
-		case EIF_NAME: return szName;
-		case EIF_KEY: return szKey;
-		case EIF_MULTIUSE: return szMultiUse;
-		case EIF_DYNAMICWIDTH: return szDynamicWidth;
+DLLEXPORT LPCSTR getExtenderInfo(int field)
+{
+	switch (field)
+	{
+	case EIF_NAME:
+		return szName;
+	case EIF_KEY:
+		return szKey;
+	case EIF_MULTIUSE:
+		return szMultiUse;
+	case EIF_DYNAMICWIDTH:
+		return szDynamicWidth;
 	}
 	return(NULL);
 }
@@ -50,7 +56,8 @@ DLLEXPORT LPCSTR getExtenderInfo(int field) {
 //
 // createExtender creates an extender with the specified config string.
 //
-DLLEXPORT HWND createExtender(const char* configString) {
+DLLEXPORT HWND createExtender(const char* configString)
+{
 	thisLabel = new barLabel();
 	thisLabel->Initialize(configString);
 	return(thisLabel->getLabelHandle());
@@ -59,7 +66,8 @@ DLLEXPORT HWND createExtender(const char* configString) {
 //
 // destroyExtender destroys the extender again. Reconfiguring will do this.
 //
-DLLEXPORT int destroyExtender(HWND extHandle) {
+DLLEXPORT int destroyExtender(HWND extHandle)
+{
 	delete thisLabel;
 	return(0);
 }
@@ -68,6 +76,7 @@ DLLEXPORT int destroyExtender(HWND extHandle) {
 // getWidth returns the width of the extender. If this value is 0 the extender
 // is set to automatic width, and bbleanbar should be left to make a decision.
 //
-DLLEXPORT int getWidth() {
+DLLEXPORT int getWidth()
+{
 	return(0);
 }

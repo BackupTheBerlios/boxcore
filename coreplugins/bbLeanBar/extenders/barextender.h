@@ -30,14 +30,16 @@
 
 #include <windows.h>
 
-enum {
+enum
+{
 	EIF_NAME = 0,
 	EIF_KEY,
 	EIF_MULTIUSE,
 	EIF_DYNAMICWIDTH
 };
 
-extern "C" {
+extern "C"
+{
 
 	//
 	//	GetExtenderInfo returns the information on an extender

@@ -37,9 +37,9 @@ DWORD WINAPI PipeReadThread(LPVOID args)
 	char message[1025];
 	char *messageStart;
 	DWORD numRead;
-	while(1)
+	while (1)
 	{
-		if(!ReadFile(hRdSlave,&message,1024,&numRead,NULL))
+		if (!ReadFile(hRdSlave,&message,1024,&numRead,NULL))
 		{
 			PostMessage(hLoaderWnd,WM_DEADPIPE,NULL,NULL);
 			cout<<"Read problem..."<<endl;
@@ -50,15 +50,15 @@ DWORD WINAPI PipeReadThread(LPVOID args)
 		{
 			cout<<"We got : \""<<messageStart<<"\""<<endl;
 			SendMessage(hLoaderWnd,WM_BBMESSAGE,(WPARAM)messageStart,NULL);
-			if(!strcmp(messageStart,"DIE"))
+			if (!strcmp(messageStart,"DIE"))
 			{
 				cout<<"Thread Terminating!!!!"<<endl;
 				return 0;
 			}
 			messageStart+=strlen(messageStart)+1;
 		}
-		while((messageStart-message)<numRead);
-		
+		while ((messageStart-message)<numRead);
+
 	}
 	return 0;
 }
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	cout<<argc<<endl;
-	for(int i=1;i<argc;++i)
+	for (int i=1;i<argc;++i)
 	{
 		if (!strncmp(argv[i],"--inpipe=",9))
 		{
@@ -91,5 +91,5 @@ int main(int argc, char *argv[])
 	threadHandle=CreateThread(NULL,0,PipeReadThread,NULL,0,&threadID);
 	WaitForSingleObject(threadHandle,INFINITE);
 	cout<<"Our reader thread died, terminating"<<endl;
-  return 0;
+	return 0;
 }

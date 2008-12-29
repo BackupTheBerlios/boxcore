@@ -4,7 +4,11 @@
 #ifndef __TINYLIST_H
 #define __TINYLIST_H
 
-struct list_node { struct list_node *next; void *v; };
+struct list_node
+{
+	struct list_node *next;
+	void *v;
+};
 //struct string_node { struct string_node *next; char str[1]; };
 
 #define dolist(_e,_l) for (_e=(_l);_e;_e=_e->next)

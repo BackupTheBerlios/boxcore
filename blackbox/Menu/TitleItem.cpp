@@ -37,7 +37,8 @@
 void TitleItem::Paint(HDC hDC)
 {
 	StyleItem *pSI = &mStyle.MenuTitle;
-	RECT rect; GetItemRect(&rect);
+	RECT rect;
+	GetItemRect(&rect);
 	int spacing = MenuInfo.nTitleIndent;
 	int just = pSI->Justify | DT_MENU_STANDARD;
 	int bw = pSI->borderWidth;
@@ -72,7 +73,8 @@ void TitleItem::Mouse(HWND hwnd, UINT uMsg, DWORD wParam, DWORD lParam)
 {
 	Menu *p = m_pMenu;
 
-	switch(uMsg) {
+	switch (uMsg)
+	{
 	case WM_RBUTTONUP:
 		if (m_bActive)
 		{
@@ -84,10 +86,10 @@ void TitleItem::Mouse(HWND hwnd, UINT uMsg, DWORD wParam, DWORD lParam)
 			}
 			else
 #endif
-			if (wParam & MK_SHIFT)
-				ShowContextMenu(NULL, m_pidl);
-			else
-				p->HideThis();
+				if (wParam & MK_SHIFT)
+					ShowContextMenu(NULL, m_pidl);
+				else
+					p->HideThis();
 		}
 		break;
 

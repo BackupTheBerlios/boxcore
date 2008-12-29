@@ -83,21 +83,21 @@ void mouse_event_exec(int message, const char **events)
 {
 	switch (message)
 	{
-		case WM_LBUTTONUP:
-			if (events[ME_LEFT]) PostMessage(BBhwnd, BB_EXECUTEASYNC, 0, (LPARAM)events[ME_LEFT]);
-			break;
+	case WM_LBUTTONUP:
+		if (events[ME_LEFT]) PostMessage(BBhwnd, BB_EXECUTEASYNC, 0, (LPARAM)events[ME_LEFT]);
+		break;
 
-		case WM_MBUTTONUP:
-			if (events[ME_MID]) PostMessage(BBhwnd, BB_EXECUTEASYNC, 0, (LPARAM)events[ME_MID]);
-			break;
+	case WM_MBUTTONUP:
+		if (events[ME_MID]) PostMessage(BBhwnd, BB_EXECUTEASYNC, 0, (LPARAM)events[ME_MID]);
+		break;
 
-		case WM_RBUTTONUP:
-			if (events[ME_RIGHT]) PostMessage(BBhwnd, BB_EXECUTEASYNC, 0, (LPARAM)events[ME_RIGHT]);
-			break;
+	case WM_RBUTTONUP:
+		if (events[ME_RIGHT]) PostMessage(BBhwnd, BB_EXECUTEASYNC, 0, (LPARAM)events[ME_RIGHT]);
+		break;
 
-		case WM_LBUTTONDBLCLK:
-			if (events[ME_DBL]) PostMessage(BBhwnd, BB_EXECUTEASYNC, 0, (LPARAM)events[ME_DBL]);
-			break;
+	case WM_LBUTTONDBLCLK:
+		if (events[ME_DBL]) PostMessage(BBhwnd, BB_EXECUTEASYNC, 0, (LPARAM)events[ME_DBL]);
+		break;
 	}
 }
 
@@ -195,16 +195,16 @@ public:
 			ret = over;
 		}
 		else
-		if (message == WM_LBUTTONDOWN
-		 || message == WM_RBUTTONDOWN
-		 || message == WM_LBUTTONDBLCLK
-		 || message == WM_RBUTTONDBLCLK
-		 )
-		{
-			SetCapture(mPI->hwnd);
-			mPI->capture_item = this;
-			active = true;
-		}
+			if (message == WM_LBUTTONDOWN
+					|| message == WM_RBUTTONDOWN
+					|| message == WM_LBUTTONDBLCLK
+					|| message == WM_RBUTTONDBLCLK
+			   )
+			{
+				SetCapture(mPI->hwnd);
+				mPI->capture_item = this;
+				active = true;
+			}
 		if (active != pa)
 			InvalidateRect(mPI->hwnd, &mr, FALSE);
 
@@ -263,8 +263,8 @@ public:
 		{
 			RECT rtmp;
 			if (IntersectRect(&rtmp, &p->item->mr, mPI->p_rcPaint)
-				|| (mPI->update_flag & 8)
-				)
+					|| (mPI->update_flag & 8)
+			   )
 				p->item->draw();
 		}
 	}
@@ -280,9 +280,9 @@ public:
 				if (p->item->activate_bbhwnd)
 				{
 					if (msg == WM_LBUTTONDOWN
-					 || msg == WM_RBUTTONDOWN
-					 || msg == WM_MBUTTONDOWN
-					 )
+							|| msg == WM_RBUTTONDOWN
+							|| msg == WM_MBUTTONDOWN
+					   )
 						SetActiveWindow(mPI->hwnd);
 				}
 				p->item->mouse_event(mx, my, msg, flags);
@@ -333,7 +333,8 @@ public:
 		if (NULL==tl) return;
 		bool lit = tl->active || tl->flashing;//|| active;
 
-		StyleItem *S; COLORREF C;
+		StyleItem *S;
+		COLORREF C;
 
 		if (lit)
 			S = ((StyleItem *)GetSettingPtr(SN_A)), C = Color_A;
@@ -384,8 +385,8 @@ public:
 			}
 		}
 		else
-		if (false == mPI->task_with_border && false == lit)
-			SI.bordered = false;
+			if (false == mPI->task_with_border && false == lit)
+				SI.bordered = false;
 
 		mPI->pBuff->MakeStyleGradient(mPI->hdcPaint, &mr, &SI, false);
 
@@ -397,7 +398,8 @@ public:
 		RECT ThisWin = mr;
 		RECT s1 = {0,0,0,0};
 		RECT s2 = {0,0,0,0};
-		int n =strlen(tl->caption); if (n>8) n=8;
+		int n =strlen(tl->caption);
+		if (n>8) n=8;
 		DrawText(mPI->hdcPaint, tl->caption,  n, &s1, DT_CALCRECT|DT_NOPREFIX);
 		DrawText(mPI->hdcPaint, tl->caption, -1, &s2, DT_CALCRECT|DT_NOPREFIX);
 
@@ -410,8 +412,8 @@ public:
 		int s = ThisWin.right - ThisWin.left;
 
 		BBDrawText(mPI->hdcPaint, tl->caption, -1, &ThisWin,
-			(s>s1.right ? TBJustify : DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS | DT_NOPREFIX),
-			S);
+				   (s>s1.right ? TBJustify : DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS | DT_NOPREFIX),
+				   S);
 
 		SelectObject(mPI->hdcPaint, oldfont);
 
@@ -445,54 +447,54 @@ public:
 			//====================
 			// Restore and focus window
 
-			case WM_LBUTTONDOWN:
-			focuswindow:
-				if (taskSysmenu && last_active_task == Window && !IsIconic(Window))
-					goto minimize;
+		case WM_LBUTTONDOWN:
+focuswindow:
+			if (taskSysmenu && last_active_task == Window && !IsIconic(Window))
+				goto minimize;
 
-				if (shift_down)
-					PostMessage(BBhwnd, BB_BRINGTOFRONT, BBBTF_CURRENT, (LPARAM)Window);
-				else
-					PostMessage(BBhwnd, BB_BRINGTOFRONT, 0,  (LPARAM)Window);
-				break;
+			if (shift_down)
+				PostMessage(BBhwnd, BB_BRINGTOFRONT, BBBTF_CURRENT, (LPARAM)Window);
+			else
+				PostMessage(BBhwnd, BB_BRINGTOFRONT, 0,  (LPARAM)Window);
+			break;
 
 			//====================
-			case WM_RBUTTONDBLCLK:
-			case WM_RBUTTONDOWN:
-				if (taskSysmenu)
-					break;
-
-				if (shift_down)
-					PostMessage(BBhwnd, BB_WINDOWCLOSE, 1, (LPARAM)Window);
-				else
-	minimize:
-					PostMessage(BBhwnd, BB_WINDOWMINIMIZE, 0, (LPARAM)Window);
+		case WM_RBUTTONDBLCLK:
+		case WM_RBUTTONDOWN:
+			if (taskSysmenu)
 				break;
+
+			if (shift_down)
+				PostMessage(BBhwnd, BB_WINDOWCLOSE, 1, (LPARAM)Window);
+			else
+minimize:
+				PostMessage(BBhwnd, BB_WINDOWMINIMIZE, 0, (LPARAM)Window);
+			break;
 
 			//====================
 			// Move window to the next/previous workspace
-			case WM_LBUTTONDBLCLK:
-				if (taskSysmenu)
-					goto focuswindow;
+		case WM_LBUTTONDBLCLK:
+			if (taskSysmenu)
+				goto focuswindow;
 
-			case WM_MBUTTONDBLCLK:
-			case WM_MBUTTONDOWN:
-				if (shift_down)
-					PostMessage(BBhwnd, BB_WORKSPACE, BBWS_MOVEWINDOWLEFT, (LPARAM)Window);
-				else
-					PostMessage(BBhwnd, BB_WORKSPACE, BBWS_MOVEWINDOWRIGHT, (LPARAM)Window);
-				break;
-
-			//====================
-			case WM_RBUTTONUP:
-				if (taskSysmenu)
-					ShowSysmenu(Window, PI->hwnd);
-				break;
+		case WM_MBUTTONDBLCLK:
+		case WM_MBUTTONDOWN:
+			if (shift_down)
+				PostMessage(BBhwnd, BB_WORKSPACE, BBWS_MOVEWINDOWLEFT, (LPARAM)Window);
+			else
+				PostMessage(BBhwnd, BB_WORKSPACE, BBWS_MOVEWINDOWRIGHT, (LPARAM)Window);
+			break;
 
 			//====================
-			case BB_DRAGOVER:
-				task_over_hwnd = Window;
-				break;
+		case WM_RBUTTONUP:
+			if (taskSysmenu)
+				ShowSysmenu(Window, PI->hwnd);
+			break;
+
+			//====================
+		case BB_DRAGOVER:
+			task_over_hwnd = Window;
+			break;
 		}
 	}
 #else
@@ -513,64 +515,64 @@ public:
 		{
 			//====================
 			// Restore and focus window
-			case WM_LBUTTONUP:
-				if (dblclk) goto move_wnd;
+		case WM_LBUTTONUP:
+			if (dblclk) goto move_wnd;
 
-				if (mPI->taskSysmenu && last_active_task == Window && !IsIconic(Window))
-					goto minimize;
+			if (mPI->taskSysmenu && last_active_task == Window && !IsIconic(Window))
+				goto minimize;
 
-				if (shift_down)
-					PostMessage(BBhwnd, BB_BRINGTOFRONT, BBBTF_CURRENT, (LPARAM)Window);
-				else
-					PostMessage(BBhwnd, BB_BRINGTOFRONT, 0,  (LPARAM)Window);
+			if (shift_down)
+				PostMessage(BBhwnd, BB_BRINGTOFRONT, BBBTF_CURRENT, (LPARAM)Window);
+			else
+				PostMessage(BBhwnd, BB_BRINGTOFRONT, 0,  (LPARAM)Window);
 
-				break;
+			break;
 
 			//====================
 			// Minimize (iconify) window
 
-			case WM_RBUTTONUP:
-				if (dblclk) break;
-				if (mPI->taskSysmenu)
-				{
-					ShowSysmenu(Window, mPI->hwnd);
-					break;
-				}
-				if (shift_down)
-					PostMessage(BBhwnd, BB_WINDOWCLOSE, 0, (LPARAM)Window);
-				else
-			minimize:
-					PostMessage(BBhwnd, BB_WINDOWMINIMIZE, 0, (LPARAM)Window);
-					//PostMessage(Window, WM_SYSCOMMAND, SC_MINIMIZE, 0);
+		case WM_RBUTTONUP:
+			if (dblclk) break;
+			if (mPI->taskSysmenu)
+			{
+				ShowSysmenu(Window, mPI->hwnd);
 				break;
+			}
+			if (shift_down)
+				PostMessage(BBhwnd, BB_WINDOWCLOSE, 0, (LPARAM)Window);
+			else
+minimize:
+				PostMessage(BBhwnd, BB_WINDOWMINIMIZE, 0, (LPARAM)Window);
+			//PostMessage(Window, WM_SYSCOMMAND, SC_MINIMIZE, 0);
+			break;
 
 			//====================
 
-			case WM_LBUTTONDBLCLK:
-			case WM_RBUTTONDBLCLK:
-				dblclk = true;
-				break;
+		case WM_LBUTTONDBLCLK:
+		case WM_RBUTTONDBLCLK:
+			dblclk = true;
+			break;
 
-			case WM_RBUTTONDOWN:
-			case WM_LBUTTONDOWN:
-				dblclk = false;
-				break;
+		case WM_RBUTTONDOWN:
+		case WM_LBUTTONDOWN:
+			dblclk = false;
+			break;
 
-			move_wnd:
-				dblclk = false;
+move_wnd:
+			dblclk = false;
 
 			// Move window to the next/previous workspace
-			case WM_MBUTTONUP:
-				if (shift_down)
-					PostMessage(BBhwnd, BB_WORKSPACE, BBWS_MOVEWINDOWLEFT, (LPARAM)Window);
-				else
-					PostMessage(BBhwnd, BB_WORKSPACE, BBWS_MOVEWINDOWRIGHT, (LPARAM)Window);
-				break;
+		case WM_MBUTTONUP:
+			if (shift_down)
+				PostMessage(BBhwnd, BB_WORKSPACE, BBWS_MOVEWINDOWLEFT, (LPARAM)Window);
+			else
+				PostMessage(BBhwnd, BB_WORKSPACE, BBWS_MOVEWINDOWRIGHT, (LPARAM)Window);
+			break;
 
 			//====================
-			case BB_DRAGOVER:
-				mPI->task_over_hwnd = Window;
-				break;
+		case BB_DRAGOVER:
+			mPI->task_over_hwnd = Window;
+			break;
 
 			//====================
 		}
@@ -621,11 +623,11 @@ public:
 			SetToolTip(mPI->hwnd, &mr, icon->szTip);
 
 			if (mPI->enable_balloons
-			 && is_bblean
-			 && 0 == icon->szTip[sizeof icon->szTip - 1]
-			 && icon->pBalloon
-			 && icon->pBalloon->uInfoTimeout
-			 )
+					&& is_bblean
+					&& 0 == icon->szTip[sizeof icon->szTip - 1]
+					&& icon->pBalloon
+					&& icon->pBalloon->uInfoTimeout
+			   )
 			{
 				RECT r = mr;
 				ClientToScreen(mPI->hwnd, (POINT*)&r.left);
@@ -648,8 +650,8 @@ public:
 			{
 				DWORD pid;
 				if (WM_MOUSEMOVE != message
-				 && pAllowSetForegroundWindow
-				 && GetWindowThreadProcessId(iconWnd, &pid))
+						&& pAllowSetForegroundWindow
+						&& GetWindowThreadProcessId(iconWnd, &pid))
 				{
 					pAllowSetForegroundWindow(pid);
 				}
@@ -657,10 +659,10 @@ public:
 				//SendNotifyMessage(iconWnd, icon->uCallbackMessage, icon->uID, message);
 				if (message != WM_MOUSEMOVE)
 				{
-				if (TrayIconEvent)
-					TrayIconEvent(iconWnd, icon->uID, message, flags, MAKELPARAM(mx,my));
-				else
-					SendNotifyMessage(iconWnd, icon->uCallbackMessage, icon->uID, message);
+					if (TrayIconEvent)
+						TrayIconEvent(iconWnd, icon->uID, message, flags, MAKELPARAM(mx,my));
+					else
+						SendNotifyMessage(iconWnd, icon->uCallbackMessage, icon->uID, message);
 				}
 			}
 			else
@@ -791,7 +793,8 @@ public:
 class bar_button : public baritem
 {
 public:
-	int dir; int mod;
+	int dir;
+	int mod;
 
 	//-----------------------------
 	bar_button(int m, barinfo *pi)  : baritem(m, pi)
@@ -804,9 +807,9 @@ public:
 	void draw()
 	{
 		StyleItem* S = (StyleItem *)GetSettingPtr(
-			active||(dir>0 && mPI->force_button_pressed)
-			? SN_TOOLBARBUTTONP : SN_TOOLBARBUTTON
-			);
+						   active||(dir>0 && mPI->force_button_pressed)
+						   ? SN_TOOLBARBUTTONP : SN_TOOLBARBUTTON
+					   );
 
 		mPI->pBuff->MakeStyleGradient(mPI->hdcPaint, &mr, S, false);
 
@@ -829,7 +832,7 @@ public:
 					Arc(mPI->hdcPaint, x-w, y-w, x+w-1, y+w, x,0,x,0);
 					Arc(mPI->hdcPaint, x-w+1, y-w, x+w, y+w, x,0,x,0);
 				}
-				while(--w);
+				while (--w);
 			}
 
 		}
@@ -840,7 +843,7 @@ public:
 			else         start = x-w+1, end = x+w;
 			MoveToEx(mPI->hdcPaint, start, z, NULL);
 			LineTo  (mPI->hdcPaint, start, z_end+1);
-			for(; z <= z_end; z++)
+			for (; z <= z_end; z++)
 			{
 				MoveToEx(mPI->hdcPaint, end,   y, NULL);
 				LineTo  (mPI->hdcPaint, start, z);
@@ -880,20 +883,20 @@ public:
 					mouse_event_exec(message, me_curOnly);
 		}
 		else
-		if (mod)
-		{
-			if (dir > 0)
-				mouse_event_exec(message, me_wnd_r);
+			if (mod)
+			{
+				if (dir > 0)
+					mouse_event_exec(message, me_wnd_r);
+				else
+					mouse_event_exec(message, me_wnd_l);
+			}
 			else
-				mouse_event_exec(message, me_wnd_l);
-		}
-		else
-		{
-			if (dir > 0)
-				mouse_event_exec(message, me_wspb_r);
-			else
-				mouse_event_exec(message, me_wspb_l);
-		}
+			{
+				if (dir > 0)
+					mouse_event_exec(message, me_wspb_r);
+				else
+					mouse_event_exec(message, me_wspb_l);
+			}
 	}
 };
 
@@ -931,9 +934,12 @@ public:
 		// Do some fugly math to get an estimation of how wide we can make the items
 		int ideal_width = (w / ts);
 		int task_width;
-		if (max_width > 0) {
+		if (max_width > 0)
+		{
 			task_width = (ideal_width > max_width)?max_width:ideal_width;
-		} else {
+		}
+		else
+		{
 			task_width = ideal_width;
 		}
 		if (task_width < min_width) task_width = min_width;
@@ -941,7 +947,8 @@ public:
 
 		int dyn_x = 0;
 		int n = 0;
-		do {
+		do
+		{
 			int left, right;
 			if (icon_mode)
 			{
@@ -963,7 +970,8 @@ public:
 			gi->mr.bottom   = mr.bottom;
 			gi->mr.left     = left;
 			gi->mr.right    = right;
-		} while (++n < ts);
+		}
+		while (++n < ts);
 	}
 
 	//-----------------------------
@@ -973,35 +981,35 @@ public:
 		{
 			switch (msg)
 			{
-				case WM_LBUTTONDOWN:
-				case WM_LBUTTONDBLCLK:
-					if (++mPI->TaskStyle==3) mPI->TaskStyle=0;
-					break;
+			case WM_LBUTTONDOWN:
+			case WM_LBUTTONDBLCLK:
+				if (++mPI->TaskStyle==3) mPI->TaskStyle=0;
+				break;
 
-				case WM_RBUTTONDOWN:
-				case WM_RBUTTONDBLCLK:
-					mPI->currentOnly = false==mPI->currentOnly;
-					mPI->NewTasklist();
-					break;
+			case WM_RBUTTONDOWN:
+			case WM_RBUTTONDBLCLK:
+				mPI->currentOnly = false==mPI->currentOnly;
+				mPI->NewTasklist();
+				break;
 
-				default:
-					return;
+			default:
+				return;
 			}
 			mPI->update_bar(2);
 			return;
 		}
 		baritemlist::mouse_event(mx, my, msg, flags);
 	}
-/*
-	void draw()
-	{
-		if (TaskStyle == 1)
+	/*
+		void draw()
 		{
-			mPI->pBuff->MakeStyleGradient(hdcPaint,  &mr, TaskStyle_L, false);
+			if (TaskStyle == 1)
+			{
+				mPI->pBuff->MakeStyleGradient(hdcPaint,  &mr, TaskStyle_L, false);
+			}
+			baritemlist::draw();
 		}
-		baritemlist::draw();
-	}
-*/
+	*/
 };
 
 //===========================================================================
@@ -1014,7 +1022,10 @@ class trayitemlist : public baritemlist
 	int xpos, ypos;
 
 public:
-	trayitemlist(barinfo *pi) : baritemlist(M_TRAYLIST, pi) { xpos = ypos = 0; }
+	trayitemlist(barinfo *pi) : baritemlist(M_TRAYLIST, pi)
+	{
+		xpos = ypos = 0;
+	}
 
 	//-----------------------------
 	// This one assigns the individual locations and sizes for
@@ -1032,11 +1043,11 @@ public:
 			xpos = x0, ypos = y0;
 			if (tray_notify_wnd)
 				SetWindowPos(tray_notify_wnd, NULL,
-					x0, y0, w, h, SWP_NOACTIVATE|SWP_NOZORDER);
+							 x0, y0, w, h, SWP_NOACTIVATE|SWP_NOZORDER);
 
 			if (tray_clock_wnd)
 				SetWindowPos(tray_clock_wnd, NULL,
-					0, 0, w, h, SWP_NOACTIVATE|SWP_NOZORDER);
+							 0, 0, w, h, SWP_NOACTIVATE|SWP_NOZORDER);
 		}
 
 		if (false == (mPI->update_flag & 4))
@@ -1051,7 +1062,8 @@ public:
 		int xpos = mr.left;
 		int n = 0;
 
-		do {
+		do
+		{
 			int right = xpos + mPI->S_ICON_SIZE+2;
 			if (right > mr.right)
 				break;
@@ -1062,15 +1074,16 @@ public:
 			gi->mr.bottom   = mr.top + s + mPI->S_ICON_SIZE + 1;
 			gi->mr.left     = xpos;
 			gi->mr.right    = xpos = right;
-		} while (++n < ts);
+		}
+		while (++n < ts);
 	}
-/*
-	void draw()
-	{
-		mPI->pBuff->MakeStyleGradient(hdcPaint,  &mr, TaskStyle_L, false);
-		baritemlist::draw();
-	}
-*/
+	/*
+		void draw()
+		{
+			mPI->pBuff->MakeStyleGradient(hdcPaint,  &mr, TaskStyle_L, false);
+			baritemlist::draw();
+		}
+	*/
 };
 
 //===========================================================================
@@ -1094,8 +1107,8 @@ public:
 	{
 		struct itemlist *p;
 		dolist (p, items)
-			if (type == p->item->mtype)
-				InvalidateRect(mPI->hwnd, &p->item->mr, FALSE);
+		if (type == p->item->mtype)
+			InvalidateRect(mPI->hwnd, &p->item->mr, FALSE);
 	}
 
 	//-----------------------------
@@ -1213,11 +1226,11 @@ public:
 		static bool countmsgs=0;
 
 		clklabel_count =
-		wsplabel_count =
-		clklabel_width =
-		wsplabel_width =
-		winlabel_width =
-		taskzone_width = 0;
+			wsplabel_count =
+				clklabel_width =
+					wsplabel_width =
+						winlabel_width =
+							taskzone_width = 0;
 
 		struct itemlist *p;
 
@@ -1233,7 +1246,8 @@ public:
 		// --- 1st pass ----------------------------------
 		dolist (p, p0)
 		{
-				char *cp; SIZE size;
+			char *cp;
+			SIZE size;
 			BOOL checkFuncRet;
 			if (M_NEWLINE == p->item->mtype)
 				break;
@@ -1333,15 +1347,15 @@ public:
 			}
 		}
 		else
-		if (winlabel_width)
-		{
-			winlabel_width = rest_width;
-		}
-		else
-		if (taskzone_width)
-		{
-			taskzone_width = rest_width;
-		}
+			if (winlabel_width)
+			{
+				winlabel_width = rest_width;
+			}
+			else
+				if (taskzone_width)
+				{
+					taskzone_width = rest_width;
+				}
 
 		// --- 2nd pass ----------------------------------
 

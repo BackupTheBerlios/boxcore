@@ -46,7 +46,8 @@ ST const char szDesktopName[] = "DesktopBackgroundClass";
 ST HWND hDesktopWnd;
 ST int focusmodel;
 
-ST struct {
+ST struct
+{
 	HBITMAP bmp;
 	char command[MAX_PATH];
 } Root;
@@ -131,7 +132,7 @@ void set_focus_model(const char *fm_string)
 	focusmodel = fm;
 
 	if (fm)
-	SystemParametersInfo(SPI_SETACTIVEWNDTRKTIMEOUT,  0, (PVOID)Settings_autoRaiseDelay, SPIF_SENDCHANGE);
+		SystemParametersInfo(SPI_SETACTIVEWNDTRKTIMEOUT,  0, (PVOID)Settings_autoRaiseDelay, SPIF_SENDCHANGE);
 	SystemParametersInfo(SPI_SETACTIVEWINDOWTRACKING, 0, (PVOID)(0!=(fm & 1)), SPIF_SENDCHANGE);
 	SystemParametersInfo(SPI_SETACTIVEWNDTRKZORDER,   0, (PVOID)(0!=(fm & 2)), SPIF_SENDCHANGE);
 }
@@ -155,7 +156,7 @@ void Desk_Init(void)
 			pSetDesktopMouseHook(BBhwnd, underExplorer);
 		else
 			BBMessageBox(MB_OK, NLS2("$BBError_DesktopHook$",
-				"Error: DesktopHook.dll not found!"));
+									 "Error: DesktopHook.dll not found!"));
 	}
 	else
 	{
@@ -178,7 +179,7 @@ void Desk_Init(void)
 			NULL,
 			hMainInstance,
 			NULL
-			);
+		);
 	}
 	Desk_new_background();
 }
@@ -209,7 +210,7 @@ ST void Desk_SetPosition()
 		HWND_BOTTOM,
 		VScreenX, VScreenY, VScreenWidth, VScreenHeight,
 		SWP_NOACTIVATE
-		);
+	);
 }
 
 //===========================================================================
@@ -261,8 +262,8 @@ void Desk_new_background(const char *p)
 	if (false == Settings_background_enabled)
 		p = "";
 	else
-	if (NULL == p)
-		p = mStyle.rootCommand;
+		if (NULL == p)
+			p = mStyle.rootCommand;
 
 	if (0 == strcmp(Root.command, p))
 		return;
@@ -294,93 +295,114 @@ ST LRESULT CALLBACK Desk_WndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	switch (uMsg)
 	{
 		//====================
-		case WM_CREATE:
-			hDesktopWnd = hwnd;
-			MakeSticky(hwnd);
-			MessageManager_AddMessages(hwnd, msgs);
-			Desk_SetPosition();
-			init_DeskDropTarget(hwnd);
-			break;
+	case WM_CREATE:
+		hDesktopWnd = hwnd;
+		MakeSticky(hwnd);
+		MessageManager_AddMessages(hwnd, msgs);
+		Desk_SetPosition();
+		init_DeskDropTarget(hwnd);
+		break;
 
 		//====================
-		case WM_DESTROY:
-			exit_DeskDropTarget(hwnd);
-			MessageManager_RemoveMessages(hwnd, msgs);
-			RemoveSticky(hwnd);
-			break;
+	case WM_DESTROY:
+		exit_DeskDropTarget(hwnd);
+		MessageManager_RemoveMessages(hwnd, msgs);
+		RemoveSticky(hwnd);
+		break;
 
-		case WM_USER:
-			Desk_Clear();
-			Root.bmp = (HBITMAP)lParam;
-		case WM_NCPAINT:
-			Desk_SetPosition();
-			break;
-
-		//====================
-		case WM_CLOSE:
-			break;
+	case WM_USER:
+		Desk_Clear();
+		Root.bmp = (HBITMAP)lParam;
+	case WM_NCPAINT:
+		Desk_SetPosition();
+		break;
 
 		//====================
-		case WM_MOUSEACTIVATE:
-			return MA_NOACTIVATE;
-
-		case WM_LBUTTONDOWN: bp = bp | 1;
-		case WM_RBUTTONDOWN: bp = bp | 2;
-		case WM_MBUTTONDOWN:
-		case WM_XBUTTONDOWN:
-			button_down = true;
-			break;
+	case WM_CLOSE:
+		break;
 
 		//====================
-		case WM_LBUTTONUP: n = 0; bp = bp & ~1; goto post_click;
-		case WM_RBUTTONUP: n = 1; bp = bp & ~2; goto post_click;
-		case WM_MBUTTONUP: n = 2; goto post_click;
-		case WM_XBUTTONUP:
-			switch (HIWORD(wParam)) {
-			case XBUTTON1: n = 3; goto post_click;
-			case XBUTTON2: n = 4; goto post_click;
-			case XBUTTON3: n = 5; goto post_click;
-			} break;
-		case WM_LBUTTONDBLCLK: n = 6; button_down = true; goto post_click;
+	case WM_MOUSEACTIVATE:
+		return MA_NOACTIVATE;
 
-		post_click:
-			if (button_down) PostMessage(BBhwnd, BB_DESKCLICK, bp, n);
-			bp = 0;
-			button_down = false;
-			break;
+	case WM_LBUTTONDOWN:
+		bp = bp | 1;
+	case WM_RBUTTONDOWN:
+		bp = bp | 2;
+	case WM_MBUTTONDOWN:
+	case WM_XBUTTONDOWN:
+		button_down = true;
+		break;
 
 		//====================
-		case WM_PAINT:
+	case WM_LBUTTONUP:
+		n = 0;
+		bp = bp & ~1;
+		goto post_click;
+	case WM_RBUTTONUP:
+		n = 1;
+		bp = bp & ~2;
+		goto post_click;
+	case WM_MBUTTONUP:
+		n = 2;
+		goto post_click;
+	case WM_XBUTTONUP:
+		switch (HIWORD(wParam))
 		{
-			PAINTSTRUCT ps;
-			HDC hdc_scrn = BeginPaint(hwnd, &ps);
-			if (Root.bmp)
-			{
-				HDC hdc_bmp = CreateCompatibleDC(hdc_scrn);
-				HGDIOBJ other = SelectObject(hdc_bmp, Root.bmp);
-				BitBltRect(hdc_scrn, hdc_bmp, &ps.rcPaint);
-				SelectObject(hdc_bmp, other);
-				DeleteDC(hdc_bmp);
-			}
-			else
-			{
-				PaintDesktop(hdc_scrn);
-			}
-			EndPaint(hwnd, &ps);
-			break;
+		case XBUTTON1:
+			n = 3;
+			goto post_click;
+		case XBUTTON2:
+			n = 4;
+			goto post_click;
+		case XBUTTON3:
+			n = 5;
+			goto post_click;
 		}
+		break;
+	case WM_LBUTTONDBLCLK:
+		n = 6;
+		button_down = true;
+		goto post_click;
+
+post_click:
+		if (button_down) PostMessage(BBhwnd, BB_DESKCLICK, bp, n);
+		bp = 0;
+		button_down = false;
+		break;
 
 		//====================
-		case WM_ERASEBKGND:
-			return TRUE;
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		HDC hdc_scrn = BeginPaint(hwnd, &ps);
+		if (Root.bmp)
+		{
+			HDC hdc_bmp = CreateCompatibleDC(hdc_scrn);
+			HGDIOBJ other = SelectObject(hdc_bmp, Root.bmp);
+			BitBltRect(hdc_scrn, hdc_bmp, &ps.rcPaint);
+			SelectObject(hdc_bmp, other);
+			DeleteDC(hdc_bmp);
+		}
+		else
+		{
+			PaintDesktop(hdc_scrn);
+		}
+		EndPaint(hwnd, &ps);
+		break;
+	}
+
+	//====================
+	case WM_ERASEBKGND:
+		return TRUE;
 
 		//====================
-		case BB_DRAGTODESKTOP:
-			return get_drop_command((const char *)lParam, wParam);
+	case BB_DRAGTODESKTOP:
+		return get_drop_command((const char *)lParam, wParam);
 
 		//====================
-		default:
-			return DefWindowProc(hwnd, uMsg, wParam, lParam);
+	default:
+		return DefWindowProc(hwnd, uMsg, wParam, lParam);
 
 	}
 	return 0;
@@ -410,8 +432,14 @@ bool Desk_mousebutton_event(LPARAM button, int switches)
 	static const char button_strings[9][10] = { "Left", "Right", "Mid", "X1", "X2", "X3", "Dbl", "LeftRight","RightLeft" };
 	char rc_key[80] = "blackbox.desktop.";
 
-	if ((button == 0) && (switches & 2)) { button = 8; }
-	if ((button == 1) && (switches & 1)) { button = 7; }
+	if ((button == 0) && (switches & 2))
+	{
+		button = 8;
+	}
+	if ((button == 1) && (switches & 1))
+	{
+		button = 7;
+	}
 
 	unsigned modkey = get_modkeys();
 	int i = 0;
@@ -428,13 +456,13 @@ bool Desk_mousebutton_event(LPARAM button, int switches)
 	if (broam)
 		post_command(broam);
 	else
-	if (1 == button && 0 == modkey)
-		PostMessage(BBhwnd, BB_MENU, BB_MENU_ROOT, 0);
-	else
-	if ((2 == button && 0 == modkey) || (1 == button && MK_SHIFT == modkey))
-		PostMessage(BBhwnd, BB_MENU, BB_MENU_TASKS, 0);
-	else
-		return false;
+		if (1 == button && 0 == modkey)
+			PostMessage(BBhwnd, BB_MENU, BB_MENU_ROOT, 0);
+		else
+			if ((2 == button && 0 == modkey) || (1 == button && MK_SHIFT == modkey))
+				PostMessage(BBhwnd, BB_MENU, BB_MENU_TASKS, 0);
+			else
+				return false;
 
 	return true;
 }
@@ -451,11 +479,11 @@ static bool get_drop_command(const char *filename, int flags)
 
 		if (0 == modkey) mode = "full";
 		else
-		if (MK_SHIFT == modkey) mode = "center";
-		else
-		if (MK_CONTROL == modkey) mode = "tile";
-		else
-			return false;
+			if (MK_SHIFT == modkey) mode = "center";
+			else
+				if (MK_CONTROL == modkey) mode = "tile";
+				else
+					return false;
 
 		if (0 == (flags & 1))
 		{

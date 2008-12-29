@@ -40,7 +40,8 @@ SkinStruct mSkin;
 
 void dbg_printf (const char *fmt, ...)
 {
-	char buffer[256]; va_list arg;
+	char buffer[256];
+	va_list arg;
 	va_start(arg, fmt);
 	vsprintf (buffer, fmt, arg);
 	OutputDebugString(buffer);
@@ -68,11 +69,11 @@ void *GetSharedMem(struct shmem *psh)
 	if (psh->hMapObject)
 	{
 		psh->lpvMem = MapViewOfFile(
-				psh->hMapObject,// object to map view of
-				FILE_MAP_READ,  // read access
-				0,              // high offset:  map from
-				0,              // low offset:   beginning
-				0);             // default: map entire file
+						  psh->hMapObject,// object to map view of
+						  FILE_MAP_READ,  // read access
+						  0,              // high offset:  map from
+						  0,              // low offset:   beginning
+						  0);             // default: map entire file
 
 		if (psh->lpvMem) return psh->lpvMem;
 	}
@@ -94,40 +95,47 @@ bool GetSkin(void)
 
 HWND GetRootWindow(HWND hwnd)
 {
-	HWND pw; HWND dw = GetDesktopWindow();
+	HWND pw;
+	HWND dw = GetDesktopWindow();
 	while (NULL != (pw = GetParent(hwnd)) && dw != pw) hwnd = pw;
 	return hwnd;
 }
 
 int get_module(HWND hwnd, char *buffer, int buffsize)
 {
-	char sFileName[MAX_PATH]; HINSTANCE hi; int i, r;
+	char sFileName[MAX_PATH];
+	HINSTANCE hi;
+	int i, r;
 	hi = (HINSTANCE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
 	r = GetModuleFileName(hi, sFileName, MAX_PATH);
 	if (0 == r) r = GetModuleFileName(NULL, sFileName, MAX_PATH);
 	for (i = r; i && sFileName[i-1] != '\\'; i--);
-	r -= i; if (r >= buffsize) r = buffsize-1;
+	r -= i;
+	if (r >= buffsize) r = buffsize-1;
 	((char*)memcpy(buffer, sFileName + i, r))[r] = 0;
 	return r;
 }
 
 char *sprint_window(char *buffer, HWND hwnd, char *msg)
 {
-	char sClassName[200]; sClassName[0] = 0;
+	char sClassName[200];
+	sClassName[0] = 0;
 	GetClassName(hwnd, sClassName, sizeof sClassName);
 
-	char sFileName[200]; sFileName[0] = 0;
+	char sFileName[200];
+	sFileName[0] = 0;
 	get_module(hwnd, sFileName, sizeof sFileName);
 
-	char caption[128]; caption[0] = 0;
+	char caption[128];
+	caption[0] = 0;
 	GetWindowText(hwnd, caption, sizeof caption);
 
 	sprintf(buffer,
-		"%s window with title \"%s\"\r\n\t%s:%s"
-		//" - %08x %08x"
-		, msg, caption, sFileName, sClassName
-		//, GetWindowLong(hwnd, GWL_STYLE), GetWindowLong(hwnd, GWL_EXSTYLE),
-		);
+			"%s window with title \"%s\"\r\n\t%s:%s"
+			//" - %08x %08x"
+			, msg, caption, sFileName, sClassName
+			//, GetWindowLong(hwnd, GWL_STYLE), GetWindowLong(hwnd, GWL_EXSTYLE),
+		   );
 	return buffer;
 }
 
@@ -152,9 +160,11 @@ void send_log(HWND hwnd, char *msg)
 int match (const char *str, const char *pat)
 {
 	for (;;)
-	{   char s = *str, p = *pat;
+	{
+		char s = *str, p = *pat;
 		if ('*' == p)
-		{   if (s && match(str+1, pat))
+		{
+			if (s && match(str+1, pat))
 				return 1;
 			++pat;
 			continue;
@@ -183,9 +193,9 @@ int HookWindow(HWND hwnd, int early)
 
 	// child windows are excluded unless they have a submenu or are MDI clients
 	if ((lStyle & WS_CHILD)
-		&& false == (lStyle & WS_SYSMENU)
-		&& false == (WS_EX_MDICHILD & lExStyle)
-		)
+			&& false == (lStyle & WS_SYSMENU)
+			&& false == (WS_EX_MDICHILD & lExStyle)
+	   )
 	{
 		//send_log(hwnd, "child, no sysmenu, not a MDI");
 		return 0;
@@ -208,7 +218,8 @@ int HookWindow(HWND hwnd, int early)
 	// check for something like a vertical titlebar, erm...
 	if (lExStyle & WS_EX_TOOLWINDOW)
 	{
-		RECT rc; GetWindowRect(hwnd, &rc);
+		RECT rc;
+		GetWindowRect(hwnd, &rc);
 		ScreenToClient(hwnd, (LPPOINT)&rc.left);
 		if (rc.top > -10)
 		{
@@ -226,10 +237,12 @@ int HookWindow(HWND hwnd, int early)
 	SkinStruct *pSkin = (SkinStruct *)GetSharedMem(&sh);
 	if (NULL == pSkin) return 0;
 
-	char sClassName[200]; sClassName[0] = 0;
+	char sClassName[200];
+	sClassName[0] = 0;
 	GetClassName(hwnd, sClassName, sizeof sClassName);
 
-	char sFileName[200]; sFileName[0] = 0;
+	char sFileName[200];
+	sFileName[0] = 0;
 	get_module(hwnd, sFileName, sizeof sFileName);
 
 	struct exclusion_item *ei = pSkin->exInfo.ei;
@@ -293,7 +306,7 @@ LRESULT CALLBACK CallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 		{
 			//dbg_printf("create hwnd %x hk %x", ((CWPSTRUCT*)lParam)->hwnd, mSkin.hCallWndHook);
 			//if (1 == HookWindow(((CWPSTRUCT*)lParam)->hwnd, 1))
-				PostMessage(((CWPSTRUCT*)lParam)->hwnd, bbSkinMsg, MSGID_LOAD, 0);
+			PostMessage(((CWPSTRUCT*)lParam)->hwnd, bbSkinMsg, MSGID_LOAD, 0);
 		}
 	}
 	return CallNextHookEx(mSkin.hCallWndHook, nCode, wParam, lParam);

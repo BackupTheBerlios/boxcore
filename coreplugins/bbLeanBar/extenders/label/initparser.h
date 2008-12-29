@@ -34,22 +34,23 @@ using namespace std;
 
 class argParser
 {
-	public:
-		// Constructor/Destructor
-		argParser();
-		~argParser();
-		// Public functions
-		void ParseString(string InitString);
-		bool HasArgument(string Argument);
-		string GetArgument(string Argument);
-		string GetArgumentEx(string Argument, string Default);
-	private:
-		struct ParseStruct{
-			string key;
-			string arg;
-		};
-		ParseStruct ParsedArgumentStruct[255];
-		int ParsedArguments;
+public:
+	// Constructor/Destructor
+	argParser();
+	~argParser();
+	// Public functions
+	void ParseString(string InitString);
+	bool HasArgument(string Argument);
+	string GetArgument(string Argument);
+	string GetArgumentEx(string Argument, string Default);
+private:
+	struct ParseStruct
+	{
+		string key;
+		string arg;
+	};
+	ParseStruct ParsedArgumentStruct[255];
+	int ParsedArguments;
 };
 
 #endif // __INITPARSER_H

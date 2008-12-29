@@ -35,11 +35,13 @@ bool isWin2kXP();
 
 //===========================================================================
 
-int imax(int a, int b) {
+int imax(int a, int b)
+{
 	return a>b?a:b;
 }
 
-int imin(int a, int b) {
+int imin(int a, int b)
+{
 	return a<b?a:b;
 }
 
@@ -59,7 +61,8 @@ void get_workarea(HWND hwnd, RECT *w, RECT *s)
 
 	if (*(DWORD*)&pMonitorFromWindow > 1)
 	{
-		MONITORINFO mi; mi.cbSize = sizeof(mi);
+		MONITORINFO mi;
+		mi.cbSize = sizeof(mi);
 		HMONITOR hMon = pMonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
 		if (hMon && pGetMonitorInfoA(hMon, &mi))
 		{
@@ -90,7 +93,11 @@ void get_workarea(HWND hwnd, RECT *w, RECT *s)
 
 void SnapWindowToEdge(WinInfo *WI, WINDOWPOS* pwPos, int nDist)
 {
-	RECT workArea, scrnArea; int x; int y; int z; int dx, dy, dz;
+	RECT workArea, scrnArea;
+	int x;
+	int y;
+	int z;
+	int dx, dy, dz;
 
 	get_workarea(pwPos->hwnd, &workArea, &scrnArea);
 
@@ -115,8 +122,8 @@ void SnapWindowToEdge(WinInfo *WI, WINDOWPOS* pwPos, int nDist)
 	if (dz<0) dz=-dz;
 	if (dz < dx) x = z, dx = dz;
 
-	if(dy < nDist) pwPos->y -= y;
-	if(dx < nDist) pwPos->x -= x;
+	if (dy < nDist) pwPos->y -= y;
+	if (dx < nDist) pwPos->x -= x;
 }
 
 //===========================================================================
@@ -137,8 +144,8 @@ void set_pos(HWND hwnd, RECT rc)
 	int width = rc.right - rc.left;
 	int height = rc.bottom - rc.top;
 	SetWindowPos(hwnd, NULL,
-		rc.left, rc.top, width, height,
-		SWP_NOZORDER|SWP_NOACTIVATE);
+				 rc.left, rc.top, width, height,
+				 SWP_NOZORDER|SWP_NOACTIVATE);
 }
 
 int get_shade_height(HWND hwnd)
@@ -148,7 +155,8 @@ int get_shade_height(HWND hwnd)
 
 void ShadeWindow(HWND hwnd)
 {
-	RECT rc; get_rect(hwnd, &rc);
+	RECT rc;
+	get_rect(hwnd, &rc);
 	int height = rc.bottom - rc.top;
 	DWORD prop = (DWORD_PTR)GetProp(hwnd, BBSHADE_PROP);
 	int h1 = LOWORD(prop);
@@ -188,69 +196,69 @@ void ShadeWindow(HWND hwnd)
 void exec_button_action(WinInfo *WI, int n, LPARAM lParam)
 {
 	HWND hwnd = WI->hwnd;
-	switch(n)
+	switch (n)
 	{
-		case btn_Close:
-			PostMessage(hwnd, WM_SYSCOMMAND, SC_CLOSE, 0);
-			break;
+	case btn_Close:
+		PostMessage(hwnd, WM_SYSCOMMAND, SC_CLOSE, 0);
+		break;
 
-		case btn_Min:
-			if (WI->style & WS_MINIMIZEBOX)
-				if (BBVERSION_LEAN == mSkin.BBVersion)
+	case btn_Min:
+		if (WI->style & WS_MINIMIZEBOX)
+			if (BBVERSION_LEAN == mSkin.BBVersion)
 				PostMessage(mSkin.BBhwnd, IsIconic(hwnd) ? BB_WINDOWRESTORE : BB_WINDOWMINIMIZE, 0, (LPARAM)hwnd);
-				else
+			else
 				PostMessage(hwnd, WM_SYSCOMMAND, IsIconic(hwnd) ? SC_RESTORE : SC_MINIMIZE, 0);
-			break;
+		break;
 
-		case btn_Max:
-			if (WI->style & WS_MAXIMIZEBOX)
-				if (BBVERSION_LEAN == mSkin.BBVersion)
+	case btn_Max:
+		if (WI->style & WS_MAXIMIZEBOX)
+			if (BBVERSION_LEAN == mSkin.BBVersion)
 				PostMessage(mSkin.BBhwnd, IsZoomed(hwnd) ? BB_WINDOWRESTORE : BB_WINDOWMAXIMIZE, 0, (LPARAM)hwnd);
-				else
+			else
 				PostMessage(hwnd, WM_SYSCOMMAND, IsZoomed(hwnd) ? SC_RESTORE : SC_MAXIMIZE, 0);
-			break;
+		break;
 
-		case btn_VMax:
-			if (WI->style & WS_MAXIMIZEBOX)
-				PostMessage(mSkin.BBhwnd, BB_WINDOWGROWHEIGHT, 0, (LPARAM)hwnd);
-			break;
+	case btn_VMax:
+		if (WI->style & WS_MAXIMIZEBOX)
+			PostMessage(mSkin.BBhwnd, BB_WINDOWGROWHEIGHT, 0, (LPARAM)hwnd);
+		break;
 
-		case btn_HMax:
-			if (WI->style & WS_MAXIMIZEBOX)
-				PostMessage(mSkin.BBhwnd, BB_WINDOWGROWWIDTH, 0, (LPARAM)hwnd);
-			break;
+	case btn_HMax:
+		if (WI->style & WS_MAXIMIZEBOX)
+			PostMessage(mSkin.BBhwnd, BB_WINDOWGROWWIDTH, 0, (LPARAM)hwnd);
+		break;
 
-		case btn_Lower:
-			PostMessage(mSkin.BBhwnd, BB_WINDOWLOWER, 0, (LPARAM)hwnd);
-			break;
+	case btn_Lower:
+		PostMessage(mSkin.BBhwnd, BB_WINDOWLOWER, 0, (LPARAM)hwnd);
+		break;
 
-		case btn_Rollup:
-			if (WI->style & WS_SIZEBOX)
-				ShadeWindow(hwnd);
-			break;
+	case btn_Rollup:
+		if (WI->style & WS_SIZEBOX)
+			ShadeWindow(hwnd);
+		break;
 
-		case btn_Sticky:
-			WI->is_sticky = false == WI->is_sticky;
-			PostMessage(mSkin.BBhwnd, BB_WORKSPACE,
-				WI->is_sticky ? BBWS_MAKESTICKY : BBWS_CLEARSTICKY,
-				(LPARAM)hwnd
-				);
-			break;
+	case btn_Sticky:
+		WI->is_sticky = false == WI->is_sticky;
+		PostMessage(mSkin.BBhwnd, BB_WORKSPACE,
+					WI->is_sticky ? BBWS_MAKESTICKY : BBWS_CLEARSTICKY,
+					(LPARAM)hwnd
+				   );
+		break;
 
-		case btn_OnTop:
-			SetWindowPos(hwnd,
-				WI->is_ontop ? HWND_NOTOPMOST : HWND_TOPMOST,
-				0, 0, 0, 0,
-				SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE);
-			break;
+	case btn_OnTop:
+		SetWindowPos(hwnd,
+					 WI->is_ontop ? HWND_NOTOPMOST : HWND_TOPMOST,
+					 0, 0, 0, 0,
+					 SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE);
+		break;
 
-		case btn_Icon:
-			POINT  pt;
-            pt.x = LOWORD(lParam);
-            pt.y = HIWORD(lParam);
-			ClientToScreen(hwnd, &pt);
-			PostMessage(hwnd, 0x0313, 0, MAKELPARAM(pt.x, pt.y));
-			break;
+	case btn_Icon:
+		POINT  pt;
+		pt.x = LOWORD(lParam);
+		pt.y = HIWORD(lParam);
+		ClientToScreen(hwnd, &pt);
+		PostMessage(hwnd, 0x0313, 0, MAKELPARAM(pt.x, pt.y));
+		break;
 	}
 }
 
@@ -258,10 +266,12 @@ void exec_button_action(WinInfo *WI, int n, LPARAM lParam)
 void DeleteBitmaps(WinInfo *WI, int a, int n)
 {
 	HGDIOBJ *pBmp = WI->gdiobjs + a;
-	do {
+	do
+	{
 		if (*pBmp) DeleteObject(*pBmp), *pBmp = NULL;
 		pBmp++;
-	} while (--n);
+	}
+	while (--n);
 }
 
 void PutGradient(WinInfo *WI, HDC hdc, RECT *rc, GradientItem *pSI)
@@ -273,7 +283,8 @@ void PutGradient(WinInfo *WI, HDC hdc, RECT *rc, GradientItem *pSI)
 		return;
 	}
 
-	HBITMAP bmp, *pBmp; HGDIOBJ other;
+	HBITMAP bmp, *pBmp;
+	HGDIOBJ other;
 	int width = rc->right-rc->left;
 	int height = rc->bottom-rc->top;
 
@@ -285,17 +296,17 @@ void PutGradient(WinInfo *WI, HDC hdc, RECT *rc, GradientItem *pSI)
 		other = SelectObject(WI->buf, bmp);
 		RECT r = { 0, 0, width, height };
 		MakeGradient(WI->buf,
-			r,
-			pSI->type,
-			pSI->Color,
-			pSI->ColorTo,
-			pSI->interlaced,
-			pSI->bevelstyle,
-			pSI->bevelposition,
-			0,
-			pSI->borderColor,
-			pSI->borderWidth
-			);
+					 r,
+					 pSI->type,
+					 pSI->Color,
+					 pSI->ColorTo,
+					 pSI->interlaced,
+					 pSI->bevelstyle,
+					 pSI->bevelposition,
+					 0,
+					 pSI->borderColor,
+					 pSI->borderWidth
+					);
 		*pBmp = bmp;
 	}
 	else
@@ -327,14 +338,18 @@ void DrawButton(WinInfo *WI, HDC hdc, RECT rc, int btn, bool state, bool active,
 	unsigned char *up = mSkin.button_bmp[btn].data[(unsigned)state];
 	unsigned bits = 0;
 	y = ya;
-	do {
+	do
+	{
 		x = xa;
-		do {
+		do
+		{
 			if (bits < 2) bits = 256 | *up++;
 			if (bits & 1) SetPixel(hdc, x, y, c);
 			bits >>= 1;
-		} while (++x < xe);
-	} while (++y < ye);
+		}
+		while (++x < xe);
+	}
+	while (++y < ye);
 }
 
 void draw_line(HDC hDC, int x1, int x2, int y1, int y2, int w)
@@ -343,7 +358,8 @@ void draw_line(HDC hDC, int x1, int x2, int y1, int y2, int w)
 	{
 		MoveToEx(hDC, x1, y1, NULL);
 		LineTo  (hDC, x2, y2);
-		if (x1 == x2) x2 = ++x1; else y2 = ++y1;
+		if (x1 == x2) x2 = ++x1;
+		else y2 = ++y1;
 		--w;
 	}
 }
@@ -354,7 +370,8 @@ void PaintAll(struct WinInfo* WI)
 {
 	//dbg_printf("painting %x", WI->hwnd);
 
-	GradientItem *pSI; RECT rc;
+	GradientItem *pSI;
+	RECT rc;
 	HICON hIcon = NULL;
 
 	HDC hdc_win = GetWindowDC(WI->hwnd);
@@ -370,8 +387,8 @@ void PaintAll(struct WinInfo* WI)
 	int title_bottom = top + title_height;
 
 	bool active = WI->is_active
-		|| GetActiveWindow() == WI->hwnd
-		|| WI->bbsm_option >= MSGID_BBSM_SETACTIVE;
+				  || GetActiveWindow() == WI->hwnd
+				  || WI->bbsm_option >= MSGID_BBSM_SETACTIVE;
 
 	int bw = mSkin.borderWidth;
 	COLORREF bc = active ? mSkin.focus_borderColor : mSkin.unfocus_borderColor;
@@ -416,46 +433,53 @@ void PaintAll(struct WinInfo* WI)
 		bool set, state;
 		switch (b)
 		{
-			case btn_Rollup: state = WI->is_rolled;
-				set = 0 != (w_style & WS_SIZEBOX);
-				break;
-			case btn_Sticky: state = WI->is_sticky;
-				set = 0 == (w_style & WS_CHILD);
-				break;
-			case btn_OnTop: state = WI->is_ontop;
-				set = 0 == (w_style & WS_CHILD);
-				break;
-			case btn_Min: state = WI->is_iconic;
-				set = 0 != (w_style & WS_MINIMIZEBOX);
-				break;
-			case btn_Max: state = WI->is_zoomed;
-				set = 0 != (w_style & WS_MAXIMIZEBOX);
-				break;
-			case btn_Close: state = false, set = true;
-				if (MSGID_BBSM_SETPRESSED == WI->bbsm_option)
-					pressed = true;
-				break;
-			case btn_Icon: state = false;
-				if (mSkin.iconSize && NULL == hIcon)
+		case btn_Rollup:
+			state = WI->is_rolled;
+			set = 0 != (w_style & WS_SIZEBOX);
+			break;
+		case btn_Sticky:
+			state = WI->is_sticky;
+			set = 0 == (w_style & WS_CHILD);
+			break;
+		case btn_OnTop:
+			state = WI->is_ontop;
+			set = 0 == (w_style & WS_CHILD);
+			break;
+		case btn_Min:
+			state = WI->is_iconic;
+			set = 0 != (w_style & WS_MINIMIZEBOX);
+			break;
+		case btn_Max:
+			state = WI->is_zoomed;
+			set = 0 != (w_style & WS_MAXIMIZEBOX);
+			break;
+		case btn_Close:
+			state = false, set = true;
+			if (MSGID_BBSM_SETPRESSED == WI->bbsm_option)
+				pressed = true;
+			break;
+		case btn_Icon:
+			state = false;
+			if (mSkin.iconSize && NULL == hIcon)
+			{
+				if (mSkin.iconSize <= 16)
 				{
-					if (mSkin.iconSize <= 16)
-					{
-						SendMessageTimeout(WI->hwnd, WM_GETICON, ICON_SMALL, 0, SMTO_ABORTIFHUNG|SMTO_NORMAL, 500, (DWORD_PTR*)&hIcon);
-						if (NULL == hIcon) hIcon = (HICON)GetClassLong(WI->hwnd, GCLP_HICONSM);
-					}
-					if (NULL == hIcon) SendMessageTimeout(WI->hwnd, WM_GETICON, ICON_BIG, 0, SMTO_ABORTIFHUNG|SMTO_NORMAL, 500, (DWORD_PTR*)&hIcon);
-					if (NULL == hIcon) hIcon = (HICON)GetClassLong(WI->hwnd, GCLP_HICON);
-					if (NULL == hIcon && mSkin.iconSize > 16)
-					{
-						SendMessageTimeout(WI->hwnd, WM_GETICON, ICON_SMALL, 0, SMTO_ABORTIFHUNG|SMTO_NORMAL, 500, (DWORD_PTR*)&hIcon);
-						if (NULL == hIcon) hIcon = (HICON)GetClassLong(WI->hwnd, GCLP_HICONSM);
-					}
+					SendMessageTimeout(WI->hwnd, WM_GETICON, ICON_SMALL, 0, SMTO_ABORTIFHUNG|SMTO_NORMAL, 500, (DWORD_PTR*)&hIcon);
+					if (NULL == hIcon) hIcon = (HICON)GetClassLong(WI->hwnd, GCLP_HICONSM);
 				}
+				if (NULL == hIcon) SendMessageTimeout(WI->hwnd, WM_GETICON, ICON_BIG, 0, SMTO_ABORTIFHUNG|SMTO_NORMAL, 500, (DWORD_PTR*)&hIcon);
+				if (NULL == hIcon) hIcon = (HICON)GetClassLong(WI->hwnd, GCLP_HICON);
+				if (NULL == hIcon && mSkin.iconSize > 16)
+				{
+					SendMessageTimeout(WI->hwnd, WM_GETICON, ICON_SMALL, 0, SMTO_ABORTIFHUNG|SMTO_NORMAL, 500, (DWORD_PTR*)&hIcon);
+					if (NULL == hIcon) hIcon = (HICON)GetClassLong(WI->hwnd, GCLP_HICONSM);
+				}
+			}
 
-				set = NULL != hIcon;
-				break;
-			default:
-				set = state = false;
+			set = NULL != hIcon;
+			break;
+		default:
+			set = state = false;
 		}
 
 		WI->button_set[n] = btn_Caption;
@@ -508,25 +532,26 @@ void PaintAll(struct WinInfo* WI)
 	if (NULL == WI->hFont)
 	{
 		WI->hFont = CreateFont(
-			mSkin.windowFont.Height,
-			0, 0, 0,
-			mSkin.windowFont.Weight,
-			false, false, false,
-			DEFAULT_CHARSET,
-			OUT_DEFAULT_PRECIS,
-			CLIP_DEFAULT_PRECIS,
-			DEFAULT_QUALITY,
-			DEFAULT_PITCH|FF_DONTCARE,
-			mSkin.windowFont.Face
-			);
+						mSkin.windowFont.Height,
+						0, 0, 0,
+						mSkin.windowFont.Weight,
+						false, false, false,
+						DEFAULT_CHARSET,
+						OUT_DEFAULT_PRECIS,
+						CLIP_DEFAULT_PRECIS,
+						DEFAULT_QUALITY,
+						DEFAULT_PITCH|FF_DONTCARE,
+						mSkin.windowFont.Face
+					);
 	}
 
 	HGDIOBJ hfontOld = SelectObject(hdc, WI->hFont);
 	SetBkMode(hdc, TRANSPARENT);
 
-	char sTitle[128]; sTitle[0] = 0;
+	char sTitle[128];
+	sTitle[0] = 0;
 	GetWindowText(WI->hwnd, sTitle, sizeof sTitle);
-	if(pSI->ShadowXY)
+	if (pSI->ShadowXY)
 	{
 		RECT rs;
 		rs.left = rc.left + pSI->ShadowX;
@@ -535,21 +560,21 @@ void PaintAll(struct WinInfo* WI)
 		rs.bottom = rc.bottom + pSI->ShadowY;
 		SetTextColor(hdc, pSI->ShadowColor);
 		DrawText(hdc, sTitle, -1, &rs,
-			mSkin.windowFont.Justify
-			| DT_SINGLELINE
-			| DT_NOPREFIX
-			| DT_END_ELLIPSIS
-			| DT_VCENTER
-			);
+				 mSkin.windowFont.Justify
+				 | DT_SINGLELINE
+				 | DT_NOPREFIX
+				 | DT_END_ELLIPSIS
+				 | DT_VCENTER
+				);
 	}
 	SetTextColor(hdc, pSI->TextColor);
 	DrawText(hdc, sTitle, -1, &rc,
-		mSkin.windowFont.Justify
-		| DT_SINGLELINE
-		| DT_NOPREFIX
-		| DT_END_ELLIPSIS
-		| DT_VCENTER
-		);
+			 mSkin.windowFont.Justify
+			 | DT_SINGLELINE
+			 | DT_NOPREFIX
+			 | DT_END_ELLIPSIS
+			 | DT_VCENTER
+			);
 
 	SelectObject(hdc, hfontOld);
 
@@ -626,8 +651,8 @@ bool get_rolled(WinInfo *WI)
 {
 	DWORD prop = (DWORD_PTR)GetProp(WI->hwnd, BBSHADE_PROP);
 	bool rolled = IsZoomed(WI->hwnd)
-		? 0 != HIWORD(prop)
-		: 0 != LOWORD(prop);
+				  ? 0 != HIWORD(prop)
+				  : 0 != LOWORD(prop);
 	return WI->is_rolled = rolled;
 }
 
@@ -661,16 +686,17 @@ bool set_region(WinInfo *WI)
 
 	SizeInfo S = WI->S;
 
-	RECT rc; GetWindowRect(hwnd, &rc);
+	RECT rc;
+	GetWindowRect(hwnd, &rc);
 	WI->S.width  = rc.right - rc.left;
 	WI->S.height = rc.bottom - rc.top;
 	GetClientRect(hwnd, &WI->S.rcClient);
 
 	int c = (WS_EX_TOOLWINDOW & WI->exstyle)
-		? mSkin.cySmCaption : mSkin.cyCaption;
+			? mSkin.cySmCaption : mSkin.cyCaption;
 
 	int b = (WS_SIZEBOX & WI->style)
-		? mSkin.cxSizeFrame : mSkin.cxFixedFrame;
+			? mSkin.cxSizeFrame : mSkin.cxFixedFrame;
 
 	WI->S.HiddenTop     = imax(0, b - mSkin.ncTop + c);
 	WI->S.HiddenSide    = imax(0, b - mSkin.borderWidth);
@@ -693,11 +719,11 @@ bool set_region(WinInfo *WI)
 	WI->apply_skin = true;
 
 	HRGN hrgn = CreateRectRgn(
-		WI->S.HiddenSide,
-		WI->S.HiddenTop,
-		WI->S.width - WI->S.HiddenSide,
-		WI->S.height - WI->S.HiddenBottom
-		);
+					WI->S.HiddenSide,
+					WI->S.HiddenTop,
+					WI->S.width - WI->S.HiddenSide,
+					WI->S.height - WI->S.HiddenBottom
+				);
 
 	WI->in_set_region = true;
 	SetWindowRgn(hwnd, hrgn, TRUE);
@@ -725,8 +751,8 @@ void subclass_window(HWND hwnd)
 	set_WinInfo(hwnd, WI);
 
 	WI->wpOrigWindowProc = (WNDPROC)
-		(WI->is_unicode ? SetWindowLongPtrW : SetWindowLongPtrA)
-			(hwnd, GWLP_WNDPROC, (LONG_PTR)WindowSubclassProc);
+						   (WI->is_unicode ? SetWindowLongPtrW : SetWindowLongPtrA)
+						   (hwnd, GWLP_WNDPROC, (LONG_PTR)WindowSubclassProc);
 
 	// some programs dont handle the posted "MSGID_LOAD" msg, so set
 	// the region here (is WI causing the 'opera does not start' issue?)
@@ -801,7 +827,8 @@ int get_button (struct WinInfo *WI, int x, int y)
 	int left = margin;
 	int right = WI->S.width - margin;
 
-	RECT rc; GetWindowRect(WI->hwnd, &rc);
+	RECT rc;
+	GetWindowRect(WI->hwnd, &rc);
 	y -= rc.top;
 	x -= rc.left;
 
@@ -811,37 +838,37 @@ int get_button (struct WinInfo *WI, int x, int y)
 	{
 		if (x < mSkin.ncTop) n = btn_Topleft;
 		else
-		if (x >= WI->S.width - mSkin.ncTop) n = btn_Topright;
-		else n = btn_Top;
+			if (x >= WI->S.width - mSkin.ncTop) n = btn_Topright;
+			else n = btn_Top;
 	}
 	else
-	if (y >= WI->S.HiddenTop + mSkin.ncTop && false == WI->is_rolled) n = btn_None;
-	else
-	if (y >= button_top + mSkin.buttonSize) n = btn_Caption;
-	else
-	if (x < left) n = btn_Topleft;
-	else
-	if (x >= right) n = btn_Topright;
-	else
-	{
-		n = btn_Caption;
-		int button_next = mSkin.buttonSize + mSkin.buttonSpace;
-		for (int i = 0; i < 15; i++)
-		{
-			if (WI->right_btn == i)
-			{
-				left = right - (14 - WI->right_btn) * button_next + mSkin.buttonSpace;
-				continue;
-			}
-			if (x < left) break;
-			if (x < left + mSkin.buttonSize)
-			{
-				n = WI->button_set[i];
-				break;
-			}
-			left += button_next;
-		}
-	}
+		if (y >= WI->S.HiddenTop + mSkin.ncTop && false == WI->is_rolled) n = btn_None;
+		else
+			if (y >= button_top + mSkin.buttonSize) n = btn_Caption;
+			else
+				if (x < left) n = btn_Topleft;
+				else
+					if (x >= right) n = btn_Topright;
+					else
+					{
+						n = btn_Caption;
+						int button_next = mSkin.buttonSize + mSkin.buttonSpace;
+						for (int i = 0; i < 15; i++)
+						{
+							if (WI->right_btn == i)
+							{
+								left = right - (14 - WI->right_btn) * button_next + mSkin.buttonSpace;
+								continue;
+							}
+							if (x < left) break;
+							if (x < left + mSkin.buttonSize)
+							{
+								n = WI->button_set[i];
+								break;
+							}
+							left += button_next;
+						}
+					}
 	if (n >= btn_Topleft)
 	{
 		if (WI->is_zoomed) n = btn_Caption;
@@ -854,18 +881,30 @@ int get_button (struct WinInfo *WI, int x, int y)
 // translate button-id to hittest value
 LRESULT translate_hittest(WinInfo *WI, int n)
 {
-	switch(n)
+	switch (n)
 	{
-		case btn_Min: return HTMINBUTTON;               //  8
-		case btn_Max: return HTMAXBUTTON;               //  9
-		case btn_Close: return HTCLOSE;                 // 20
-		case btn_Caption: return HTCAPTION;             //  2
-		case btn_Nowhere: return HTNOWHERE;             //  0
-		case btn_Top: n = HTTOP;  goto s1;              // 12
-		case btn_Topleft: n = HTTOPLEFT; goto s1;       // 13
-		case btn_Topright: n = HTTOPRIGHT;  goto s1;    // 14
-		default: break;
-	  s1:
+	case btn_Min:
+		return HTMINBUTTON;               //  8
+	case btn_Max:
+		return HTMAXBUTTON;               //  9
+	case btn_Close:
+		return HTCLOSE;                 // 20
+	case btn_Caption:
+		return HTCAPTION;             //  2
+	case btn_Nowhere:
+		return HTNOWHERE;             //  0
+	case btn_Top:
+		n = HTTOP;
+		goto s1;              // 12
+	case btn_Topleft:
+		n = HTTOPLEFT;
+		goto s1;       // 13
+	case btn_Topright:
+		n = HTTOPRIGHT;
+		goto s1;    // 14
+	default:
+		break;
+s1:
 		if (WI->style & WS_SIZEBOX) return n;
 		return HTCAPTION;
 	}
@@ -908,7 +947,9 @@ int get_caption_click(WPARAM wParam, char *pCA)
 
 LRESULT APIENTRY WindowSubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	WinInfo *WI = get_WinInfo(hwnd); LRESULT result = 0; int n;
+	WinInfo *WI = get_WinInfo(hwnd);
+	LRESULT result = 0;
+	int n;
 
 	bool flag_save;
 
@@ -917,86 +958,95 @@ LRESULT APIENTRY WindowSubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 #endif
 
 	if (WI->apply_skin
-	 || uMsg == WM_NCDESTROY
-	 || uMsg == WM_STYLECHANGED
-	 || uMsg == bbSkinMsg
-	 )
-	switch (uMsg)
-	{
-
-	//----------------------------------
-	// Windows draws the caption on WM_SETTEXT/WM_SETICON
-
-	case WM_SETICON:
-	case WM_SETTEXT:
-		if ((WI->exstyle & WS_EX_MDICHILD) && IsZoomed(hwnd))
+			|| uMsg == WM_NCDESTROY
+			|| uMsg == WM_STYLECHANGED
+			|| uMsg == bbSkinMsg
+	   )
+		switch (uMsg)
 		{
-			post_redraw(GetRootWindow(hwnd));
-			break;
-		}
 
-	//if (false == mSkin.drawLocked)
-		goto paint_after;
-/*
-	paint_locked:  // smooth, but slow and dangerous also
-	{
-		bool flag_save = WI->dont_draw;
-		WI->dont_draw = true;
-		BOOL locked = LockWindowUpdate(hwnd);
-		result = CALLORIGWINDOWPROC(hwnd, uMsg, wParam, lParam);
-		if (locked) LockWindowUpdate(NULL);
-		WI->dont_draw = flag_save;
-		goto paint_now;
-	}
-*/
-	//----------------------------------
-	// Windows draws the caption buttons on WM_SETCURSOR (size arrows),
-	// which looks completely unsmooth, have to override this
+			//----------------------------------
+			// Windows draws the caption on WM_SETTEXT/WM_SETICON
 
-	case WM_SETCURSOR:
-	{
-		LPCSTR CU;
-		switch (LOWORD(lParam))
+		case WM_SETICON:
+		case WM_SETTEXT:
+			if ((WI->exstyle & WS_EX_MDICHILD) && IsZoomed(hwnd))
+			{
+				post_redraw(GetRootWindow(hwnd));
+				break;
+			}
+
+			//if (false == mSkin.drawLocked)
+			goto paint_after;
+			/*
+				paint_locked:  // smooth, but slow and dangerous also
+				{
+					bool flag_save = WI->dont_draw;
+					WI->dont_draw = true;
+					BOOL locked = LockWindowUpdate(hwnd);
+					result = CALLORIGWINDOWPROC(hwnd, uMsg, wParam, lParam);
+					if (locked) LockWindowUpdate(NULL);
+					WI->dont_draw = flag_save;
+					goto paint_now;
+				}
+			*/
+			//----------------------------------
+			// Windows draws the caption buttons on WM_SETCURSOR (size arrows),
+			// which looks completely unsmooth, have to override this
+
+		case WM_SETCURSOR:
 		{
+			LPCSTR CU;
+			switch (LOWORD(lParam))
+			{
 			case HTLEFT:
-			case HTRIGHT: CU = IDC_SIZEWE;  break;
+			case HTRIGHT:
+				CU = IDC_SIZEWE;
+				break;
 
 			case HTTOPRIGHT:
-			case HTBOTTOMLEFT: CU = IDC_SIZENESW; break;
+			case HTBOTTOMLEFT:
+				CU = IDC_SIZENESW;
+				break;
 
 			case HTTOPLEFT:
 			case HTGROWBOX:
-			case HTBOTTOMRIGHT: CU = IDC_SIZENWSE; break;
+			case HTBOTTOMRIGHT:
+				CU = IDC_SIZENWSE;
+				break;
 
 			case HTTOP:
-			case HTBOTTOM: CU = IDC_SIZENS; break;
+			case HTBOTTOM:
+				CU = IDC_SIZENS;
+				break;
 
-			default: goto paint_after;
+			default:
+				goto paint_after;
+			}
+			SetCursor(LoadCursor(NULL, CU));
+			result = 1;
+			goto leave;
 		}
-		SetCursor(LoadCursor(NULL, CU));
-		result = 1;
-		goto leave;
-	}
 
-	//----------------------------------
+		//----------------------------------
 
-	case WM_NCACTIVATE:
-		WI->is_active = 0 != wParam;
-		post_redraw(hwnd);
-		goto paint_after;
+		case WM_NCACTIVATE:
+			WI->is_active = 0 != wParam;
+			post_redraw(hwnd);
+			goto paint_after;
 
-	//----------------------------------
-	case WM_NCHITTEST:
-		n = get_button(WI, (short)LOWORD(lParam), (short)HIWORD(lParam));
-		if (btn_None == n)
-			result = CALLORIGWINDOWPROC(hwnd, uMsg, wParam, lParam);
-		else
-			result = translate_hittest(WI, n);
+			//----------------------------------
+		case WM_NCHITTEST:
+			n = get_button(WI, (short)LOWORD(lParam), (short)HIWORD(lParam));
+			if (btn_None == n)
+				result = CALLORIGWINDOWPROC(hwnd, uMsg, wParam, lParam);
+			else
+				result = translate_hittest(WI, n);
 
-		if (WI->is_rolled)
-		{
-			switch(result)
+			if (WI->is_rolled)
 			{
+				switch (result)
+				{
 				case HTBOTTOM: // if this is removed, a rolled window can be opened by dragging
 				case HTTOP:
 				case HTMENU:
@@ -1012,305 +1062,309 @@ LRESULT APIENTRY WindowSubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 				case HTTOPRIGHT:
 					result = HTRIGHT;
 					break;
+				}
 			}
-		}
-		goto leave;
-
-	//----------------------------------
-	case WM_MOUSEMOVE:
-		if (btn_None == (n = WI->capture_button))
-			break;
-		{
-			POINT pt;
-			pt.x = (short)LOWORD(lParam);
-			pt.y = (short)HIWORD(lParam);
-			ClientToScreen(hwnd, &pt);
-			if (get_button(WI, pt.x, pt.y) != n)
-				n = btn_None;
-		}
-		if (WI->button_down != n)
-		{
-			WI->button_down = n;
-			post_redraw(hwnd);
-		}
-		goto leave;
-
-
-	//----------------------------------
-
-	set_capture:
-		WI->capture_button = WI->button_down = n;
-		SetCapture(hwnd);
-		post_redraw(hwnd);
-		goto leave;
-
-	exec_action:
-		WI->capture_button = WI->button_down = btn_None;
-		ReleaseCapture();
-		exec_button_action(WI, n, lParam);
-		post_redraw(hwnd);
-		goto leave;
-
-	case WM_CAPTURECHANGED:
-		if (btn_None == WI->capture_button)
-			break;
-		WI->capture_button = WI->button_down = btn_None;
-		goto leave;
-
-	//----------------------------------
-	case WM_LBUTTONUP:
-		if (btn_None == WI->capture_button)
-			break;
-		n = WI->button_down;
-		goto exec_action;
-
-	case WM_RBUTTONUP:
-		if (btn_None == WI->capture_button)
-			break;
-		n = (wParam & MK_SHIFT) ? btn_VMax : btn_HMax;
-		goto exec_action;
-
-	case WM_MBUTTONUP:
-		if (btn_None == WI->capture_button)
-			break;
-		n = btn_VMax;
-		goto exec_action;
-
-	//----------------------------------
-	case WM_NCLBUTTONDBLCLK:
-		if (-1 == (n = get_caption_click(wParam, mSkin.captionClicks.Dbl)))
-			goto case_WM_NCLBUTTONDOWN;
-		exec_button_action(WI, n, lParam);
-		goto leave;
-
-	case_WM_NCLBUTTONDOWN:
-	case WM_NCLBUTTONDOWN:
-		n = translate_button(wParam);
-		if (n >= 0 && n < 7) goto set_capture; // clicked in a button
-		if (-1 == get_caption_click(wParam, mSkin.captionClicks.Left))
-			break;
-		goto leave;
-
-	case WM_NCLBUTTONUP:
-		if (-1 == (n = get_caption_click(wParam, mSkin.captionClicks.Left)))
-			break;
-		exec_button_action(WI, n, lParam);
-		goto leave;
-
-	//----------------------------------
-	case WM_NCRBUTTONDOWN:
-		n = translate_button(wParam);
-		if (btn_Max == n) goto set_capture;
-	case WM_NCRBUTTONDBLCLK:
-		if (-1 == get_caption_click(wParam, mSkin.captionClicks.Right))
-			break;
-		goto leave;
-
-	case WM_NCRBUTTONUP:
-		if (-1 == (n = get_caption_click(wParam, mSkin.captionClicks.Right)))
-			break;
-		exec_button_action(WI, n, lParam);
-		goto leave;
-
-	//----------------------------------
-	case WM_NCMBUTTONDOWN:
-		n = translate_button(wParam);
-		if (btn_Max == n) goto set_capture;
-	case WM_NCMBUTTONDBLCLK:
-		if (-1 == get_caption_click(wParam, mSkin.captionClicks.Mid))
-			break;
-		goto leave;
-
-	case WM_NCMBUTTONUP:
-		if (-1 == (n = get_caption_click(wParam, mSkin.captionClicks.Mid)))
-			break;
-		exec_button_action(WI, n, lParam);
-		goto leave;
-
-	//----------------------------------
-	case WM_SYSCOMMAND:
-		//dbg_printf("SYSCOMMAND: %08x", wParam);
-		// ----------
-		// these SYSCOMMAND's enter the 'window move/size' modal loop
-		if (wParam >= 0xf001 && wParam <= 0xf008 // size
-		 || wParam == 0xf012 // move
-			)
-		{
-			// draw the caption before
-			PaintAll(WI);
-			break;
-		}
-		// ----------
-		// these SYSCOMMAND's draw the caption
-		if (wParam == 0xf095 // menu invoked
-		 || wParam == 0xf100 // sysmenu invoked
-		 || wParam == 0xf165 // menu closed
-			)
-		{
-			// draw over after
-			post_redraw(hwnd);
-			break;
-		}
-		// ----------
-		// unshade the window on close, just in case it likes to store it's size
-		if (wParam == SC_CLOSE && WI->is_rolled)
-		{
-			ShadeWindow(hwnd);
-			break;
-		}
-		post_redraw(hwnd);
-		break;
-
-	//----------------------------------
-	case WM_NCPAINT:
-		if (WI->dont_draw)
 			goto leave;
 
-		if (false == WI->is_rolled)
-		{
-			// Okay, so let's create an own region and pass that to
-			// the original WndProc instead of (HRGN)wParam
-			RECT rc; GetWindowRect(hwnd, &rc);
-			HRGN hrgn = CreateRectRgn(
-				rc.left + WI->S.HiddenSide + mSkin.borderWidth,
-				rc.top + WI->S.HiddenTop + mSkin.ncTop,
-				rc.right - WI->S.HiddenSide - mSkin.borderWidth,
-				rc.bottom - WI->S.HiddenBottom - mSkin.ncBottom
-				);
-			result = CALLORIGWINDOWPROC(hwnd, uMsg, (WPARAM)hrgn, lParam);
-			DeleteObject(hrgn);
-		}
+			//----------------------------------
+		case WM_MOUSEMOVE:
+			if (btn_None == (n = WI->capture_button))
+				break;
+			{
+				POINT pt;
+				pt.x = (short)LOWORD(lParam);
+				pt.y = (short)HIWORD(lParam);
+				ClientToScreen(hwnd, &pt);
+				if (get_button(WI, pt.x, pt.y) != n)
+					n = btn_None;
+			}
+			if (WI->button_down != n)
+			{
+				WI->button_down = n;
+				post_redraw(hwnd);
+			}
+			goto leave;
 
-	paint_now:
-		PaintAll(WI);
-		goto leave;
 
-	paint_after:
-		{
+			//----------------------------------
+
+set_capture:
+			WI->capture_button = WI->button_down = n;
+			SetCapture(hwnd);
+			post_redraw(hwnd);
+			goto leave;
+
+exec_action:
+			WI->capture_button = WI->button_down = btn_None;
+			ReleaseCapture();
+			exec_button_action(WI, n, lParam);
+			post_redraw(hwnd);
+			goto leave;
+
+		case WM_CAPTURECHANGED:
+			if (btn_None == WI->capture_button)
+				break;
+			WI->capture_button = WI->button_down = btn_None;
+			goto leave;
+
+			//----------------------------------
+		case WM_LBUTTONUP:
+			if (btn_None == WI->capture_button)
+				break;
+			n = WI->button_down;
+			goto exec_action;
+
+		case WM_RBUTTONUP:
+			if (btn_None == WI->capture_button)
+				break;
+			n = (wParam & MK_SHIFT) ? btn_VMax : btn_HMax;
+			goto exec_action;
+
+		case WM_MBUTTONUP:
+			if (btn_None == WI->capture_button)
+				break;
+			n = btn_VMax;
+			goto exec_action;
+
+			//----------------------------------
+		case WM_NCLBUTTONDBLCLK:
+			if (-1 == (n = get_caption_click(wParam, mSkin.captionClicks.Dbl)))
+				goto case_WM_NCLBUTTONDOWN;
+			exec_button_action(WI, n, lParam);
+			goto leave;
+
+case_WM_NCLBUTTONDOWN:
+		case WM_NCLBUTTONDOWN:
+			n = translate_button(wParam);
+			if (n >= 0 && n < 7) goto set_capture; // clicked in a button
+			if (-1 == get_caption_click(wParam, mSkin.captionClicks.Left))
+				break;
+			goto leave;
+
+		case WM_NCLBUTTONUP:
+			if (-1 == (n = get_caption_click(wParam, mSkin.captionClicks.Left)))
+				break;
+			exec_button_action(WI, n, lParam);
+			goto leave;
+
+			//----------------------------------
+		case WM_NCRBUTTONDOWN:
+			n = translate_button(wParam);
+			if (btn_Max == n) goto set_capture;
+		case WM_NCRBUTTONDBLCLK:
+			if (-1 == get_caption_click(wParam, mSkin.captionClicks.Right))
+				break;
+			goto leave;
+
+		case WM_NCRBUTTONUP:
+			if (-1 == (n = get_caption_click(wParam, mSkin.captionClicks.Right)))
+				break;
+			exec_button_action(WI, n, lParam);
+			goto leave;
+
+			//----------------------------------
+		case WM_NCMBUTTONDOWN:
+			n = translate_button(wParam);
+			if (btn_Max == n) goto set_capture;
+		case WM_NCMBUTTONDBLCLK:
+			if (-1 == get_caption_click(wParam, mSkin.captionClicks.Mid))
+				break;
+			goto leave;
+
+		case WM_NCMBUTTONUP:
+			if (-1 == (n = get_caption_click(wParam, mSkin.captionClicks.Mid)))
+				break;
+			exec_button_action(WI, n, lParam);
+			goto leave;
+
+			//----------------------------------
+		case WM_SYSCOMMAND:
+			//dbg_printf("SYSCOMMAND: %08x", wParam);
+			// ----------
+			// these SYSCOMMAND's enter the 'window move/size' modal loop
+			if (wParam >= 0xf001 && wParam <= 0xf008 // size
+					|| wParam == 0xf012 // move
+			   )
+			{
+				// draw the caption before
+				PaintAll(WI);
+				break;
+			}
+			// ----------
+			// these SYSCOMMAND's draw the caption
+			if (wParam == 0xf095 // menu invoked
+					|| wParam == 0xf100 // sysmenu invoked
+					|| wParam == 0xf165 // menu closed
+			   )
+			{
+				// draw over after
+				post_redraw(hwnd);
+				break;
+			}
+			// ----------
+			// unshade the window on close, just in case it likes to store it's size
+			if (wParam == SC_CLOSE && WI->is_rolled)
+			{
+				ShadeWindow(hwnd);
+				break;
+			}
+			post_redraw(hwnd);
+			break;
+
+			//----------------------------------
+		case WM_NCPAINT:
+			if (WI->dont_draw)
+				goto leave;
+
+			if (false == WI->is_rolled)
+			{
+				// Okay, so let's create an own region and pass that to
+				// the original WndProc instead of (HRGN)wParam
+				RECT rc;
+				GetWindowRect(hwnd, &rc);
+				HRGN hrgn = CreateRectRgn(
+								rc.left + WI->S.HiddenSide + mSkin.borderWidth,
+								rc.top + WI->S.HiddenTop + mSkin.ncTop,
+								rc.right - WI->S.HiddenSide - mSkin.borderWidth,
+								rc.bottom - WI->S.HiddenBottom - mSkin.ncBottom
+							);
+				result = CALLORIGWINDOWPROC(hwnd, uMsg, (WPARAM)hrgn, lParam);
+				DeleteObject(hrgn);
+			}
+
+paint_now:
+			PaintAll(WI);
+			goto leave;
+
+paint_after:
+			{
+				flag_save = WI->dont_draw;
+				WI->dont_draw = true;
+				result = CALLORIGWINDOWPROC(hwnd, uMsg, wParam, lParam);
+				WI->dont_draw = flag_save;
+			}
+			goto paint_now;
+
+			//----------------------------------
+
+			//----------------------------------
+			// set flag, whether snapWindows should be applied below
+		case WM_ENTERSIZEMOVE:
+			WI->is_moving = true;
+			/**
+				Noccy: Added transparent window dragging
+			*/
+			WI->is_transparentdrag = false;
 			flag_save = WI->dont_draw;
 			WI->dont_draw = true;
-			result = CALLORIGWINDOWPROC(hwnd, uMsg, wParam, lParam);
-			WI->dont_draw = flag_save;
-		}
-		goto paint_now;
-
-	//----------------------------------
-
-	//----------------------------------
-	// set flag, whether snapWindows should be applied below
-	case WM_ENTERSIZEMOVE:
-		WI->is_moving = true;
-		/**
-			Noccy: Added transparent window dragging
-		*/
-		WI->is_transparentdrag = false;
-		flag_save = WI->dont_draw;
-		WI->dont_draw = true;
-		if ((mSkin.dragTransparency > 0) && (isWin2kXP())) {
-			if (!(GetWindowLong(hwnd,GWL_EXSTYLE) & WS_EX_LAYERED)) {
-				dbg_printf("Windows does not have WS_EX_LAYERED style set");
-				// Window is not layered. Safe to proceed with layering it here
-				int setAlpha = (255 * (100 - mSkin.dragTransparency)) / 100;
-				SetWindowLong(hwnd,GWL_EXSTYLE,	GetWindowLong(hwnd,GWL_EXSTYLE) | WS_EX_LAYERED);
-				SetLayeredWindowAttributes(hwnd, 0, setAlpha, LWA_ALPHA);
-				WI->is_transparentdrag = true;
-			}
-		}
-		WI->dont_draw = flag_save;
-		break;
-
-	case WM_EXITSIZEMOVE:
-		WI->is_moving = false;
-		/**
-			Noccy: Added transparent window dragging
-		*/
-		flag_save = WI->dont_draw;
-		WI->dont_draw = true;
-		if (WI->is_transparentdrag == true) {
-			SetWindowLong(hwnd, GWL_EXSTYLE,
-				GetWindowLong(hwnd, GWL_EXSTYLE) & ~WS_EX_LAYERED);
-			WI->is_transparentdrag = false;
-		}
-		WI->dont_draw = flag_save;
-		break;
-
-	//----------------------------------
-	// If moved, snap to screen edges...
-	case WM_WINDOWPOSCHANGING:
-		if (WI->is_moving
-		 && mSkin.snapWindows
-		 && 0 == (WS_CHILD & WI->style)
-		 && ((((WINDOWPOS*)lParam)->flags & SWP_NOSIZE)
-			 || (WI->S.width == ((WINDOWPOS*)lParam)->cx
-				&& WI->S.height == ((WINDOWPOS*)lParam)->cy
-					)))
-			SnapWindowToEdge(WI, (WINDOWPOS*)lParam, 7);
-
-		if (get_rolled(WI))
-		{
-			// prevent app from possibly setting a minimum size
-			((LPWINDOWPOS)lParam)->cy = mSkin.rollupHeight + WI->S.HiddenTop;
-			goto leave;
-		}
-		break;
-
-	//----------------------------------
-	case WM_WINDOWPOSCHANGED:
-		result = CALLORIGWINDOWPROC(hwnd, uMsg, wParam, lParam);
-		// adjust the windowregion
-		set_region(WI);
-		// MDI childs repaint their buttons at each odd occasion
-		if (WS_CHILD & WI->style)
-			goto paint_now;
-		goto leave;
-
-	//----------------------------------
-	case WM_STYLECHANGED:
-		set_region(WI);
-		break;
-
-	//----------------------------------
-	// adjust for the bottom border (handleHeight)
-
-	case WM_NCCALCSIZE:
-		if (wParam)
-		{
-			result = CALLORIGWINDOWPROC(hwnd, uMsg, wParam, lParam);
-			if (WI->S.BottomAdjust)
-				((NCCALCSIZE_PARAMS*)lParam)->rgrc[0].bottom -= WI->S.BottomAdjust;
-			goto leave;
-		}
-		break;
-
-	//----------------------------------
-	case WM_GETMINMAXINFO:
-	{
-		LPMINMAXINFO lpmmi = (LPMINMAXINFO)lParam;
-		lpmmi->ptMinTrackSize.x = 12 * mSkin.buttonSize;
-		lpmmi->ptMinTrackSize.y = mSkin.ncTop + WI->S.HiddenTop + mSkin.ncBottom - WI->S.HiddenBottom - mSkin.borderWidth;
-		break;
-	}
-
-	//----------------------------------
-	// Terminate subclassing
-
-	case WM_NCDESTROY:
-		detach_skinner(WI);
-		result = CALLORIGWINDOWPROC(hwnd, uMsg, wParam, lParam);
-		release_window(WI);
-		return result;
-
-	//----------------------------------
-	default:
-		if (uMsg == bbSkinMsg) // our registered message
-		{
-			switch (wParam)
+			if ((mSkin.dragTransparency > 0) && (isWin2kXP()))
 			{
-				// initialisation message
+				if (!(GetWindowLong(hwnd,GWL_EXSTYLE) & WS_EX_LAYERED))
+				{
+					dbg_printf("Windows does not have WS_EX_LAYERED style set");
+					// Window is not layered. Safe to proceed with layering it here
+					int setAlpha = (255 * (100 - mSkin.dragTransparency)) / 100;
+					SetWindowLong(hwnd,GWL_EXSTYLE,	GetWindowLong(hwnd,GWL_EXSTYLE) | WS_EX_LAYERED);
+					SetLayeredWindowAttributes(hwnd, 0, setAlpha, LWA_ALPHA);
+					WI->is_transparentdrag = true;
+				}
+			}
+			WI->dont_draw = flag_save;
+			break;
+
+		case WM_EXITSIZEMOVE:
+			WI->is_moving = false;
+			/**
+				Noccy: Added transparent window dragging
+			*/
+			flag_save = WI->dont_draw;
+			WI->dont_draw = true;
+			if (WI->is_transparentdrag == true)
+			{
+				SetWindowLong(hwnd, GWL_EXSTYLE,
+							  GetWindowLong(hwnd, GWL_EXSTYLE) & ~WS_EX_LAYERED);
+				WI->is_transparentdrag = false;
+			}
+			WI->dont_draw = flag_save;
+			break;
+
+			//----------------------------------
+			// If moved, snap to screen edges...
+		case WM_WINDOWPOSCHANGING:
+			if (WI->is_moving
+					&& mSkin.snapWindows
+					&& 0 == (WS_CHILD & WI->style)
+					&& ((((WINDOWPOS*)lParam)->flags & SWP_NOSIZE)
+						|| (WI->S.width == ((WINDOWPOS*)lParam)->cx
+							&& WI->S.height == ((WINDOWPOS*)lParam)->cy
+						   )))
+				SnapWindowToEdge(WI, (WINDOWPOS*)lParam, 7);
+
+			if (get_rolled(WI))
+			{
+				// prevent app from possibly setting a minimum size
+				((LPWINDOWPOS)lParam)->cy = mSkin.rollupHeight + WI->S.HiddenTop;
+				goto leave;
+			}
+			break;
+
+			//----------------------------------
+		case WM_WINDOWPOSCHANGED:
+			result = CALLORIGWINDOWPROC(hwnd, uMsg, wParam, lParam);
+			// adjust the windowregion
+			set_region(WI);
+			// MDI childs repaint their buttons at each odd occasion
+			if (WS_CHILD & WI->style)
+				goto paint_now;
+			goto leave;
+
+			//----------------------------------
+		case WM_STYLECHANGED:
+			set_region(WI);
+			break;
+
+			//----------------------------------
+			// adjust for the bottom border (handleHeight)
+
+		case WM_NCCALCSIZE:
+			if (wParam)
+			{
+				result = CALLORIGWINDOWPROC(hwnd, uMsg, wParam, lParam);
+				if (WI->S.BottomAdjust)
+					((NCCALCSIZE_PARAMS*)lParam)->rgrc[0].bottom -= WI->S.BottomAdjust;
+				goto leave;
+			}
+			break;
+
+			//----------------------------------
+		case WM_GETMINMAXINFO:
+		{
+			LPMINMAXINFO lpmmi = (LPMINMAXINFO)lParam;
+			lpmmi->ptMinTrackSize.x = 12 * mSkin.buttonSize;
+			lpmmi->ptMinTrackSize.y = mSkin.ncTop + WI->S.HiddenTop + mSkin.ncBottom - WI->S.HiddenBottom - mSkin.borderWidth;
+			break;
+		}
+
+		//----------------------------------
+		// Terminate subclassing
+
+		case WM_NCDESTROY:
+			detach_skinner(WI);
+			result = CALLORIGWINDOWPROC(hwnd, uMsg, wParam, lParam);
+			release_window(WI);
+			return result;
+
+			//----------------------------------
+		default:
+			if (uMsg == bbSkinMsg) // our registered message
+			{
+				switch (wParam)
+				{
+					// initialisation message
 				case MSGID_LOAD:
 					break;
 
-				// detach the skinner
+					// detach the skinner
 				case MSGID_UNLOAD:
 					detach_skinner(WI);
 					SetWindowRgn(hwnd, NULL, TRUE);
@@ -1318,12 +1372,12 @@ LRESULT APIENTRY WindowSubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 					release_window(WI);
 					break;
 
-				// repaint the caption
+					// repaint the caption
 				case MSGID_REDRAW:
 					if (WI->apply_skin) goto paint_now;
 					break;
 
-				// changed Skin
+					// changed Skin
 				case MSGID_REFRESH:
 					GetSkin();
 					DeleteBitmaps(WI, 0, NUMOFGDIOBJS);
@@ -1331,14 +1385,14 @@ LRESULT APIENTRY WindowSubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 						goto paint_now;
 					break;
 
-				// options for bbStyleMaker
+					// options for bbStyleMaker
 				case MSGID_BBSM_RESET:
 				case MSGID_BBSM_SETACTIVE:
 				case MSGID_BBSM_SETPRESSED:
 					WI->bbsm_option = wParam;
 					break;
 
-				// set sticky button state, sent from BB
+					// set sticky button state, sent from BB
 				case MSGID_BB_SETSTICKY:
 					WI->is_sticky = lParam;
 					if (WI->apply_skin) goto paint_now;
@@ -1348,21 +1402,22 @@ LRESULT APIENTRY WindowSubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 					result = mSkin.rollupHeight + WI->S.HiddenTop;
 					break;
 
-				//----------------------------------
+					//----------------------------------
+				}
+				goto leave;
 			}
-			goto leave;
-		}
-		break;
+			break;
 
-	//----------------------------------
-	} //switch
+			//----------------------------------
+		} //switch
 
 	result = CALLORIGWINDOWPROC(hwnd, uMsg, wParam, lParam);
 leave:
 	return result;
 }
 
-bool isWin2kXP() {
+bool isWin2kXP()
+{
 
 	OSVERSIONINFO osInfo;
 	bool usingNT;

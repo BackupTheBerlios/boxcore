@@ -9,16 +9,16 @@ typedef WINAPI BOOL (*fnSHUnlockShared)(void *pvData);
 
 class clsShlwapi
 {
-	public:
-		clsShlwapi();
-		virtual ~clsShlwapi();
+public:
+	clsShlwapi();
+	virtual ~clsShlwapi();
 
-		fnSHLockShared SHLockShared;
-		fnSHUnlockShared SHUnlockShared;
-	protected:
-		HMODULE hModule;
+	fnSHLockShared SHLockShared;
+	fnSHUnlockShared SHUnlockShared;
+protected:
+	HMODULE hModule;
 
-	private:
+private:
 };
 
 #endif // CLSSHLWAPI_H

@@ -75,7 +75,11 @@ struct GradientItem
 	int validated;
 	union
 	{
-		struct { char ShadowX; char ShadowY; };
+		struct
+		{
+			char ShadowX;
+			char ShadowY;
+		};
 		unsigned short ShadowXY;
 	};
 	COLORREF ShadowColor;
@@ -150,7 +154,8 @@ struct SkinStruct
 	struct button_bmp button_bmp[6];
 	char button_string[15];
 
-	struct {
+	struct
+	{
 		char Dbl[3];
 		char Right[3];
 		char Mid[3];

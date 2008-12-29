@@ -47,127 +47,128 @@
 // wParams for the registered 'BBLEANSKIN_WINDOWMSG'
 enum
 {
-    MSGID_GETSHADEHEIGHT   = 1,
-    MSGID_LOAD              ,
-    MSGID_UNLOAD            ,
-    MSGID_REDRAW            ,
-    MSGID_REFRESH           ,
-    MSGID_BB_SETSTICKY      ,
-    MSGID_BBSM_RESET        ,
-    MSGID_BBSM_SETACTIVE    ,
-    MSGID_BBSM_SETPRESSED   ,
+	MSGID_GETSHADEHEIGHT   = 1,
+	MSGID_LOAD              ,
+	MSGID_UNLOAD            ,
+	MSGID_REDRAW            ,
+	MSGID_REFRESH           ,
+	MSGID_BB_SETSTICKY      ,
+	MSGID_BBSM_RESET        ,
+	MSGID_BBSM_SETACTIVE    ,
+	MSGID_BBSM_SETPRESSED   ,
 };
 
 // ---------------------------------------------
 struct GradientItem
 {
-    int bevelstyle;
-    int bevelposition;
-    int type;
-    bool parentRelative;
-    bool interlaced;
-    COLORREF Color;
-    COLORREF ColorTo;
-    COLORREF TextColor;
-    int borderWidth;
-    COLORREF borderColor;
-    int marginWidth;
-    int validated;
+	int bevelstyle;
+	int bevelposition;
+	int type;
+	bool parentRelative;
+	bool interlaced;
+	COLORREF Color;
+	COLORREF ColorTo;
+	COLORREF TextColor;
+	int borderWidth;
+	COLORREF borderColor;
+	int marginWidth;
+	int validated;
 };
 
 // ---------------------------------------------
 struct exclusion_item
 {
-    unsigned char flen, clen, option;
-    char buff[2];
+	unsigned char flen, clen, option;
+	char buff[2];
 };
 
 struct exclusion_info
 {
-    int size;
-    int count;
-    struct exclusion_item ei[1];
+	int size;
+	int count;
+	struct exclusion_item ei[1];
 };
 
 #define BUTTON_SIZE 9
 #define BUTTON_MAP_SIZE ((BUTTON_SIZE*BUTTON_SIZE-1)/8+1)
 struct button_bmp
 {
-    unsigned char data[2][BUTTON_MAP_SIZE];
+	unsigned char data[2][BUTTON_MAP_SIZE];
 };
 
 // ---------------------------------------------
 struct SkinStruct
 {
-    GradientItem windowTitleFocus;
-    GradientItem windowLabelFocus;
-    GradientItem windowHandleFocus;
-    GradientItem windowGripFocus;
-    GradientItem windowButtonFocus;
-    GradientItem windowButtonPressed;
+	GradientItem windowTitleFocus;
+	GradientItem windowLabelFocus;
+	GradientItem windowHandleFocus;
+	GradientItem windowGripFocus;
+	GradientItem windowButtonFocus;
+	GradientItem windowButtonPressed;
 
-    GradientItem windowTitleUnfocus;
-    GradientItem windowLabelUnfocus;
-    GradientItem windowHandleUnfocus;
-    GradientItem windowGripUnfocus;
-    GradientItem windowButtonUnfocus;
+	GradientItem windowTitleUnfocus;
+	GradientItem windowLabelUnfocus;
+	GradientItem windowHandleUnfocus;
+	GradientItem windowGripUnfocus;
+	GradientItem windowButtonUnfocus;
 
-    struct
-    {
-        int  Height;
-        int  Weight;
-        int  Justify;   // DT_LEFT, DT_CENTER, DT_RIGHT
-        int  validated; // not used
-        char Face[128];
+	struct
+	{
+		int  Height;
+		int  Weight;
+		int  Justify;   // DT_LEFT, DT_CENTER, DT_RIGHT
+		int  validated; // not used
+		char Face[128];
 
-    } windowFont;
+	} windowFont;
 
-    COLORREF focus_borderColor;
-    COLORREF unfocus_borderColor;
-    int borderWidth;
-    int handleHeight;
+	COLORREF focus_borderColor;
+	COLORREF unfocus_borderColor;
+	int borderWidth;
+	int handleHeight;
 
-    int gripWidth;
-    int buttonSize;
-    int labelHeight;
-    int rollupHeight;
+	int gripWidth;
+	int buttonSize;
+	int labelHeight;
+	int rollupHeight;
 
-    int buttonSpace;
-    int buttonMargin;
-    int labelMargin;
-    int ncTop;
-    int ncBottom;
+	int buttonSpace;
+	int buttonMargin;
+	int labelMargin;
+	int ncTop;
+	int ncBottom;
 
-    struct button_bmp button_bmp[6];
-    char button_string[6];
+	struct button_bmp button_bmp[6];
+	char button_string[6];
 
-    struct {
-        char Dbl[3];
-        char Right[3];
-        char Mid[3];
-        char Left[3];
-    } captionClicks;
+	struct
+	{
+		char Dbl[3];
+		char Right[3];
+		char Mid[3];
+		char Left[3];
+	} captionClicks;
 
-    bool snapWindows;
-    bool enableLog;
-    bool nixShadeStyle;
-    bool imageDither;
-    bool isNewStyle;
-    bool drawLocked;
+	bool snapWindows;
+	bool enableLog;
+	bool nixShadeStyle;
+	bool imageDither;
+	bool isNewStyle;
+	bool drawLocked;
 
-    int cxSizeFrame;
-    int cxFixedFrame;
-    int cyCaption;
-    int cySmCaption;
+	int cxSizeFrame;
+	int cxFixedFrame;
+	int cyCaption;
+	int cySmCaption;
 
-    HWND BBhwnd;
-    HWND loghwnd;
-    HWND skinwnd;
-    int BBVersion;
+	HWND BBhwnd;
+	HWND loghwnd;
+	HWND skinwnd;
+	int BBVersion;
 
-    HHOOK hCallWndHook;
-    HHOOK hGetMsgHook;
-    struct exclusion_info exInfo;
+	HHOOK hCallWndHook;
+	HHOOK hGetMsgHook;
+	struct exclusion_info exInfo;
 };
 
 #define offset_exInfo ((int)&((SkinStruct*)NULL)->exInfo)

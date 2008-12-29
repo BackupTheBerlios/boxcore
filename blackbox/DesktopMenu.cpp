@@ -33,7 +33,13 @@
 #include "Menu/Menu.h"
 
 //===========================================================================
-struct en { Menu *m; int desk; HWND hwndTop; int i; };
+struct en
+{
+	Menu *m;
+	int desk;
+	HWND hwndTop;
+	int i;
+};
 
 static BOOL task_enum_func(struct tasklist *tl, LPARAM lParam)
 {
@@ -65,11 +71,16 @@ static Menu * build_task_folder(int desk, const char *title, bool popup)
 Menu * GetTaskFolder(int n, bool popup)
 {
 	if (n < 0) return NULL;
-	DesktopInfo DI; get_desktop_info(&DI, n);
+	DesktopInfo DI;
+	get_desktop_info(&DI, n);
 	return build_task_folder(n, DI.name, popup);
 }
 
-struct dn { Menu *m; bool popup; };
+struct dn
+{
+	Menu *m;
+	bool popup;
+};
 
 static BOOL desk_enum_func(struct DesktopInfo *DI, LPARAM lParam)
 {
@@ -93,7 +104,9 @@ Menu* MakeDesktopMenu(bool popup)
 {
 	Menu *m = MakeNamedMenu(NLS0("Workspaces"), "IDRoot_workspaces", popup);
 
-	struct dn dn; dn.m = m; dn.popup = popup;
+	struct dn dn;
+	dn.m = m;
+	dn.popup = popup;
 	EnumDesks(desk_enum_func, (LPARAM)&dn);
 
 	MakeMenuNOP(m);

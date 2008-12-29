@@ -61,48 +61,48 @@ extern "C"
 //============================================================================
 
 // blackbox and logwindow stuff
-	HINSTANCE hInstance;
-	HWND BBhwnd;
-	int BBVersion;
-	HWND m_hwnd;
-	HWND hwndLog;
-	bool is_plugin;
-	bool enableLog;
+HINSTANCE hInstance;
+HWND BBhwnd;
+int BBVersion;
+HWND m_hwnd;
+HWND hwndLog;
+bool is_plugin;
+bool enableLog;
 
 // settings
-	bool applyToOpen;
-	bool adjustCaptionHeight;
-	char rcpath[MAX_PATH];
+bool applyToOpen;
+bool adjustCaptionHeight;
+char rcpath[MAX_PATH];
 
 // additional windows options
-	char windows_menu_fontFace[120];
-	int windows_menu_fontHeight;
-	int ScrollbarSize;
-	int MenuHeight;
-	bool setTTColor;
+char windows_menu_fontFace[120];
+int windows_menu_fontHeight;
+int ScrollbarSize;
+int MenuHeight;
+bool setTTColor;
 
 // skin info passed via shared mem
-	UINT bbSkinMsg;
-	SkinStruct mSkin;
+UINT bbSkinMsg;
+SkinStruct mSkin;
 
 // for the shared memory
-	HANDLE hMapObject;
-	SkinStruct *lpvMem;
+HANDLE hMapObject;
+SkinStruct *lpvMem;
 
 // skinner dll
-	bool engine_running;
+bool engine_running;
 
 // forward declaration
-	void refreshStyle(void);
+void refreshStyle(void);
 
-	void startEngine();
-	void stopEngine();
-	void reconfigureEngine(void);
-	const char* engineInfo(int field);
-	void setEngineOption(UINT id);
+void startEngine();
+void stopEngine();
+void reconfigureEngine(void);
+const char* engineInfo(int field);
+void setEngineOption(UINT id);
 
-	void free_dll(void);
-	bool load_dll(void);
+void free_dll(void);
+bool load_dll(void);
 
 //============================================================================
 // plugin interface
@@ -112,8 +112,8 @@ int beginPlugin(HINSTANCE hMainInstance)
 {
 	if (is_plugin || engine_running)
 	{
-	   MessageBox(NULL, "Dont load me twice!", szAppName, MB_OK|MB_TOPMOST|MB_SETFOREGROUND);
-	   return 1;
+		MessageBox(NULL, "Dont load me twice!", szAppName, MB_OK|MB_TOPMOST|MB_SETFOREGROUND);
+		return 1;
 	}
 	is_plugin = true;
 	startEngine();
@@ -130,14 +130,21 @@ LPCSTR pluginInfo(int field)
 {
 	switch (field)
 	{
-		default:
-		case 0: return szVersion;
-		case 1: return szAppName;
-		case 2: return szInfoVersion;
-		case 3: return szInfoAuthor;
-		case 4: return szInfoRelDate;
-		case 5: return szInfoLink;
-		case 6: return szInfoEmail;
+	default:
+	case 0:
+		return szVersion;
+	case 1:
+		return szAppName;
+	case 2:
+		return szInfoVersion;
+	case 3:
+		return szInfoAuthor;
+	case 4:
+		return szInfoRelDate;
+	case 5:
+		return szInfoLink;
+	case 6:
+		return szInfoEmail;
 	}
 }
 #endif
@@ -176,21 +183,25 @@ void write_log(char *s)
 
 void dbg_printf (const char *fmt, ...)
 {
-	char buffer[256]; va_list arg;
+	char buffer[256];
+	va_list arg;
 	va_start(arg, fmt);
 	vsprintf (buffer, fmt, arg);
 	OutputDebugString(buffer);
 }
 
-int imax(int a, int b) {
+int imax(int a, int b)
+{
 	return a>b?a:b;
 }
 
-int imin(int a, int b) {
+int imin(int a, int b)
+{
 	return a<b?a:b;
 }
 
-int iminmax(int a, int b, int c) {
+int iminmax(int a, int b, int c)
+{
 	if (a<b) a=b;
 	if (a>c) a=c;
 	return a;
@@ -230,23 +241,23 @@ BOOL CreateSharedMem(int size)
 {
 	// handle to file mapping
 	hMapObject = CreateFileMapping(
-		INVALID_HANDLE_VALUE,     // use paging file
-		NULL,                   // no security attributes
-		PAGE_READWRITE,         // read/write access
-		0,                      // size: high 32-bits
-		size,                   // size: low 32-bits
-		BBLEANSKIN_SHMEMID      // name of map object
-		);
+					 INVALID_HANDLE_VALUE,     // use paging file
+					 NULL,                   // no security attributes
+					 PAGE_READWRITE,         // read/write access
+					 0,                      // size: high 32-bits
+					 size,                   // size: low 32-bits
+					 BBLEANSKIN_SHMEMID      // name of map object
+				 );
 
 	if (hMapObject && GetLastError() != ERROR_ALREADY_EXISTS)
 	{
 		// Get a pointer to the file-mapped shared memory.
 		lpvMem = (SkinStruct *)MapViewOfFile(
-			hMapObject,     // object to map view of
-			FILE_MAP_WRITE, // read/write access
-			0,              // high offset:  map from
-			0,              // low offset:   beginning
-			0);             // default: map entire file
+					 hMapObject,     // object to map view of
+					 FILE_MAP_WRITE, // read/write access
+					 0,              // high offset:  map from
+					 0,              // low offset:   beginning
+					 0);             // default: map entire file
 		if (lpvMem)
 		{
 			ZeroMemory(lpvMem, size);
@@ -281,33 +292,35 @@ bool make_exclusion_list(void)
 	// first read all strings into a list and calculate the size...
 	FILE *fp = FileOpen(set_my_path(exclusionspath, "exclusions.rc"));
 	if (fp) for (;;)
-	{
-		char *line, line_buffer[256];
-		if (false == ReadNextCommand(fp, line_buffer, sizeof line_buffer))
 		{
-			FileClose(fp);
-			break;
-		}
-		strlwr(line = line_buffer);
-		int option = 0;
-		if (0 == memicmp (line, "hook-early:", 11))
-		{
-			option = 1; line += 10; while (' ' == *++line);
-		}
+			char *line, line_buffer[256];
+			if (false == ReadNextCommand(fp, line_buffer, sizeof line_buffer))
+			{
+				FileClose(fp);
+				break;
+			}
+			strlwr(line = line_buffer);
+			int option = 0;
+			if (0 == memicmp (line, "hook-early:", 11))
+			{
+				option = 1;
+				line += 10;
+				while (' ' == *++line);
+			}
 
-		int line_len = strlen(line);
+			int line_len = strlen(line);
 
-		char *cp = strchr(line, ':');
-		if (cp) *cp++ = 0;
-		else *(cp = line + line_len++) = 0;
-		p = (struct elist *)malloc(line_len + sizeof(struct elist));
-		memcpy(p->buff, line, ++line_len);
-		p->flen = cp - line;
-		p->option = option;
-		*(pp = &(*pp = p)->next) = NULL;
-		t_len += line_len-2;
-		t_count++;
-	}
+			char *cp = strchr(line, ':');
+			if (cp) *cp++ = 0;
+			else *(cp = line + line_len++) = 0;
+			p = (struct elist *)malloc(line_len + sizeof(struct elist));
+			memcpy(p->buff, line, ++line_len);
+			p->flen = cp - line;
+			p->option = option;
+			*(pp = &(*pp = p)->next) = NULL;
+			t_len += line_len-2;
+			t_count++;
+		}
 
 	t_len += sizeof(struct exclusion_info) + (t_count-1) * sizeof(struct exclusion_item);
 
@@ -322,7 +335,9 @@ bool make_exclusion_list(void)
 	struct exclusion_item *ei = pExclInfo->ei;
 	while (p0)
 	{
-		p = p0; p0 = p0->next; char *cp = ei->buff;
+		p = p0;
+		p0 = p0->next;
+		char *cp = ei->buff;
 		ei->flen = 1+strlen(strcpy(cp, p->buff));
 		ei->clen = 1+strlen(strcpy(cp+ei->flen, p->buff+p->flen));
 		ei->option = p->option;
@@ -354,24 +369,25 @@ void write_bin(void)
 // edit control, readonly
 void make_log_window(void)
 {
-	RECT r; GetClientRect(m_hwnd, &r);
+	RECT r;
+	GetClientRect(m_hwnd, &r);
 	hwndLog = CreateWindow(
-		"EDIT", NULL,
-		WS_CHILD
-		| WS_HSCROLL
-		| WS_VSCROLL
-		| WS_VISIBLE
-		| ES_MULTILINE
-		| ES_READONLY
-		| ES_AUTOHSCROLL
-		| ES_AUTOVSCROLL
-		,
-		0, 0, r.right, r.bottom,
-		m_hwnd,
-		NULL,
-		hInstance,
-		NULL
-		);
+				  "EDIT", NULL,
+				  WS_CHILD
+				  | WS_HSCROLL
+				  | WS_VSCROLL
+				  | WS_VISIBLE
+				  | ES_MULTILINE
+				  | ES_READONLY
+				  | ES_AUTOHSCROLL
+				  | ES_AUTOVSCROLL
+				  ,
+				  0, 0, r.right, r.bottom,
+				  m_hwnd,
+				  NULL,
+				  hInstance,
+				  NULL
+			  );
 
 	SendMessage(hwndLog, WM_SETFONT, (WPARAM)GetStockObject(ANSI_FIXED_FONT), 0);
 	ShowWindow(m_hwnd, SW_SHOW);
@@ -422,23 +438,23 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if (0 == stricmp(msg, "About"))
 				about_box();
 			else
-			if (0 == stricmp(msg, "toggleLog"))
-				goto toggle_log;
-			else
-			if (0 == stricmp(msg, "toggleSkin"))
-			{
-				if (engine_running)
-				{
-					write_log("\r\n\t---- stopping engine ----\r\n");
-					PostMessage(hwnd, bbSkinMsg, MSGID_UNLOAD, 0);
-					PostMessage(hwnd, BB_QUIT, 0, 0);
-				}
+				if (0 == stricmp(msg, "toggleLog"))
+					goto toggle_log;
 				else
-				{
-					write_log("\r\n\t---- starting engine ----\r\n");
-					startEngine();
-				}
-			}
+					if (0 == stricmp(msg, "toggleSkin"))
+					{
+						if (engine_running)
+						{
+							write_log("\r\n\t---- stopping engine ----\r\n");
+							PostMessage(hwnd, bbSkinMsg, MSGID_UNLOAD, 0);
+							PostMessage(hwnd, BB_QUIT, 0, 0);
+						}
+						else
+						{
+							write_log("\r\n\t---- starting engine ----\r\n");
+							startEngine();
+						}
+					}
 		}
 		break;
 
@@ -451,14 +467,14 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			reconfigureEngine();
 		break;
 
-	toggle_log:
+toggle_log:
 		WriteBool(rcpath, "bbleanskin.option.enableLog:", false == enableLog);
 		reconfigureEngine();
 		break;
 
-	//-------------------------------------------------------------
-	// used in combination with bbstylemaker to update the skin info
-	// and optionally force active or button pressed state.
+		//-------------------------------------------------------------
+		// used in combination with bbstylemaker to update the skin info
+		// and optionally force active or button pressed state.
 
 	case BB_REDRAWGUI:
 		if (BBRG_WINDOW & wParam)
@@ -481,8 +497,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 
-	//-------------------------------------------------------------
-	// Log string sent by the engine dll
+		//-------------------------------------------------------------
+		// Log string sent by the engine dll
 
 	case WM_COPYDATA:
 	{
@@ -518,7 +534,9 @@ extern "C" BOOL WINAPI DllMain(HINSTANCE hi, DWORD reason, LPVOID reserved)
 {
 	if (reason==DLL_PROCESS_ATTACH)
 	{
-		hInstance = hi; WNDCLASS wc; RECT dt;
+		hInstance = hi;
+		WNDCLASS wc;
+		RECT dt;
 
 		if (BBhwnd)
 		{
@@ -529,8 +547,8 @@ extern "C" BOOL WINAPI DllMain(HINSTANCE hi, DWORD reason, LPVOID reserved)
 		const char *bbv = GetBBVersion();
 		if (0 == memicmp(bbv, "bblean", 6)) BBVersion = 2;
 		else
-		if (0 == memicmp(bbv, "bb", 2)) BBVersion = 1;
-		else BBVersion = 0;
+			if (0 == memicmp(bbv, "bb", 2)) BBVersion = 1;
+			else BBVersion = 0;
 
 		BBhwnd = GetBBWnd();
 		set_my_path(rcpath, "bbLeanSkin.rc");
@@ -563,15 +581,15 @@ extern "C" BOOL WINAPI DllMain(HINSTANCE hi, DWORD reason, LPVOID reserved)
 			NULL,
 			wc.hInstance,
 			NULL
-			);
+		);
 	}
 	else
-	if (reason==DLL_PROCESS_DETACH)
-	{
-		stopEngine();
-		DestroyWindow(m_hwnd);
-		UnregisterClass(szAppName, hInstance);
-	}
+		if (reason==DLL_PROCESS_DETACH)
+		{
+			stopEngine();
+			DestroyWindow(m_hwnd);
+			UnregisterClass(szAppName, hInstance);
+		}
 	return TRUE;
 }
 
@@ -583,28 +601,29 @@ void read_buttons(void)
 {
 	char path[MAX_PATH];
 	HBITMAP hbmp = (HBITMAP)LoadImage(
-		NULL, set_my_path(path, "buttons.bmp"),
-		IMAGE_BITMAP,
-		0,
-		0,
-		LR_LOADFROMFILE// | LR_CREATEDIBSECTION
-		);
+					   NULL, set_my_path(path, "buttons.bmp"),
+					   IMAGE_BITMAP,
+					   0,
+					   0,
+					   LR_LOADFROMFILE// | LR_CREATEDIBSECTION
+				   );
 
 	if (NULL == hbmp)
 	{
-		static unsigned char default_buttons[6*2][BUTTON_MAP_SIZE] = {
-		{ 0x00, 0x8C, 0xB9, 0xE3, 0x83, 0x83, 0x8F, 0x3B, 0x63, 0x00, 0x00 },
-		{ 0x00, 0x8C, 0xB9, 0xE3, 0x83, 0x83, 0x8F, 0x3B, 0x63, 0x00, 0x00 },
-		{ 0x00, 0xFC, 0xF9, 0x13, 0x24, 0x48, 0x90, 0x20, 0x7F, 0x00, 0x00 },
-		{ 0xF8, 0xF1, 0x23, 0xFC, 0xF9, 0x33, 0x7C, 0x88, 0x10, 0x3F, 0x00 },
-		{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x3F, 0x7F, 0x00, 0x00 },
-		{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x3F, 0x7F, 0x00, 0x00 },
-		{ 0x00, 0x1C, 0x38, 0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-		{ 0x00, 0x1C, 0x38, 0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-		{ 0x00, 0x20, 0xE0, 0xE0, 0xE3, 0x0F, 0x07, 0x0E, 0x1C, 0x00, 0x00 },
-		{ 0x00, 0x70, 0xE0, 0xC0, 0xE1, 0x8F, 0x0F, 0x0E, 0x08, 0x00, 0x00 },
-		{ 0x00, 0x0C, 0x18, 0x30, 0xE0, 0xC7, 0x80, 0x01, 0x03, 0x00, 0x00 },
-		{ 0x00, 0xFC, 0xF9, 0xF3, 0x07, 0x01, 0x02, 0x04, 0x08, 0x00, 0x00 },
+		static unsigned char default_buttons[6*2][BUTTON_MAP_SIZE] =
+		{
+			{ 0x00, 0x8C, 0xB9, 0xE3, 0x83, 0x83, 0x8F, 0x3B, 0x63, 0x00, 0x00 },
+			{ 0x00, 0x8C, 0xB9, 0xE3, 0x83, 0x83, 0x8F, 0x3B, 0x63, 0x00, 0x00 },
+			{ 0x00, 0xFC, 0xF9, 0x13, 0x24, 0x48, 0x90, 0x20, 0x7F, 0x00, 0x00 },
+			{ 0xF8, 0xF1, 0x23, 0xFC, 0xF9, 0x33, 0x7C, 0x88, 0x10, 0x3F, 0x00 },
+			{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x3F, 0x7F, 0x00, 0x00 },
+			{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x3F, 0x7F, 0x00, 0x00 },
+			{ 0x00, 0x1C, 0x38, 0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+			{ 0x00, 0x1C, 0x38, 0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+			{ 0x00, 0x20, 0xE0, 0xE0, 0xE3, 0x0F, 0x07, 0x0E, 0x1C, 0x00, 0x00 },
+			{ 0x00, 0x70, 0xE0, 0xC0, 0xE1, 0x8F, 0x0F, 0x0E, 0x08, 0x00, 0x00 },
+			{ 0x00, 0x0C, 0x18, 0x30, 0xE0, 0xC7, 0x80, 0x01, 0x03, 0x00, 0x00 },
+			{ 0x00, 0xFC, 0xF9, 0xF3, 0x07, 0x01, 0x02, 0x04, 0x08, 0x00, 0x00 },
 		};
 		memcpy(&mSkin.button_bmp, default_buttons, sizeof default_buttons);
 		return;
@@ -626,8 +645,8 @@ void read_buttons(void)
 #if 0
 			unsigned char *u = (unsigned char*)bp->data[state];
 			dbg_printf("       { "
-				"0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X },",
-				u[0], u[1], u[2], u[3], u[4], u[5], u[6], u[7], u[8], u[9], u[10]);
+					   "0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X },",
+					   u[0], u[1], u[2], u[3], u[4], u[5], u[6], u[7], u[8], u[9], u[10]);
 #endif
 		}
 	DeleteObject(SelectObject(hdc, other));
@@ -649,7 +668,8 @@ void readSettings(void)
 	{
 		static const char *modifiers[] = { "", "Shift", "Ctrl" };
 		static const char *buttons[]  = { "Dbl", "Right", "Mid", "Left" };
-		static const char *button_ids[6+1+1] = {
+		static const char *button_ids[6+1+1] =
+		{
 			"Close", "Maximize", "Minimize",
 			"Rollup", "AlwaysOnTop", "Pin",
 			"Lower", NULL
@@ -738,7 +758,7 @@ void readStyle(void)
 	{
 		mSkin.borderWidth = *(int*)GetSettingPtr(SN_BORDERWIDTH);
 		mSkin.focus_borderColor =
-		mSkin.unfocus_borderColor = *(COLORREF*)GetSettingPtr(SN_BORDERCOLOR);
+			mSkin.unfocus_borderColor = *(COLORREF*)GetSettingPtr(SN_BORDERCOLOR);
 	}
 	else
 	{
@@ -750,7 +770,8 @@ void readStyle(void)
 	mSkin.handleHeight = *(int*)GetSettingPtr(SN_HANDLEHEIGHT);
 	int bevelWidth = *(int*)GetSettingPtr(SN_BEVELWIDTH);
 
-	GradientItem * pG; const char *s = settings_id_array;
+	GradientItem * pG;
+	const char *s = settings_id_array;
 	for (pG = &mSkin.windowTitleFocus; pG <= &mSkin.windowButtonUnfocus; ++pG, ++s)
 	{
 		StyleItem *pSI = (StyleItem*)GetSettingPtr(*s);
@@ -773,13 +794,13 @@ void readStyle(void)
 		pG->ShadowY = pSI->ShadowY;
 
 		if (nVersion < 2
-		 && (*s == SN_WINFOCUS_TITLE
-		  || *s == SN_WINFOCUS_HANDLE
-		  || *s == SN_WINFOCUS_GRIP
-		  || *s == SN_WINUNFOCUS_TITLE
-		  || *s == SN_WINUNFOCUS_HANDLE
-		  || *s == SN_WINUNFOCUS_GRIP
-		  ))
+				&& (*s == SN_WINFOCUS_TITLE
+					|| *s == SN_WINFOCUS_HANDLE
+					|| *s == SN_WINFOCUS_GRIP
+					|| *s == SN_WINUNFOCUS_TITLE
+					|| *s == SN_WINUNFOCUS_HANDLE
+					|| *s == SN_WINUNFOCUS_GRIP
+				   ))
 		{
 			pG->borderWidth = mSkin.borderWidth;
 			if (*s == SN_WINFOCUS_TITLE)
@@ -818,7 +839,7 @@ void readStyle(void)
 	}
 	else
 	{
-		if(-1 == mSkin.iconSize)
+		if (-1 == mSkin.iconSize)
 		{
 			mSkin.iconSize = mSkin.windowFont.Height + 2;
 			labelH = imax(8, mSkin.windowFont.Height) + 2;
@@ -838,7 +859,7 @@ void readStyle(void)
 	}
 
 	int tbheight = imax(labelH, buttonH) + 2 *
-		(mSkin.windowTitleFocus.borderWidth + mSkin.windowTitleFocus.marginWidth);
+				   (mSkin.windowTitleFocus.borderWidth + mSkin.windowTitleFocus.marginWidth);
 
 	mSkin.buttonSize = buttonH;
 	mSkin.labelHeight = labelH;
@@ -952,7 +973,7 @@ void setmetrics(void)
 			sizeof(NONCLIENTMETRICS),
 			&ncm_now,
 			SPIF_SENDCHANGE
-			);
+		);
 		//dbg_printf("set SystemParametersInfo");
 	}
 
@@ -977,9 +998,9 @@ enum { SAVE_3DC, RESTORE_3DC, APPLY_3DC };
 COLORREF mixcolors(COLORREF c1, COLORREF c2)
 {
 	return RGB(
-		(GetRValue(c1)+GetRValue(c2))/2,
-		(GetGValue(c1)+GetGValue(c2))/2,
-		(GetBValue(c1)+GetBValue(c2))/2);
+			   (GetRValue(c1)+GetRValue(c2))/2,
+			   (GetGValue(c1)+GetGValue(c2))/2,
+			   (GetBValue(c1)+GetBValue(c2))/2);
 }
 
 void setSysClr(int f)
@@ -1007,7 +1028,8 @@ void setSysClr(int f)
 	if (SAVE_3DC == f)
 	{
 		int n = 0;
-		do C_SAVE[n] = GetSysColor(C_ID[n]); while (++n<ncolors);
+		do C_SAVE[n] = GetSysColor(C_ID[n]);
+		while (++n<ncolors);
 		changed = false;
 		return;
 	}
@@ -1028,7 +1050,7 @@ void setSysClr(int f)
 		COLORREF C_CR[NCOLORS];
 		GradientItem *pGI;
 		pGI = mSkin.windowLabelFocus.parentRelative ?
-			&mSkin.windowTitleFocus : &mSkin.windowLabelFocus;
+			  &mSkin.windowTitleFocus : &mSkin.windowLabelFocus;
 
 		C_CR[4] = pGI->Color;
 
@@ -1041,7 +1063,7 @@ void setSysClr(int f)
 		}
 
 		pGI = mSkin.windowLabelUnfocus.parentRelative ?
-			&mSkin.windowTitleUnfocus : &mSkin.windowLabelUnfocus;
+			  &mSkin.windowTitleUnfocus : &mSkin.windowLabelUnfocus;
 
 		C_CR[5] = pGI->Color;
 		C_CR[7] = B_SOLID == pGI->type ? pGI->Color : pGI->ColorTo;
@@ -1088,14 +1110,14 @@ bool load_dll(void)
 		if (NULL == EntryFunc)
 			error = "Could not load: " BBLEANSKIN_ENGINEDLL;
 		else
-		if (ENGINE_THISVERSION != EntryFunc(ENGINE_GETVERSION, NULL))
-			error = "Wrong version: " BBLEANSKIN_ENGINEDLL;
+			if (ENGINE_THISVERSION != EntryFunc(ENGINE_GETVERSION, NULL))
+				error = "Wrong version: " BBLEANSKIN_ENGINEDLL;
 
 		if (error)
 		{
 			free_dll();
 			MessageBox(NULL, error, szAppName,
-				MB_OK | MB_ICONERROR | MB_SETFOREGROUND | MB_TOPMOST);
+					   MB_OK | MB_ICONERROR | MB_SETFOREGROUND | MB_TOPMOST);
 			return false;
 		}
 	}
@@ -1111,17 +1133,17 @@ static BOOL CALLBACK SkinEnumProc(HWND hwnd, LPARAM lParam)
 	if (MSGID_LOAD == lParam)
 	{
 		if (NULL == pInfo
-			&& WS_CAPTION == (WS_CAPTION & GetWindowLong(hwnd, GWL_STYLE)))
+				&& WS_CAPTION == (WS_CAPTION & GetWindowLong(hwnd, GWL_STYLE)))
 		{
 			//dbg_printf("post %08x", hwnd);
 			PostMessage(hwnd, bbSkinMsg, lParam, 0);
 		}
 	}
 	else
-	if (pInfo)
-	{
-		SendMessage(hwnd, bbSkinMsg, lParam, 0);
-	}
+		if (pInfo)
+		{
+			SendMessage(hwnd, bbSkinMsg, lParam, 0);
+		}
 	return TRUE;
 }
 

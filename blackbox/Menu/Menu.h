@@ -42,7 +42,11 @@ HWND window_under_mouse(void);
 void register_menuclass(void);
 void un_register_menuclass(void);
 
-struct MenuList { struct MenuList *next; class Menu *m; };
+struct MenuList
+{
+	struct MenuList *next;
+	class Menu *m;
+};
 
 //===========================================================================
 class Menu
@@ -122,7 +126,10 @@ protected:
 	MenuItem *AddMenuItem(MenuItem* m);
 	void DeleteMenuItems();
 
-	bool IsPinned() { return m_bPinned; };
+	bool IsPinned()
+	{
+		return m_bPinned;
+	};
 	void SetPinned( bool bPinned );
 
 	void LinkToParentItem(MenuItem *Item);
@@ -324,7 +331,10 @@ public:
 	void GetItemRect(RECT* r);
 	void GetTextRect(RECT* r, int iconSize);
 	const char*  GetDisplayString(void);
-	inline bool within(int y) { return y >= m_nTop && y < m_nTop + m_nHeight; }
+	inline bool within(int y)
+	{
+		return y >= m_nTop && y < m_nTop + m_nHeight;
+	}
 	MenuItem *Sort(int(*cmp_fn)(MenuItem**, MenuItem**));
 
 	// ----------------------

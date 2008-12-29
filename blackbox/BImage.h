@@ -71,14 +71,14 @@ extern "C"
 		int bevelWidth,
 		COLORREF borderColour,
 		int borderWidth
-		);
+	);
 
 	void CreateBorder(
 		HDC hDC,
 		RECT *prect,
 		COLORREF borderColour,
 		int borderWidth
-		);
+	);
 
 	HBITMAP MakeGradientBitmap(
 		int width, int height,
@@ -88,7 +88,7 @@ extern "C"
 		bool bInterlaced,
 		int bevelStyle,
 		int bevelPosition
-		);
+	);
 };
 
 //===========================================================================

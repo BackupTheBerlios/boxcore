@@ -73,7 +73,8 @@ struct WinInfo
 	char bbsm_option;
 };
 
-enum {
+enum
+{
 	btn_None      = -1,
 
 	btn_Close     = 0,

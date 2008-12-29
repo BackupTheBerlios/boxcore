@@ -40,8 +40,8 @@
 #ifdef EXTERN_WALLPAPER
 HBITMAP load_desk_bitmap(LPCSTR command)
 {
-		BBExecute_string(command, false);
-		return NULL;
+	BBExecute_string(command, false);
+	return NULL;
 }
 
 //===========================================================================
@@ -117,28 +117,28 @@ class root_bitmap
 	void init_root(void)
 	{
 		bmp     =
-		solid   =
-		gradient =
-		mod     =
-		wpstyle =
-		*wpfile = 0;
+			solid   =
+				gradient =
+					mod     =
+						wpstyle =
+							*wpfile = 0;
 		sat     = 255;
 		hue     = 0;
 		from    =
-		modfg   = 0xffffff;
+			modfg   = 0xffffff;
 		to      =
-		modbg   = 0x000000;
+			modbg   = 0x000000;
 		interlaced = false;
 		type    = B_HORIZONTAL;
 		modx    =
-		mody    = 4;
+			mody    = 4;
 	}
 
 	//===========================================================================
 	int next_token(void)
 	{
-	   strlwr(NextToken(token, &cptr));
-	   return get_string_index(token, cmds);
+		strlwr(NextToken(token, &cptr));
+		return get_string_index(token, cmds);
 	}
 
 	int read_int(int *dst)
@@ -164,50 +164,51 @@ class root_bitmap
 		while (*cptr)
 		{
 			int s = next_token();
-	cont_1:
+cont_1:
 			if ('-' != token[0] && 0==bmp) goto img_name;
-			switch (s) {
+			switch (s)
+			{
 			case E_bitmap:
-				while(*cptr)
+				while (*cptr)
 				{
 					s = next_token();
 					if (s == Etile)
-			case E_tile:
-			case E_t:
-						wpstyle = WP_TILE;
+					case E_tile:
+				case E_t:
+					wpstyle = WP_TILE;
 					else
-					if (s == Ecenter)
-			case E_center:
-			case E_c:
-						wpstyle = WP_CENTER;
+						if (s == Ecenter)
+						case E_center:
+				case E_c:
+					wpstyle = WP_CENTER;
 					else
-					if (s == Estretch)
-			case E_full:
-			case E_f:
-						wpstyle = WP_FULL;
+						if (s == Estretch)
+						case E_full:
+				case E_f:
+					wpstyle = WP_FULL;
 					else
-					if (s==E_hue)
-					{
-						if (0==read_int(&hue)) goto command_error;
-					}
-					else
-					if (s==E_sat)
-					{
-						if (0==read_int(&sat)) goto command_error;
-					}
-					else
-					if (0==bmp)
-					{
-	img_name:
-						unquote(wpfile, token);
-						bmp = 1;
-					}
-					else goto cont_1;
+						if (s==E_hue)
+						{
+							if (0==read_int(&hue)) goto command_error;
+						}
+						else
+							if (s==E_sat)
+							{
+								if (0==read_int(&sat)) goto command_error;
+							}
+							else
+								if (0==bmp)
+								{
+img_name:
+									unquote(wpfile, token);
+									bmp = 1;
+								}
+								else goto cont_1;
 				}
 				continue;
 
 			case E_solid:
-				while(*cptr)
+				while (*cptr)
 				{
 					s = next_token();
 					if (s == E_interlaced)
@@ -215,20 +216,21 @@ class root_bitmap
 						interlaced = true;
 					}
 					else
-					if (0 == solid)
-					{
-						solidcolor = ReadColorFromString(token);
-						solid = 1;
-					}
-					else goto cont_1;
+						if (0 == solid)
+						{
+							solidcolor = ReadColorFromString(token);
+							solid = 1;
+						}
+						else goto cont_1;
 				}
 				continue;
 
 			case E_gradient:
-				while(*cptr)
+				while (*cptr)
 				{
 					s = next_token();
-					int t; int ParseType(char *);
+					int t;
+					int ParseType(char *);
 					if (-1 != (t = ParseType(token)))
 					{
 						gradient = 1;
@@ -237,21 +239,21 @@ class root_bitmap
 							interlaced = true;
 					}
 					else
-					if (s == E_from)
-					{
-						if (0==read_color(&from)) goto command_error;
-					}
-					else
-					if (s == E_to)
-					{
-						if (0==read_color(&to)) goto command_error;
-					}
-					else
-					if (s == E_interlaced)
-					{
-						interlaced = true;
-					}
-					else goto cont_1;
+						if (s == E_from)
+						{
+							if (0==read_color(&from)) goto command_error;
+						}
+						else
+							if (s == E_to)
+							{
+								if (0==read_color(&to)) goto command_error;
+							}
+							else
+								if (s == E_interlaced)
+								{
+									interlaced = true;
+								}
+								else goto cont_1;
 				}
 				continue;
 
@@ -265,27 +267,27 @@ class root_bitmap
 						interlaced = true;
 					}
 					else
-					if (s == E_fg)
-					{
-						if (0==read_color(&modfg)) goto command_error;
-					}
-					else
-					if (s == E_bg)
-					{
-						if (0==read_color(&modbg)) goto command_error;
-					}
-					else
-					if (*token>='0' && *token <='9' && mod<3)
-					{
-						mody = atoi(token);
-						if (++mod==2) modx = mody;
-					}
-					else goto cont_1;
+						if (s == E_fg)
+						{
+							if (0==read_color(&modfg)) goto command_error;
+						}
+						else
+							if (s == E_bg)
+							{
+								if (0==read_color(&modbg)) goto command_error;
+							}
+							else
+								if (*token>='0' && *token <='9' && mod<3)
+								{
+									mody = atoi(token);
+									if (++mod==2) modx = mody;
+								}
+								else goto cont_1;
 				}
 				continue;
 
 			default:
-			command_error:
+command_error:
 				return 0;
 			}
 		}
@@ -324,13 +326,13 @@ public:
 		if (gradient)
 			;
 		else
-		if (solid)
-		   type = B_SOLID, from = to = solidcolor;
-		else
-		if (mod)
-		   type = B_SOLID, from = to = modbg;
-		else
-			return NULL;
+			if (solid)
+				type = B_SOLID, from = to = solidcolor;
+			else
+				if (mod)
+					type = B_SOLID, from = to = modbg;
+				else
+					return NULL;
 
 		int width = VScreenWidth;
 		int height = VScreenHeight;
@@ -376,7 +378,9 @@ static HBITMAP read_bitmap(LPCSTR path, bool delete_after)
 		return NULL;
 	}
 
-	BITMAPINFOHEADER bih, *pbih; int CU; void *lpBits;
+	BITMAPINFOHEADER bih, *pbih;
+	int CU;
+	void *lpBits;
 	fread(&bih, 1, sizeof(bih), fp);
 	CU = bih.biClrUsed * sizeof(RGBQUAD);
 	pbih = (PBITMAPINFOHEADER)m_alloc(bih.biSize + CU);
@@ -457,7 +461,7 @@ HBITMAP load_desk_bitmap(LPCSTR command)
 
 	char spawn_cmd[1024];
 	sprintf(spawn_cmd, "\"%s\" %s -save \"%s\"",
-		exe_path, cptr, bsetroot_bmp);
+			exe_path, cptr, bsetroot_bmp);
 
 	char bb_path[MAX_PATH];
 	GetBlackboxPath(bb_path, MAX_PATH);
@@ -466,7 +470,7 @@ HBITMAP load_desk_bitmap(LPCSTR command)
 	if (false == ShellCommand(spawn_cmd, bb_path, true))
 	{
 		BBMessageBox(MB_OK, NLS2("$BBError_rootCommand$",
-			"Error: Could not execute rootCommand:\n%s"), spawn_cmd);
+								 "Error: Could not execute rootCommand:\n%s"), spawn_cmd);
 		return NULL;
 	}
 

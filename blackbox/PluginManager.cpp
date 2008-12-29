@@ -59,7 +59,7 @@ void PluginManager_Init()
 {
 	bbplugins = NULL;
 	PluginManager_FT.dwLowDateTime =
-	PluginManager_FT.dwHighDateTime = 0;
+		PluginManager_FT.dwHighDateTime = 0;
 
 	const char *path=plugrcPath();
 	get_filetime(path, &PluginManager_FT);
@@ -85,10 +85,10 @@ ST struct plugins *parse_plugin(const char *rcline)
 	if ('#' == *rcline || 0 == *rcline)
 		q->is_comment = true;
 	else
-	if ('!' == *rcline)
-		while (' '== *++rcline);
-	else
-		q->enabled = true;
+		if ('!' == *rcline)
+			while (' '== *++rcline);
+		else
+			q->enabled = true;
 
 	if ('&' == *rcline)
 	{
@@ -106,7 +106,9 @@ ST struct plugins *parse_plugin(const char *rcline)
 		q->is_slit = 0 == memicmp(s, "BBSlit", 6) && (s[6] == 0 || s[7] == 0);
 
 		// lookup for duplicates
-		int n = 0; int l = strlen(s); struct plugins *q2;
+		int n = 0;
+		int l = strlen(s);
+		struct plugins *q2;
 		dolist (q2, bbplugins)
 		{
 			char *p = q2->name;
@@ -169,59 +171,68 @@ ST void plugin_error(struct plugins *q, int error)
 	const char *msg;
 	switch (error)
 	{
-		case error_is_built_in      :
-			msg = NLS2("$PluginError_IsBuiltIn$",
-			"Dont load this plugin with bbLean. It is built-in."
-			); break;
-		case error_dll_not_found    :
-			msg = NLS2("$PluginError_NotFound$",
-			"The plugin was not found."
-			); break;
-		case error_dll_needs_module :
-			msg = NLS2("$PluginError_MissingModule$",
-			"This plugin cannot be loaded. Possible reason:"
-			"\n- The plugin requires another dll which is not in place."
-			); break;
-		case error_does_not_load    :
-			msg = NLS2("$PluginError_DoesNotLoad$",
-			"This plugin cannot be loaded. Possible reasons:"
-			"\n- The plugin is incompatible with the windows version."
-			"\n- The plugin is incompatible with this blackbox version."
-			); break;
-		case error_missing_entry    :
-			msg = NLS2("$PluginError_MissingEntry$",
-			"This plugin misses one of the required functions. Possible reasons:"
-			"\n- The plugin is not a plugin made for Blackbox for Windows."
-			"\n- The plugin is incompatible with this blackbox version."
-			); break;
-		case error_not_slitable     :
-			msg = NLS2("$PluginError_NotSlitable$",
-			"This plugin is not designed to be loaded into the slit."
-			); break;
-		case error_fail_to_load     :
-			msg = NLS2("$PluginError_IniFailed$",
-			"This plugin failed to initialize."
-			); break;
-		case error_crash_on_load    :
-			msg = NLS2("$PluginError_CrashedOnLoad$",
-			"This plugin caused a general protection violation on initializing."
-			"\nPlease contact the plugin author."
-			); break;
-		case error_crash_on_unload  :
-			msg = NLS2("$PluginError_CrashedOnShutdown$",
-			"This plugin caused a general protection violation on shutdown."
-			"\nPlease contact the plugin author."
-			); break;
+	case error_is_built_in      :
+		msg = NLS2("$PluginError_IsBuiltIn$",
+				   "Dont load this plugin with bbLean. It is built-in."
+				  );
+		break;
+	case error_dll_not_found    :
+		msg = NLS2("$PluginError_NotFound$",
+				   "The plugin was not found."
+				  );
+		break;
+	case error_dll_needs_module :
+		msg = NLS2("$PluginError_MissingModule$",
+				   "This plugin cannot be loaded. Possible reason:"
+				   "\n- The plugin requires another dll which is not in place."
+				  );
+		break;
+	case error_does_not_load    :
+		msg = NLS2("$PluginError_DoesNotLoad$",
+				   "This plugin cannot be loaded. Possible reasons:"
+				   "\n- The plugin is incompatible with the windows version."
+				   "\n- The plugin is incompatible with this blackbox version."
+				  );
+		break;
+	case error_missing_entry    :
+		msg = NLS2("$PluginError_MissingEntry$",
+				   "This plugin misses one of the required functions. Possible reasons:"
+				   "\n- The plugin is not a plugin made for Blackbox for Windows."
+				   "\n- The plugin is incompatible with this blackbox version."
+				  );
+		break;
+	case error_not_slitable     :
+		msg = NLS2("$PluginError_NotSlitable$",
+				   "This plugin is not designed to be loaded into the slit."
+				  );
+		break;
+	case error_fail_to_load     :
+		msg = NLS2("$PluginError_IniFailed$",
+				   "This plugin failed to initialize."
+				  );
+		break;
+	case error_crash_on_load    :
+		msg = NLS2("$PluginError_CrashedOnLoad$",
+				   "This plugin caused a general protection violation on initializing."
+				   "\nPlease contact the plugin author."
+				  );
+		break;
+	case error_crash_on_unload  :
+		msg = NLS2("$PluginError_CrashedOnShutdown$",
+				   "This plugin caused a general protection violation on shutdown."
+				   "\nPlease contact the plugin author."
+				  );
+		break;
 
-		default:
-			msg = "(Unknown Error)";
+	default:
+		msg = "(Unknown Error)";
 	}
 	BBMessageBox(
 		MB_OK,
 		NLS2("$BBPluginError$", "Error: %s\n%s"),
 		q->fullpath,
 		msg
-		);
+	);
 }
 
 //===========================================================================
@@ -294,7 +305,8 @@ ST void load_plugin(struct plugins *q)
 			//---------------------------------------
 			// grab interface functions
 			{
-				static const char* function_names[] = {
+				static const char* function_names[] =
+				{
 					"pluginInfo"        ,
 					"beginPlugin"       ,
 					"endPlugin"         ,
@@ -348,15 +360,16 @@ ST void load_plugin(struct plugins *q)
 				if (0 == i)
 					q->hmodule = hModule, q->inslit = useslit;
 				else
-				if (2 != i)
-					error = error_fail_to_load;
+					if (2 != i)
+						error = error_fail_to_load;
 			}
 			EXCEPT
 			{
 				error = error_crash_on_load;
 			}
 
-		} while (0);
+		}
+		while (0);
 
 		//---------------------------------------
 		// clean up after error
@@ -408,8 +421,11 @@ ST bool write_plugins(void)
 
 void PluginManager_aboutPlugins()
 {
-	char buff[8000]; int x = 0; bool slitted = false;
-	do {
+	char buff[8000];
+	int x = 0;
+	bool slitted = false;
+	do
+	{
 		struct plugins *q;
 		dolist(q, bbplugins)
 		{
@@ -419,22 +435,23 @@ void PluginManager_aboutPlugins()
 				if (slitted) buff[x++] = '&';
 				if (pluginInfo)
 					x+=sprintf(buff+x, "%s %s %s %s (%s)\n",
-						pluginInfo(PLUGIN_NAME),
-						pluginInfo(PLUGIN_VERSION),
-						NLS2("$BBAboutPlugins_by$", "by"),
-						pluginInfo(PLUGIN_AUTHOR),
-						pluginInfo(PLUGIN_RELEASE)
-						);
+							   pluginInfo(PLUGIN_NAME),
+							   pluginInfo(PLUGIN_VERSION),
+							   NLS2("$BBAboutPlugins_by$", "by"),
+							   pluginInfo(PLUGIN_AUTHOR),
+							   pluginInfo(PLUGIN_RELEASE)
+							  );
 				else
 					x+=sprintf(buff+x, "%s\n", q->fullpath);
 			}
 		}
-	} while (false != (slitted = false == slitted));
+	}
+	while (false != (slitted = false == slitted));
 	BBMessageBox(MB_OK,
-		"#bbLean - %s#%s\t\t\t",
-		NLS2("$BBAboutPlugins_Title$", "About loaded plugins"),
-		x ? buff : NLS1("No plugins loaded.")
-		);
+				 "#bbLean - %s#%s\t\t\t",
+				 NLS2("$BBAboutPlugins_Title$", "About loaded plugins"),
+				 x ? buff : NLS1("No plugins loaded.")
+				);
 }
 
 //===========================================================================
@@ -445,16 +462,17 @@ ST UINT_PTR APIENTRY OFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lP
 	if (WM_INITDIALOG == uiMsg)
 	{
 		// center 'open file' dialog on screen
-		RECT r, w; HWND hwnd = GetParent(hdlg);
+		RECT r, w;
+		HWND hwnd = GetParent(hdlg);
 		GetWindowRect(hwnd, &r);
 		GetMonitorRect(hwnd, &w, GETMON_WORKAREA|GETMON_FROM_WINDOW);
 		MoveWindow(hwnd,
-			(w.right+w.left+r.left-r.right) / 2,
-			(w.bottom+w.top+r.top-r.bottom) / 2,
-			r.right - r.left,
-			r.bottom - r.top,
-			TRUE
-			);
+				   (w.right+w.left+r.left-r.right) / 2,
+				   (w.bottom+w.top+r.top-r.bottom) / 2,
+				   r.right - r.left,
+				   r.bottom - r.top,
+				   TRUE
+				  );
 	}
 	return 0;
 }
@@ -482,7 +500,7 @@ ST bool browse_file(const char *title, const char *filters, char *buffer)
 	BOOL (WINAPI *pGetOpenFileName)(LPOPENFILENAME lpofn);
 	HMODULE hLib;
 	if (NULL != (hLib = LoadLibrary("comdlg32.dll"))
-	 && NULL != (*(FARPROC*)&pGetOpenFileName = GetProcAddress(hLib, "GetOpenFileNameA")))
+			&& NULL != (*(FARPROC*)&pGetOpenFileName = GetProcAddress(hLib, "GetOpenFileNameA")))
 	{
 		ret = pGetOpenFileName(&ofCmdFile);
 		FreeLibrary(hLib);
@@ -498,7 +516,8 @@ void PluginManager_handleBroam(const char *submessage)
 	char cmd[80], arg[MAX_PATH], boolarg[40], *tokens[2] = { cmd, arg };
 	BBTokenize (submessage, tokens, 2, boolarg);
 
-	static const char *actions[] = {
+	static const char *actions[] =
+	{
 		//  0        1        2       3
 		"remove", "load", "inslit", "add", NULL
 	};
@@ -511,9 +530,9 @@ void PluginManager_handleBroam(const char *submessage)
 	if (3 == action)
 	{
 		if (0 == *arg
-		 && false == browse_file(
-				NLS1("Add Plugin"),
-				"Plugins (*.dll)\0*.dll\0All Files (*.*)\0*.*\0", arg))
+				&& false == browse_file(
+					NLS1("Add Plugin"),
+					"Plugins (*.dll)\0*.dll\0All Files (*.*)\0*.*\0", arg))
 			return;
 
 		q = parse_plugin(get_relative_path(arg));
@@ -521,8 +540,8 @@ void PluginManager_handleBroam(const char *submessage)
 	else
 	{
 		dolist (q, bbplugins)
-			if (0 == stricmp(q->name, arg))
-				break;
+		if (0 == stricmp(q->name, arg))
+			break;
 	}
 
 	if (NULL == q) return;

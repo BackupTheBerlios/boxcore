@@ -136,16 +136,16 @@ void Menu::make_menu_window(void)
 	{
 		incref();
 		m_hwnd =  CreateWindowEx(
-			WS_EX_TOOLWINDOW,
-			MenuClassName,      // window class name
-			NULL,               // window title
-			WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
-			0, 0, 0, 0,
-			NULL,               // parent window
-			NULL,               // no menu
-			hMainInstance,      // hInstance
-			this                // creation data - link to the object
-			);
+					  WS_EX_TOOLWINDOW,
+					  MenuClassName,      // window class name
+					  NULL,               // window title
+					  WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
+					  0, 0, 0, 0,
+					  NULL,               // parent window
+					  NULL,               // no menu
+					  hMainInstance,      // hInstance
+					  this                // creation data - link to the object
+				  );
 
 		MakeSticky(m_hwnd);
 		register_droptarget(true);
@@ -211,7 +211,8 @@ void Menu_All_Delete(void)
 int Menu::decref(void)
 {
 	//dbg_printf("decref %d %s", m_refc-1, m_pMenuItems->m_pszTitle);
-	int n; if (0 == (n = --m_refc)) delete this;
+	int n;
+	if (0 == (n = --m_refc)) delete this;
 	return n;
 }
 
@@ -273,10 +274,10 @@ Menu *Menu::FindNamedMenu(LPCSTR IDString)
 {
 	MenuList *ml;
 	dolist (ml, g_MenuStructList)
-		if (ml->m->m_IDString && 0==strcmp(ml->m->m_IDString, IDString))
-		{
-			return ml->m;
-		}
+	if (ml->m->m_IDString && 0==strcmp(ml->m->m_IDString, IDString))
+	{
+		return ml->m;
+	}
 	return NULL;
 }
 
@@ -290,15 +291,15 @@ void Menu::set_timer(bool set)
 		KillTimer(m_hwnd, MENU_POPUP_TIMER);
 	}
 	else
-	if (Settings_menuPopupDelay)
-	{
-		SetTimer(m_hwnd, MENU_POPUP_TIMER, Settings_menuPopupDelay, NULL);
-	}
-	else
-	{
-		UpdateWindow(m_hwnd); // Set priority to updating the hilite bar
-		PostMessage(m_hwnd, WM_TIMER, MENU_POPUP_TIMER, 0);
-	}
+		if (Settings_menuPopupDelay)
+		{
+			SetTimer(m_hwnd, MENU_POPUP_TIMER, Settings_menuPopupDelay, NULL);
+		}
+		else
+		{
+			UpdateWindow(m_hwnd); // Set priority to updating the hilite bar
+			PostMessage(m_hwnd, WM_TIMER, MENU_POPUP_TIMER, 0);
+		}
 }
 
 void Menu::set_focus(void)
@@ -439,7 +440,8 @@ void Menu::cons_focus(void)
 // get the list-index for item or -2, if not found
 int Menu::get_item_index (MenuItem *item)
 {
-	int c = -1; MenuItem *Item;
+	int c = -1;
+	MenuItem *Item;
 	dolist (Item, m_pMenuItems)
 	{
 		if (item == Item) return c;
@@ -458,7 +460,8 @@ int Menu::get_active_index (void)
 MenuItem * Menu::nth_item(int a)
 {
 	if (a < -1) return NULL;
-	int c = -2; MenuItem *Item;
+	int c = -2;
+	MenuItem *Item;
 	dolist (Item, m_pMenuItems) if (++c == a) break;
 	return Item;
 }
@@ -496,7 +499,7 @@ Menu * Menu::last_active_menu_root(void)
 {
 	MenuList *ml;
 	dolist (ml, g_MenuWindowList)
-		if (NULL == ml->next) return ml->m->menu_root();
+	if (NULL == ml->next) return ml->m->menu_root();
 	return NULL;
 }
 
@@ -504,7 +507,11 @@ Menu * Menu::last_active_menu_root(void)
 bool Menu_Activate_Last(void)
 {
 	Menu *m = Menu::last_active_menu_root();
-	if (m) { m->set_focus(); return true; }
+	if (m)
+	{
+		m->set_focus();
+		return true;
+	}
 	return false;
 }
 
@@ -514,16 +521,17 @@ void Menu_All_Toggle(bool hide)
 	if (false == Settings_menuspluginToggle) return;
 	MenuList *ml;
 	dolist (ml, Menu::g_MenuWindowList)
-		ShowWindow(ml->m->m_hwnd, hide ? SW_HIDE : SW_SHOWNA);
+	ShowWindow(ml->m->m_hwnd, hide ? SW_HIDE : SW_SHOWNA);
 }
 
 // update menus after style changed
 void Menu_All_Redraw(int flags)
 {
-	Menu*m; MenuList *ml;
+	Menu*m;
+	MenuList *ml;
 	dolist (ml, Menu::g_MenuWindowList)
-		if (NULL == (m=ml->m)->m_pParent)
-			PostMessage(m->m_hwnd, BB_REDRAWGUI, flags, 0);
+	if (NULL == (m=ml->m)->m_pParent)
+		PostMessage(m->m_hwnd, BB_REDRAWGUI, flags, 0);
 }
 
 // Hide all menus, which are not pinned
@@ -535,7 +543,8 @@ void Menu_All_Hide(void)
 // bring all menus on top, restoring the previous z-order
 void Menu_All_BringOnTop(void)
 {
-	Menu *m; MenuList *ml;
+	Menu *m;
+	MenuList *ml;
 	dolist (ml, Menu::g_MenuWindowList)
 	{
 		SetOnTop((m=ml->m)->m_hwnd);
@@ -549,10 +558,11 @@ void Menu_All_BringOnTop(void)
 // Hide all menus, which are not pinned, but not 'p'
 void Menu::Hide_All_But(Menu *p)
 {
-	Menu*m; MenuList *ml;
+	Menu*m;
+	MenuList *ml;
 	dolist (ml, g_MenuWindowList)
-		if (NULL == (m=ml->m)->m_pParent && p != m)
-			PostMessage(m->m_hwnd, BB_HIDEMENU, 0, 0);
+	if (NULL == (m=ml->m)->m_pParent && p != m)
+		PostMessage(m->m_hwnd, BB_HIDEMENU, 0, 0);
 }
 
 // Hide menu on item clicked
@@ -561,7 +571,7 @@ void Menu::hide_on_click(void)
 	Menu *root = menu_root();
 	if (!root->IsPinned()) root->Hide();
 	else
-	if (m_MenuID & MENU_ID_SHCONTEXT) Hide();
+		if (m_MenuID & MENU_ID_SHCONTEXT) Hide();
 }
 
 // save menu fixed keyboard position
@@ -581,11 +591,11 @@ void Menu::menu_set_pos(HWND after, UINT flags)
 	if (m_pChild) // keep it behind the child menu anyway
 		after = m_pChild->m_hwnd;
 	else
-	if (m_bOnTop || false == menu_root()->IsPinned())
-		after = HWND_TOPMOST;
+		if (m_bOnTop || false == menu_root()->IsPinned())
+			after = HWND_TOPMOST;
 
 	SetWindowPos(m_hwnd, after, m_xpos, m_ypos, m_width, m_height,
-		flags|SWP_NOACTIVATE|SWP_NOSENDCHANGING);
+				 flags|SWP_NOACTIVATE|SWP_NOSENDCHANGING);
 }
 
 // set menu on top of the z-order
@@ -613,7 +623,8 @@ void Menu::bring_menu_ontop(void)
 
 HWND window_under_mouse(void)
 {
-	POINT pt; GetCursorPos(&pt);
+	POINT pt;
+	GetCursorPos(&pt);
 	return GetRootWindow(WindowFromPoint(pt));
 }
 
@@ -628,7 +639,8 @@ void Menu::Paint()
 	PAINTSTRUCT ps;
 	HDC hdc, hdc_screen = hdc = BeginPaint(m_hwnd, &ps);
 	HDC back = CreateCompatibleDC(hdc_screen);
-	RECT r; HGDIOBJ S0, F0, B0 = NULL;
+	RECT r;
+	HGDIOBJ S0, F0, B0 = NULL;
 
 	int y1 = ps.rcPaint.top;
 	int y2 = ps.rcPaint.bottom;
@@ -707,8 +719,10 @@ void Menu::Paint()
 		if (NULL == m_hBmpScroll)
 		{
 			RECT rs;
-			rs.left = 0; rs.right  = r.right - r.left;
-			rs.top  = 0; rs.bottom = r.bottom - r.top;
+			rs.left = 0;
+			rs.right  = r.right - r.left;
+			rs.top  = 0;
+			rs.bottom = r.bottom - r.top;
 			m_hBmpScroll = CreateCompatibleBitmap(hdc_screen, rs.right, rs.bottom);
 			S0 = SelectObject(buf, m_hBmpScroll);
 			StyleItem *pSI = &MenuInfo.Scroller;
@@ -724,10 +738,10 @@ void Menu::Paint()
 			for (x = r.left; x < r.right; ++x)
 				for (y = r.top; y < r.bottom; ++y)
 					SetPixel(hdc, x, y, mixcolors(
-							GetPixel(hdc, x, y),
-							GetPixel(buf, x - r.left, y - r.top),
-							Settings_menuScrollHue
-						));
+								 GetPixel(hdc, x, y),
+								 GetPixel(buf, x - r.left, y - r.top),
+								 Settings_menuScrollHue
+							 ));
 		}
 		else
 			BitBlt(hdc, r.left, r.top, r.right-r.left, r.bottom-r.top, buf, 0, 0, SRCCOPY);
@@ -747,7 +761,8 @@ void Menu::Paint()
 	bool focus = GetRootWindow(GetFocus()) == m_hwnd;
 	if (focus || m_bHasFocus)
 	{
-		RECT r; GetClientRect(m_hwnd, &r);
+		RECT r;
+		GetClientRect(m_hwnd, &r);
 		COLORREF c = focus ? (m_bHasFocus ? 0x00DDFF : 0x0088FF) : 0x00CC00;
 		CreateBorder(hdc_screen, &r, c, 2);
 	}
@@ -786,15 +801,15 @@ void Menu::Show(int xpos, int ypos, int flags)
 		bool at_left;
 		if (xright + m_width > screen_rect.right) at_left = true;
 		else
-		if (xleft < screen_rect.left) at_left = false;
-		else
-		if (p->m_pParent)
-			at_left = p->m_pParent->m_xpos > p->m_xpos;
-		else
-		if (BS_EMPTY != FolderItem::m_nBulletStyle)
-			at_left = FolderItem::m_nBulletPosition == DT_LEFT;
-		else
-			at_left = p->m_xpos > (screen_rect.left + screen_rect.right) / 2;
+			if (xleft < screen_rect.left) at_left = false;
+			else
+				if (p->m_pParent)
+					at_left = p->m_pParent->m_xpos > p->m_xpos;
+				else
+					if (BS_EMPTY != FolderItem::m_nBulletStyle)
+						at_left = FolderItem::m_nBulletPosition == DT_LEFT;
+					else
+						at_left = p->m_xpos > (screen_rect.left + screen_rect.right) / 2;
 
 		xpos = at_left ? xleft : xright;
 		ypos = p->m_ypos;
@@ -819,10 +834,10 @@ void Menu::Show(int xpos, int ypos, int flags)
 			ypos -= MenuInfo.nTitleHeight/2;
 		}
 		else
-		if (MENUSHOW_BOTTOM & flags)
-		{
-			ypos -= m_height;
-		}
+			if (MENUSHOW_BOTTOM & flags)
+			{
+				ypos -= m_height;
+			}
 
 		if (MENUSHOW_RIGHT & flags)
 		{
@@ -880,10 +895,10 @@ void Menu::MenuTimer(UINT nTimer)
 		if (NULL == m_pActiveItem)
 		{
 			HideChild();
-		/*
-			if (false == bbactive && false == has_in_chain(window_under_mouse()))
-				Hide_All_But(NULL);
-		*/
+			/*
+				if (false == bbactive && false == has_in_chain(window_under_mouse()))
+					Hide_All_But(NULL);
+			*/
 			return;
 		}
 
@@ -914,7 +929,7 @@ void Menu::Detach()
 			m_pParent->UnHilite();
 
 		if ((m_MenuID & (MENU_ID_SF|MENU_ID_SHCONTEXT))
-		 && !(m_pParent->m_MenuID & MENU_ID_SHCONTEXT))
+				&& !(m_pParent->m_MenuID & MENU_ID_SHCONTEXT))
 			m_pParentItem->UnlinkSubmenu();
 		else
 			LinkToParentItem(NULL);
@@ -940,7 +955,7 @@ void Menu::Hide(void)
 			delete_assoc(&g_MenuFocusList, this);
 			if (m_pParent) m_pParent->set_focus();
 			else
-			if (g_MenuFocusList) g_MenuFocusList->m->set_focus();
+				if (g_MenuFocusList) g_MenuFocusList->m->set_focus();
 		}
 
 		Detach();
@@ -1003,7 +1018,8 @@ void Menu::Validate()
 	int tborder = mStyle.MenuTitle.borderWidth;
 	int hmax    = MenuInfo.MaxMenuHeight;
 
-	int w1, w2, c0, c1, h1; SIZE size;
+	int w1, w2, c0, c1, h1;
+	SIZE size;
 	char current_optional_command[2*MAX_PATH];
 
 	current_optional_command[0] = 0;
@@ -1030,7 +1046,11 @@ void Menu::Validate()
 		if (size.cx > w2) w2 = size.cx;
 		++c0;
 		int h = Item->m_nHeight = size.cy;
-		if (h1 < hmax) { c1 = c0; h1 += h; }
+		if (h1 < hmax)
+		{
+			c1 = c0;
+			h1 += h;
+		}
 
 		// set the 'current style selected' checkmark
 		if (Item->m_ItemID & MENUITEM_ID_STYLE)
@@ -1055,10 +1075,10 @@ void Menu::Validate()
 	int is = m_iconSize;
 	if (-2 == is) is = MenuInfo.nIconSize;
 	m_width = imin(
-		MenuInfo.MaxMenuWidth,
-		imax(w1 + 2 * (MenuInfo.nTitleIndent + border),
-			 w2 + 2 * (MenuInfo.nItemIndent[is] + margin)
-			 ));
+				  MenuInfo.MaxMenuWidth,
+				  imax(w1 + 2 * (MenuInfo.nTitleIndent + border),
+					   w2 + 2 * (MenuInfo.nItemIndent[is] + margin)
+					  ));
 
 	// ---------------------------------------------------
 	// assign item positions
@@ -1080,13 +1100,13 @@ void Menu::Validate()
 	if (c0 && false == m_bIconized) // there are items
 		m_height = m_firstitem_top + h1 + margin;
 	else
-	if (m_bNoTitle)
-		m_height = 2*(border + margin + 1);
-	else
-	if (mStyle.MenuTitle.parentRelative)
-		m_height = m_firstitem_top + border;
-	else
-		m_height = Item->m_nHeight - tborder + 2*border;
+		if (m_bNoTitle)
+			m_height = 2*(border + margin + 1);
+		else
+			if (mStyle.MenuTitle.parentRelative)
+				m_height = m_firstitem_top + border;
+			else
+				m_height = Item->m_nHeight - tborder + 2*border;
 
 	// asign x-coords and width
 	w1 = m_width - 2*border;
@@ -1130,8 +1150,8 @@ void track_mouse_event(HWND hwnd, bool indrag)
 	{
 		// TrackMouseEvent does not seem to work in drag operation (and on win95)
 		SetTimer(hwnd,
-			MENU_TRACKMOUSE_TIMER,
-			iminmax(Settings_menuPopupDelay-10, 20, 100), NULL);
+				 MENU_TRACKMOUSE_TIMER,
+				 iminmax(Settings_menuPopupDelay-10, 20, 100), NULL);
 	}
 }
 
@@ -1162,8 +1182,8 @@ void Menu::mouse_over(bool indrag)
 void Menu::mouse_leave(void)
 {
 	if (NULL == m_pChild
-		|| (false == m_pChild->m_bMouseOver
-			&& NULL == m_pChild->m_pChild))
+			|| (false == m_pChild->m_bMouseOver
+				&& NULL == m_pChild->m_pChild))
 	{
 		UnHilite();
 		if (m_pChild) set_timer(true); // to close submenu
@@ -1189,19 +1209,19 @@ void Menu::Handle_Mouse(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 		}
 		else
-		if (m_captureflg & MENU_CAPT_TWEAKINT) // integer item
-		{
-			if (m_pActiveItem)
-				m_pActiveItem->Mouse(hwnd, uMsg, wParam, lParam);
-		}
-		else
-		if (WM_MOUSEMOVE == uMsg && m_pActiveItem && hwnd != window_under_mouse())
-		{
-			// start drag operation on mouseleave
-			ReleaseCapture();
-			m_captureflg = 0;
-			m_pActiveItem->Invoke(INVOKE_DRAG);
-		}
+			if (m_captureflg & MENU_CAPT_TWEAKINT) // integer item
+			{
+				if (m_pActiveItem)
+					m_pActiveItem->Mouse(hwnd, uMsg, wParam, lParam);
+			}
+			else
+				if (WM_MOUSEMOVE == uMsg && m_pActiveItem && hwnd != window_under_mouse())
+				{
+					// start drag operation on mouseleave
+					ReleaseCapture();
+					m_captureflg = 0;
+					m_pActiveItem->Invoke(INVOKE_DRAG);
+				}
 
 		if (WM_MOUSEMOVE == uMsg)
 			return;
@@ -1215,7 +1235,8 @@ void Menu::Handle_Mouse(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		// check ScrollButton, if there
 		if (m_pagesize < m_itemcount)
 		{
-			RECT scroller; get_vscroller_rect(&scroller);
+			RECT scroller;
+			get_vscroller_rect(&scroller);
 			if (pt.x >= scroller.left && pt.x < scroller.right && pt.y >= MenuInfo.nTitleHeight)
 			{
 				if (WM_LBUTTONDOWN == uMsg)
@@ -1225,16 +1246,16 @@ void Menu::Handle_Mouse(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					SetCapture(hwnd);
 				}
 				else
-				if (m_pChild)
-				{
-					if (m_pChild->m_pParentItem->within(pt.y))
+					if (m_pChild)
 					{
-						// ignore scroller, if an folder-item is at the same position
-						bool at_right = m_pChild->m_xpos > m_xpos;
-						bool scroll_right = DT_RIGHT == FolderItem::m_nScrollPosition;
-						if (at_right == scroll_right) return;
+						if (m_pChild->m_pParentItem->within(pt.y))
+						{
+							// ignore scroller, if an folder-item is at the same position
+							bool at_right = m_pChild->m_xpos > m_xpos;
+							bool scroll_right = DT_RIGHT == FolderItem::m_nScrollPosition;
+							if (at_right == scroll_right) return;
+						}
 					}
-				}
 				mouse_leave();
 				return;
 			}
@@ -1252,11 +1273,11 @@ void Menu::Handle_Mouse(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	// check through items, where the mouse is over
 	MenuItem* item;
 	dolist(item, m_pMenuItems)
-		if (item->within(pt.y))
-		{
-			item->Mouse(hwnd, uMsg, wParam, lParam);
-			break;
-		}
+	if (item->within(pt.y))
+	{
+		item->Mouse(hwnd, uMsg, wParam, lParam);
+		break;
+	}
 }
 
 //==============================================
@@ -1267,14 +1288,15 @@ const _ITEMIDLIST *Menu::dragover(POINT* ppt)
 	POINT pt = *ppt;
 	ScreenToClient(m_hwnd, &pt);
 	mouse_over(true);
-	MenuItem* Item; dolist(Item, m_pMenuItems)
-		if (Item->within(pt.y))
-		{
-			Item->Active(1);
-			if (Item->m_ItemID == MENUITEM_ID_SF)
-				return ((SpecialFolderItem*)Item)->check_pidl();
-			return Item->m_pidl;
-		}
+	MenuItem* Item;
+	dolist(Item, m_pMenuItems)
+	if (Item->within(pt.y))
+	{
+		Item->Active(1);
+		if (Item->m_ItemID == MENUITEM_ID_SF)
+			return ((SpecialFolderItem*)Item)->check_pidl();
+		return Item->m_pidl;
+	}
 	return NULL;
 }
 
@@ -1285,7 +1307,7 @@ void Menu::start_drag(const char *arg, const _ITEMIDLIST *c_pidl)
 	{
 		if (c_pidl) pidl = duplicateIDlist(c_pidl);
 		else
-		if (arg) pidl = sh_getpidl(NULL, arg);
+			if (arg) pidl = sh_getpidl(NULL, arg);
 		if (pidl)
 		{
 			incref();
@@ -1326,20 +1348,22 @@ void Menu::activate_by_key(MenuItem *Item)
 //===========================================================================
 MenuItem * Menu::match_next_shortcut(const char *d)
 {
-	MenuItem *Item; const char *s, *t, *e; unsigned n = 2, dl = strlen(d);
+	MenuItem *Item;
+	const char *s, *t, *e;
+	unsigned n = 2, dl = strlen(d);
 	for (Item = m_pActiveItem; ; Item = m_pMenuItems)
 	{
 		if (Item) while (NULL != (Item = Item->next))
-		{
-			s = strchr(t = Item->m_pszTitle, '&');
-			e = s && s[1] != s[0] ? &s[1] : &t[0];
-			if (strlen(e) >= dl
-			 && 2 == CompareString(
-					LOCALE_USER_DEFAULT,
-					NORM_IGNORECASE|NORM_IGNOREWIDTH|NORM_IGNOREKANATYPE,
-					d, dl, e, dl))
-				break;
-		}
+			{
+				s = strchr(t = Item->m_pszTitle, '&');
+				e = s && s[1] != s[0] ? &s[1] : &t[0];
+				if (strlen(e) >= dl
+						&& 2 == CompareString(
+							LOCALE_USER_DEFAULT,
+							NORM_IGNORECASE|NORM_IGNOREWIDTH|NORM_IGNOREKANATYPE,
+							d, dl, e, dl))
+					break;
+			}
 		if (Item || 0 == --n) return Item;
 	}
 }
@@ -1358,22 +1382,25 @@ void Menu::set_keyboard_active_item(void)
 void Menu_Tab_Next(Menu *p)
 {
 	//bool backwards = 0x8000 & GetAsyncKeyState(VK_SHIFT);
-	Menu *m; MenuList *ml;
+	Menu *m;
+	MenuList *ml;
 	dolist (ml, Menu::g_MenuWindowList)
-		if (NULL == (m=ml->m)->m_pParent && p != m)
-		{
-			m->bring_menu_ontop();
-			Menu::Hide_All_But(m);
-			m->set_keyboard_active_item();
-			break;
-		}
+	if (NULL == (m=ml->m)->m_pParent && p != m)
+	{
+		m->bring_menu_ontop();
+		Menu::Hide_All_But(m);
+		m->set_keyboard_active_item();
+		break;
+	}
 }
 
 //--------------------------------------
 bool Menu::Handle_Key(UINT msg, UINT wParam)
 {
 	int n, a, c, d, e, i;
-	MenuItem *Item; bool ctrl; const int c_steps = 1;
+	MenuItem *Item;
+	bool ctrl;
+	const int c_steps = 1;
 
 	//--------------------------------------
 	if (MENU_ID_INT & m_MenuID)
@@ -1381,223 +1408,234 @@ bool Menu::Handle_Key(UINT msg, UINT wParam)
 		m_pMenuItems->next->Key(msg, wParam);
 	}
 	else
-	if (MENU_ID_STRING & m_MenuID)
-	{
-	}
-	else
-	if (WM_CHAR == msg)
-	{
-		char chars[80]; MSG msg; i = 0;
-		chars[i++] = wParam;
-		while(PeekMessage(&msg, m_hwnd, WM_CHAR, WM_CHAR, PM_REMOVE) && (unsigned)i < sizeof chars - 1)
-			chars[i++] = msg.wParam;
-		chars[i] = 0;
-
-		//dbg_printf("chars <%s>", chars);
-
-		// Shortcuts
-		Item = match_next_shortcut(chars);
-		if (Item)
+		if (MENU_ID_STRING & m_MenuID)
 		{
-			hilite(Item);
-			if (Item == match_next_shortcut(chars))
+		}
+		else
+			if (WM_CHAR == msg)
 			{
-				// popup folder if only one choice
-				if (MENUITEM_ID_FOLDER & Item->m_ItemID)
-					goto k_right;
+				char chars[80];
+				MSG msg;
+				i = 0;
+				chars[i++] = wParam;
+				while (PeekMessage(&msg, m_hwnd, WM_CHAR, WM_CHAR, PM_REMOVE) && (unsigned)i < sizeof chars - 1)
+					chars[i++] = msg.wParam;
+				chars[i] = 0;
+
+				//dbg_printf("chars <%s>", chars);
+
+				// Shortcuts
+				Item = match_next_shortcut(chars);
+				if (Item)
+				{
+					hilite(Item);
+					if (Item == match_next_shortcut(chars))
+					{
+						// popup folder if only one choice
+						if (MENUITEM_ID_FOLDER & Item->m_ItemID)
+							goto k_right;
+					}
+				}
 			}
-		}
-	}
-	else
-	if (WM_KEYDOWN == msg)
-	{
-		a = get_active_index();
-		e = m_itemcount - 1;
-		d = m_pagesize - 1;
-		n = 0;
-		ctrl = 0x8000 & GetKeyState(VK_CONTROL);
+			else
+				if (WM_KEYDOWN == msg)
+				{
+					a = get_active_index();
+					e = m_itemcount - 1;
+					d = m_pagesize - 1;
+					n = 0;
+					ctrl = 0x8000 & GetKeyState(VK_CONTROL);
 one_more:
-		i = 1;
-		switch(wParam)
-		{
-			set:
-				Item = a < 0 ? NULL : nth_item(a);
-				if (NULL == Item)
-					break;
+					i = 1;
+					switch (wParam)
+					{
+set:
+						Item = a < 0 ? NULL : nth_item(a);
+						if (NULL == Item)
+							break;
 
-				if (Item->m_isNOP & (MI_NOP_TEXT | MI_NOP_SEP))
-				{
-					if (n++ < e) goto one_more;
-					m_keyboard_item_pos = -2;
-					break;
-				}
+						if (Item->m_isNOP & (MI_NOP_TEXT | MI_NOP_SEP))
+						{
+							if (n++ < e) goto one_more;
+							m_keyboard_item_pos = -2;
+							break;
+						}
 
-				activate_by_key(Item);
-				break;
-
-			//--------------------------------------
-			case VK_DOWN:
-				if (ctrl)
-				{
-					i = imin(c_steps, e - d - m_topindex);
-					if (i >= 0)
-						scroll_menu(i);
-					else
+						activate_by_key(Item);
 						break;
+
+						//--------------------------------------
+					case VK_DOWN:
+						if (ctrl)
+						{
+							i = imin(c_steps, e - d - m_topindex);
+							if (i >= 0)
+								scroll_menu(i);
+							else
+								break;
+						}
+						if (a < 0) a = m_topindex;
+						else
+							if (a >= e) a = (d < e) ? e : 0;
+							else a = imin(a+i, e);
+						goto set;
+
+						//--------------------------------------
+					case VK_UP:
+						if (ctrl)
+						{
+							i = imin(c_steps, m_topindex);
+							if (i >= 0) scroll_menu(-i);
+							else break;
+						}
+						if (a < 0) a = e;
+						else
+							if (0 == a) a = (d < e) ? 0 : e;
+							else a = imax(a-i, 0);
+						goto set;
+
+						//--------------------------------------
+					case VK_NEXT:
+						if (a < 0) a = m_topindex;
+						c = imin (e - d - m_topindex, d);
+						if (c <= 0) a = e;
+						else a += c;
+						scroll_menu(c);
+						wParam = VK_DOWN;
+						goto set;
+
+						//--------------------------------------
+					case VK_PRIOR:
+						if (a < 0) a = m_topindex;
+						c = imin(m_topindex, d);
+						if (c <= 0) a = 0;
+						else a -= c;
+						scroll_menu(-c);
+						wParam = VK_UP;
+						goto set;
+
+						//--------------------------------------
+					case VK_HOME:
+						a = 0;
+						goto set;
+
+						//--------------------------------------
+					case VK_END:
+						a = e;
+						goto set;
+
+						//--------------------------------------
+					case VK_RIGHT:
+						if (FolderItem::m_nBulletPosition == DT_LEFT) goto k_left;
+k_right:
+						if (m_pActiveItem)
+						{
+							m_pActiveItem->ShowSubMenu();
+						}
+hilite_child:
+						if (m_pChild)
+						{
+							m_pChild->set_focus();
+							Item = m_pChild->m_pMenuItems->next;
+							if (Item) m_pChild->activate_by_key(Item);
+						}
+						break;
+
+						//--------------------------------------
+					case VK_LEFT:
+						if (FolderItem::m_nBulletPosition == DT_LEFT) goto k_right;
+k_left:
+						if (m_pParent)
+							m_pParent->hilite(m_pParentItem);
+						break;
+
+						//--------------------------------------
+					case VK_RETURN: // invoke command
+					case VK_SPACE:
+						if (m_pActiveItem)
+						{
+							m_pActiveItem->Invoke(INVOKE_LEFT);
+							goto hilite_child;
+						}
+						break;
+
+						//--------------------------------------
+					case VK_APPS: // context menu
+						if (m_pActiveItem)
+						{
+							m_pActiveItem->Invoke(INVOKE_RIGHT);
+							goto hilite_child;
+						}
+						break;
+
+						//--------------------------------------
+					case VK_F5: // update folder
+						PostMessage(m_hwnd, BB_FOLDERCHANGED, 0, 0);
+						break;
+
+						//--------------------------------------
+					case VK_TAB: // cycle through menues
+						Menu_Tab_Next(this);
+						break;
+
+						//--------------------------------------
+					case VK_INSERT:
+						if (false == IsPinned())
+							SetPinned(true);
+						else
+							m_bOnTop = false == m_bOnTop;
+
+						SetZPos();
+						break;
+
+						//--------------------------------------
+					case VK_ESCAPE:
+						Menu_All_Hide();
+						focus_top_window();
+						break;
+
+					case VK_DELETE:
+						HideThis();
+						break;
+
+						//--------------------------------------
+					default:
+						return false;
+					}
 				}
-				if (a < 0) a = m_topindex;
 				else
-				if (a >= e) a = (d < e) ? e : 0;
-				else a = imin(a+i, e);
-				goto set;
-
-			//--------------------------------------
-			case VK_UP:
-				if (ctrl)
-				{
-					i = imin(c_steps, m_topindex);
-					if (i >= 0) scroll_menu(-i);
-					else break;
-				}
-				if (a < 0) a = e;
-				else
-				if (0 == a) a = (d < e) ? 0 : e;
-				else a = imax(a-i, 0);
-				goto set;
-
-			//--------------------------------------
-			case VK_NEXT:
-				if (a < 0) a = m_topindex;
-				c = imin (e - d - m_topindex, d);
-				if (c <= 0) a = e;
-				else a += c;
-				scroll_menu(c);
-				wParam = VK_DOWN;
-				goto set;
-
-			//--------------------------------------
-			case VK_PRIOR:
-				if (a < 0) a = m_topindex;
-				c = imin(m_topindex, d);
-				if (c <= 0) a = 0;
-				else a -= c;
-				scroll_menu(-c);
-				wParam = VK_UP;
-				goto set;
-
-			//--------------------------------------
-			case VK_HOME:
-				a = 0;
-				goto set;
-
-			//--------------------------------------
-			case VK_END:
-				a = e;
-				goto set;
-
-			//--------------------------------------
-			case VK_RIGHT:
-				if (FolderItem::m_nBulletPosition == DT_LEFT) goto k_left;
-			k_right:
-				if (m_pActiveItem)
-				{
-					m_pActiveItem->ShowSubMenu();
-				}
-			hilite_child:
-				if (m_pChild)
-				{
-					m_pChild->set_focus();
-					Item = m_pChild->m_pMenuItems->next;
-					if (Item) m_pChild->activate_by_key(Item);
-				}
-				break;
-
-			//--------------------------------------
-			case VK_LEFT:
-				if (FolderItem::m_nBulletPosition == DT_LEFT) goto k_right;
-			k_left:
-				if (m_pParent)
-					m_pParent->hilite(m_pParentItem);
-				break;
-
-			//--------------------------------------
-			case VK_RETURN: // invoke command
-			case VK_SPACE:
-				if (m_pActiveItem)
-				{
-					m_pActiveItem->Invoke(INVOKE_LEFT);
-					goto hilite_child;
-				}
-				break;
-
-			//--------------------------------------
-			case VK_APPS: // context menu
-				if (m_pActiveItem)
-				{
-					m_pActiveItem->Invoke(INVOKE_RIGHT);
-					goto hilite_child;
-				}
-				break;
-
-			//--------------------------------------
-			case VK_F5: // update folder
-				PostMessage(m_hwnd, BB_FOLDERCHANGED, 0, 0);
-				break;
-
-			//--------------------------------------
-			case VK_TAB: // cycle through menues
-				Menu_Tab_Next(this);
-				break;
-
-			//--------------------------------------
-			case VK_INSERT:
-				if (false == IsPinned())
-					SetPinned(true);
-				else
-					m_bOnTop = false == m_bOnTop;
-
-				SetZPos();
-				break;
-
-			//--------------------------------------
-			case VK_ESCAPE:
-				Menu_All_Hide();
-				focus_top_window();
-				break;
-
-			case VK_DELETE:
-				HideThis();
-				break;
-
-			//--------------------------------------
-			default:
-				return false;
-		}
-	}
-	else
-	if (WM_SYSKEYDOWN == msg)
-	{
-		int d = 12;
-		//if (0x8000 & GetAsyncKeyState(VK_CONTROL)) d = 1;
-		int x = m_xpos;
-		int y = m_ypos;
-		switch(wParam)
-		{
-			case VK_LEFT:  x -= d; break;
-			case VK_RIGHT: x += d; break;
-			case VK_UP:    y -= d; break;
-			case VK_DOWN:  y += d; break;
-			default: return false;
-		}
-		Show(x, y, MENUSHOW_LEFT|MENUSHOW_UPDATE);
-		write_menu_pos();
-		if (false == IsPinned())
-			SetPinned(true), SetZPos();
-	}
-	else
-	{
-		return false;
-	}
+					if (WM_SYSKEYDOWN == msg)
+					{
+						int d = 12;
+						//if (0x8000 & GetAsyncKeyState(VK_CONTROL)) d = 1;
+						int x = m_xpos;
+						int y = m_ypos;
+						switch (wParam)
+						{
+						case VK_LEFT:
+							x -= d;
+							break;
+						case VK_RIGHT:
+							x += d;
+							break;
+						case VK_UP:
+							y -= d;
+							break;
+						case VK_DOWN:
+							y += d;
+							break;
+						default:
+							return false;
+						}
+						Show(x, y, MENUSHOW_LEFT|MENUSHOW_UPDATE);
+						write_menu_pos();
+						if (false == IsPinned())
+							SetPinned(true), SetZPos();
+					}
+					else
+					{
+						return false;
+					}
 	Menu::g_DiscardMouseMoves = 5; // discard next 5 mouse messages
 	return true;
 }
@@ -1621,226 +1659,226 @@ LRESULT CALLBACK Menu::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	//dbg_printf("hwnd %x  msg %x  wp %08x  lp %08x", hwnd, uMsg, wParam, lParam);
 
 	p->incref();
-	switch(uMsg)
+	switch (uMsg)
 	{
 		//====================
-		case WM_DESTROY:
-			break;
+	case WM_DESTROY:
+		break;
 
 		//====================
-		case WM_KILLFOCUS:
-			p->m_bHasFocus = false;
-			if (NULL == p->m_pChild) p->UnHilite();
+	case WM_KILLFOCUS:
+		p->m_bHasFocus = false;
+		if (NULL == p->m_pChild) p->UnHilite();
 
 #ifdef CHECKFOCUS
-			dbg_printf("WM_KILLFOCUS %s", p->m_pMenuItems->m_pszTitle);
-			InvalidateRect(hwnd, NULL, FALSE);
+		dbg_printf("WM_KILLFOCUS %s", p->m_pMenuItems->m_pszTitle);
+		InvalidateRect(hwnd, NULL, FALSE);
 #endif
-			break;
+		break;
 
 		//====================
-		case WM_SETFOCUS:
-			p->m_bHasFocus = true;
-			g_MouseWheelAccu = 0;
+	case WM_SETFOCUS:
+		p->m_bHasFocus = true;
+		g_MouseWheelAccu = 0;
 
 #ifdef CHECKFOCUS
-			dbg_printf("WM_SETFOCUS %s", p->m_pMenuItems->m_pszTitle);
-			InvalidateRect(hwnd, NULL, FALSE);
+		dbg_printf("WM_SETFOCUS %s", p->m_pMenuItems->m_pszTitle);
+		InvalidateRect(hwnd, NULL, FALSE);
 #endif
-			break;
+		break;
 
 		//====================
-		case WM_ACTIVATEAPP:
-			if (false == wParam)
-				freeall(&g_MenuFocusList);
-			break;
+	case WM_ACTIVATEAPP:
+		if (false == wParam)
+			freeall(&g_MenuFocusList);
+		break;
 
-		case WM_ACTIVATE:
-			if (WA_INACTIVE != LOWORD(wParam))
-			{
-				p->insert_at_last();
-				p->cons_focus();
-			}
-			break;
-
-		//====================
-		case BB_HIDEMENU:
-			p->Hide();
-			break;
-
-		case WM_CLOSE:
-			p->HideThis();
-			break;
-
-		case BB_REDRAWGUI:
-			if (wParam & BBRG_FOLDER) p->UpdateFolder();
-			p->redraw_structure();
-			break;
-
-		case BB_FOLDERCHANGED:
-			PostMessage(hwnd, BB_REDRAWGUI, BBRG_FOLDER, 0);
-			break;
-
-		case BB_DRAGOVER:
-			result = (LRESULT)p->dragover((POINT *)lParam);
-			break;
-
-		//====================
-		case WM_SYSKEYDOWN:
-		case WM_KEYDOWN:
-		case WM_KEYUP:
-		case WM_CHAR:
-			if (false == p->Handle_Key(uMsg, wParam))
-				goto _default;
-			break;
-
-		//====================
-		case WM_MOUSEWHEEL:
+	case WM_ACTIVATE:
+		if (WA_INACTIVE != LOWORD(wParam))
 		{
-			int i = g_MouseWheelAccu + Settings_menuMousewheelfac * 5 * (short)HIWORD(wParam);
-			//long f = (long)LOWORD(wParam); // Our modifier keys
-			int n = 0;
-			while (i < -300) n++, i+=600;
-			while (i >  300) n--, i-=600;
-			g_MouseWheelAccu=i;
-			p->scroll_menu(n);
+			p->insert_at_last();
+			p->cons_focus();
+		}
+		break;
 
-			POINT pt;
-			pt.x = (short)LOWORD(lParam);
-			pt.y = (short)HIWORD(lParam);
-			ScreenToClient(hwnd, &pt);
-			PostMessage(hwnd, WM_MOUSEMOVE, LOWORD(wParam), MAKELPARAM(pt.x, pt.y));
+		//====================
+	case BB_HIDEMENU:
+		p->Hide();
+		break;
+
+	case WM_CLOSE:
+		p->HideThis();
+		break;
+
+	case BB_REDRAWGUI:
+		if (wParam & BBRG_FOLDER) p->UpdateFolder();
+		p->redraw_structure();
+		break;
+
+	case BB_FOLDERCHANGED:
+		PostMessage(hwnd, BB_REDRAWGUI, BBRG_FOLDER, 0);
+		break;
+
+	case BB_DRAGOVER:
+		result = (LRESULT)p->dragover((POINT *)lParam);
+		break;
+
+		//====================
+	case WM_SYSKEYDOWN:
+	case WM_KEYDOWN:
+	case WM_KEYUP:
+	case WM_CHAR:
+		if (false == p->Handle_Key(uMsg, wParam))
+			goto _default;
+		break;
+
+		//====================
+	case WM_MOUSEWHEEL:
+	{
+		int i = g_MouseWheelAccu + Settings_menuMousewheelfac * 5 * (short)HIWORD(wParam);
+		//long f = (long)LOWORD(wParam); // Our modifier keys
+		int n = 0;
+		while (i < -300) n++, i+=600;
+		while (i >  300) n--, i-=600;
+		g_MouseWheelAccu=i;
+		p->scroll_menu(n);
+
+		POINT pt;
+		pt.x = (short)LOWORD(lParam);
+		pt.y = (short)HIWORD(lParam);
+		ScreenToClient(hwnd, &pt);
+		PostMessage(hwnd, WM_MOUSEMOVE, LOWORD(wParam), MAKELPARAM(pt.x, pt.y));
+		break;
+	}
+
+	//====================
+	case WM_MOUSELEAVE:
+		//dbg_printf("mouseleave %x", hwnd);
+		if (p->m_bMouseOver)
+		{
+			p->m_bMouseOver = false;
+			p->mouse_leave();
+		}
+		break;
+
+		//====================
+	case WM_MOUSEMOVE:
+		if (g_DiscardMouseMoves)
+			--Menu::g_DiscardMouseMoves;
+		else
+			p->Handle_Mouse(hwnd, uMsg, wParam, lParam);
+		break;
+
+	case WM_LBUTTONDBLCLK:
+	case WM_RBUTTONDBLCLK:
+	case WM_MBUTTONDBLCLK:
+		p->m_dblClicked = true;
+		p->Handle_Mouse(hwnd, uMsg, wParam, lParam);
+		break;
+
+	case WM_LBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+	case WM_MBUTTONDOWN:
+		p->m_dblClicked = false;
+		p->Handle_Mouse(hwnd, uMsg, wParam, lParam);
+		break;
+
+	case WM_LBUTTONUP:
+	case WM_RBUTTONUP:
+	case WM_MBUTTONUP:
+		p->Handle_Mouse(hwnd, uMsg, wParam, lParam);
+		ReleaseCapture();
+		p->m_captureflg = 0;
+		break;
+
+		//====================
+	case WM_TIMER:
+		if (MENU_TRACKMOUSE_TIMER == wParam)
+		{
+			if (hwnd != window_under_mouse())
+			{
+				KillTimer(hwnd, wParam);
+				PostMessage(hwnd, WM_MOUSELEAVE, 0, 0);
+			}
 			break;
 		}
+		//dbg_printf("Timer %x %d", hwnd, wParam);
+		p->MenuTimer(wParam);
+		break;
 
 		//====================
-		case WM_MOUSELEAVE:
-			//dbg_printf("mouseleave %x", hwnd);
-			if (p->m_bMouseOver)
-			{
-				p->m_bMouseOver = false;
-				p->mouse_leave();
-			}
-			break;
+	case WM_WINDOWPOSCHANGING:
+		if (p->m_bMoving && Settings_menusSnapWindow)
+		{
+			WINDOWPOS* wp = (WINDOWPOS*)lParam;
+			SnapWindowToEdge(wp, 0, SNAP_NOPLUGINS|SNAP_FULLSCREEN);
+		}
+		break;
+
+	case WM_WINDOWPOSCHANGED:
+		p->m_xpos = ((LPWINDOWPOS)lParam)->x;
+		p->m_ypos = ((LPWINDOWPOS)lParam)->y;
+		if (p->m_pChild)
+		{
+			if (p->menu_root()->m_bMoving)
+				p->m_pChild->Show(0, 0, MENUSHOW_UPDATE);
+
+			// put behind child again
+			p->menu_set_pos(NULL, SWP_NOMOVE|SWP_NOSIZE);
+		}
+		break;
 
 		//====================
-		case WM_MOUSEMOVE:
-			if (g_DiscardMouseMoves)
-				--Menu::g_DiscardMouseMoves;
-			else
-				p->Handle_Mouse(hwnd, uMsg, wParam, lParam);
-			break;
-
-		case WM_LBUTTONDBLCLK:
-		case WM_RBUTTONDBLCLK:
-		case WM_MBUTTONDBLCLK:
-			p->m_dblClicked = true;
-			p->Handle_Mouse(hwnd, uMsg, wParam, lParam);
-			break;
-
-		case WM_LBUTTONDOWN:
-		case WM_RBUTTONDOWN:
-		case WM_MBUTTONDOWN:
-			p->m_dblClicked = false;
-			p->Handle_Mouse(hwnd, uMsg, wParam, lParam);
-			break;
-
-		case WM_LBUTTONUP:
-		case WM_RBUTTONUP:
-		case WM_MBUTTONUP:
-			p->Handle_Mouse(hwnd, uMsg, wParam, lParam);
-			ReleaseCapture();
-			p->m_captureflg = 0;
-			break;
+	case WM_ENTERSIZEMOVE:
+		p->m_bMoving = true;
+		break;
 
 		//====================
-		case WM_TIMER:
-			if (MENU_TRACKMOUSE_TIMER == wParam)
-			{
-				if (hwnd != window_under_mouse())
-				{
-					KillTimer(hwnd, wParam);
-					PostMessage(hwnd, WM_MOUSELEAVE, 0, 0);
-				}
-				break;
-			}
-			//dbg_printf("Timer %x %d", hwnd, wParam);
-			p->MenuTimer(wParam);
-			break;
+	case WM_EXITSIZEMOVE:
+		p->m_bMoving = false;
+		p->write_menu_pos();
+		break;
 
 		//====================
-		case WM_WINDOWPOSCHANGING:
-			if (p->m_bMoving && Settings_menusSnapWindow)
-			{
-				WINDOWPOS* wp = (WINDOWPOS*)lParam;
-				SnapWindowToEdge(wp, 0, SNAP_NOPLUGINS|SNAP_FULLSCREEN);
-			}
-			break;
-
-		case WM_WINDOWPOSCHANGED:
-			p->m_xpos = ((LPWINDOWPOS)lParam)->x;
-			p->m_ypos = ((LPWINDOWPOS)lParam)->y;
-			if (p->m_pChild)
-			{
-				if (p->menu_root()->m_bMoving)
-					p->m_pChild->Show(0, 0, MENUSHOW_UPDATE);
-
-				// put behind child again
-				p->menu_set_pos(NULL, SWP_NOMOVE|SWP_NOSIZE);
-			}
-			break;
+	case WM_PAINT:
+		p->Paint();
+		break;
 
 		//====================
-		case WM_ENTERSIZEMOVE:
-			p->m_bMoving = true;
-			break;
-
-		//====================
-		case WM_EXITSIZEMOVE:
-			p->m_bMoving = false;
-			p->write_menu_pos();
-			break;
-
-		//====================
-		case WM_PAINT:
-			p->Paint();
-			break;
-
-		//====================
-		case WM_ERASEBKGND:
-			result = TRUE;
-			break;
+	case WM_ERASEBKGND:
+		result = TRUE;
+		break;
 
 		//===============================================
 		// String Item - parent window notifications
-		case WM_COMMAND:
-			if (1234 == LOWORD(wParam))
-				if (EN_UPDATE == HIWORD(wParam)
-				||  EN_HSCROLL == HIWORD(wParam))
-				{
-					InvalidateRect((HWND)lParam, NULL, FALSE);
-				}
-			break;
+	case WM_COMMAND:
+		if (1234 == LOWORD(wParam))
+			if (EN_UPDATE == HIWORD(wParam)
+					||  EN_HSCROLL == HIWORD(wParam))
+			{
+				InvalidateRect((HWND)lParam, NULL, FALSE);
+			}
+		break;
 
-		case WM_CTLCOLOREDIT:
-			SetTextColor((HDC)wParam, mStyle.MenuFrame.TextColor);
-			SetBkMode((HDC)wParam, TRANSPARENT);
-			result = (LRESULT)GetStockObject(NULL_BRUSH);
-			break;
+	case WM_CTLCOLOREDIT:
+		SetTextColor((HDC)wParam, mStyle.MenuFrame.TextColor);
+		SetBkMode((HDC)wParam, TRANSPARENT);
+		result = (LRESULT)GetStockObject(NULL_BRUSH);
+		break;
 
-		case WM_CAPTURECHANGED:
-			if (p->m_MenuID & MENU_ID_STRING)
-				InvalidateRect(hwnd, NULL, FALSE);
+	case WM_CAPTURECHANGED:
+		if (p->m_MenuID & MENU_ID_STRING)
+			InvalidateRect(hwnd, NULL, FALSE);
 
-			p->m_captureflg = 0;
-			break;
+		p->m_captureflg = 0;
+		break;
 
 		//===============================================
 
-		default:
-		_default:
-			result = DefWindowProc(hwnd, uMsg, wParam, lParam);
-			break;
+	default:
+_default:
+		result = DefWindowProc(hwnd, uMsg, wParam, lParam);
+		break;
 
 		//====================
 	}
@@ -1955,21 +1993,22 @@ void Menu_ShowFirst(Menu *p, bool from_kbd, bool with_xy, int x, int y)
 		p->Show(x, y, menushow_pos);
 	}
 	else
-	if (from_kbd)
-	{
-		// some mouse-moves are ignored just in case the mouse is over the menu
-		Menu::g_DiscardMouseMoves = 5;
-		p->m_bKBDInvoked = true;
-		p->Show(Settings_menuPositionX, Settings_menuPositionY, MENUSHOW_LEFT);
-	}
-	else
-	{
-		p->SetPinned(false);
-		Menu::g_DiscardMouseMoves = 2;
-		p->m_bKBDInvoked = false;
-		POINT pt; GetCursorPos(&pt);
-		p->Show(pt.x, pt.y, MENUSHOW_CENTER);
-	}
+		if (from_kbd)
+		{
+			// some mouse-moves are ignored just in case the mouse is over the menu
+			Menu::g_DiscardMouseMoves = 5;
+			p->m_bKBDInvoked = true;
+			p->Show(Settings_menuPositionX, Settings_menuPositionY, MENUSHOW_LEFT);
+		}
+		else
+		{
+			p->SetPinned(false);
+			Menu::g_DiscardMouseMoves = 2;
+			p->m_bKBDInvoked = false;
+			POINT pt;
+			GetCursorPos(&pt);
+			p->Show(pt.x, pt.y, MENUSHOW_CENTER);
+		}
 
 	p->decref();
 	ForceForegroundWindow(p->m_hwnd);   // force focus, if it was invoked by a keystroke
@@ -2148,7 +2187,7 @@ MenuItem * make_helper_menu(Menu *PluginMenu, LPCSTR Title, int menuID, MenuItem
 MenuItem *MakeMenuItemInt(Menu *PluginMenu, LPCSTR Title, LPCSTR Cmd, int val, int minval, int maxval)
 {
 	return make_helper_menu(PluginMenu, Title, MENU_ID_INT,
-		new IntegerItem(Cmd, val, minval, maxval));
+							new IntegerItem(Cmd, val, minval, maxval));
 }
 
 //===========================================================================
@@ -2158,7 +2197,7 @@ MenuItem *MakeMenuItemInt(Menu *PluginMenu, LPCSTR Title, LPCSTR Cmd, int val, i
 MenuItem *MakeMenuItemString(Menu *PluginMenu, LPCSTR Title, LPCSTR Cmd, LPCSTR init_string)
 {
 	return make_helper_menu(PluginMenu, Title, MENU_ID_STRING,
-		new StringItem(Cmd, init_string));
+							new StringItem(Cmd, init_string));
 }
 
 //===========================================================================
@@ -2178,7 +2217,7 @@ MenuItem* MakeMenuNOP(Menu *PluginMenu, LPCSTR Title)
 
 MenuItem* MakeMenuVOL(Menu *PluginMenu, LPCSTR Title)
 {
-    return PluginMenu->AddMenuItem(new VolumeItem(Title));
+	return PluginMenu->AddMenuItem(new VolumeItem(Title));
 }
 
 //===========================================================================
@@ -2210,7 +2249,7 @@ MenuItem* MakePathMenu(Menu *ParentMenu, LPCSTR Title, LPCSTR path, LPCSTR Cmd, 
 
 			// Conserve first path
 			char *path_end = (char *)path, c = *path_end;
-			while(c && c != '|') c = *(++path_end);
+			while (c && c != '|') c = *(++path_end);
 			*path_end = 0;
 
 			mi->m_pidl = get_folder_pidl(path);
@@ -2236,10 +2275,10 @@ bool MenuExists(const char* IDString_part)
 	int l = strlen(IDString_part);
 	MenuList *ml;
 	dolist (ml, Menu::g_MenuStructList)
-		if (ml->m->m_IDString && 0 == memcmp(ml->m->m_IDString, IDString_part, l))
-		{
-			return true;
-		}
+	if (ml->m->m_IDString && 0 == memcmp(ml->m->m_IDString, IDString_part, l))
+	{
+		return true;
+	}
 	return false;
 }
 

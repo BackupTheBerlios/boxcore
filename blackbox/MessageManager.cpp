@@ -98,15 +98,15 @@ static void AddRemoveMessages(HWND window, UINT* messages, bool add)
 					wp = &w->next;
 		}
 		else
-		if (add)
-		{
-			mm = (struct MsgMap*)c_alloc(sizeof *mm);
-			mm->msg = msg;
-			//mm->winlist = NULL;
-			//mm->next = NULL;
-			//mm->count = 0;
-			append_node (&msgs, mm);
-		}
+			if (add)
+			{
+				mm = (struct MsgMap*)c_alloc(sizeof *mm);
+				mm->msg = msg;
+				//mm->winlist = NULL;
+				//mm->next = NULL;
+				//mm->count = 0;
+				append_node (&msgs, mm);
+			}
 
 		if (add)
 		{
@@ -117,11 +117,11 @@ static void AddRemoveMessages(HWND window, UINT* messages, bool add)
 			++mm->count;
 		}
 		else
-		if (mm)
-		{
-			dbg_msg("del", window, msg);
-			if (NULL == mm->winlist) remove_item(&msgs, mm);
-		}
+			if (mm)
+			{
+				dbg_msg("del", window, msg);
+				if (NULL == mm->winlist) remove_item(&msgs, mm);
+			}
 	}
 }
 
@@ -149,7 +149,8 @@ found:
 	// make a local copy to be safe for messages being added or removed
 	// while traversing the list...
 	HWND hwnd_array[256], *pw = hwnd_array;
-	do *pw++ = w->hwnd, w = w->next; while (w);
+	do *pw++ = w->hwnd, w = w->next;
+	while (w);
 
 	LRESULT result = SendMessage(*--pw, msg, wParam, lParam);
 	if (BB_DRAGTODESKTOP == msg)

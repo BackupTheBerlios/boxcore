@@ -30,69 +30,70 @@
 
 struct SizeInfo
 {
-    int width, height;
-    int HiddenTop;
-    int HiddenBottom;
-    int HiddenSide;
-    int BottomAdjust;
-    RECT rcClient;
+	int width, height;
+	int HiddenTop;
+	int HiddenBottom;
+	int HiddenSide;
+	int BottomAdjust;
+	RECT rcClient;
 };
 
 struct WinInfo
 {
-    HMODULE hModule;
-    HWND hwnd;
-    LRESULT (WINAPI *pCallWindowProc)(WNDPROC,HWND,UINT,WPARAM,LPARAM);
-    WNDPROC wpOrigWindowProc;
-    LONG style, exstyle;
+	HMODULE hModule;
+	HWND hwnd;
+	LRESULT (WINAPI *pCallWindowProc)(WNDPROC,HWND,UINT,WPARAM,LPARAM);
+	WNDPROC wpOrigWindowProc;
+	LONG style, exstyle;
 
-    SizeInfo S;
+	SizeInfo S;
 
-    HGDIOBJ gdiobjs[NUMOFGDIOBJS];
-    HDC buf;
+	HGDIOBJ gdiobjs[NUMOFGDIOBJS];
+	HDC buf;
 
-    bool is_unicode;
-    bool apply_skin;
-    bool dont_draw;
-    bool in_set_region;
+	bool is_unicode;
+	bool apply_skin;
+	bool dont_draw;
+	bool in_set_region;
 
-    bool is_active;
-    bool is_zoomed;
-    bool is_iconic;
-    bool is_moving;
+	bool is_active;
+	bool is_zoomed;
+	bool is_iconic;
+	bool is_moving;
 
-    bool is_rolled;
-    bool is_ontop;
-    bool is_sticky;
+	bool is_rolled;
+	bool is_ontop;
+	bool is_sticky;
 
-    char button_set[6];
-    char capture_button;
-    char button_down;
-    char bbsm_option;
+	char button_set[6];
+	char capture_button;
+	char button_down;
+	char bbsm_option;
 };
 
-enum {
-    btn_None      = -1,
+enum
+{
+	btn_None      = -1,
 
-    btn_Close     = 0,
-    btn_Max       = 1,
-    btn_Min       = 2,
-    btn_Rollup    = 3,
-    btn_OnTop     = 4,
-    btn_Sticky    = 5,
+	btn_Close     = 0,
+	btn_Max       = 1,
+	btn_Min       = 2,
+	btn_Rollup    = 3,
+	btn_OnTop     = 4,
+	btn_Sticky    = 5,
 
-    btn_Lower     = 6,
-    btn_VMax        ,
-    btn_HMax        ,
+	btn_Lower     = 6,
+	btn_VMax        ,
+	btn_HMax        ,
 
-    btn_Caption     ,
-    btn_Nowhere     ,
+	btn_Caption     ,
+	btn_Nowhere     ,
 
-    btn_Topleft     ,
-    btn_Topright    ,
-    btn_Top
+	btn_Topleft     ,
+	btn_Topright    ,
+	btn_Top
 };
-    
+
 //-----------------------------------------------------------------
 
 #define IMAGEDITHER mSkin.imageDither

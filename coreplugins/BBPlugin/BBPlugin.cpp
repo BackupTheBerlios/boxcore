@@ -31,15 +31,18 @@
 ST int BBVersion;
 
 //===========================================================================
-int imax(int a, int b) {
+int imax(int a, int b)
+{
 	return a>b?a:b;
 }
 
-int imin(int a, int b) {
+int imin(int a, int b)
+{
 	return a<b?a:b;
 }
 
-int iminmax(int a, int b, int c) {
+int iminmax(int a, int b, int c)
+{
 	if (a<b) a=b;
 	if (a>c) a=c;
 	return a;
@@ -53,7 +56,7 @@ void BitBltRect(HDC hdc_to, HDC hdc_from, RECT *r)
 		hdc_from,
 		r->left, r->top,
 		SRCCOPY
-		);
+	);
 }
 
 static void free_str(char**p)
@@ -154,46 +157,46 @@ void set_place(struct plugin_info *PI)
 	switch (place)
 	{
 
-		case POS_Top:
-		case POS_TopLeft:
-		case POS_TopCenter:
-		case POS_TopRight:
-			y = 0;
-			break;
+	case POS_Top:
+	case POS_TopLeft:
+	case POS_TopCenter:
+	case POS_TopRight:
+		y = 0;
+		break;
 
-		case POS_CenterLeft:
-		case POS_CenterRight:
-			y = sh/2 - h/2;
-			break;
+	case POS_CenterLeft:
+	case POS_CenterRight:
+		y = sh/2 - h/2;
+		break;
 
-		case POS_Bottom:
-		case POS_BottomLeft:
-		case POS_BottomCenter:
-		case POS_BottomRight:
-			y = sh - h;
-			break;
+	case POS_Bottom:
+	case POS_BottomLeft:
+	case POS_BottomCenter:
+	case POS_BottomRight:
+		y = sh - h;
+		break;
 	}
 
 	switch (place)
 	{
-		case POS_Left:
-		case POS_TopLeft:
-		case POS_CenterLeft:
-		case POS_BottomLeft:
-			x = 0;
-			break;
+	case POS_Left:
+	case POS_TopLeft:
+	case POS_CenterLeft:
+	case POS_BottomLeft:
+		x = 0;
+		break;
 
-		case POS_TopCenter:
-		case POS_BottomCenter:
-			x = sw/2 - w/2;
-			break;
+	case POS_TopCenter:
+	case POS_BottomCenter:
+		x = sw/2 - w/2;
+		break;
 
-		case POS_Right:
-		case POS_TopRight:
-		case POS_CenterRight:
-		case POS_BottomRight:
-			x = sw - w;
-			break;
+	case POS_Right:
+	case POS_TopRight:
+	case POS_CenterRight:
+	case POS_BottomRight:
+		x = sw - w;
+		break;
 	}
 
 	PI->xpos = PI->mon_rect.left + iminmax(x, 0, sw - w);
@@ -226,7 +229,8 @@ void BBP_set_window_modes(struct plugin_info *PI)
 
 	if (useslit)
 	{
-		RECT r; GetWindowRect(PI->hwnd, &r);
+		RECT r;
+		GetWindowRect(PI->hwnd, &r);
 		int w = r.right - r.left;
 		int h = r.bottom - r.top;
 		bool update_size = (w != PI->width || h != PI->height);
@@ -240,7 +244,7 @@ void BBP_set_window_modes(struct plugin_info *PI)
 				PI->width,
 				PI->height,
 				SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER
-				);
+			);
 
 		if (false == PI->inSlit)
 		{
@@ -254,10 +258,10 @@ void BBP_set_window_modes(struct plugin_info *PI)
 			PI->inSlit = true;
 		}
 		else
-		if (update_size)
-		{
-			SendMessage(PI->hSlit, SLIT_UPDATE, 0, (LPARAM)PI->hwnd);
-		}
+			if (update_size)
+			{
+				SendMessage(PI->hSlit, SLIT_UPDATE, 0, (LPARAM)PI->hwnd);
+			}
 	}
 	else
 	{
@@ -270,33 +274,34 @@ void BBP_set_window_modes(struct plugin_info *PI)
 			int hangout = 1;
 			int place = PI->place;
 			if ((PI->orient_vertical && (place == POS_TopLeft || place == POS_BottomLeft))
-				|| place == POS_CenterLeft || place == POS_Left)
+					|| place == POS_CenterLeft || place == POS_Left)
 			{
 				x = PI->mon_rect.left + hangout - PI->width;
 				PI->auto_hidden = true;
 			}
 			else
-			if ((PI->orient_vertical && (place == POS_TopRight || place == POS_BottomRight))
-				|| place == POS_CenterRight || place == POS_Right)
-			{
-				x = PI->mon_rect.right - hangout;
-				PI->auto_hidden = true;
-			}
-			else
-			if (place == POS_TopLeft || place == POS_TopCenter || place == POS_TopRight || place == POS_Top)
-			{
-				y = PI->mon_rect.top + hangout - PI->height;
-				PI->auto_hidden = true;
-			}
-			else
-			if (place == POS_BottomLeft || place == POS_BottomCenter || place == POS_BottomRight || place == POS_Bottom)
-			{
-				y = PI->mon_rect.bottom - hangout;
-				PI->auto_hidden = true;
-			}
+				if ((PI->orient_vertical && (place == POS_TopRight || place == POS_BottomRight))
+						|| place == POS_CenterRight || place == POS_Right)
+				{
+					x = PI->mon_rect.right - hangout;
+					PI->auto_hidden = true;
+				}
+				else
+					if (place == POS_TopLeft || place == POS_TopCenter || place == POS_TopRight || place == POS_Top)
+					{
+						y = PI->mon_rect.top + hangout - PI->height;
+						PI->auto_hidden = true;
+					}
+					else
+						if (place == POS_BottomLeft || place == POS_BottomCenter || place == POS_BottomRight || place == POS_Bottom)
+						{
+							y = PI->mon_rect.bottom - hangout;
+							PI->auto_hidden = true;
+						}
 		}
 
-		HWND hwnd_after; UINT flags;
+		HWND hwnd_after;
+		UINT flags;
 
 		if (WS_CHILD & GetWindowLong(PI->hwnd, GWL_STYLE))
 		{
@@ -320,13 +325,13 @@ void BBP_set_window_modes(struct plugin_info *PI)
 			PI->width,
 			PI->height,
 			flags
-			);
+		);
 
 		BYTE trans;
 		if (PI->auto_hidden) trans = 8;
 		else
-		if (PI->transparency) trans = PI->alpha;
-		else trans = 255;
+			if (PI->transparency) trans = PI->alpha;
+			else trans = 255;
 
 		if (PI->has_alpha != trans)
 		{
@@ -346,7 +351,8 @@ void BBP_set_window_modes(struct plugin_info *PI)
 
 //===========================================================================
 
-const char *placement_strings[] = {
+const char *placement_strings[] =
+{
 	"User"          ,
 
 	"TopLeft"       ,
@@ -367,7 +373,8 @@ const char *placement_strings[] = {
 	NULL
 };
 
-const char *menu_placement_strings[] = {
+const char *menu_placement_strings[] =
+{
 	"User"          ,
 
 	"Top Left"       ,
@@ -453,38 +460,38 @@ void write_rc(struct plugin_info *PI, void *v)
 		BBP_write_int       (PI, "position.y", PI->ypos);
 	}
 	else
-	if (v == &PI->width)
-	{
-		BBP_write_int       (PI, "width",  PI->width);
-		BBP_write_int       (PI, "height", PI->height);
-	}
-	else
-	if (v == &PI->useSlit)
-		BBP_write_bool      (PI, "useSlit", PI->useSlit);
-	else
-	if (v == &PI->alwaysOnTop)
-		BBP_write_bool      (PI, "OnTop", PI->alwaysOnTop);
-	else
-	if (v == &PI->autoHide)
-		BBP_write_bool      (PI, "autoHide", PI->autoHide);
-	else
-	if (v == &PI->clickRaise)
-		BBP_write_bool      (PI, "clickRaise", PI->clickRaise);
-	else
-	if (v == &PI->snapWindow)
-		BBP_write_bool      (PI, "snapToEdge", PI->snapWindow);
-	else
-	if (v == &PI->pluginToggle)
-		BBP_write_bool      (PI, "pluginToggle", PI->pluginToggle);
-	else
-	if (v == &PI->transparency)
-		BBP_write_bool      (PI, "alpha.enabled", PI->transparency);
-	else
-	if (v == &PI->alpha)
-		BBP_write_int       (PI, "alpha.value", PI->alpha);
-	else
-	if (v == &PI->orient_vertical)
-		BBP_write_string    (PI, "orientation", PI->orient_vertical ? "vertical" : "horizontal");
+		if (v == &PI->width)
+		{
+			BBP_write_int       (PI, "width",  PI->width);
+			BBP_write_int       (PI, "height", PI->height);
+		}
+		else
+			if (v == &PI->useSlit)
+				BBP_write_bool      (PI, "useSlit", PI->useSlit);
+			else
+				if (v == &PI->alwaysOnTop)
+					BBP_write_bool      (PI, "OnTop", PI->alwaysOnTop);
+				else
+					if (v == &PI->autoHide)
+						BBP_write_bool      (PI, "autoHide", PI->autoHide);
+					else
+						if (v == &PI->clickRaise)
+							BBP_write_bool      (PI, "clickRaise", PI->clickRaise);
+						else
+							if (v == &PI->snapWindow)
+								BBP_write_bool      (PI, "snapToEdge", PI->snapWindow);
+							else
+								if (v == &PI->pluginToggle)
+									BBP_write_bool      (PI, "pluginToggle", PI->pluginToggle);
+								else
+									if (v == &PI->transparency)
+										BBP_write_bool      (PI, "alpha.enabled", PI->transparency);
+									else
+										if (v == &PI->alpha)
+											BBP_write_int       (PI, "alpha.value", PI->alpha);
+										else
+											if (v == &PI->orient_vertical)
+												BBP_write_string    (PI, "orientation", PI->orient_vertical ? "vertical" : "horizontal");
 }
 
 //===========================================================================
@@ -533,9 +540,9 @@ bool BBP_read_window_modes(struct plugin_info *PI, const char *rcfile)
 
 	const char *place_string = BBP_read_string(PI, NULL, "placement", NULL);
 	PI->place = place_string
-		? get_string_index(place_string, placement_strings)
-		: POS_User
-		;
+				? get_string_index(place_string, placement_strings)
+				: POS_User
+				;
 
 	PI->hMon = GetMonitorRect(&PI->xpos, &PI->mon_rect, GETMON_FROM_POINT);
 	set_place(PI);
@@ -628,7 +635,8 @@ void BBP_exit_moving(struct plugin_info *PI)
 {
 	if (false == PI->inSlit && PI->is_moving)
 	{
-		RECT r; GetWindowRect(PI->hwnd, &r);
+		RECT r;
+		GetWindowRect(PI->hwnd, &r);
 		PI->xpos = r.left;
 		PI->ypos = r.top;
 		PI->width = r.right - r.left;
@@ -661,7 +669,8 @@ void BBP_set_size(struct plugin_info *PI, int w, int h)
 
 bool check_mouse(HWND hwnd)
 {
-	POINT pt; RECT rct;
+	POINT pt;
+	RECT rct;
 	GetCursorPos(&pt);
 	GetWindowRect(hwnd, &rct);
 	return PtInRect(&rct, pt);
@@ -783,10 +792,10 @@ int BBP_handle_broam(struct plugin_info *PI, const char *temp)
 		if (!stricmp(temp, "vertical"))
 			PI->orient_vertical = true;
 		else
-		if (!stricmp(temp, "horizontal"))
-			PI->orient_vertical = false;
-		else
-			PI->orient_vertical = false == PI->orient_vertical;
+			if (!stricmp(temp, "horizontal"))
+				PI->orient_vertical = false;
+			else
+				PI->orient_vertical = false == PI->orient_vertical;
 
 		write_rc(PI, &PI->orient_vertical);
 		return 2;
@@ -881,7 +890,7 @@ struct _menuitem
 struct _menuitemnop : _menuitem
 {
 	_menuitemnop(n_menu *m, const char *_text)
-	: _menuitem(m, _text, i_nop)
+			: _menuitem(m, _text, i_nop)
 	{
 	}
 	MenuItem* _make_item(Menu *pMenu)
@@ -895,7 +904,7 @@ struct _menuitemsub : _menuitem
 {
 	struct n_menu *sub;
 	_menuitemsub(n_menu *m, const char *_text, n_menu* _sub)
-	: _menuitem(m, _text, i_sub)
+			: _menuitem(m, _text, i_sub)
 	{
 		sub = _sub;
 	}
@@ -919,7 +928,7 @@ struct _menuitemcmd : _menuitem
 {
 	char *cmd;
 	_menuitemcmd(n_menu *m, const char *_text, const char *_cmd)
-	: _menuitem(m, _text, i_cmd)
+			: _menuitem(m, _text, i_cmd)
 	{
 		cmd = new_str(_cmd);
 	}
@@ -939,7 +948,7 @@ struct _menuitembol : _menuitemcmd
 {
 	bool checked;
 	_menuitembol(n_menu *m, const char *_text, const char *_cmd, bool _checked)
-	: _menuitemcmd(m, _text, _cmd)
+			: _menuitemcmd(m, _text, _cmd)
 	{
 		checked = _checked;
 		mode = i_bol;
@@ -956,7 +965,7 @@ struct _menuitemstr : _menuitem
 	char *cmd;
 	char *init;
 	_menuitemstr(n_menu *m, const char *_text, const char *_cmd, const char *_init)
-	: _menuitem(m, _text, i_str)
+			: _menuitem(m, _text, i_str)
 	{
 		cmd = new_str(_cmd);
 		init = new_str(_init);
@@ -980,7 +989,7 @@ struct _menuitemint : _menuitem
 	int minval;
 	int maxval;
 	_menuitemint(n_menu *m, const char *_text, const char *_cmd, int _initval, int _minval, int _maxval)
-	: _menuitem(m, _text, i_int)
+			: _menuitem(m, _text, i_int)
 	{
 		cmd = new_str(_cmd);
 		initval = _initval;
@@ -995,7 +1004,8 @@ struct _menuitemint : _menuitem
 	{
 		if (BBVERSION_09X == BBVersion)
 		{
-			char buffer[20]; sprintf(buffer, "%d", initval);
+			char buffer[20];
+			sprintf(buffer, "%d", initval);
 			return MakeMenuItemString(pMenu, text, menu->addid(cmd), buffer);
 		}
 		else
@@ -1039,7 +1049,8 @@ Menu *n_menu::convert(char **broam_key, const char *_id_string, bool _popup)
 	this->broam_key = broam_key;
 	//dbg_printf("<%s>", id_string);
 	Menu *pMenu = MakeNamedMenu(title, id_string, popup);
-	_menuitem *mi = items; while (mi)
+	_menuitem *mi = items;
+	while (mi)
 	{
 		mi->_make_item(pMenu);
 		if (mi->disabled) DisableLastItem(pMenu);
@@ -1200,133 +1211,133 @@ LRESULT CALLBACK BBP_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 
 	switch (message)
 	{
-		case WM_CREATE:
-			SendMessage(GetBBWnd(), BB_REGISTERMESSAGE, (WPARAM)hwnd, (LPARAM)msgs);
-			MakeSticky(hwnd);
-			goto pass_nothing;
+	case WM_CREATE:
+		SendMessage(GetBBWnd(), BB_REGISTERMESSAGE, (WPARAM)hwnd, (LPARAM)msgs);
+		MakeSticky(hwnd);
+		goto pass_nothing;
 
-		case WM_DESTROY:
-			SendMessage(GetBBWnd(), BB_UNREGISTERMESSAGE, (WPARAM)hwnd, (LPARAM)msgs);
-			RemoveSticky(hwnd);
-			goto pass_nothing;
+	case WM_DESTROY:
+		SendMessage(GetBBWnd(), BB_UNREGISTERMESSAGE, (WPARAM)hwnd, (LPARAM)msgs);
+		RemoveSticky(hwnd);
+		goto pass_nothing;
 
 		// ==========
-		case BB_BROADCAST:
+	case BB_BROADCAST:
+	{
+		if (!stricmp((LPCSTR)lParam, "@BBShowPlugins"))
 		{
-			if (!stricmp((LPCSTR)lParam, "@BBShowPlugins"))
-			{
-				BBP_set_hidden(PI, PI->toggled_hidden = false);
-				goto pass_result;
-			}
-
-			if (!stricmp((LPCSTR)lParam, "@BBHidePlugins"))
-			{
-				if (PI->pluginToggle && false == PI->inSlit)
-					BBP_set_hidden(PI, PI->toggled_hidden = true);
-
-				goto pass_result;
-			}
-
-			const char *temp = (LPCSTR)lParam;
-			if ('@' == *temp
-				&& 0 == memicmp(++temp, PI->broam_key, PI->broam_key_len)
-				&& '.' == temp[PI->broam_key_len]
-				)
-			{
-				temp += PI->broam_key_len+1;
-				PI->process_broam(temp, BBP_handle_broam(PI, temp));
-				goto pass_result;
-			}
-
-			goto pass_nothing;
+			BBP_set_hidden(PI, PI->toggled_hidden = false);
+			goto pass_result;
 		}
 
-		// ==========
+		if (!stricmp((LPCSTR)lParam, "@BBHidePlugins"))
+		{
+			if (PI->pluginToggle && false == PI->inSlit)
+				BBP_set_hidden(PI, PI->toggled_hidden = true);
 
-		case BB_DESKCLICK:
-			if (lParam == 0
-			 && PI->clickRaise
-			 && false == PI->alwaysOnTop
-			 && false == PI->inSlit)
-				SetWindowPos(hwnd, HWND_TOP, 0,0,0,0, SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOSIZE);
 			goto pass_result;
+		}
 
-		// ==========
-		case WM_WINDOWPOSCHANGING:
-			if (PI->is_moving
-			 && false == PI->inSlit
-			 && PI->snapWindow
-			 && 0 == (0x8000 & GetAsyncKeyState(VK_SHIFT))
-			 )
-				SnapWindowToEdge((WINDOWPOS*)lParam, 10,
-					//PI->is_sizing ? SNAP_FULLSCREEN|SNAP_SIZING :
-					SNAP_FULLSCREEN
-					);
+		const char *temp = (LPCSTR)lParam;
+		if ('@' == *temp
+				&& 0 == memicmp(++temp, PI->broam_key, PI->broam_key_len)
+				&& '.' == temp[PI->broam_key_len]
+		   )
+		{
+			temp += PI->broam_key_len+1;
+			PI->process_broam(temp, BBP_handle_broam(PI, temp));
 			goto pass_result;
+		}
 
-		case WM_ENTERSIZEMOVE:
-			PI->is_moving = true;
-			goto pass_result;
+		goto pass_nothing;
+	}
 
-		case WM_EXITSIZEMOVE:
-			BBP_exit_moving(PI);
-			BBP_set_autoHide(PI, PI->autoHide);
-			if (false == PI->auto_hidden)
-				PI->pos_changed();
-			PI->show_menu(false);
-			if (PI->inSlit) SendMessage(PI->hSlit, SLIT_UPDATE, 0, (LPARAM)PI->hwnd);
-			goto pass_result;
+	// ==========
+
+	case BB_DESKCLICK:
+		if (lParam == 0
+				&& PI->clickRaise
+				&& false == PI->alwaysOnTop
+				&& false == PI->inSlit)
+			SetWindowPos(hwnd, HWND_TOP, 0,0,0,0, SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOSIZE);
+		goto pass_result;
 
 		// ==========
-		case WM_LBUTTONDOWN:
-			if (false == PI->inSlit && (MK_CONTROL & wParam))
-			{
-				// start moving, when control-key is held down
-				SetActiveWindow(hwnd);
-				UpdateWindow(hwnd);
-				PostMessage(hwnd, WM_SYSCOMMAND, 0xf012, 0);
-				goto pass_result;
-			}
-			goto pass_nothing;
+	case WM_WINDOWPOSCHANGING:
+		if (PI->is_moving
+				&& false == PI->inSlit
+				&& PI->snapWindow
+				&& 0 == (0x8000 & GetAsyncKeyState(VK_SHIFT))
+		   )
+			SnapWindowToEdge((WINDOWPOS*)lParam, 10,
+							 //PI->is_sizing ? SNAP_FULLSCREEN|SNAP_SIZING :
+							 SNAP_FULLSCREEN
+							);
+		goto pass_result;
 
-		case WM_NCHITTEST:
-			Result = HTCLIENT;
-			if (PI->inSlit)
+	case WM_ENTERSIZEMOVE:
+		PI->is_moving = true;
+		goto pass_result;
+
+	case WM_EXITSIZEMOVE:
+		BBP_exit_moving(PI);
+		BBP_set_autoHide(PI, PI->autoHide);
+		if (false == PI->auto_hidden)
+			PI->pos_changed();
+		PI->show_menu(false);
+		if (PI->inSlit) SendMessage(PI->hSlit, SLIT_UPDATE, 0, (LPARAM)PI->hwnd);
+		goto pass_result;
+
+		// ==========
+	case WM_LBUTTONDOWN:
+		if (false == PI->inSlit && (MK_CONTROL & wParam))
+		{
+			// start moving, when control-key is held down
+			SetActiveWindow(hwnd);
+			UpdateWindow(hwnd);
+			PostMessage(hwnd, WM_SYSCOMMAND, 0xf012, 0);
+			goto pass_result;
+		}
+		goto pass_nothing;
+
+	case WM_NCHITTEST:
+		Result = HTCLIENT;
+		if (PI->inSlit)
+		{
+			if (0x8000 & GetAsyncKeyState(VK_SHIFT))
+				Result = HTTRANSPARENT;
+		}
+		goto pass_result;
+
+	case WM_TIMER:
+		if (AUTOHIDE_TIMER == wParam)
+		{
+			if (PI->auto_shown)
 			{
-				if (0x8000 & GetAsyncKeyState(VK_SHIFT))
-					Result = HTTRANSPARENT;
+				if (PI->wnd_proc(hwnd, message, wParam, lParam, &Result))
+					return 0;
 			}
+			BBP_check_autohide(PI);
+			return 0;
+		}
+		goto pass_nothing;
+
+	case WM_MOUSEMOVE:
+		if (wake_autohide(PI))
 			goto pass_result;
 
-		case WM_TIMER:
-			if (AUTOHIDE_TIMER == wParam)
-			{
-				if (PI->auto_shown)
-				{
-					if (PI->wnd_proc(hwnd, message, wParam, lParam, &Result))
-						return 0;
-				}
-				BBP_check_autohide(PI);
-				return 0;
-			}
-			goto pass_nothing;
+		goto pass_nothing;
 
-		case WM_MOUSEMOVE:
-			if (wake_autohide(PI))
-				goto pass_result;
+	case WM_CLOSE:
+		goto pass_result;
 
-			goto pass_nothing;
+	case WM_ERASEBKGND:
+		Result = TRUE;
+		goto pass_result;
 
-		case WM_CLOSE:
-			goto pass_result;
-
-		case WM_ERASEBKGND:
-			Result = TRUE;
-			goto pass_result;
-
-		default:
-		pass_nothing:
-			return PI->wnd_proc(hwnd, message, wParam, lParam, NULL);
+	default:
+pass_nothing:
+		return PI->wnd_proc(hwnd, message, wParam, lParam, NULL);
 	}
 pass_result:
 	return PI->wnd_proc(hwnd, message, wParam, lParam, &Result);
@@ -1407,8 +1418,8 @@ int BBP_Init_Plugin(struct plugin_info *PI)
 		const char *bbv = GetBBVersion();
 		if (0 == memicmp(bbv, "bblean", 6)) BBVersion = BBVERSION_LEAN;
 		else
-		if (0 == memicmp(bbv, "bb", 2)) BBVersion = BBVERSION_XOB;
-		else BBVersion = BBVERSION_09X;
+			if (0 == memicmp(bbv, "bb", 2)) BBVersion = BBVERSION_XOB;
+			else BBVersion = BBVERSION_09X;
 	}
 
 	PI->broam_key_len = strlen(PI->broam_key);
@@ -1419,19 +1430,19 @@ int BBP_Init_Plugin(struct plugin_info *PI)
 
 	//dbg_printf("creating window <%s>", PI->class_name);
 	PI->hwnd = CreateWindowEx(
-		WS_EX_TOOLWINDOW,
-		PI->class_name,
-		NULL,
-		WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
-		PI->xpos,
-		PI->ypos,
-		PI->width,
-		PI->height,
-		NULL,           // parent window
-		NULL,           // no menu
-		PI->hInstance,  // hInstance of .dll
-		PI              // init_data
-		);
+				   WS_EX_TOOLWINDOW,
+				   PI->class_name,
+				   NULL,
+				   WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
+				   PI->xpos,
+				   PI->ypos,
+				   PI->width,
+				   PI->height,
+				   NULL,           // parent window
+				   NULL,           // no menu
+				   PI->hInstance,  // hInstance of .dll
+				   PI              // init_data
+			   );
 
 	if (NULL == PI->hwnd)
 	{

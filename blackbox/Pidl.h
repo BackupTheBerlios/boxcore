@@ -91,14 +91,14 @@ bool sh_get_uiobject(
 	struct IShellFolder **ppsfFolder,
 	const struct _GUID riid,
 	void **pObject
-	);
+);
 
 //===========================================================================
 extern "C" HRESULT WINAPI StrRetToBufA(
-	struct _STRRET *pstr,
-	const UNALIGNED _ITEMIDLIST *pidl,
-	LPSTR pszBuf,
-	UINT cchBuf
+		struct _STRRET *pstr,
+		const UNALIGNED _ITEMIDLIST *pidl,
+		LPSTR pszBuf,
+		UINT cchBuf
 	);
 
 //===========================================================================
