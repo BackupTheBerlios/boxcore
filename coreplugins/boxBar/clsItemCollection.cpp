@@ -216,9 +216,16 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
   *
   * @todo: document this function
   */
-void clsItemCollection::addItem(clsItem *pItem)
+void clsItemCollection::addItem(clsItem *p_item, bool p_front)
 {
-	itemList.push_back(pItem);
+	if (p_front)
+	{
+		itemList.push_front(p_item);
+	}
+	else
+	{
+		itemList.push_back(p_item);
+	}
 }
 
 /** @brief Changes the position of the collection and its contents

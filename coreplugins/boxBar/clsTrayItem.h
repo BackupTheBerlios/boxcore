@@ -5,6 +5,7 @@
 #include "clsIconItem.h"
 
 typedef BOOL(*fnTrayIconEvent)(HWND, UINT, UINT, WPARAM, LPARAM);
+typedef BOOL(*fnGetTrayInfo)(HWND, UINT, PVOID*, ATOM*, UINT);
 
 /** @class clsTrayItem
   * @brief Represents a single tray item in the bar
@@ -19,9 +20,11 @@ protected:
 	HWND iconWnd;
 	UINT iconID;
 	UINT iconCallback;
+	UINT m_version;
 	bool popupVisible;
 
 	static fnTrayIconEvent TrayIconEvent;
+	static fnGetTrayInfo GetTrayInfo;
 private:
 };
 

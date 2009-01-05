@@ -49,11 +49,6 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertica
 
 	margin = 0;
 
-	if (bbApiLoader.requestApiPresence(TEXT("boxCore::hasSetTaskbarPos")))
-		SetTaskbarPos = (fnSetTaskbarPos)bbApiLoader.requestApiPointer("SetTaskbarPos");
-	else
-		SetTaskbarPos = NULL;
-
 	WNDCLASS wc;
 	ZeroMemory(&wc, sizeof wc);
 	wc.lpfnWndProc      = realWndProc;
@@ -491,8 +486,12 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			else
 				barEdge = ABE_TOP;
 		}
-		if (hasTray && SetTaskbarPos)
-			SetTaskbarPos(wp->x, wp->y, wp->x + wp->cx, wp->y + wp->cy, barEdge);
+		if (hasTray)
+		{
+			char broam[254];
+			sprintf(broam,"@boxCore.TaskbarLocation %d %d %d %d %u",wp->x, wp->y, wp->x + wp->cx, wp->y + wp->cy, barEdge);
+			SendMessage(hBlackboxWnd, BB_BROADCAST, NULL, reinterpret_cast<LPARAM>(broam));
+		}
 	}
 	break;
 	case WM_LBUTTONDOWN:

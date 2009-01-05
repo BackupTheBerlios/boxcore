@@ -3,6 +3,8 @@ boxBar.y: 0
 boxBar.vertical: true
 boxBar.items: tasks,tray,clock
 boxBar.percentage: 100
+boxBar.useSlit: true
+boxBar.toggleWithPlugins: true
 
 boxBar.tasks.iconsize: 16
 
@@ -10,5 +12,5 @@ boxBar.tray.vertical: false
 boxBar.tray.iconsize: 16
 boxBar.tray.maxCols: 5
 
-boxBar.clock.format %H:%M
+boxBar.clock.format: %H:%M
 boxBar.clock.tipFormat: %A %d %B %Y

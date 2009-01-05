@@ -4,7 +4,6 @@
 #include "clsItemCollection.h"
 #include <tchar.h>
 
-typedef void(*fnSetTaskbarPos)(int pLeft, int pTop, int pRight, int pBottom, UINT pEdge);
 enum ePosition {POS_TOP = 1, POS_VCENTER = 2, POS_BOTTOM = 4, POS_LEFT = 8, POS_CENTER = 16, POS_RIGHT = 32};
 
 
@@ -53,8 +52,6 @@ private:
 
 	UINT barLocation;
 	int sizePercentage;
-
-	fnSetTaskbarPos SetTaskbarPos;
 };
 
 #endif // CLSBAR_H

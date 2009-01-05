@@ -129,6 +129,12 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			return 0;
 		case TASKITEM_ADDED:
 		{
+			clsItem * backSpacer;
+			if (vertical && stretchTaskarea)
+			{
+				backSpacer = itemList.back();
+				itemList.pop_back();
+			}
 			if (!itemMapping[(HWND)wParam])
 			{
 				tasklist *task = GetTaskListPtr();
@@ -147,6 +153,10 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			else
 			{
 				clsItemCollection::wndProc(hWnd, BB_TASKSUPDATE, wParam, TASKITEM_MODIFIED);
+			}
+			if (vertical && stretchTaskarea)
+			{
+				itemList.push_back(backSpacer);
 			}
 			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);

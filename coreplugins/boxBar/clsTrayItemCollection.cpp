@@ -58,7 +58,7 @@ void clsTrayItemCollection::populateTray()
 			addItem(new clsItemCollection(!vertical));
 	}
 	list<clsItem*>::iterator column = itemList.begin();
-	for (int i = 0; i < GetTraySize(); ++i)
+	for (int i = (m_newFirst?GetTraySize()-1:0); (m_newFirst?(i>=0):(i < GetTraySize())); (m_newFirst?--i:++i))
 	{
 		systemTray *trayItem = GetTrayIcon(i);
 		if (numRowCols > 0)
@@ -97,6 +97,7 @@ void clsTrayItemCollection::readSettings()
 		numRowCols = ReadInt(configFile, "boxBar.tray.maxCols:", 0);
 	spacingBorder = ReadInt(configFile, "boxBar.tray.spacingBorder:", 0);
 	spacingItems = ReadInt(configFile, "boxBar.tray.spacingItems:", 2);
+	m_newFirst = ReadBool(configFile, "boxBar.tray.newIconsFirst:",false);
 	populateTray();
 }
 

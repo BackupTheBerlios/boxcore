@@ -17,6 +17,7 @@ protected:
 	UINT iconSize;
 	int numRowCols;
 private:
+	bool m_newFirst;
 };
 
 #endif // CLSTRAYITEMCOLLECTION_H
