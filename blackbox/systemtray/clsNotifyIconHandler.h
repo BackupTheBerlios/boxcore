@@ -33,6 +33,7 @@ public:
 	bool GetNotificationIconInfo(NotificationIcon *p_icon, PVOID p_return[], eNotificationIconInfo p_info[], UINT p_count);
 
 	UINT GetTraySize();
+	void CleanTray();
 
 	NotificationIcon *FindIconToShare(HICON p_icon);
 	eUpdateResult DeleteIcon(HWND p_hWnd, UINT p_uID);

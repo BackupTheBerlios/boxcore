@@ -23,6 +23,7 @@ NotificationIcon::NotificationIcon(LegacyNotificationIcon *p_legacyData, NotifyI
 	m_hIcon = NULL;
 	m_hIconOrig = NULL;
 	m_hBalloonIcon = NULL;
+	m_uCallbackMessage = 0;
 	ZeroMemory(&m_szTip, sizeof(m_szTip));
 	ZeroMemory(&m_szInfo, sizeof(m_szInfo));
 	ZeroMemory(&m_szInfoTitle, sizeof(m_szInfoTitle));
@@ -47,28 +48,18 @@ NotificationIcon::~NotificationIcon()
 
 bool NotificationIcon::IsIcon(std::pair<HWND,UINT> p_Test)
 {
-	return (p_Test.first == m_hWnd) && (p_Test.second == m_uID);
+	return ((p_Test.first == m_hWnd) && (p_Test.second == m_uID));
 }
 
 eUpdateResult NotificationIcon::UpdateIcon(NID_INTERNAL & p_nid)
 {
 	bool newIcon = (m_hWnd == NULL);
-	bool hideIcon = false;
-	bool showIcon = newIcon;
+	bool wasVisible = IsVisible();
 	m_hWnd = p_nid.hWnd;
 	m_uID = p_nid.uID;
 	if (p_nid.uFlags & NIF_MESSAGE)
 	{
-		if (!m_uCallbackMessage)
-		{
-			showIcon = true;
-		}
 		m_uCallbackMessage = p_nid.uCallbackMessage;
-	}
-	if (!m_uCallbackMessage)
-	{
-		hideIcon = true;
-		showIcon = false;
 	}
 
 	bool useSharedIcon = false;
@@ -86,23 +77,15 @@ eUpdateResult NotificationIcon::UpdateIcon(NID_INTERNAL & p_nid)
 			if (p_nid.dwState & NIS_HIDDEN)
 			{
 				m_hidden = true;
-				showIcon = false;
-				hideIcon = true;
 			}
 			else
 			{
 				m_hidden = false;
-				hideIcon = false;
-				showIcon = true;
 			}
 		}
 	}
 	if (p_nid.uFlags & NIF_ICON)
 	{
-		if (!m_hIcon)
-		{
-			showIcon = true;
-		}
 		if (m_sharedIcon)
 		{
 			m_sharedIcon->ShareIcon(this, false);
@@ -121,6 +104,7 @@ eUpdateResult NotificationIcon::UpdateIcon(NID_INTERNAL & p_nid)
 			{
 				m_hIcon = NULL;
 				m_hIconOrig = NULL;
+				return ICON_FAILURE;
 			}
 		}
 		else
@@ -128,11 +112,6 @@ eUpdateResult NotificationIcon::UpdateIcon(NID_INTERNAL & p_nid)
 			m_hIconOrig = p_nid.hIcon;
 			m_hIcon = CopyIcon(p_nid.hIcon);
 		}
-	}
-	if (!m_hIcon)
-	{
-		hideIcon = true;
-		showIcon = false;
 	}
 
 	if (p_nid.uFlags & NIF_TIP)
@@ -176,11 +155,19 @@ eUpdateResult NotificationIcon::UpdateIcon(NID_INTERNAL & p_nid)
 	{
 		m_showTip = true;
 	}
+	else
+	{
+		if (m_uVersion == 4)
+		{
+			m_showTip = false;
+		}
+	}
 	if (m_legacyData)
 	{
 		m_legacyData->updateLegacy(this);
 	}
-	return static_cast<eUpdateResult>((newIcon ? ICON_ADDED : ICON_MODIFIED) | (hideIcon ? ICON_HIDE : 0) | (showIcon ? ICON_SHOW : 0));
+	bool nowVisible = IsVisible();
+	return static_cast<eUpdateResult>((newIcon ? ICON_ADDED : ICON_MODIFIED) | (wasVisible ? (nowVisible?0:ICON_HIDE) : (nowVisible?ICON_SHOW:0)));
 }
 
 eUpdateResult NotificationIcon::VersionIcon(NID_INTERNAL & p_nid)
@@ -228,8 +215,8 @@ bool NotificationIcon::ShareIcon(NotificationIcon *const p_sharer, bool p_share)
 }
 
 bool NotificationIcon::IsVisible()
-	{
-		return (!m_hidden && m_hIcon && m_uCallbackMessage);
-	}
+{
+	return (!m_hidden && m_hIcon && m_uCallbackMessage);
+}
 
 }

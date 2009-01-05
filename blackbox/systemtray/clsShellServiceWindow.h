@@ -59,6 +59,7 @@ public:
 	virtual ~ShellServiceWindow();
 
 	void RegisterHandler(eShellHandlers pType, ShellServiceHandler *pHandler);
+	void SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom, UINT pEdge);
 private:
 	UINT TaskbarCreated;
 	HWND hTrayWnd;

@@ -29,6 +29,7 @@
   */
 
 #include "clsShellServiceWindow.h"
+#include "clsAppbarHandler.h"
 #include "../../debug/debug.h"
 
 namespace ShellServices
@@ -150,6 +151,15 @@ HWND ShellServiceWindow::createChild(HWND pParent, LPCTSTR pClsName)
 	HWND childWindow = CreateWindowEx( 0, pClsName, NULL,
 									   WS_CHILD | WS_DISABLED, 0, 0, 0, 0, pParent, NULL, hInstance, NULL);
 	return childWindow;
+}
+
+void ShellServiceWindow::SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom, UINT pEdge)
+{
+	if (handlers[HANDLER_APPBAR])
+	{
+		reinterpret_cast<AppbarHandler *>(handlers[HANDLER_APPBAR])->SetTaskbarPos(pLeft,pTop,pRight,pBottom,pEdge);
+	}
+	SetWindowPos(hTrayWnd, NULL, pLeft, pTop, pRight - pLeft, pBottom - pTop, SWP_NOZORDER | SWP_NOACTIVATE);
 }
 
 }

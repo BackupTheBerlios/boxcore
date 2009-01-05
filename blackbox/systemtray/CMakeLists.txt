@@ -7,6 +7,7 @@ clsSystemTray.cpp
 clsShellServiceWindow.cpp
 clsNotifyIconHandler.cpp
 clsNotificationIcon.cpp
+clsAppbarHandler.cpp
 clsTrayItem.cpp
 
 ../../dynwinapi/clsShlwapi.cpp

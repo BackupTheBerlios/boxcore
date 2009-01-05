@@ -69,11 +69,8 @@ struct NID_INTERNAL
 	DWORD dwState;
 	DWORD dwStateMask;
 	WCHAR szInfo[256];
-	union
-	{
-		UINT uTimeout;
-		UINT uVersion;
-	};
+	UINT uTimeout;
+	UINT uVersion;
 	WCHAR szInfoTitle[64];
 	DWORD dwInfoFlags;
 	GUID guidItem;
