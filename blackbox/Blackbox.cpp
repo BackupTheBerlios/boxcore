@@ -48,7 +48,7 @@
 #include <locale.h>
 
 #include "blackbox.h"
-#include "systemtray/clsSystemTray.h"
+//#include "systemtray/clsSystemTray.h"
 #include "shellserviceobjects/clsShellServiceObjects.h"
 #include "clsSystemInfo.h"
 #include "../debug/debug.h"
@@ -92,7 +92,23 @@ RECT OldDT;
 bool bbactive = true;
 BOOL save_opaquemove;
 
-SystemTray SystemTrayManager(hMainInstance);
+#include "systemtray/clsShellServiceWindow.h"
+#include "systemtray/clsNotifyIconHandler.h"
+#include "systemtray/clsAppbarHandler.h"
+#include "clsSystemTrayIcon.h"
+
+ShellServices::ShellServiceWindow *g_pShellServiceWindow;
+ShellServices::NotifyIconHandler *g_pNotificationIconHandler;
+ShellServices::AppbarHandler *g_pAppbarHandler;
+
+ShellServices::LegacyNotificationIcon *SystemTrayIconFactory()
+{
+	return new SystemTrayIcon;
+}
+
+std::map<ATOM,ShellServices::eNotificationIconInfo> g_trayInfoMapping;
+
+//SystemTray SystemTrayManager(hMainInstance);
 clsShellServiceObjects ShellServiceObjectsManager;
 clsSystemInfo SystemInfo;
 
@@ -246,19 +262,22 @@ void set_opaquemove(void)
 	SystemParametersInfo(SPI_SETDRAGFULLWINDOWS, Settings_opaqueMove, NULL, SPIF_SENDCHANGE);
 }
 
-void broadcastAdd()
+void broadcastAdd(void *p_data)
 {
-	PostMessage(BBhwnd, BB_TRAYUPDATE, 0, TRAYICON_ADDED);
+	PRINT("BROADCAST: Icon Added");
+	PostMessage(BBhwnd, BB_TRAYUPDATE, reinterpret_cast<WPARAM>(p_data), TRAYICON_ADDED);
 }
 
-void broadcastRemove()
+void broadcastRemove(void *p_data)
 {
-	PostMessage(BBhwnd, BB_TRAYUPDATE, 0, TRAYICON_REMOVED);
+	PRINT("BROADCAST: Icon Deleted");
+	PostMessage(BBhwnd, BB_TRAYUPDATE, reinterpret_cast<WPARAM>(p_data), TRAYICON_REMOVED);
 }
 
-void broadcastMod()
+void broadcastMod(void *p_data)
 {
-	PostMessage(BBhwnd, BB_TRAYUPDATE, 0, TRAYICON_MODIFIED);
+	//PRINT("BROADCAST: Icon Modified");
+	PostMessage(BBhwnd, BB_TRAYUPDATE, reinterpret_cast<WPARAM>(p_data), TRAYICON_MODIFIED);
 }
 
 //===========================================================================
@@ -361,7 +380,8 @@ bool check_options (LPCSTR lpCmdLine)
 	return false;
 }
 
-const wchar_t *atomNames[] = {L"boxCore::running",L"boxCore::hasTrayIconEvent",L"boxCore::hasSetTaskbarPos"};
+//const wchar_t *atomNames[] = {L"boxCore::running",L"boxCore::hasTrayIconEvent",L"boxCore::hasSetTaskbarPos"};
+const wchar_t *atomNames[] = {L"boxCore::running",L"boxCore::hasGetTrayInfo"};
 vector<ATOM> atomList;
 
 /**
@@ -381,6 +401,13 @@ void RemoveApiExtensions()
 {
 	for (unsigned int i = 0; i < atomList.size(); ++i)
 		GlobalDeleteAtom(atomList[i]);
+}
+
+void InitTrayMapping()
+{
+	g_trayInfoMapping[AddAtom("TrayIcon::Version")] = ShellServices::NI_VERSION;
+	g_trayInfoMapping[AddAtom("TrayIcon::AnsiTip")] = ShellServices::NI_TIP;
+	g_trayInfoMapping[AddAtom("TrayIcon::UnicodeTip")] = ShellServices::NI_TIP;
 }
 
 //===========================================================================
@@ -524,10 +551,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	MenuMaker_Configure();
 	Workspaces_Init();
 	Desk_Init();
-	SystemTrayManager.setCallback(TCALLBACK_ADD,broadcastAdd);
-	SystemTrayManager.setCallback(TCALLBACK_DEL,broadcastRemove);
-	SystemTrayManager.setCallback(TCALLBACK_MOD,broadcastMod);
-	SystemTrayManager.initialize();
+	InitTrayMapping();
+	g_pShellServiceWindow = new ShellServices::ShellServiceWindow(hMainInstance, true);
+	g_pNotificationIconHandler = new ShellServices::NotifyIconHandler(SystemTrayIconFactory);
+	g_pNotificationIconHandler->RegisterCallback(ShellServices::TCALLBACK_ADD,broadcastAdd);
+	g_pNotificationIconHandler->RegisterCallback(ShellServices::TCALLBACK_MOD,broadcastMod);
+	g_pNotificationIconHandler->RegisterCallback(ShellServices::TCALLBACK_DEL,broadcastRemove);
+	g_pShellServiceWindow->RegisterHandler(ShellServices::HANDLER_NOTIFYICON, g_pNotificationIconHandler);
+	g_pAppbarHandler = new ShellServices::AppbarHandler();
+	g_pShellServiceWindow->RegisterHandler(ShellServices::HANDLER_APPBAR, g_pAppbarHandler);
 
 	if (!underExplorer)
 	{
@@ -625,7 +657,9 @@ void shutdown_blackbox()
 	Menu_All_Delete();
 	kill_plugins();
 	ShellServiceObjectsManager.stopServiceObjects();
-	SystemTrayManager.terminate();
+	//SystemTrayManager.terminate();
+	delete g_pShellServiceWindow;
+	g_pShellServiceWindow = NULL;
 	Desk_Exit();
 	Workspaces_Exit();
 	MenuMaker_Exit();
@@ -905,7 +939,7 @@ case_bb_restart:
 		// sent from the systembar on mouse over, if on mouseover
 		// a tray app's window turned out to be not valid anymore
 	case BB_CLEANTRAY:
-		SystemTrayManager.CleanTray();
+		g_pNotificationIconHandler->CleanTray();
 		break;
 
 		//====================
@@ -1457,6 +1491,24 @@ void exec_core_broam(const char *broam)
 	}
 }
 
+void exec_boxcore_broam(const char *broam)
+{
+	char buffer[1024];
+	const char *core_args = broam + 9; // skip "BBCore."
+	char *core_cmd = NextToken(buffer, &core_args);
+
+	if (0 == memicmp(core_cmd,"TaskbarLocation",15))
+	{
+		int left = atoi(NextToken(buffer, &core_args));
+		int top = atoi(NextToken(buffer, &core_args));
+		int right = atoi(NextToken(buffer, &core_args));
+		int bottom = atoi(NextToken(buffer, &core_args));
+		UINT edge = atoi(NextToken(buffer, &core_args));
+		g_pShellServiceWindow->SetTaskbarPos(left,top,right,bottom,edge);
+		TRACE("Taskbar is at %d %d %d %d with edge %u",left,top,right,bottom,edge);
+	}
+}
+
 //===========================================================================
 
 bool exec_script(const char *broam)
@@ -1491,6 +1543,13 @@ bool exec_broam(const char *broam) // 'true' for done, 'false' for broadcast
 	{
 		// broams from bbkeys or menu commands
 		exec_core_broam(broam);
+		return true;
+	}
+
+	if (0 == memicmp(broam, "@boxCore.", 9))
+	{
+		// New boxcore broams
+		exec_boxcore_broam(broam);
 		return true;
 	}
 

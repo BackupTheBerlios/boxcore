@@ -24,6 +24,8 @@ BBRoot.cpp
 BBVWM.cpp
 Pidl.cpp
 VolumeControl.cpp
+
+clsSystemTrayIcon.cpp
 )
 
 set (BLACKBOX_NEW_SRCS

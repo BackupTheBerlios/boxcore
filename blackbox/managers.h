@@ -26,12 +26,14 @@
 #ifndef MANAGERS_H
 #define MANAGERS_H
 
-#include "systemtray/clsSystemTray.h"
 #include "shellserviceobjects/clsShellServiceObjects.h"
+#include "systemtray/clsNotifyIconHandler.h"
 #include "clsSystemInfo.h"
+#include <map>
 
-extern SystemTray SystemTrayManager;
 extern clsShellServiceObjects ShellServiceObjectsManager;
 extern clsSystemInfo SystemInfo;
+extern ShellServices::NotifyIconHandler *g_pNotificationIconHandler;
+extern std::map<ATOM,ShellServices::eNotificationIconInfo> g_trayInfoMapping;
 
 #endif

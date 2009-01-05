@@ -2,8 +2,8 @@
  ============================================================================
 
   This file is part of the bbLean source code
-  Copyright © 2001-2003 The Blackbox for Windows Development Team
-  Copyright © 2004 grischka
+  Copyright ï¿½ 2001-2003 The Blackbox for Windows Development Team
+  Copyright ï¿½ 2004 grischka
 
   http://bb4win.sourceforge.net/bblean
   http://sourceforge.net/projects/bb4win
@@ -97,7 +97,7 @@
 /* Always includes */
 
 #define __BBCORE__ // enable exports in BBApi.h
-#include "BBApiInternal.h"
+#include "BBApi.h"
 #include "win0x500.h"
 #include "m_alloc.h"
 #include "Tinylist.h"

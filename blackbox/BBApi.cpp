@@ -37,6 +37,9 @@
 #include <shellapi.h>
 #include <time.h>
 
+#include "clsSystemTrayIcon.h"
+#include "../debug/debug.h"
+
 #define ST static
 
 ST char tempBuf[1024];
@@ -2487,69 +2490,56 @@ ST void snap_to_edge(struct edges *h, struct edges *v, bool sizing, bool same_le
 	if (v->d < v->dmin) v->dmin = v->d, v->omin = v->o;
 }
 
-/** @brief Handles mouse events for system tray icons
-  * @param[in] ownerHwnd The window handle of the icons owner
-  * @param[in] iconID The icon id for the specific icon
-  * @param[in] msg The message to be processed
-  * @param[in] wParam The WPARAM value for the message
-  * @param[in] lParam The LPARAM value for the message
-  * This function simply forwards to SystemTray::TrayIconEvent()
-  * @warning This is not an official API function, do not link statically to it.
-  */
-BOOL TrayIconEvent(HWND hWnd, UINT uID, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	return SystemTrayManager.TrayIconEvent(hWnd, uID, msg, wParam, lParam);
-}
-
-/** @brief Changes the position of the emulated taskbar
-  * @param[in] pLeft Coordinate of left edge of bar
-  * @param[in] pTop Coordinate of top edge of bar
-  * @param[in] pRight Coordinate of right edge of bar
-  * @param[in] pBottom Coordinate of bottom edge of bar
-  * @param[in] pEdge The edge of the screen the bar is located at
-  * @warning This is not an official API function, do not link statically to it.
-  */
-void SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom, UINT pEdge)
-{
-	SystemTrayManager.SetTaskbarPos(pLeft, pTop, pRight, pBottom, pEdge);
-}
-
 /** @brief Gets the number of visible icons in the tray
   * @return The number of visible icons in the tray
   */
 int GetTraySize()
 {
-	return SystemTrayManager.GetNumVisible();
+	return g_pNotificationIconHandler->GetTraySize();
 }
 
-/** @brief Stores systemTray structures for passing to plugins
-  */
-vector<systemTray> apiVector;
-
-/** @brief Retrieve a system tray icons infomration by index
+/** @brief Retrieve a system tray icons information by index
   * @param[in] idx The icon number to retrieve
   * @return A pointer to a systemTray struct describing the requested icon.
   */
 systemTray* GetTrayIcon(UINT idx)
 {
-	const TrayItem *item = SystemTrayManager.GetTrayIcon(idx);
-	if (item)
+	PVOID data[1];
+	ShellServices::eNotificationIconInfo info[1] = {ShellServices::NI_LEGACY};
+	g_pNotificationIconHandler->GetNotificationIconInfo(idx, data,info, 1);
+	return static_cast<SystemTrayIcon *>(data[0])->getSystemTray();
+}
+
+extern "C" API_EXPORT BOOL GetTrayInfo(HWND p_hWnd, UINT p_uID, PVOID *p_trayInfo, ATOM *p_infoTypes, UINT p_numInfo)
+{
+	static char ansiTip[128];
+	for (UINT i = 0; i< p_numInfo; ++i)
 	{
-		if (apiVector.size()<(idx+1))
-			apiVector.resize(idx+1);
-		apiVector[idx].hWnd = item->hWnd;
-		apiVector[idx].uID = item->iconID;
-		apiVector[idx].uCallbackMessage = item->callbackMessage;
-		apiVector[idx].hIcon = item->hIcon;
-		if (item->showTooltip)
-			WideCharToMultiByte(CP_ACP, 0, item->tooltip.c_str(), -1, apiVector[idx].szTip, 200, NULL, NULL);
-		else
-			apiVector[idx].szTip[0] = '\0';
-		apiVector[idx].pBalloon = NULL;
-		return &apiVector[idx];
+		ShellServices::eNotificationIconInfo request = g_trayInfoMapping[p_infoTypes[i]];
+		PVOID tempInfo[1];
+		switch (request)
+		{
+		case ShellServices::NI_VERSION:
+			g_pNotificationIconHandler->GetNotificationIconInfo(p_hWnd,p_uID,tempInfo,&request,1);
+			p_trayInfo[i] = tempInfo[0];
+			break;
+		case ShellServices::NI_TIP:
+			g_pNotificationIconHandler->GetNotificationIconInfo(p_hWnd,p_uID,tempInfo,&request,1);
+			if (p_infoTypes[i] == FindAtom(TEXT("Trayicon::AnsiTip")))
+			{
+				WideCharToMultiByte(CP_ACP,0,reinterpret_cast<LPCWSTR>(tempInfo[0]),-1,ansiTip,128,NULL,NULL);
+				p_trayInfo[i] = ansiTip;
+			}
+			else
+			{
+				p_trayInfo[i] = tempInfo[0];
+			}
+			break;
+		default:
+			return FALSE;
+		}
 	}
-	else
-		return NULL;
+	return TRUE;
 }
 
 //===========================================================================
