@@ -52,6 +52,16 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DI
 add_custom_target(doc ${DOXYGEN_EXECUTABLE})
 endif (DOXYGEN_EXECUTABLE)
 
+find_program(ASTYLE_EXECUTABLE astyle 
+             NO_CMAKE_ENVIRONMENT_PATH
+             NO_CMAKE_PATH)
+if (ASTYLE_EXECUTABLE)
+add_custom_target(astyle
+                  COMMAND ${ASTYLE_EXECUTABLE} --options=astyleconfig "*.cpp" "*.h"
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
+                  COMMENT "Formatting source files...")
+endif (ASTYLE_EXECUTABLE)
+
 set (CPACK_ALL_INSTALL_TYPES Full Upgrade)
 
 add_subdirectory (debug)

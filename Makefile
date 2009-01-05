@@ -10,6 +10,9 @@ doc:
 #	$(MAKE) doc -C build32
 	$(MAKE) doc -C build64
 
+astyle:
+	$(MAKE) astyle -C build64
+
 package:
 	$(MAKE) package -C build32
 	$(MAKE) package -C build64
