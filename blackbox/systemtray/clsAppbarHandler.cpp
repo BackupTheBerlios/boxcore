@@ -11,6 +11,10 @@
 
 clsShlwapi shlwapi;
 
+#ifndef ABM_SETSTATE
+#define ABM_SETSTATE 0x0000000A
+#endif
+
 //Received from XP onwards (lParam member is 64 bits)
 struct APPBARDATA_64
 {
@@ -110,9 +114,9 @@ HRESULT AppbarHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 	}
 	switch (appbarMsg.dwMessage)
 	{
-	case 0:
+	case ABM_NEW:
 		return 1;
-	case 5:
+	case ABM_GETTASKBARPOS:
 		if (shlwapi.SHLockShared)
 			appbarMsg.abd = (APPBARDATA_32 *)shlwapi.SHLockShared(appbarMsg.hSharedMemory, appbarMsg.dwSourceProcessID);
 		SetRect(&appbarMsg.abd->rc, barLeft, barTop, barRight, barBottom);
@@ -120,6 +124,14 @@ HRESULT AppbarHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 		if (shlwapi.SHUnlockShared)
 			shlwapi.SHUnlockShared(appbarMsg.abd);
 		return 1;
+	case ABM_REMOVE:
+	case ABM_QUERYPOS:
+	case ABM_GETSTATE:
+	case ABM_ACTIVATE:
+	case ABM_GETAUTOHIDEBAR:
+	case ABM_SETAUTOHIDEBAR:
+	case ABM_WINDOWPOSCHANGED:
+	case ABM_SETSTATE:
 	default:
 		TRACE("Appbar debug :The message is %ld or %ld", ((APPBARMSG_32*)(p_lpData))->dwMessage, ((APPBARMSG_64*)(p_lpData))->dwMessage);
 		return FALSE;
