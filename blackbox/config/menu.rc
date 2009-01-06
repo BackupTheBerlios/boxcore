@@ -1,15 +1,12 @@
 # -----------------------------------------------------------------
-# bblean 1.16 - MENU FILE
+# boxBar - MENU FILE
 # -----------------------------------------------------------------
 
 # Available menu commands are listed in the documentation.
 
 [begin] (Start menu)
-    [exec] (foobar2000) {"C:\Program Files\foobar2000\foobar2000.exe"} <*>
-    [exec] (Firefox) {"C:\Program Files\Mozilla Firefox\firefox.exe"} <*>
-    [exec] (Totalcmd) {"C:\Program Files\totalcmd\Totalcmd.exe"} <*>
-    [separator]
-    [path] (Programs) {PROGRAMS|COMMON_PROGRAMS|DESKTOPDIRECTORY|COMMON_DESKTOPDIRECTORY}
+    [path] (Start Menu) {STARTMENU|COMMON_STARTMENU}
+    [path] (Desktop)    {DESKTOPDIRECTORY|COMMON_DESKTOPDIRECTORY}
     [separator]
     [submenu] (System)
         [path] (My Computer) {DRIVES}
