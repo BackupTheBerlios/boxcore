@@ -72,6 +72,8 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			if ((HWND)wParam == taskWnd)
 			{
 				tasklist *task = GetTaskListPtr();
+				tipText = NULL;
+				setTooltip();
 				for (int i = 0; i < GetTaskListSize(); ++i)
 				{
 					if (task->hwnd == (HWND)wParam)

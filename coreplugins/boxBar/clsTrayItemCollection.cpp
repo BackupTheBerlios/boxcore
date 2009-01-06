@@ -28,7 +28,7 @@ LRESULT clsTrayItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 		case TRAYICON_ADDED:
 		case TRAYICON_REMOVED:
 			populateTray();
-			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+			SendMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 			return 0;
 		case TRAYICON_MODIFIED:
 			return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);

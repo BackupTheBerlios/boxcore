@@ -1,5 +1,9 @@
 #include "clsTrayItem.h"
 #include <tchar.h>
+#include "../../dynwinapi/clsUser32.h"
+#include "clsTip.h"
+
+static clsUser32 user32;
 
 #ifndef NIN_POPUPOPEN
 #define NIN_POPUPOPEN 0x00000406
@@ -10,11 +14,6 @@
 
 clsTrayItem::clsTrayItem(systemTray *trayItem, UINT pIconSize, bool pVertical): clsIconItem(trayItem->hIcon, pIconSize, pVertical)
 {
-	if (TrayIconEvent == NULL)
-	{
-		if (bbApiLoader.requestApiPresence(TEXT("boxCore::hasTrayIconEvent")))
-			TrayIconEvent = (fnTrayIconEvent)bbApiLoader.requestApiPointer("TrayIconEvent");
-	}
 	if (GetTrayInfo == NULL)
 	{
 		if (bbApiLoader.requestApiPresence(TEXT("boxCore::hasGetTrayInfo")))
@@ -25,16 +24,13 @@ clsTrayItem::clsTrayItem(systemTray *trayItem, UINT pIconSize, bool pVertical): 
 	m_version = 0;
 	if (GetTrayInfo)
 	{
-		PRINT(TEXT("Got GetIconInfo"));
 		PVOID info[2];
 		ATOM infoTypes[2];
 		infoTypes[0]=FindAtom(TEXT("TrayIcon::Version"));
 #ifdef UNICODE
 		infoTypes[1]=FindAtom(TEXT("TrayIcon::UnicodeTip"));
-		PRINT(TEXT("We want Unicode tip"));
 #else
 		infoTypes[1]=FindAtom(TEXT("TrayIcon::AnsiTip"));
-		PRINT(TEXT("We want ANSI tip"));
 #endif
 		if (GetTrayInfo(iconWnd,iconID,info,infoTypes,2))
 		{
@@ -93,42 +89,42 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		mousePos.x = LOWORD(lParam);
 		mousePos.y = HIWORD(lParam);
 		ClientToScreen(hWnd, &mousePos);
-		LPARAM lParamNew = MAKELPARAM(mousePos.x, mousePos.y);
-		if (TrayIconEvent)
-			return TrayIconEvent(iconWnd, iconID, msg, wParam, lParamNew);
-		else
+		if (IsWindow(iconWnd))
 		{
-			if (IsWindow(iconWnd))
+			DWORD pid;
+			if (WM_MOUSEMOVE != msg
+					&& user32.AllowSetForegroundWindow
+					&& GetWindowThreadProcessId(iconWnd, &pid))
 			{
-				switch (m_version)
+				user32.AllowSetForegroundWindow(pid);
+			}
+			switch (m_version)
+			{
+			case 4:
+				switch (msg)
 				{
-				case 4:
-					switch (msg)
-					{
-					case WM_RBUTTONUP:
-						SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(LOWORD(lParam), HIWORD(lParam)), MAKELPARAM(WM_CONTEXTMENU, iconID));
-						break;
-					case WM_MOUSEMOVE:
-						SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(LOWORD(lParam), HIWORD(lParam)), MAKELPARAM(NIN_POPUPOPEN, iconID));
-						break;
-					case WM_MOUSELEAVE:
-						SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(LOWORD(lParam), HIWORD(lParam)), MAKELPARAM(NIN_POPUPCLOSE, iconID));
-						break;
-					default:
-						SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(LOWORD(lParam), HIWORD(lParam)), MAKELPARAM(msg, iconID));
-					}
+				case WM_RBUTTONUP:
+					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(WM_CONTEXTMENU, iconID));
+					break;
+				case WM_MOUSEMOVE:
+					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(NIN_POPUPOPEN, iconID));
+					break;
+				case WM_MOUSELEAVE:
+					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(NIN_POPUPCLOSE, iconID));
 					break;
 				default:
-					SendNotifyMessage(iconWnd, iconCallback, iconID, msg);
+					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(msg, iconID));
 				}
-				PRINT(TEXT("No TrayIconEvent"));
+				break;
+			default:
+				SendNotifyMessage(iconWnd, iconCallback, iconID, msg);
 			}
-			else
-			{
-				PostMessage(hBlackboxWnd, BB_CLEANTRAY, 0, 0);
-			}
-			return 0;
 		}
+		else
+		{
+			PostMessage(hBlackboxWnd, BB_CLEANTRAY, 0, 0);
+		}
+		return 0;
 	}
 	case BB_TRAYUPDATE:
 		switch (lParam)
@@ -144,16 +140,13 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					tipText = NULL;
 					if (GetTrayInfo)
 					{
-						PRINT(TEXT("Got GetIconInfo"));
 						PVOID info[2];
 						ATOM infoTypes[2];
 						infoTypes[0]=FindAtom(TEXT("TrayIcon::Version"));
 #ifdef UNICODE
 						infoTypes[1]=FindAtom(TEXT("TrayIcon::UnicodeTip"));
-						PRINT(TEXT("We want Unicode tip"));
 #else
 						infoTypes[1]=FindAtom(TEXT("TrayIcon::AnsiTip"));
-						PRINT(TEXT("We want ANSI tip"));
 #endif
 						if (GetTrayInfo(iconWnd,iconID,info,infoTypes,2))
 						{
@@ -181,6 +174,17 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					}
 
 					setTooltip();
+					if (trayItem->pBalloon && trayItem->pBalloon->uInfoTimeout && strlen(trayItem->pBalloon->szInfo))
+					{
+						POINT iconPos;
+								iconPos.x = (itemArea.left + itemArea.right)/2;
+								iconPos.y = (itemArea.top + itemArea.bottom)/2;
+								ClientToScreen(hWnd, &iconPos);
+						Tip *newTip = new Tip(hInstance, iconWnd,iconID,iconCallback, m_version,trayItem->pBalloon->szInfo,trayItem->pBalloon->szInfoTitle,trayItem->pBalloon->uInfoTimeout);
+						newTip->Position(iconPos.x,iconPos.y);
+						trayItem->pBalloon->uInfoTimeout = 0;
+						PostMessage(barWnd,BOXBAR_QUEUEBALLOON, 0, reinterpret_cast<LPARAM>(newTip));
+					}
 					InvalidateRect(barWnd, &itemArea, TRUE);
 					PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 					return 0;
@@ -191,5 +195,4 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-fnTrayIconEvent clsTrayItem::TrayIconEvent = NULL;
 fnGetTrayInfo clsTrayItem::GetTrayInfo = NULL;

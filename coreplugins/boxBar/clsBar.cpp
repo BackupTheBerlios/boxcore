@@ -6,6 +6,8 @@
 #include "clsFlexiSpacer.h"
 #include "clsWorkspaceLabel.h"
 
+#include "clsTip.h"
+
 #include <shellapi.h>
 #include <stdlib.h>
 
@@ -49,8 +51,9 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertica
 
 	margin = 0;
 
-	WNDCLASS wc;
+	WNDCLASSEX wc;
 	ZeroMemory(&wc, sizeof wc);
+	wc.cbSize = sizeof(wc);
 	wc.lpfnWndProc      = realWndProc;
 	wc.cbClsExtra = sizeof(this);
 	wc.hInstance        = pInstance;
@@ -58,7 +61,7 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertica
 	wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
 	wc.style            = CS_DBLCLKS;
 
-	if (!RegisterClass(&wc))
+	if (!RegisterClassEx(&wc))
 	{
 		MessageBox(NULL ,
 				   TEXT("Error registering window class"), pClassName,
@@ -66,9 +69,20 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertica
 		return;
 	}
 
+	ZeroMemory(&wc, sizeof(wc));
+	wc.cbSize = sizeof(wc);
+	wc.cbWndExtra = sizeof(this);
+	wc.hInstance        = hInstance;
+	wc.lpszClassName    = TEXT("boxBarTip");
+	wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
+	wc.style            = CS_DBLCLKS;
+	wc.lpfnWndProc      = Tip::realWndProc;
+	RegisterClassEx(&wc);
+
 	int x = ReadInt(configFile, "boxBar.x:", 0);
 	int y = ReadInt(configFile, "boxBar.y:", 0);
-
+	itemArea.right = 1;
+	itemArea.bottom = 1;
 	barWnd = CreateWindowEx(
 				 WS_EX_TOOLWINDOW | WS_EX_TOPMOST | (enableTransparency ? WS_EX_LAYERED : 0),   // window ex-style
 				 pClassName,          // window class name
@@ -76,8 +90,8 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertica
 				 WS_POPUP | WS_OVERLAPPED, // window style
 				 x,            // x position
 				 y,            // y position
-				 200,           // window width
-				 200,          // window height
+				 1,           // window width
+				 1,          // window height
 				 NULL,               // parent window
 				 NULL,               // window menu
 				 pInstance,          // hInstance of .dll
@@ -108,6 +122,12 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertica
 	bufferInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
 	bufferBitmap = CreateDIBSection(buffer, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
 	origBitmap = (HBITMAP)SelectObject(buffer, bufferBitmap);
+
+
+	m_activeTip = NULL;
+	m_tipTimer = getTimerID();
+	m_replaceTip = true;
+
 	populateBar();
 
 }
@@ -131,6 +151,7 @@ clsBar::~clsBar()
 		PostMessage(slitWnd, SLIT_REMOVE, 0, (LPARAM)barWnd);
 	DestroyWindow(barWnd);
 	UnregisterClass(className, hInstance);
+	UnregisterClass(TEXT("boxBarTip"), hInstance);
 }
 
 /** @brief realWndProc
@@ -241,6 +262,10 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		else
 			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 		break;
+
+	case BOXBAR_QUEUEBALLOON:
+		QueueTip(reinterpret_cast<Tip *>(lParam));
+		return 0;
 
 
 		// ----------------------------------------------------------
@@ -399,7 +424,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if ((wp->x > rightthirdX) || ((wp->x + wp->cx) == monRect.right))
 		{
 			barLocation = POS_RIGHT;
-			WriteInt(configFile, "boxBar.x:", wp->x + wp->cx);
+			WriteInt(configFile, "boxBar.x:", wp->x + wp->cx - 1);
 		}
 		else
 		{
@@ -416,10 +441,11 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		int third1Y = (monRect.bottom + 2 * monRect.top) / 3;
 		int third2Y = (2 * monRect.bottom + monRect.top) / 3;
+		TRACE("Bot edge %d bottom monitor %d",wp->y + wp->cy,monRect.bottom);
 		if ((wp->y > third2Y) || ((wp->y + wp->cy) == monRect.bottom))
 		{
 			barLocation += POS_BOTTOM;
-			WriteInt(configFile, "boxBar.y:", wp->y + wp->cy);
+			WriteInt(configFile, "boxBar.y:", wp->y + wp->cy -1);
 		}
 		else
 		{
@@ -488,8 +514,8 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		if (hasTray)
 		{
-			char broam[254];
-			sprintf(broam,"@boxCore.TaskbarLocation %d %d %d %d %u",wp->x, wp->y, wp->x + wp->cx, wp->y + wp->cy, barEdge);
+			char broam[255];
+			sprintf(broam,"@boxCore.TaskbarLocation %d %d %d %d %u",wp->x, wp->y, wp->x + wp->cx - 1, wp->y + wp->cy - 1, barEdge);
 			SendMessage(hBlackboxWnd, BB_BROADCAST, NULL, reinterpret_cast<LPARAM>(broam));
 		}
 	}
@@ -526,6 +552,23 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			trackMouse = true;
 		}
 		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
+	case WM_TIMER:
+		if (wParam == m_tipTimer)
+		{
+			m_replaceTip = true;
+			if (m_tipQueue.size() > 0)
+			{
+				m_activeTip->Kill();
+				delete m_activeTip;
+				KillTimer(barWnd, m_tipTimer);
+				m_activeTip = m_tipQueue.front();
+				m_activeTip->Display();
+				m_tipQueue.pop_front();
+				SetTimer(barWnd, m_tipTimer, 10000, NULL);
+				m_replaceTip = false;
+			}
+		}
+		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
 	default:
 		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
 	}
@@ -549,8 +592,13 @@ dimType clsBar::resize(int pX, int pY)
 	GetWindowRect(barWnd, &barRect);
 	int newX = barRect.left;
 	int newY = barRect.top;
+	TRACE("Before adjusts X %d Y %d pX %d pY %d, was %d %d", newX, newY, pX, pY, getSize(DIM_HORIZONTAL),getSize(DIM_VERTICAL));
 	if (pX < 0)
+	{
 		pX = getSize(DIM_HORIZONTAL);
+	}
+	else
+	{
 	int dX = getSize(DIM_HORIZONTAL) - pX;
 	if (barLocation&POS_LEFT)
 		newX = barRect.left;
@@ -558,9 +606,13 @@ dimType clsBar::resize(int pX, int pY)
 		newX = barRect.left + dX / 2;
 	else
 		newX = barRect.left + dX;
-
+	}
 	if (pY < 0)
+	{
 		pY = getSize(DIM_VERTICAL);
+	}
+	else
+	{
 	int dY = getSize(DIM_VERTICAL) - pY;
 	if (barLocation&POS_TOP)
 		newY = barRect.top;
@@ -568,7 +620,8 @@ dimType clsBar::resize(int pX, int pY)
 		newY = barRect.top + dY / 2;
 	else
 		newY = barRect.top + dY;
-
+	}
+	TRACE("Going to do X %d Y %d pX %d pY %d", newX, newY, pX, pY);
 	SetWindowPos(barWnd, NULL, newX, newY, pX, pY, SWP_NOACTIVATE | SWP_NOZORDER);
 	dimType tempReturn = clsItemCollection::resize(pX, pY);
 	bufferInfo.bmiHeader.biWidth = itemArea.right - itemArea.left;
@@ -605,6 +658,63 @@ void clsBar::calculateSizes(bool pSizeGiven)
   *
   * @todo: document this function
   */
+void clsBar::QueueTip(Tip *p_tip)
+{
+	if (m_activeTip)
+	{
+		m_tipQueue.push_back(p_tip);
+		if (m_replaceTip)
+		{
+			m_activeTip->Kill();
+			delete m_activeTip;
+			KillTimer(barWnd, m_tipTimer);
+			m_activeTip = m_tipQueue.front();
+			m_activeTip->Display();
+			m_tipQueue.pop_front();
+			SetTimer(barWnd, m_tipTimer, 10000, NULL);
+			m_replaceTip = false;
+		}
+	}
+	else
+	{
+		m_activeTip = p_tip;
+		m_activeTip->Display();
+		m_replaceTip = false;
+		SetTimer(barWnd, m_tipTimer, 10000, NULL);
+	}
+}
+
+void clsBar::KillTips(HWND p_hWnd, UINT p_uID)
+{
+	for (deque<Tip *>::iterator i = m_tipQueue.begin(); i != m_tipQueue.end(); ++i)
+	{
+		if ((*i)->BelongsTo(p_hWnd, p_uID))
+		{
+			(*i)->Kill();
+			delete *i;
+			m_tipQueue.erase(i);
+			KillTips(p_hWnd, p_uID);
+			return;
+		}
+	}
+	if (m_activeTip->BelongsTo(p_hWnd, p_uID))
+	{
+		m_activeTip->Kill();
+		delete m_activeTip;
+		m_activeTip = NULL;
+		m_replaceTip = true;
+		KillTimer(barWnd, m_tipTimer);
+		if (m_tipQueue.size() > 0)
+		{
+			m_activeTip = m_tipQueue.front();
+			m_activeTip->Display();
+			m_tipQueue.pop_front();
+			SetTimer(barWnd, m_tipTimer, 10000, NULL);
+			m_replaceTip = false;
+		}
+	}
+}
+
 void clsBar::populateBar()
 {
 	hasTray = false;

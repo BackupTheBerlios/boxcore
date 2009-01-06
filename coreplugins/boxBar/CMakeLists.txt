@@ -31,6 +31,8 @@ clsStyle.cpp
 
 clsBar.cpp
 
+clsTip.cpp
+
 ../utils/clsApiLoader.cpp
 ../../dynwinapi/clsUser32.cpp
 ../../dynwinapi/clsMsimg32.cpp

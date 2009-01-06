@@ -4,7 +4,6 @@
 #include "BBApi.h"
 #include "clsIconItem.h"
 
-typedef BOOL(*fnTrayIconEvent)(HWND, UINT, UINT, WPARAM, LPARAM);
 typedef BOOL(*fnGetTrayInfo)(HWND, UINT, PVOID*, ATOM*, UINT);
 
 /** @class clsTrayItem
@@ -23,7 +22,6 @@ protected:
 	UINT m_version;
 	bool popupVisible;
 
-	static fnTrayIconEvent TrayIconEvent;
 	static fnGetTrayInfo GetTrayInfo;
 private:
 };

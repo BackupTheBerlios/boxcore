@@ -3,6 +3,11 @@
 
 #include "clsItemCollection.h"
 #include <tchar.h>
+#include <deque>
+
+class Tip;
+
+using std::deque;
 
 enum ePosition {POS_TOP = 1, POS_VCENTER = 2, POS_BOTTOM = 4, POS_LEFT = 8, POS_CENTER = 16, POS_RIGHT = 32};
 
@@ -19,6 +24,9 @@ public:
 	virtual dimType resize(int pX, int pY);
 	virtual void readSettings();
 	virtual void configMenu(Menu *pMenu);
+
+	void QueueTip(Tip *p_tip);
+	void KillTips(HWND p_hWnd, UINT p_uID);
 protected:
 	void populateBar();
 private:
@@ -52,6 +60,11 @@ private:
 
 	UINT barLocation;
 	int sizePercentage;
+
+	deque<Tip *> m_tipQueue;
+	Tip * m_activeTip;
+	UINT m_tipTimer;
+	bool m_replaceTip;
 };
 
 #endif // CLSBAR_H
