@@ -177,9 +177,9 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					if (trayItem->pBalloon && trayItem->pBalloon->uInfoTimeout && strlen(trayItem->pBalloon->szInfo))
 					{
 						POINT iconPos;
-								iconPos.x = (itemArea.left + itemArea.right)/2;
-								iconPos.y = (itemArea.top + itemArea.bottom)/2;
-								ClientToScreen(hWnd, &iconPos);
+						iconPos.x = (itemArea.left + itemArea.right)/2;
+						iconPos.y = (itemArea.top + itemArea.bottom)/2;
+						ClientToScreen(hWnd, &iconPos);
 						Tip *newTip = new Tip(hInstance, iconWnd,iconID,iconCallback, m_version,trayItem->pBalloon->szInfo,trayItem->pBalloon->szInfoTitle,trayItem->pBalloon->uInfoTimeout);
 						newTip->Position(iconPos.x,iconPos.y);
 						trayItem->pBalloon->uInfoTimeout = 0;

@@ -667,31 +667,31 @@ public:
 				{
 					int version = 0;
 					if (GetTrayInfo == NULL)
-						{
-							if (bbApiLoader.requestApiPresence(TEXT("boxCore::hasGetTrayInfo")))
-								GetTrayInfo = (fnGetTrayInfo)bbApiLoader.requestApiPointer("GetTrayInfo");
-						}
+					{
+						if (bbApiLoader.requestApiPresence(TEXT("boxCore::hasGetTrayInfo")))
+							GetTrayInfo = (fnGetTrayInfo)bbApiLoader.requestApiPointer("GetTrayInfo");
+					}
 					if (GetTrayInfo)
+					{
+						PVOID info[1];
+						ATOM infoTypes[1];
+						infoTypes[0]=FindAtom(TEXT("TrayIcon::Version"));
+						if (GetTrayInfo(iconWnd,icon->uID,info,infoTypes,1))
 						{
-							PVOID info[1];
-							ATOM infoTypes[1];
-							infoTypes[0]=FindAtom(TEXT("TrayIcon::Version"));
-							if (GetTrayInfo(iconWnd,icon->uID,info,infoTypes,1))
-							{
-								version = reinterpret_cast<UINT_PTR>(info[0]);
-							}
+							version = reinterpret_cast<UINT_PTR>(info[0]);
 						}
-					switch(version)
+					}
+					switch (version)
 					{
 					case 4:
 						switch (message)
-										{
-										case WM_RBUTTONUP:
-											SendNotifyMessage(iconWnd, icon->uCallbackMessage, MAKEWPARAM(mx, my), MAKELPARAM(WM_CONTEXTMENU, icon->uID));
-											break;
-										default:
-											SendNotifyMessage(iconWnd, icon->uCallbackMessage, MAKEWPARAM(mx, my), MAKELPARAM(message, icon->uID));
-										}
+						{
+						case WM_RBUTTONUP:
+							SendNotifyMessage(iconWnd, icon->uCallbackMessage, MAKEWPARAM(mx, my), MAKELPARAM(WM_CONTEXTMENU, icon->uID));
+							break;
+						default:
+							SendNotifyMessage(iconWnd, icon->uCallbackMessage, MAKEWPARAM(mx, my), MAKELPARAM(message, icon->uID));
+						}
 						break;
 					default:
 						SendNotifyMessage(iconWnd, icon->uCallbackMessage, icon->uID, message);

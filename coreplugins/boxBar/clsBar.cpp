@@ -599,13 +599,13 @@ dimType clsBar::resize(int pX, int pY)
 	}
 	else
 	{
-	int dX = getSize(DIM_HORIZONTAL) - pX;
-	if (barLocation&POS_LEFT)
-		newX = barRect.left;
-	else if (barLocation&POS_CENTER)
-		newX = barRect.left + dX / 2;
-	else
-		newX = barRect.left + dX;
+		int dX = getSize(DIM_HORIZONTAL) - pX;
+		if (barLocation&POS_LEFT)
+			newX = barRect.left;
+		else if (barLocation&POS_CENTER)
+			newX = barRect.left + dX / 2;
+		else
+			newX = barRect.left + dX;
 	}
 	if (pY < 0)
 	{
@@ -613,13 +613,13 @@ dimType clsBar::resize(int pX, int pY)
 	}
 	else
 	{
-	int dY = getSize(DIM_VERTICAL) - pY;
-	if (barLocation&POS_TOP)
-		newY = barRect.top;
-	else if (barLocation&POS_VCENTER)
-		newY = barRect.top + dY / 2;
-	else
-		newY = barRect.top + dY;
+		int dY = getSize(DIM_VERTICAL) - pY;
+		if (barLocation&POS_TOP)
+			newY = barRect.top;
+		else if (barLocation&POS_VCENTER)
+			newY = barRect.top + dY / 2;
+		else
+			newY = barRect.top + dY;
 	}
 	TRACE("Going to do X %d Y %d pX %d pY %d", newX, newY, pX, pY);
 	SetWindowPos(barWnd, NULL, newX, newY, pX, pY, SWP_NOACTIVATE | SWP_NOZORDER);
