@@ -181,6 +181,10 @@ eUpdateResult NotificationIcon::VersionIcon(NID_INTERNAL & p_nid)
 	{
 		m_showTip = true;
 	}
+	if (m_legacyData)
+		{
+			m_legacyData->updateLegacy(this);
+		}
 	return ICON_MODIFIED;
 }
 

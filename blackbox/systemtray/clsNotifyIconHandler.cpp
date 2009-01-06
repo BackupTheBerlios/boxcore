@@ -388,7 +388,7 @@ bool NotifyIconHandler::GetNotificationIconInfo(HWND p_hWnd, UINT p_uID, PVOID p
 
 bool NotifyIconHandler::GetNotificationIconInfo(NotificationIcon *p_icon, PVOID p_return[], eNotificationIconInfo p_info[], UINT p_count)
 {
-	static WCHAR empty[2] = L"";
+	static WCHAR empty[1] = L"";
 	for (UINT i = 0;i < p_count;++i)
 	{
 		switch (p_info[i])
@@ -423,7 +423,7 @@ bool NotifyIconHandler::GetNotificationIconInfo(NotificationIcon *p_icon, PVOID 
 		case NI_TIP:
 			if (p_icon->m_showTip)
 			{
-			p_return[i] = reinterpret_cast<PVOID>(p_icon->m_szTip);
+				p_return[i] = reinterpret_cast<PVOID>(p_icon->m_szTip);
 			}
 			else
 			{
