@@ -3,12 +3,10 @@ cmake_minimum_required(VERSION 2.6)
 project (ShellServices)
 
 set (SYSTEMTRAY_SRCS
-clsSystemTray.cpp
 clsShellServiceWindow.cpp
 clsNotifyIconHandler.cpp
 clsNotificationIcon.cpp
 clsAppbarHandler.cpp
-clsTrayItem.cpp
 
 ../../dynwinapi/clsShlwapi.cpp
 ../../dynwinapi/clsUser32.cpp
