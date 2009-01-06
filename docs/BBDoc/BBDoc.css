@@ -1,0 +1,147 @@
+body {
+   text-align: left;
+   color: #FFFFFF;
+   background-color: #333333;
+   font-family: Tahoma, sans-serif;
+   font-weight: normal;
+   margin: 5px;
+/*
+   scrollbar-face-color: #636363;
+   scrollbar-shadow-color: #535353;
+   scrollbar-highlight-color: #737373;
+   scrollbar-3dlight-color: #737373;
+   scrollbar-darkshadow-color: #535353;
+   scrollbar-track-color: #333333;
+   scrollbar-arrow-color: #FFFFFF;
+*/
+}
+
+a:link {
+   color: #AAAAAA;
+}
+
+a:visited {
+   color: #AAAAAA;
+}
+
+a:active {
+   color: #AAAAAA;
+}
+
+a:hover {
+   color: #888888;
+}
+
+table.main {
+   margin: 1px;
+   margin-left: auto;
+   margin-right: auto;
+   width: 800px;
+   border-spacing: 0px;
+   padding: 0px;
+}
+
+table.main tr {
+   vertical-align: top;
+}
+
+table.title {
+   width: 100%;
+   border: 1px solid #BBBBBB;
+   border-spacing: 0px;
+   border-collapse: collapse;
+   padding: 0px;
+   margin: 1px;
+}
+
+table.title tr {
+   background-color: #555555;
+}
+
+td {
+   padding: 10px;
+}
+
+td.invisible {
+   padding: 1px;
+}
+
+td.info {
+   background-color: #333333;
+}
+
+td.info2 {
+   padding-bottom: 0px;
+}
+
+table.panel {
+   border-spacing: 0px;
+   border-collapse: collapse;
+   border: 1px solid #BBBBBB;
+   font-size: 8pt;
+   margin: 1px;
+}
+
+table.panel2 {
+   width: 497px;
+   background-color: #222222;
+}
+
+td.header {
+   border: 1px solid #BBBBBB;
+   border-spacing: 0px;
+   padding: 10px;
+   font-weight: bold;
+   text-align: center;
+   background-color: #444444;
+   color: #777777;
+}
+
+td.header2 {
+   border-spacing: 0px;
+   padding: 10px;
+   padding-bottom: 0px;
+   text-align: center;
+   color: #BBBBBB;
+}
+
+td.header2 table tr td {
+   padding: 0px;
+}
+
+div.quote {
+   font-family: Verdana, sans-serif;
+   font-style: italic;
+   color: #777777;
+}
+
+div.dark {
+   color: #777777;
+}
+
+div.inline {
+   display: inline;
+}
+
+div.acks {
+   color: #BBBBBB;
+}
+
+div.disclaimer {
+   color: #777777;
+   font-variant: small-caps;
+   text-align: justify;
+}
+
+div.title {
+   font-size: larger;
+   display: inline;
+}
+
+div.version {
+   color: #BBBBBB;
+   display: inline;
+}
+
+div.normal {
+}

@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE docs SYSTEM "BBDoc/BBDoc.dtd">
+<?xml-stylesheet type="text/xsl" href="BBDoc/BBDoc.xsl"?>
+<docs>
+	<title>
+		<name>boxBar</name>
+		<version>0.1.3</version>
+	</title>
+	<leftSide>
+		<raised>
+			<name>description</name>
+			<text>
+				boxBar is a
+				<a href="http://bb4win.sourceforge.net/">Blackbox for Windows</a>
+				plugin that provides a system bar. It is designed to be easily extensible, and is becoming more configurable. Its current major feature is that allows a vertical bar.</text>
+			<text>
+				boxBar has been tested with
+				<a href="http://developer.berlios.de/projects/boxcore">boxCore</a>
+				on Windows Vista x64 by the author, and on Windows XP by users. It should also work under other branches (except xoblite at this point, due to task support), and has had some testing under vanilla bbLean.</text>
+			<text>
+				Enjoy using boxBar
+         	</text>
+			<quote> </quote>
+			<author>Carsomyr</author>
+			<mail>carsomyr@users.berlios.de</mail>
+		</raised>
+		<raised>
+			<name>revision history</name>
+			<revision>
+				<version>0.1.3</version>
+				<date>2008-12-26</date>
+				<author>Carsomyr</author>
+				<mail>carsomyr@users.berlios.de</mail>
+				<list-dark>Add Slit support</list-dark>
+				<list-dark>Add support for toggle with plugins</list-dark>
+				<list-dark>Add task reorganising</list-dark>
+				<list-dark>Fix clock errors in some laguages</list-dark>
+				<list-dark>Fix some sizing bugs</list-dark>
+			</revision>
+			<revision>
+				<version>0.1.2</version>
+				<date>2008-12-06</date>
+				<author>Carsomyr</author>
+				<mail>carsomyr@users.berlios.de</mail>
+				<list-dark>First standalone release</list-dark>
+				<list-dark>Improved drawing (less flicker)</list-dark>
+				<list-dark>Added workspace label item</list-dark>
+			</revision>
+			<revision>
+				<version>0.1.1</version>
+				<date>2008-12-02</date>
+				<author>Carsomyr</author>
+				<mail>carsomyr@users.berlios.de</mail>
+				<list-dark>Added size for task and tray icons</list-dark>
+				<list-dark>Improved reloading of settings on reconfigure</list-dark>
+			</revision>
+			<revision>
+				<version>0.1.0</version>
+				<date>2008-11-28</date>
+				<author>Carsomyr</author>
+				<mail>carsomyr@users.berlios.de</mail>
+				<list-dark>First release as part of boxCore</list-dark>
+			</revision>
+		</raised>
+		<raised>
+			<name>known bugs</name>
+			<list-dark>None :)</list-dark>
+		</raised>
+		<raised>
+			<name>future releases?</name>
+			<list>
+				Button items for the bar
+         </list>
+			<list>
+				xoblite support
+         </list>
+			<list> Suggestions? Tell me!</list>
+		</raised>
+		<raised>
+			<name>license information</name>
+			<license>
+				<date>2008</date>
+				<owner>Shaun Barlow</owner>
+			</license>
+		</raised>
+	</leftSide>
+	<rightSide>
+		<flat>
+			<name>initial setup</name>
+			<text>
+				To load boxBar, just add the relative path of the plugin
+				(from your
+				Blackbox directory) to the Blackbox configuration file
+				<div class="dark inline">plugins.rc</div>
+				(located in
+				the Blackbox directory). For example, if you installed
+				Blackbox into
+				C:\Blackbox, and boxBar.dll is located in
+				C:\Blackbox\Plugins\boxBar, you should add the line
+				<div class="dark
+            inline">Plugins\boxBar\boxBar.dll</div>
+				to
+				plugins.rc. Simple, eh? :)
+			</text>
+		</flat>
+		<flat>
+			<name>boxBar.rc settings</name>
+			<text>
+				boxBar reads an rc file with the same name as the plugin. So if
+				you leave
+				it as boxBar.dll it will read boxBar.rc. If you rename the
+				plugin to otherBar.dll then
+				it will read otherBar.rc. The setting
+				names within the rc file do not change with the plugin
+				name, only the
+				name of the file read
+	</text>
+			<text>
+				Currently, boxBar supports the following settings which are
+				intended to be
+				changed by users.
+				They are included in the default rc
+				file.
+         </text>
+			<settings>
+				<setting>
+					<name>boxBar.items</name>
+					<range>see below</range>
+					<desc>
+						Items which appear in the bar, described in detail in the
+						items section
+               </desc>
+				</setting>
+				<setting>
+					<name>boxBar.vertical</name>
+					<range>true|false</range>
+					<desc>
+						Is the bar vertical or horizontal
+               </desc>
+				</setting>
+				<setting>
+					<name>boxBar.percentage</name>
+					<range>0-100</range>
+					<desc>
+						The percentage of the monitor to use
+               </desc>
+				</setting>
+				<setting>
+					<name>boxBar.toggleWithPlugins</name>
+					<range>true|false</range>
+					<desc>
+						Toggle visibility with plugins
+               </desc>
+				</setting>
+				<setting>
+					<name>boxBar.useSlit</name>
+					<range>true|false</range>
+					<desc>
+						Plugin in slit if available
+               </desc>
+				</setting>
+				<setting>
+					<name>boxBar.tasks.iconsize</name>
+					<range>1-256</range>
+					<desc>Size of icons for tasks (16 or 32 looks good)</desc>
+				</setting>
+				<setting>
+					<name>boxBar.tray.iconsize</name>
+					<range>1-256</range>
+					<desc>Size of tray icons (16 looks best)</desc>
+				</setting>
+				<setting>
+					<name>boxBar.tray.vertical</name>
+					<range>true|false</range>
+					<desc>Sets the tray to vertical or horizontal.</desc>
+				</setting>
+				<setting>
+					<name>boxBar.tray.maxCols</name>
+					<range>0-256</range>
+					<desc>Maximum number of icons per row. (0 disables)</desc>
+				</setting>
+				<setting>
+					<name>boxBar.tray.maxRows</name>
+					<range>0-256</range>
+					<desc>Maximum number of icons per column. (0 disables)</desc>
+				</setting>
+				<setting>
+					<name>boxBar.tray.maxRows</name>
+					<range>0-256</range>
+					<desc>Maximum number of icons per column. (0 disables)</desc>
+				</setting>
+				<setting>
+					<name>boxBar.clock.format</name>
+					<range>%H:%M</range>
+               <desc>What is displayed on a clock label</desc>
+            </setting>
+	    <setting>
+               <name>boxBar.clock.tipFormat</name>
+               <range>%A %d %B %Y</range>
+               <desc>What is displayed on the clock tooltip</desc>
+            </setting>
+         </settings>
+	<text>
+		boxBar also supports the following settings, but use them with caution. They are not included in the default rc.
+         </text>
+         <settings>
+            <setting>
+               <name>boxBar.spacingBorder</name>
+               <range>0-100</range>
+               <desc>
+                  Bar border spacing
+               </desc>
+            </setting>
+		<setting>
+               <name>boxBar.spacingItems</name>
+               <range>0-100</range>
+               <desc>
+                  Bar inter-item spacing
+               </desc>
+		</setting>
+            <setting>
+               <name>boxBar.tasks.spacingBorder</name>
+               <range>0-100</range>
+               <desc>
+                  Taskarea border spacing
+               </desc>
+            </setting>
+		<setting>
+               <name>boxBar.tasks.spacingItems</name>
+               <range>0-100</range>
+               <desc>
+                  Taskarea inter-item spacing
+               </desc>
+            </setting>
+            <setting>
+               <name>boxBar.tasks.task.spacingBorder</name>
+               <range>0-100</range>
+               <desc>
+                  Border spacing inside a task
+               </desc>
+            </setting>
+		<setting>
+               <name>boxBar.tasks.task.spacingItems</name>
+               <range>0-100</range>
+               <desc>
+                  Gap between task icon and text
+               </desc>
+            </setting>
+		<setting>
+               <name>boxBar.tray.spacingBorder</name>
+               <range>0-100</range>
+               <desc>
+                  Tray border spacing
+               </desc>
+            </setting>
+	<setting>
+               <name>boxBar.tray.spacingItems</name>
+               <range>0-100</range>
+               <desc>
+                  Tray area inter-item spacing
+               </desc>
+            </setting>
+         </settings>
+      </flat>
+	<flat>
+         <name>boxBar items</name>
+	 <text>You can use as many or as few of the following item to make up your boxBar.items: setting. Duplicates are allowed, but do not use spaces. The default is:</text>
+	 <settings><setting><name>boxBar.items</name><range>tasks,tray,clock</range><desc></desc></setting></settings>
+	 <list>clock</list>
+	 <text>
+		
+		A clock label on your bar. It is configured by settings starting boxBar.clock</text>
+	 <list>tasks</list>
+	<text>
+		A section which contains the current tasks. You can adjust settings for this by changing settings starting
+		with boxBar.tasks. This section will expand to fill as much space as possible. Leftclick activates a task.
+	</text>
+	<list>tray</list>
+	<text>A system tray area. Will display all your tray icons. Can be set to have a speicifc number of rows or columns as well as opther settings through the settings starting with boxBar.tray.</text>
+	<list>wslabel</list>
+	<text>A label to indicate your current workspace. Leftclick goes to next, rightclick to previous.</text>
+	</flat>
+      <flat>
+         <name>additional notes</name>
+         <text>
+            This plugin will not create, delete or edit any files at all except
+            for the boxBar.rc file.
+         </text>
+      </flat>
+      <raised>
+         <name>acknowledgements</name>
+         <text>
+            Thanks to all the blackbox devs (past and present) for making bb4win (and branches) what it is today.
+	    Also thanks to everyone at lostinthebox.com or on #bb4win who has helped by testing this plugin and reporting bugs. Also thanks to Fatman for his bbDoc project, without which this may never have been written.
+         </text>
+      </raised>
+   </rightSide>
+</docs>

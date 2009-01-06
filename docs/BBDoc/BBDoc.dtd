@@ -1,0 +1,25 @@
+<!ELEMENT docs (title, leftSide, rightSide)>
+<!ELEMENT title (name, version)>
+<!ELEMENT leftSide (raised, raised, raised, raised, raised)>
+<!ELEMENT rightSide (flat, flat, flat, raised)>
+<!ELEMENT flat (name, text+, settings?, text*)>
+<!ELEMENT settings (setting+)>
+<!ELEMENT setting (name, range, desc)>
+<!ELEMENT raised (name, text*, revision*, list*, list-dark*, quote?, author?,
+                  mail?, license?)>
+<!ELEMENT revision (version, date, author, mail, list-dark+)>
+<!ELEMENT license (date, owner)>
+
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT version (#PCDATA)>
+<!ELEMENT text (#PCDATA)>
+<!ELEMENT list (#PCDATA)>
+<!ELEMENT list-dark (#PCDATA)>
+<!ELEMENT quote (#PCDATA)>
+<!ELEMENT author (#PCDATA)>
+<!ELEMENT mail (#PCDATA)>
+<!ELEMENT date (#PCDATA)>
+<!ELEMENT owner (#PCDATA)>
+<!ELEMENT range (#PCDATA)>
+<!ELEMENT desc (#PCDATA)>
+

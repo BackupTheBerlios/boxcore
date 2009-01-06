@@ -16,6 +16,8 @@ Doxyfile
 *.layout
 *.geany
 *.project
+*.cproject
+*.settings
 *.svn*
 */version.h
 */resource.rc

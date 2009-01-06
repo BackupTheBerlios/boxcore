@@ -1,0 +1,316 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>boxBar</title>
+<link rel="Stylesheet" type="text/css" href="BBDoc/BBDoc.css">
+</head>
+<body><table class="main">
+<tr><td colspan="2" class="invisible"><table class="title"><tr><td class="title">
+<div class="title">boxBar</div>
+<div class="title version">
+                        v0.1.3</div>
+</td></tr></table></td></tr>
+<tr>
+<td class="invisible"><table class="panel">
+      <tr><td class="header">description</td></tr>
+<tr><td class="info">
+         
+         <div class="normal">
+            boxBar is a  <a href="http://bb4win.sourceforge.net/">Blackbox
+            for Windows</a> plugin that provides a system bar. It is designed to be easily extensible, and
+		is becoming more configurable. Its current major feature is that allows a vertical bar.
+         </div>
+<p></p>
+         <div class="normal">
+		boxBar has been tested with  <a href="http://developer.berlios.de/projects/boxcore">boxCore</a>
+		on Windows Vista x64 by the author, and on Windows XP by users. It should also work under other branches
+		(except xoblite at this point, due to task support), and has had some testing under vanilla bbLean.
+         </div>
+<p></p>
+         <div class="normal">
+            Enjoy using boxBar
+         </div>
+<p></p>
+         <div class="quote"> </div>
+<p></p>
+         <a href="mailto:carsomyr@users.berlios.de">Carsomyr</a>
+         
+      </td></tr>
+      <tr><td class="header">revision history</td></tr>
+<tr><td class="info">
+         
+         <div class="normal inline">boxBar
+         v0.1.3 (2008-12-26) /
+      </div>
+          
+          
+          <a href="mailto:carsomyr@users.berlios.de">Carsomyr</a>
+          
+          <div class="dark">•Add Slit support</div>
+          <div class="dark">•Add support for toggle with plugins</div>
+          <div class="dark">•Add task reorganising</div>
+          <div class="dark">•Fix clock errors in some laguages</div>
+          <div class="dark">•Fix some sizing bugs</div>
+        <p></p>
+              <div class="normal inline">boxBar
+         v0.1.2 (2008-12-06) /
+      </div>
+          
+          
+          <a href="mailto:carsomyr@users.berlios.de">Carsomyr</a>
+          
+          <div class="dark">•First standalone release</div>
+          <div class="dark">•Improved drawing (less flicker)</div>
+          <div class="dark">•Added workspace label item</div>
+        <p></p>
+         <div class="normal inline">boxBar
+         v0.1.1 (2008-12-02) /
+      </div>
+            
+            
+            <a href="mailto:carsomyr@users.berlios.de">Carsomyr</a>
+            
+            <div class="dark">•Added size for task and tray icons</div>
+            <div class="dark">•Improved reloading of settings on reconfigure</div>
+         <p></p>
+         <div class="normal inline">boxBar
+         v0.1.0 (2008-11-28) /
+      </div>
+            
+            
+            <a href="mailto:carsomyr@users.berlios.de">Carsomyr</a>
+            
+            <div class="dark">•First release as part of boxCore</div>
+         <p></p>
+      </td></tr>
+      <tr><td class="header">known bugs</td></tr>
+<tr><td class="info">
+         
+         <div class="dark">•None :)</div>
+      </td></tr>
+      <tr><td class="header">future releases?</td></tr>
+<tr><td class="info">
+         
+         <div class="normal">•
+            Button items for the bar
+         </div>
+         <div class="normal">•
+            xoblite support
+         </div>
+         <div class="normal">• Suggestions? Tell me!</div>
+      </td></tr>
+      <tr><td class="header">license information</td></tr>
+<tr><td class="info">
+         
+         <div class="version">
+         Copyright ©
+         2008 Shaun Barlow</div>
+<p></p>
+<div class="disclaimer">boxBar
+         is provided "as is" without warranty of any kind. The author disclaims
+         all warranties, either expressed or implied, including the warranties
+         of merchantability and fitness for a particular purpose. In no event
+         shall the author or its suppliers be liable for any damages whatsoever
+         including direct, indirect, incidental, consequential, loss of business
+         profits or special damages, even if the author or its suppliers have
+         been advised of the possibility of such damages.
+      </div>
+      </td></tr>
+   </table></td>
+<td class="invisible"><table class="panel panel2">
+      <tr><td class="header2"><table width="100%" bgcolor="#333333"><tr><td>initial setup</td></tr></table></td></tr>
+<tr><td class="info2">
+         
+         <div class="normal">
+            To load boxBar, just add the relative path of the plugin
+            (from your Blackbox directory) to the Blackbox configuration file
+            <div class="dark inline">plugins.rc</div> (located in
+            the Blackbox directory). For example, if you installed Blackbox into
+            C:\Blackbox, and boxBar.dll is located in
+            C:\Blackbox\Plugins\boxBar, you should add the line
+            <div class="dark             inline">Plugins\boxBar\boxBar.dll</div> to
+            plugins.rc. Simple, eh? :)
+         </div>
+<p></p>
+      </td></tr>
+      <tr><td class="header2"><table width="100%" bgcolor="#333333"><tr><td>boxBar.rc settings</td></tr></table></td></tr>
+<tr><td class="info2">
+         
+	<div class="normal">
+		boxBar reads an rc file with the same name as the plugin. So if you leave it as boxBar.dll 
+		it will read boxBar.rc. If you rename the plugin to otherBar.dll then it will read otherBar.rc.
+		The setting names within the rc file do not change with the plugin name, only the name of the file read
+	</div>
+<p></p>
+         <div class="normal">
+            Currently, boxBar supports the following settings which are intended to be changed by users.
+		They are included in the default rc file.
+         </div>
+<p></p>
+         
+            <div class="acks inline">boxBar.items: see below</div>
+<div class="dark inline">
+            
+                  Items which appear in the bar, described in detail in the items section
+               </div>
+<br>
+            <div class="acks inline">boxBar.vertical: true|false</div>
+<div class="dark inline">
+            
+                  Is the bar vertical or horizontal
+               </div>
+<br>
+            <div class="acks inline">boxBar.percentage: 0-100</div>
+<div class="dark inline">
+            
+                  The percentage of the monitor to use
+               </div>
+<br>
+            <div class="acks inline">boxBar.toggleWithPlugins: true|false</div>
+<div class="dark inline">
+            
+                  Toggle visibility with plugins
+               </div>
+<br>
+            <div class="acks inline">boxBar.useSlit: true|false</div>
+<div class="dark inline">
+            
+                  Plugin in slit if available
+               </div>
+<br>
+            <div class="acks inline">boxBar.tasks.iconsize: 1-256</div>
+<div class="dark inline">
+            Size of icons for tasks (16 or 32 looks good)</div>
+<br>
+            <div class="acks inline">boxBar.tray.iconsize: 1-256</div>
+<div class="dark inline">
+            Size of tray icons (16 looks best)</div>
+<br>
+            <div class="acks inline">boxBar.tray.vertical: true|false</div>
+<div class="dark inline">
+            Sets the tray to vertical or horizontal.</div>
+<br>
+		<div class="acks inline">boxBar.tray.maxCols: 0-256</div>
+<div class="dark inline">
+            Maximum number of icons per row. (0 disables)</div>
+<br>
+		<div class="acks inline">boxBar.tray.maxRows: 0-256</div>
+<div class="dark inline">
+            Maximum number of icons per column. (0 disables)</div>
+<br>
+		<div class="acks inline">boxBar.tray.maxRows: 0-256</div>
+<div class="dark inline">
+            Maximum number of icons per column. (0 disables)</div>
+<br>
+	    <div class="acks inline">boxBar.clock.format: %H:%M</div>
+<div class="dark inline">
+            What is displayed on a clock label</div>
+<br>
+	    <div class="acks inline">boxBar.clock.tipFormat: %A %d %B %Y</div>
+<div class="dark inline">
+            What is displayed on the clock tooltip</div>
+<br>
+         <p></p>
+	<div class="normal">
+		boxBar also supports the following settings, but use them with caution. They are not included in the default rc.
+         </div>
+<p></p>
+         
+            <div class="acks inline">boxBar.spacingBorder: 0-100</div>
+<div class="dark inline">
+            
+                  Bar border spacing
+               </div>
+<br>
+		<div class="acks inline">boxBar.spacingItems: 0-100</div>
+<div class="dark inline">
+            
+                  Bar inter-item spacing
+               </div>
+<br>
+            <div class="acks inline">boxBar.tasks.spacingBorder: 0-100</div>
+<div class="dark inline">
+            
+                  Taskarea border spacing
+               </div>
+<br>
+		<div class="acks inline">boxBar.tasks.spacingItems: 0-100</div>
+<div class="dark inline">
+            
+                  Taskarea inter-item spacing
+               </div>
+<br>
+            <div class="acks inline">boxBar.tasks.task.spacingBorder: 0-100</div>
+<div class="dark inline">
+            
+                  Border spacing inside a task
+               </div>
+<br>
+		<div class="acks inline">boxBar.tasks.task.spacingItems: 0-100</div>
+<div class="dark inline">
+            
+                  Gap between task icon and text
+               </div>
+<br>
+		<div class="acks inline">boxBar.tray.spacingBorder: 0-100</div>
+<div class="dark inline">
+            
+                  Tray border spacing
+               </div>
+<br>
+	<div class="acks inline">boxBar.tray.spacingItems: 0-100</div>
+<div class="dark inline">
+            
+                  Tray area inter-item spacing
+               </div>
+<br>
+         <p></p>
+      </td></tr>
+	<tr><td class="header2"><table width="100%" bgcolor="#333333"><tr><td>boxBar items</td></tr></table></td></tr>
+<tr><td class="info2">
+         
+	 <div class="normal">You can use as many or as few of the following item to make up your boxBar.items: setting. Duplicates are allowed, but do not use spaces. The default is:</div>
+<p></p>
+	 <div class="acks inline">boxBar.items: tasks,tray,clock</div>
+<div class="dark inline">
+            </div>
+<br><p></p>
+	 <div class="normal">•clock</div>
+	 <div class="normal">
+		
+		A clock label on your bar. It is configured by settings starting boxBar.clock</div>
+<p></p>
+	 <div class="normal">•tasks</div>
+	<div class="normal">
+		A section which contains the current tasks. You can adjust settings for this by changing settings starting
+		with boxBar.tasks. This section will expand to fill as much space as possible. Leftclick activates a task.
+	</div>
+<p></p>
+	<div class="normal">•tray</div>
+	<div class="normal">A system tray area. Will display all your tray icons. Can be set to have a speicifc number of rows or columns as well as opther settings through the settings starting with boxBar.tray.</div>
+<p></p>
+	<div class="normal">•wslabel</div>
+	<div class="normal">A label to indicate your current workspace. Leftclick goes to next, rightclick to previous.</div>
+<p></p>
+	</td></tr>
+      <tr><td class="header2"><table width="100%" bgcolor="#333333"><tr><td>additional notes</td></tr></table></td></tr>
+<tr><td class="info2">
+         
+         <div class="normal">
+            This plugin will not create, delete or edit any files at all except
+            for the boxBar.rc file.
+         </div>
+<p></p>
+      </td></tr>
+      <tr><td class="header">acknowledgements</td></tr>
+<tr><td class="info">
+         
+         <div class="acks">
+            Thanks to all the blackbox devs (past and present) for making bb4win (and branches) what it is today.
+	    Also thanks to everyone at lostinthebox.com or on #bb4win who has helped by testing this plugin and reporting bugs. Also thanks to Fatman for his bbDoc project, without which this may never have been written.
+         </div>
+      </td></tr>
+   </table></td>
+</tr>
+</table></body>
+</html>
