@@ -7,10 +7,16 @@ boxBar.useSlit: true
 boxBar.toggleWithPlugins: true
 
 boxBar.tasks.iconsize: 16
+boxBar.tasks.stretchArea: true
 
 boxBar.tray.vertical: false
 boxBar.tray.iconsize: 16
+boxBar.tray.maxRows: 2
 boxBar.tray.maxCols: 5
+boxBar.tray.newIconsFirst: true
 
 boxBar.clock.format: %H:%M
 boxBar.clock.tipFormat: %A %d %B %Y
+
+boxBar.drawBackground: true
+boxBar.useAlphaBlend: false
