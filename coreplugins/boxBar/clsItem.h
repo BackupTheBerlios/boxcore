@@ -32,6 +32,8 @@ enum dimType {DIM_NONE = 0, DIM_HORIZONTAL = 1, DIM_VERTICAL = 2, DIM_BOTH = 3};
 #define BOXBAR_QUEUEBALLOON WM_USER + 5
 #define BOXBAR_CLEANBALLOONS WM_USER + 6
 
+#define BOXBAR_BALLOONDONE WM_USER+100
+
 class clsItem;
 
 /** @typedef mouseFunction

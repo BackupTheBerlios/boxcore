@@ -267,6 +267,24 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		QueueTip(reinterpret_cast<Tip *>(lParam));
 		return 0;
 
+	case BOXBAR_BALLOONDONE:
+		if (reinterpret_cast<Tip *>(lParam) == m_activeTip)
+		{
+			delete m_activeTip;
+			m_activeTip = NULL;
+			m_replaceTip = true;
+			KillTimer(hWnd, m_tipTimer);
+			if (m_tipQueue.size() > 0)
+			{
+				m_activeTip = m_tipQueue.front();
+							m_activeTip->Display();
+							m_tipQueue.pop_front();
+							SetTimer(barWnd, m_tipTimer, 10000, NULL);
+							m_replaceTip = false;
+			}
+		}
+		return 0;
+
 
 		// ----------------------------------------------------------
 		// Blackbox sends Broams to all windows...
@@ -558,14 +576,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			m_replaceTip = true;
 			if (m_tipQueue.size() > 0)
 			{
-				m_activeTip->Kill();
-				delete m_activeTip;
-				KillTimer(barWnd, m_tipTimer);
-				m_activeTip = m_tipQueue.front();
-				m_activeTip->Display();
-				m_tipQueue.pop_front();
-				SetTimer(barWnd, m_tipTimer, 10000, NULL);
-				m_replaceTip = false;
+				m_activeTip->Timeout();
 			}
 		}
 		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
@@ -665,14 +676,7 @@ void clsBar::QueueTip(Tip *p_tip)
 		m_tipQueue.push_back(p_tip);
 		if (m_replaceTip)
 		{
-			m_activeTip->Kill();
-			delete m_activeTip;
-			KillTimer(barWnd, m_tipTimer);
-			m_activeTip = m_tipQueue.front();
-			m_activeTip->Display();
-			m_tipQueue.pop_front();
-			SetTimer(barWnd, m_tipTimer, 10000, NULL);
-			m_replaceTip = false;
+			m_activeTip->Timeout();
 		}
 	}
 	else

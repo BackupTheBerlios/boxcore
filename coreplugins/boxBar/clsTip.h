@@ -18,6 +18,7 @@ public:
 	virtual ~Tip();
 
 	void Position(INT p_x, INT p_y);
+	void NotifyWindow(HWND p_notify);
 
 	bool BelongsTo(HWND p_hWnd, UINT p_uID);
 
@@ -40,6 +41,8 @@ private:
 	UINT m_iconVersion;
 
 	HINSTANCE m_instance;
+
+	HWND m_notifyWindow;
 
 	bool m_leftDown;
 	bool m_rightDown;

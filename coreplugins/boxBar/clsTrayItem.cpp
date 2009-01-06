@@ -182,6 +182,7 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						ClientToScreen(hWnd, &iconPos);
 						Tip *newTip = new Tip(hInstance, iconWnd,iconID,iconCallback, m_version,trayItem->pBalloon->szInfo,trayItem->pBalloon->szInfoTitle,trayItem->pBalloon->uInfoTimeout);
 						newTip->Position(iconPos.x,iconPos.y);
+						newTip->NotifyWindow(barWnd);
 						trayItem->pBalloon->uInfoTimeout = 0;
 						PostMessage(barWnd,BOXBAR_QUEUEBALLOON, 0, reinterpret_cast<LPARAM>(newTip));
 					}

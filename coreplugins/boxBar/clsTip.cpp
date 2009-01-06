@@ -10,6 +10,8 @@
 #include "../../debug/debug.h"
 #include "BBApi.h"
 
+#define BOXBAR_BALLOONDONE WM_USER+100
+
 #ifndef NIN_BALLOONSHOW
 #define NIN_BALLOONSHOW 0x0402
 #endif
@@ -43,6 +45,7 @@ Tip::Tip(HINSTANCE p_instance, HWND p_hWnd, UINT p_uID, UINT p_uCallbackMessage,
 	strcpy(m_info, p_info);
 	strcpy(m_infoTitle, p_infoTitle);
 	m_timeout = p_timeout;
+	m_notifyWindow = NULL;
 	m_tipWindow = CreateWindowEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST,   // window ex-style
 								 TEXT("boxBarTip"),          // window class name
 								 NULL,               // window caption text
@@ -88,6 +91,10 @@ void Tip::Timeout()
 {
 	KillTimer(m_tipWindow,1);
 	DestroyWindow(m_tipWindow);
+	if (m_notifyWindow)
+		{
+			PostMessage(m_notifyWindow, BOXBAR_BALLOONDONE, 0, reinterpret_cast<LPARAM>(this));
+		}
 	switch (m_iconVersion)
 	{
 	case 4:
@@ -102,6 +109,10 @@ void Tip::Click()
 {
 	KillTimer(m_tipWindow,1);
 	DestroyWindow(m_tipWindow);
+	if (m_notifyWindow)
+		{
+			PostMessage(m_notifyWindow, BOXBAR_BALLOONDONE, 0, reinterpret_cast<LPARAM>(this));
+		}
 	switch (m_iconVersion)
 	{
 	case 4:
@@ -121,6 +132,10 @@ void Tip::Kill()
 {
 	KillTimer(m_tipWindow,1);
 	DestroyWindow(m_tipWindow);
+	if (m_notifyWindow)
+	{
+		PostMessage(m_notifyWindow, BOXBAR_BALLOONDONE, 0, reinterpret_cast<LPARAM>(this));
+	}
 	switch (m_iconVersion)
 	{
 	case 4:
@@ -149,6 +164,11 @@ void Tip::Position(INT p_x, INT p_y)
 	}
 	GetClientRect(m_tipWindow, &calcRect);
 	SetWindowPos(m_tipWindow, NULL, (left ? p_x : (p_x - calcRect.right)), (top ? p_y : (p_y - calcRect.bottom)), 0, 0,SWP_NOSIZE | SWP_NOZORDER);
+}
+
+void Tip::NotifyWindow(HWND p_notify)
+{
+	m_notifyWindow = p_notify;
 }
 
 LRESULT Tip::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
