@@ -70,7 +70,7 @@ endif (DEBUG_CODE)
 if (MINGW)
 set_target_properties (boxBar PROPERTIES
 	LINK_FLAGS "-s"
-	COMPILE_FLAGS "-Wall -Os -fno-rtti -fno-exceptions"
+	COMPILE_FLAGS "-Wall -Os -fno-exceptions"
 )
 endif (MINGW)
 
