@@ -162,6 +162,7 @@ protected:
 	}
 	void initTooltips();
 	void setTooltip();
+	void ClearTooltip();
 	TCHAR *tipText;
 private:
 	BLENDFUNCTION itemBlend;

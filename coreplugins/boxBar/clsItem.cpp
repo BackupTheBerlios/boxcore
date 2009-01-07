@@ -47,11 +47,8 @@ clsItem::clsItem(bool pVertical)
 clsItem::~clsItem()
 {
 	delete tipText;
-	if (tipText)
-	{
 		tipText = NULL;
-		setTooltip();
-	}
+	ClearTooltip();
 }
 
 /** @brief Test if point is within the item
@@ -72,6 +69,7 @@ bool clsItem::hitTest(int pX, int pY)
   */
 void clsItem::move(int pX, int pY)
 {
+	ClearTooltip();
 	int sizeX = itemArea.right - itemArea.left;
 	int sizeY = itemArea.bottom - itemArea.top;
 	itemArea.left = pX;
@@ -93,6 +91,7 @@ void clsItem::move(int pX, int pY)
   */
 dimType clsItem::resize(int pX, int pY)
 {
+	ClearTooltip();
 	dimType done = DIM_NONE;
 	if (pX >= 0)
 	{
@@ -383,3 +382,20 @@ clsStyle clsItem::bbStyle;
 HWND clsItem::hBlackboxWnd = NULL;
 HINSTANCE clsItem::hInstance = NULL;
 bool clsItem::alphaDraw = true;
+
+void clsItem::ClearTooltip()
+{
+	if (!tooltipWnd)
+			initTooltips();
+		TOOLINFO toolInfo;
+		ZeroMemory(&toolInfo, sizeof(toolInfo));
+		toolInfo.cbSize = sizeof(toolInfo);
+		toolInfo.uFlags = TTF_SUBCLASS | TTF_TRANSPARENT;
+		toolInfo.hwnd = barWnd;
+		toolInfo.uId = (UINT_PTR)this;
+		toolInfo.rect = itemArea;
+		toolInfo.hinst = hInstance;
+			SendMessage(tooltipWnd, TTM_DELTOOL, 0, (LPARAM)&toolInfo);
+}
+
+
