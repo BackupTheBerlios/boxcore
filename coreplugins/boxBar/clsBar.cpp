@@ -100,8 +100,11 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertica
 	ShowWindow(barWnd, SW_SHOWNA);
 	if (useSlit && slitWnd)
 	{
-		PostMessage(slitWnd, SLIT_ADD, 0, (LPARAM)barWnd);
+		SendMessage(slitWnd, SLIT_ADD, 0, reinterpret_cast<LPARAM>(barWnd));
+		SendMessage(slitWnd, SLIT_UPDATE, 0, reinterpret_cast<LPARAM>(barWnd));
+		SetWindowPos(barWnd, NULL, x, y, 0, 0, SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOSIZE);
 		inSlit = true;
+		setMargin = false;
 	}
 	else
 	{
@@ -321,100 +324,6 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	}
-	// check general broams
-	/*if (!stricmp(msg_string, "@BBShowPlugins"))
-	{
-		if (my.is_hidden)
-		{
-			my.is_hidden = false;
-			ShowWindow(hwnd, SW_SHOWNA);
-		}
-		break;
-	}
-
-	if (!stricmp(msg_string, "@BBHidePlugins"))
-	{
-		if (my.pluginToggle && NULL == my.hSlit)
-		{
-			my.is_hidden = true;
-			ShowWindow(hwnd, SW_HIDE);
-		}
-		break;
-	}
-
-	// Our broadcast message prefix:
-	const char broam_prefix[] = "@bbSDK.";
-	const int broam_prefix_len = sizeof broam_prefix - 1; // minus terminating \0
-
-	// check broams sent from our own menu
-	if (!memicmp(msg_string, broam_prefix, broam_prefix_len))
-	{
-		msg_string += broam_prefix_len;
-		if (!stricmp(msg_string, "useSlit"))
-		{
-			eval_menu_cmd(M_BOL, &my.useSlit, msg_string);
-			break;
-		}
-
-		if (!stricmp(msg_string, "alwaysOnTop"))
-		{
-			eval_menu_cmd(M_BOL, &my.alwaysOnTop, msg_string);
-			break;
-		}
-
-		if (!stricmp(msg_string, "drawBorder"))
-		{
-			eval_menu_cmd(M_BOL, &my.drawBorder, msg_string);
-			break;
-		}
-
-		if (!stricmp(msg_string, "snapWindow"))
-		{
-			eval_menu_cmd(M_BOL, &my.snapWindow, msg_string);
-			break;
-		}
-
-		if (!stricmp(msg_string, "alphaEnabled"))
-		{
-			eval_menu_cmd(M_BOL, &my.alphaEnabled, msg_string);
-			break;
-		}
-
-		if (!my_substr_icmp(msg_string, "alphaValue"))
-		{
-			eval_menu_cmd(M_INT, &my.alphaValue, msg_string);
-			break;
-		}
-
-		if (!stricmp(msg_string, "pluginToggle"))
-		{
-			eval_menu_cmd(M_BOL, &my.pluginToggle, msg_string);
-			break;
-		}
-
-		if (!my_substr_icmp(msg_string, "windowText"))
-		{
-			eval_menu_cmd(M_STR, &my.window_text, msg_string);
-			break;
-		}
-
-		if (!stricmp(msg_string, "editRC"))
-		{
-			SendMessage(BBhwnd, BB_EDITFILE, (WPARAM) - 1, (LPARAM)rcpath);
-			break;
-		}
-
-		if (!stricmp(msg_string, "About"))
-		{
-			about_box();
-			break;
-		}
-	}
-	break;
-	}
-	*/
-	// ----------------------------------------------------------
-	// prevent the user from closing the plugin with alt-F4
 
 	case WM_CLOSE:
 		break;
@@ -546,8 +455,9 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			return 0;
 		}
 		break;
+	case WM_NCRBUTTONDOWN:
 	case WM_RBUTTONDOWN:
-		if (wParam & MK_CONTROL)
+		if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
 		{
 			Menu *mainMenu = MakeNamedMenu("boxBar", "boxBar", true);
 			configMenu(mainMenu);
@@ -633,7 +543,7 @@ dimType clsBar::resize(int pX, int pY)
 			newY = barRect.top + dY;
 	}
 	TRACE("Going to do X %d Y %d pX %d pY %d", newX, newY, pX, pY);
-	SetWindowPos(barWnd, NULL, newX, newY, pX, pY, SWP_NOACTIVATE | SWP_NOZORDER);
+	SetWindowPos(barWnd, NULL, newX, newY, pX, pY, SWP_NOACTIVATE | SWP_NOZORDER | (inSlit ? SWP_NOMOVE : 0));
 	dimType tempReturn = clsItemCollection::resize(pX, pY);
 	bufferInfo.bmiHeader.biWidth = itemArea.right - itemArea.left;
 	bufferInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
@@ -644,7 +554,7 @@ dimType clsBar::resize(int pX, int pY)
 	RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 	PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 	if (inSlit)
-		PostMessage(slitWnd, SLIT_UPDATE, 0, (LPARAM)barWnd);
+		PostMessage(slitWnd, SLIT_UPDATE, 0, reinterpret_cast<LPARAM>(barWnd));
 	return tempReturn;
 }
 
@@ -781,7 +691,15 @@ void clsBar::configMenu(Menu *pMenu)
 void clsBar::readSettings()
 {
 	sizePercentage = ReadInt(configFile, "boxBar.percentage:", 80);
+	if (!inSlit)
+	{
 	setMargin = ReadBool(configFile, "boxBar.setMargin:", true);
+	}
+	else
+	{
+		setMargin = false;
+	}
+
 	vertical = ReadBool(configFile, "boxBar.vertical:", false);
 	toggleWithPlugins = ReadBool(configFile, "boxBar.TogglewithPlugins:", true);
 	useSlit = ReadBool(configFile, "boxBar.useSlit:", false);
