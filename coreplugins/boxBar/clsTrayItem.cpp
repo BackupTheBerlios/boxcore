@@ -69,9 +69,6 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 	case WM_MOUSEMOVE:
-		if (popupVisible)
-			break;
-		popupVisible = true;
 	case WM_LBUTTONDOWN:
 	case WM_LBUTTONUP:
 	case WM_RBUTTONDOWN:
@@ -83,8 +80,6 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_MBUTTONDBLCLK:
 	case WM_MOUSELEAVE:
 	{
-		if (msg == WM_MOUSELEAVE)
-			popupVisible = false;
 		POINT mousePos;
 		mousePos.x = LOWORD(lParam);
 		mousePos.y = HIWORD(lParam);
@@ -107,9 +102,13 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(WM_CONTEXTMENU, iconID));
 					break;
 				case WM_MOUSEMOVE:
+					if (popupVisible)
+								break;
+							popupVisible = true;
 					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(NIN_POPUPOPEN, iconID));
 					break;
 				case WM_MOUSELEAVE:
+					popupVisible = false;
 					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(NIN_POPUPCLOSE, iconID));
 					break;
 				default:
