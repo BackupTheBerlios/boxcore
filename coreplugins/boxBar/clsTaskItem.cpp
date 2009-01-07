@@ -48,11 +48,7 @@ clsTaskItem::~clsTaskItem()
 	delete iconItem;
 	delete captionItem;
 	itemList.clear();
-	if (tipText)
-	{
-		tipText = NULL;
-		setTooltip();
-	}
+	tipText = NULL;
 }
 
 
@@ -73,7 +69,7 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				tasklist *task = GetTaskListPtr();
 				tipText = NULL;
-				setTooltip();
+				ClearTooltip();
 				for (int i = 0; i < GetTaskListSize(); ++i)
 				{
 					if (task->hwnd == (HWND)wParam)
@@ -118,8 +114,6 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			if (wParam)
 				tipText = caption;
-			else
-				tipText = NULL;
 			setTooltip();
 		}
 		break;
@@ -133,8 +127,11 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
   */
 void clsTaskItem::activateTask(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	clsTaskItem *realItem = static_cast<clsTaskItem *>(pItem);
+	clsTaskItem *realItem = dynamic_cast<clsTaskItem *>(pItem);
+	if (realItem)
+	{
 	PostMessage(hBlackboxWnd, BB_BRINGTOFRONT, 0,  (LPARAM)realItem->taskWnd);
+	}
 }
 
 /** @brief readSettings

@@ -168,6 +168,7 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			removedTask = itemMapping[(HWND)wParam];
 			itemList.remove(removedTask);
 			itemMapping.erase((HWND)wParam);
+			delete removedTask;
 			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 		}
