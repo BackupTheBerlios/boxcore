@@ -1,5 +1,7 @@
 #include "clsMsimg32.h"
 
+clsMsimg32 msimg32;
+
 clsMsimg32::clsMsimg32()
 {
 	hModule = LoadLibrary(TEXT("msimg32.dll"));

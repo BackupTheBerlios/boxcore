@@ -21,4 +21,6 @@ protected:
 private:
 };
 
+extern clsShlwapi shlwapi;
+
 #endif // CLSSHLWAPI_H

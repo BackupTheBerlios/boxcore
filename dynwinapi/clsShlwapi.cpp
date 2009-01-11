@@ -1,5 +1,7 @@
 #include "clsShlwapi.h"
 
+clsShlwapi shlwapi;
+
 clsShlwapi::clsShlwapi()
 {
 	hModule = LoadLibrary(TEXT("shlwapi.dll"));

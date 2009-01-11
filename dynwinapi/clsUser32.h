@@ -24,4 +24,6 @@ protected:
 private:
 };
 
+extern clsUser32 user32;
+
 #endif // CLSUSER32_H

@@ -1,5 +1,7 @@
 #include "clsUser32.h"
 
+clsUser32 user32;
+
 clsUser32::clsUser32()
 {
 	hModule = LoadLibrary(TEXT("user32.dll"));

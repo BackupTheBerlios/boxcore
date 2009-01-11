@@ -16,4 +16,6 @@ protected:
 private:
 };
 
+extern clsMsimg32 msimg32;
+
 #endif // CLSMSIMG32_H
