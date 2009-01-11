@@ -10,6 +10,8 @@ set (VERSION_BUILD 0)
 
 set (VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
+option(USE_UNICOWS "Should we link against unicows.dll?" ON)
+
 if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL AMD64)
 set (ARCH amd64)
 set (PACKAGE_ARCH x64)
@@ -19,9 +21,13 @@ else (${CMAKE_SYSTEM_PROCESSOR} STREQUAL AMD64)
 set (ARCH x86)
 set (PACKAGE_ARCH x86)
 set (WINAPI_DECORATOR "@8")
+if (USE_UNICOWS)
 add_library(unicows STATIC IMPORTED)
 set_target_properties (unicows PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/lib/libunicows.a)
 set (UNICOWSLIB "unicows")
+else (USE_UNICOWS)
+set (UNICOWSLIB "")
+endif (USE_UNICOWS)
 endif (${CMAKE_SYSTEM_PROCESSOR} STREQUAL AMD64)
 
 find_package(Doxygen)
