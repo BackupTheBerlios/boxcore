@@ -139,6 +139,18 @@ eUpdateResult NotificationIcon::UpdateIcon(NID_INTERNAL & p_nid)
 			m_hBalloonIcon = CopyIcon(p_nid.hBalloonIcon);
 		}
 	}
+	else
+	{
+		ZeroMemory(&m_szInfo, sizeof(m_szInfo));
+		ZeroMemory(&m_szInfoTitle, sizeof(m_szInfoTitle));
+		m_uTimeout = 0;
+		m_dwInfoFlags = 0;
+		if (m_hBalloonIcon)
+		{
+			DestroyIcon(m_hBalloonIcon);
+			m_hBalloonIcon = NULL;
+		}
+	}
 	if (p_nid.uFlags & NIF_GUID)
 	{
 		m_guidItem = p_nid.guidItem;
