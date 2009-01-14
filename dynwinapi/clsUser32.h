@@ -3,9 +3,9 @@
 
 #include <windows.h>
 
-typedef WINAPI BOOL (*fnAllowSetForegroundWindow)(DWORD dwProcessId);
-typedef WINAPI BOOL (*fnTrackMouseEvent)(LPTRACKMOUSEEVENT lpEventTrack);
-typedef WINAPI BOOL (*fnUpdateLayeredWindow)(HWND hwnd, HDC hdcDest, POINT *pptDest, SIZE *psize, HDC hdcSrc, POINT *pptSrc, COLORREF crKey, BLENDFUNCTION *pBlend, DWORD dwFlags);
+typedef BOOL (WINAPI *fnAllowSetForegroundWindow)(DWORD dwProcessId);
+typedef BOOL (WINAPI *fnTrackMouseEvent)(LPTRACKMOUSEEVENT lpEventTrack);
+typedef BOOL (WINAPI *fnUpdateLayeredWindow)(HWND hwnd, HDC hdcDest, POINT *pptDest, SIZE *psize, HDC hdcSrc, POINT *pptSrc, COLORREF crKey, BLENDFUNCTION *pBlend, DWORD dwFlags);
 
 
 class clsUser32
