@@ -12,10 +12,7 @@
 #include <stdlib.h>
 
 #include "../../dynwinapi/clsUser32.h"
-<<<<<<< local
-=======
 #include "../../utility/stringcopy.h"
->>>>>>> other
 
 clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertical): clsItemCollection(pVertical)
 {
