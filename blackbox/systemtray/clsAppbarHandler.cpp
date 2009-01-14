@@ -9,8 +9,6 @@
 #include "../../dynwinapi/clsShlwapi.h"
 #include "../../debug/debug.h"
 
-clsShlwapi shlwapi;
-
 #ifndef ABM_SETSTATE
 #define ABM_SETSTATE 0x0000000A
 #endif

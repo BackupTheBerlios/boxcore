@@ -79,6 +79,7 @@ if(MINGW)
                                          -i${CMAKE_CURRENT_BINARY_DIR}/resource.rc
                                          -o ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
   SET(BLACKBOX_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
+  set (RC_MANIFEST_LINE "APP_MANIFEST RT_MANIFEST blackbox.exe.manifest")
 else(MINGW)
   SET(BLACKBOX_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/resource.rc)
 endif(MINGW)
@@ -88,22 +89,29 @@ include_directories(blackbox ${CMAKE_CURRENT_BINARY_DIR})
 #add_custom_command (TARGET blackbox POST_BUILD
 #	COMMAND ${DLLTOOL} -d ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def -l ${CMAKE_CURRENT_BINARY_DIR}/libblackbox.a -D blackbox.exe
 #	COMMENT "Building proper library")
-target_link_libraries (blackbox ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def
+target_link_libraries (blackbox 
 	debuglib shellserviceobjects systemtray shlwapi version ole32 uuid comctl32 comdlg32 shell32 advapi32 winmm gdi32)
 set_target_properties (blackbox PROPERTIES
+	WIN32_EXECUTABLE true
 	IMPORT_SUFFIX .a
 	ENABLE_EXPORTS true
 )
 
 if (MINGW)
 set_target_properties (blackbox PROPERTIES
-	LINK_FLAGS "-mwindows -s"
+	LINK_FLAGS " -s ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def"
 	COMPILE_FLAGS "-Os -Wall -fno-rtti -fno-exceptions"
 )
 endif (MINGW)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/manifest.in
 ${CMAKE_CURRENT_BINARY_DIR}/blackbox.exe.manifest)
+
+if (MINGW)
+set (DEF_HEADER "")
+else (MINGW)
+set (DEF_HEADER "LIBRARY Blackbox.exe")
+endif (MINGW)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libBlackbox.def.in
 ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def)

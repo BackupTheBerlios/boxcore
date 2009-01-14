@@ -207,7 +207,7 @@ void EndDeferWindowPosAsync(HDWP hWinPosInfo)
 		unsigned char* func = (unsigned char*)GetProcAddress(user32, "EndDeferWindowPos");
 		if (func && func[10]==0xE8)   // CALL IMM32 opcode
 		{
-			typedef int WINAPI (*NtUserEndDeferWindowPosEx)(HDWP, BOOL);
+			typedef int (WINAPI *NtUserEndDeferWindowPosEx)(HDWP, BOOL);
 
 			// get address of NtUserEndDeferWindowPosEx, from within EndDeferWindowPos's code
 			NtUserEndDeferWindowPosEx func2 = (NtUserEndDeferWindowPosEx)

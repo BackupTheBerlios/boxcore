@@ -164,12 +164,9 @@ bool clsClsidSource::inWhitelist(CLSID pClsid)
 
 /** @brief Converts a string form CLSID into an actual CLSID for later output
   */
-clsClsidInjected::clsClsidInjected(const wstring &pClsidString)
+clsClsidInjected::clsClsidInjected(const CLSID p_inject)
 {
-	WCHAR clsidString[pClsidString.size()+1];
-	pClsidString.copy(clsidString, pClsidString.size(), 0);
-	CLSIDFromString(clsidString, &inject);
-
+	inject = p_inject;
 	used = false;
 }
 

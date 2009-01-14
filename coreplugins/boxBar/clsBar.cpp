@@ -13,9 +13,6 @@
 
 #include "../../dynwinapi/clsUser32.h"
 
-clsUser32 user32;
-clsMsimg32 msimg32;
-
 clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertical): clsItemCollection(pVertical)
 {
 	trackMouse = false;

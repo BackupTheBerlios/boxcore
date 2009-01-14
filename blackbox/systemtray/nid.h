@@ -81,12 +81,12 @@ struct NID_INTERNAL
 #define offsetof(type, member) __builtin_offsetof(type, member)
 #endif
 
-#define NID_WIN95_SIZE offsetof(NID_ANSI, szTip[64])
+#define NID_WIN95_SIZE offsetof(NID_ANSI, szTip) + 64 * sizeof(CHAR)
 #define NID_2KA_SIZE offsetof(NID_ANSI, guidItem)
 #define NID_XPA_SIZE offsetof(NID_ANSI, hBalloonIcon)
 #define NID_VISTAA_SIZE sizeof(NID_ANSI)
 
-#define NID_NT_SIZE offsetof(NID_UNICODE, szTip[64])
+#define NID_NT_SIZE offsetof(NID_UNICODE, szTip) + 64 * sizeof(WCHAR)
 #define NID_2KW_SIZE offsetof(NID_UNICODE, guidItem)
 #define NID_XPW_SIZE offsetof(NID_UNICODE, hBalloonIcon)
 #define NID_VISTAW_SIZE sizeof(NID_UNICODE)

@@ -2,7 +2,7 @@
 #define CLSMSIMG32_H
 #include <windows.h>
 
-typedef WINAPI BOOL (*fnAlphaBlend)(HDC hdcDest,int xoriginDest,int yoriginDest,int wDest,int hDest,HDC hdcSrc,int xoriginSrc,int yoriginSrc,int wSrc,int hSrc,BLENDFUNCTION ftn);
+typedef BOOL (WINAPI *fnAlphaBlend)(HDC hdcDest,int xoriginDest,int yoriginDest,int wDest,int hDest,HDC hdcSrc,int xoriginSrc,int yoriginSrc,int wSrc,int hSrc,BLENDFUNCTION ftn);
 
 class clsMsimg32
 {

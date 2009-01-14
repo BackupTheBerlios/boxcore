@@ -153,7 +153,7 @@ int getvalue(char *from, char *token, char *to, bool from_right)
 	{
 		p += strlen(token);
 		while (' ' == *p) ++p;
-		if ('(' == *p && NULL != (q = (from_right?strrchr:strchr)(++p,')')))
+		if ('(' == *p && NULL != (q = (from_right?strrchr(++p,')'):strchr(++p,')'))))
 			memcpy(to, p, l = q-p);
 	}
 	to[l]=0;

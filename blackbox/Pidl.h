@@ -94,14 +94,6 @@ bool sh_get_uiobject(
 );
 
 //===========================================================================
-extern "C" HRESULT WINAPI StrRetToBufA(
-		struct _STRRET *pstr,
-		const UNALIGNED _ITEMIDLIST *pidl,
-		LPSTR pszBuf,
-		UINT cchBuf
-	);
-
-//===========================================================================
 
 #define NextID(pidl) ((LPITEMIDLIST)((BYTE*)pidl+pidl->mkid.cb))
 

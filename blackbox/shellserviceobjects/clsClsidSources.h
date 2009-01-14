@@ -139,7 +139,7 @@ private:
 class clsClsidInjected : public clsClsidSource
 {
 public:
-	clsClsidInjected(const wstring &);
+	clsClsidInjected(const CLSID p_inject);
 	virtual CLSID getNextCLSID();
 private:
 	/// The CLSID to output

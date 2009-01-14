@@ -565,7 +565,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	{
 		if (SystemInfo.isOsVista())
 		{
-			clsClsidInjected vistaInject(L"{730F6CDC-2C86-11D2-8773-92E220524153}");
+			CLSID CLSID_VistaStartup = 
+				{ 0x35CEC8A3, 0x2BE6, 0x11D2,
+		  { 0x87, 0x73, 0x92, 0xE2, 0x20, 0x52, 0x41, 0x53 }
+		};
+			clsClsidInjected vistaInject(CLSID_VistaStartup);
 			clsClsidRegKeys vistaKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\explorer\\ShellServiceObjects");
 			vector<wstring> vistaWhitelist;
 			vistaWhitelist.push_back(L"{7007ACCF-3202-11D1-AAD2-00805FC1270E}");

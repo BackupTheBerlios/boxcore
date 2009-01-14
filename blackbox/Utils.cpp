@@ -780,7 +780,7 @@ int exec_pidl(const _ITEMIDLIST *pidl, LPCSTR verb, LPCSTR arguments)
 //===========================================================================
 
 #ifndef SHCNF_ACCEPT_INTERRUPTS
-#ifndef _WIN64
+#ifdef MINGW && !_WIN64
 struct _SHChangeNotifyEntry
 {
 	const _ITEMIDLIST *pidl;

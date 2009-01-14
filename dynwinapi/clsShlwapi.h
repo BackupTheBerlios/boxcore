@@ -3,8 +3,8 @@
 
 #include <windows.h>
 
-typedef WINAPI LPVOID (*fnSHLockShared)(HANDLE hData, DWORD dwOtherProcId);
-typedef WINAPI BOOL (*fnSHUnlockShared)(void *pvData);
+typedef LPVOID (WINAPI *fnSHLockShared)(HANDLE hData, DWORD dwOtherProcId);
+typedef BOOL (WINAPI *fnSHUnlockShared)(void *pvData);
 
 
 class clsShlwapi

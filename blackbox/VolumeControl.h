@@ -50,9 +50,26 @@ struct IMMNotificationClient : public IUnknown
 {
 };
 
+#ifndef PROPERTYKEY_DEFINED
+#define PROPERTYKEY_DEFINED
+typedef struct {
+    GUID fmtid;
+    DWORD pid;
+} PROPERTYKEY;
+#endif
+typedef PROPERTYKEY &REFPROPERTYKEY;
+
+#ifndef __IPropertyStore_INTERFACE_DEFINED__
+#define __IPropertyStore_INTERFACE_DEFINED__
 struct IPropertyStore : public IUnknown
 {
+	virtual HRESULT GetCount(DWORD *cProps);
+	virtual HRESULT GetAt(DWORD iProp, PROPERTYKEY *pkey);
+	virtual HRESULT GetValue(REFPROPERTYKEY key,PROPVARIANT *pv);
+	virtual HRESULT SetValue(REFPROPERTYKEY key,REFPROPVARIANT propvar);
+	virtual HRESULT Commit();
 };
+#endif
 
 struct IMMDeviceCollection : public IUnknown
 {

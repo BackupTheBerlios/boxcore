@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
+cmake_policy (SET CMP0008 NEW)
 set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules")
+add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 project (boxCore)
 

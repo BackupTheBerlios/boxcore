@@ -11,7 +11,7 @@ void trace_printf(const char *pFileName, unsigned int pLine, const char *pFuncti
 
 #ifndef NDEBUG
 #define PRINT(A) OutputDebugString(A)
-#define TRACE(...) trace_printf(__FILE__, __LINE__, __PRETTY_FUNCTION__, __VA_ARGS__)
+#define TRACE(...) trace_printf(__FILE__, __LINE__, __FUNCTION__, __VA_ARGS__)
 #define MESSAGEBOX(A) MessageBox(NULL, A, TEXT("boxCore debug messagebox"), MB_OK)
 #else
 #define PRINT(A)

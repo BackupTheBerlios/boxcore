@@ -38,7 +38,7 @@
 #define RT_MANIFEST 24
 #define APP_MANIFEST 1
 
-APP_MANIFEST RT_MANIFEST blackbox.exe.manifest
+${RC_MANIFEST_LINE}
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -63,7 +63,7 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 
-IDI_BLACKBOX ICON DISCARDABLE "Blackbox.ico"
+IDI_BLACKBOX ICON DISCARDABLE "${CMAKE_CURRENT_SOURCE_DIR}/Blackbox.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -71,7 +71,7 @@ IDI_BLACKBOX ICON DISCARDABLE "Blackbox.ico"
 // Menu Drag Cursor
 //
 
-IDC_MOVEMENU CURSOR DISCARDABLE "Menu/MoveMenu.cur"
+IDC_MOVEMENU CURSOR DISCARDABLE "${CMAKE_CURRENT_SOURCE_DIR}/Menu/MoveMenu.cur"
 
 /////////////////////////////////////////////////////////////////////////////
 //
