@@ -2510,29 +2510,35 @@ systemTray* GetTrayIcon(UINT idx)
 	return static_cast<SystemTrayIcon *>(data[0])->getSystemTray();
 }
 
-extern "C" API_EXPORT BOOL GetTrayInfo(HWND p_hWnd, UINT p_uID, PVOID *p_trayInfo, ATOM *p_infoTypes, UINT p_numInfo)
+BOOL GetTrayInfoReal(ShellServices::NotificationIcon *p_icon, PVOID *p_trayInfo, ATOM *p_infoTypes, UINT p_numInfo)
 {
 	static char ansiTip[128];
+	ShellServices::eNotificationIconInfo request[p_numInfo];
+	PVOID trayInfo[p_numInfo];
 	for (UINT i = 0; i< p_numInfo; ++i)
 	{
-		ShellServices::eNotificationIconInfo request = g_trayInfoMapping[p_infoTypes[i]];
-		PVOID tempInfo[1];
-		switch (request)
+		request[i] = g_trayInfoMapping[p_infoTypes[i]];
+	}
+	if (!g_pNotificationIconHandler->GetNotificationIconInfo(p_icon,trayInfo,request,p_numInfo))
+	{
+		return FALSE;
+	}
+	for (UINT i = 0; i< p_numInfo; ++i)
+	{
+		switch (request[i])
 		{
 		case ShellServices::NI_VERSION:
-			g_pNotificationIconHandler->GetNotificationIconInfo(p_hWnd,p_uID,tempInfo,&request,1);
-			p_trayInfo[i] = tempInfo[0];
+			p_trayInfo[i] = trayInfo[i];
 			break;
 		case ShellServices::NI_TIP:
-			g_pNotificationIconHandler->GetNotificationIconInfo(p_hWnd,p_uID,tempInfo,&request,1);
 			if (p_infoTypes[i] == FindAtom(TEXT("Trayicon::AnsiTip")))
 			{
-				WideCharToMultiByte(CP_ACP,0,reinterpret_cast<LPCWSTR>(tempInfo[0]),-1,ansiTip,128,NULL,NULL);
+				WideCharToMultiByte(CP_ACP,0,reinterpret_cast<LPCWSTR>(trayInfo[i]),-1,ansiTip,128,NULL,NULL);
 				p_trayInfo[i] = ansiTip;
 			}
 			else
 			{
-				p_trayInfo[i] = tempInfo[0];
+				p_trayInfo[i] = trayInfo[i];
 			}
 			break;
 		default:
@@ -2540,6 +2546,23 @@ extern "C" API_EXPORT BOOL GetTrayInfo(HWND p_hWnd, UINT p_uID, PVOID *p_trayInf
 		}
 	}
 	return TRUE;
+}
+
+extern "C" API_EXPORT BOOL GetTrayInfo(HWND p_hWnd, UINT p_uID, PVOID *p_trayInfo, ATOM *p_infoTypes, UINT p_numInfo)
+{
+	ShellServices::NotificationIcon *icon = g_pNotificationIconHandler->LookupIcon(p_hWnd, p_uID);
+	return GetTrayInfoReal(icon, p_trayInfo, p_infoTypes, p_numInfo);
+}
+
+extern "C" API_EXPORT BOOL GetTrayInfoIndexed(UINT p_index, PVOID *p_trayInfo, ATOM *p_infoTypes, UINT p_numInfo)
+{
+	ShellServices::NotificationIcon *icon = g_pNotificationIconHandler->LookupIcon(p_index);
+	return GetTrayInfoReal(icon, p_trayInfo, p_infoTypes, p_numInfo);
+}
+
+extern "C" API_EXPORT BOOL GetTrayInfoMsg(WPARAM p_wParam, PVOID *p_trayInfo, ATOM *p_infoTypes, UINT p_numInfo)
+{
+	return GetTrayInfoReal(reinterpret_cast<ShellServices::NotificationIcon *>(p_wParam), p_trayInfo, p_infoTypes, p_numInfo);
 }
 
 //===========================================================================
