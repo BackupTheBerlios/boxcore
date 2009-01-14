@@ -405,9 +405,20 @@ void RemoveApiExtensions()
 
 void InitTrayMapping()
 {
-	g_trayInfoMapping[AddAtom("TrayIcon::Version")] = ShellServices::NI_VERSION;
+	g_trayInfoMapping[AddAtom("TrayIcon::Window")] = ShellServices::NI_HWND;
+	g_trayInfoMapping[AddAtom("TrayIcon::ID")] = ShellServices::NI_ID;
+	g_trayInfoMapping[AddAtom("TrayIcon::CallbackMessage")] = ShellServices::NI_CALLBACKMESSAGE;
+	g_trayInfoMapping[AddAtom("TrayIcon::Icon")] = ShellServices::NI_ICON;
 	g_trayInfoMapping[AddAtom("TrayIcon::AnsiTip")] = ShellServices::NI_TIP;
 	g_trayInfoMapping[AddAtom("TrayIcon::UnicodeTip")] = ShellServices::NI_TIP;
+	g_trayInfoMapping[AddAtom("TrayIcon::AnsiInfoText")] = ShellServices::NI_INFOTEXT;
+	g_trayInfoMapping[AddAtom("TrayIcon::UnicodeInfoText")] = ShellServices::NI_INFOTEXT;
+	g_trayInfoMapping[AddAtom("TrayIcon::AnsiInfoTitle")] = ShellServices::NI_INFOTITLE;
+	g_trayInfoMapping[AddAtom("TrayIcon::UnicodeInfoTitle")] = ShellServices::NI_INFOTITLE;
+	g_trayInfoMapping[AddAtom("TrayIcon::InfoIcon")] = ShellServices::NI_INFOICON;
+	g_trayInfoMapping[AddAtom("TrayIcon::InfoFlags")] = ShellServices::NI_INFOFLAGS;
+	g_trayInfoMapping[AddAtom("TrayIcon::InfoTimout")] = ShellServices::NI_INFOTIMEOUT;
+	g_trayInfoMapping[AddAtom("TrayIcon::Version")] = ShellServices::NI_VERSION;
 }
 
 //===========================================================================
@@ -565,13 +576,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	{
 		if (SystemInfo.isOsVista())
 		{
-			clsClsidInjected vistaInject(L"{730F6CDC-2C86-11D2-8773-92E220524153}");
-			clsClsidRegKeys vistaKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\explorer\\ShellServiceObjects");
-			vector<wstring> vistaWhitelist;
-			vistaWhitelist.push_back(L"{7007ACCF-3202-11D1-AAD2-00805FC1270E}");
-			vistaKey.setWhitelist(vistaWhitelist);
+			//clsClsidInjected vistaInject(L"{730F6CDC-2C86-11D2-8773-92E220524153}");
+			clsClsidInjected vistaInject(L"{35CEC8A3-2BE6-11D2-8773-92E220524153}");
+			//clsClsidRegKeys vistaKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\explorer\\ShellServiceObjects");
+			//vector<wstring> vistaWhitelist;
+			//vistaWhitelist.push_back(L"{7007ACCF-3202-11D1-AAD2-00805FC1270E}");
+			//vistaKey.setWhitelist(vistaWhitelist);
 			ShellServiceObjectsManager.startServiceObjects(vistaInject);
-			ShellServiceObjectsManager.startServiceObjects(vistaKey);
+			//ShellServiceObjectsManager.startServiceObjects(vistaKey);
 		}
 		else
 		{
@@ -1505,7 +1517,6 @@ void exec_boxcore_broam(const char *broam)
 		int bottom = atoi(NextToken(buffer, &core_args));
 		UINT edge = atoi(NextToken(buffer, &core_args));
 		g_pShellServiceWindow->SetTaskbarPos(left,top,right,bottom,edge);
-		TRACE("Taskbar is at %d %d %d %d with edge %u",left,top,right,bottom,edge);
 	}
 }
 
