@@ -27,7 +27,7 @@
 #define MANAGERS_H
 
 #include "shellserviceobjects/clsShellServiceObjects.h"
-#include "systemtray/clsNotifyIconHandler.h"
+#include "shellservices/clsNotifyIconHandler.h"
 #include "clsSystemInfo.h"
 #include <map>
 

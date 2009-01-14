@@ -6,7 +6,7 @@
  */
 
 #include "clsSystemTrayIcon.h"
-#include "systemtray/clsNotificationIcon.h"
+#include "shellservices/clsNotificationIcon.h"
 #include "../debug/debug.h"
 #include "../utility/stringcopy.h"
 

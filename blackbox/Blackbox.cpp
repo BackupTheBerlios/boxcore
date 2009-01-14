@@ -92,9 +92,9 @@ RECT OldDT;
 bool bbactive = true;
 BOOL save_opaquemove;
 
-#include "systemtray/clsShellServiceWindow.h"
-#include "systemtray/clsNotifyIconHandler.h"
-#include "systemtray/clsAppbarHandler.h"
+#include "shellservices/clsShellServiceWindow.h"
+#include "shellservices/clsNotifyIconHandler.h"
+#include "shellservices/clsAppbarHandler.h"
 #include "clsSystemTrayIcon.h"
 
 ShellServices::ShellServiceWindow *g_pShellServiceWindow;

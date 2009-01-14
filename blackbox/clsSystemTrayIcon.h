@@ -8,7 +8,7 @@
 #ifndef CLSSYSTEMTRAYICON_H_
 #define CLSSYSTEMTRAYICON_H_
 
-#include "systemtray/clsLegacyNotificationIcon.h"
+#include "shellservices/clsLegacyNotificationIcon.h"
 #include "BBApi.h"
 
 class SystemTrayIcon: public ShellServices::LegacyNotificationIcon

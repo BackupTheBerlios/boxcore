@@ -12,17 +12,17 @@ clsAppbarHandler.cpp
 ../../dynwinapi/clsUser32.cpp
 )
 
-add_library (systemtray STATIC ${SYSTEMTRAY_SRCS})
-target_link_libraries (systemtray ${UNICOWSLIB} debuglib shlwapi)
+add_library (shellservices STATIC ${SYSTEMTRAY_SRCS})
+target_link_libraries (shellservices ${UNICOWSLIB} debuglib shlwapi)
 
 if (DEBUG_CODE)
-set_target_properties (systemtray PROPERTIES COMPILE_DEFINITIONS "DEBUG")
+set_target_properties (shellservices PROPERTIES COMPILE_DEFINITIONS "DEBUG")
 else (DEBUG_CODE)
-set_target_properties (systemtray PROPERTIES COMPILE_DEFINITIONS "NDEBUG")
+set_target_properties (shellservices PROPERTIES COMPILE_DEFINITIONS "NDEBUG")
 endif (DEBUG_CODE)
 
 if (MINGW)
-set_target_properties (systemtray PROPERTIES
-	LINK_FLAGS "-mwindows -s"
+set_target_properties (shellservices PROPERTIES
+	LINK_FLAGS "-s"
 	COMPILE_FLAGS "-Os -Wall -fno-rtti -fno-exceptions")
 endif (MINGW)
