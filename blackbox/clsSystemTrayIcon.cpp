@@ -8,6 +8,7 @@
 #include "clsSystemTrayIcon.h"
 #include "systemtray/clsNotificationIcon.h"
 #include "../debug/debug.h"
+#include "../utility/stringcopy.h"
 
 SystemTrayIcon::SystemTrayIcon()
 {
@@ -30,7 +31,7 @@ void SystemTrayIcon::updateLegacy(ShellServices::NotificationIcon *p_icon)
 	m_systemTray.hWnd = p_icon->getHWnd();
 	if (p_icon->getShowTip())
 	{
-		WideCharToMultiByte(CP_ACP, 0, p_icon->getSzTip(),-1,m_systemTray.szTip,sizeof(m_systemTray.szTip),NULL,NULL);
+		CopyString(m_systemTray.szTip, p_icon->getSzTip(), 200);
 	}
 	else
 	{
