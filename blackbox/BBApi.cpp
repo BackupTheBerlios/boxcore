@@ -33,6 +33,7 @@
 #include "Settings.h"
 #include "managers.h"
 #include "version.h"
+#include <vector>
 
 #include <shellapi.h>
 #include <time.h>
@@ -2513,13 +2514,13 @@ systemTray* GetTrayIcon(UINT idx)
 BOOL GetTrayInfoReal(ShellServices::NotificationIcon *p_icon, PVOID *p_trayInfo, ATOM *p_infoTypes, CONST UINT p_numInfo)
 {
 	static char ansiTip[128];
-	ShellServices::eNotificationIconInfo request[ShellServices::NI_ENUMSIZE];
-	PVOID trayInfo[ShellServices::NI_ENUMSIZE];
+	std::vector<ShellServices::eNotificationIconInfo> request(p_numInfo);
+	std::vector<PVOID> trayInfo(p_numInfo);
 	for (UINT i = 0; i< p_numInfo; ++i)
 	{
 		request[i] = g_trayInfoMapping[p_infoTypes[i]];
 	}
-	if (!g_pNotificationIconHandler->GetNotificationIconInfo(p_icon,trayInfo,request,p_numInfo))
+	if (!g_pNotificationIconHandler->GetNotificationIconInfo(p_icon,&(trayInfo[0]),&(request[0]),p_numInfo))
 	{
 		return FALSE;
 	}
