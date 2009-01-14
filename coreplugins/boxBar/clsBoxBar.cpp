@@ -41,7 +41,7 @@ int clsBoxBar::beginPluginEx(HINSTANCE hPluginInstance, HWND hSlit)
 	else
 	{
 		TCHAR msg[MAX_PATH];
-		_stprintf(msg,TEXT("This plugin is already loaded under this name. To load multiple instances, you must rename the plugin DLL. %d"),GlobalFindAtom(pluginName));
+		_stprintf(msg,TEXT("This plugin is already loaded under this name. To load multiple instances, you must rename the plugin DLL."));
 		MessageBox(NULL, msg
 				   , pluginName, MB_OK | MB_TOPMOST);
 		return 1;

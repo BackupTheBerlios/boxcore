@@ -12,9 +12,7 @@
 #include <stdlib.h>
 
 #include "../../dynwinapi/clsUser32.h"
-
-clsUser32 user32;
-clsMsimg32 msimg32;
+#include "../../utility/stringcopy.h"
 
 clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertical): clsItemCollection(pVertical)
 {
@@ -31,11 +29,7 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertica
 	hBlackboxWnd = GetBBWnd();
 	char rcname[100];
 	char pluginpath[MAX_PATH];
-#ifdef UNICODE
-	WideCharToMultiByte(CP_ACP, 0 , pClassName, -1, rcname, 95, NULL, NULL);
-#else
-	strcpy(rcname, pClassName);
-#endif
+	CopyString(rcname, pClassName, 95);
 	strcat(rcname, ".rc");
 	GetModuleFileNameA(hInstance, pluginpath, MAX_PATH);
 	if (strrchr(pluginpath, '\\'))
@@ -193,7 +187,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 	case WM_CREATE:
-		// Register to reveive these message
+		// Register to receive these message
 		SendMessage(hBlackboxWnd, BB_REGISTERMESSAGE, (WPARAM)hWnd, (LPARAM)messages);
 		// Make the window appear on all workspaces
 		MakeSticky(hWnd);
@@ -280,10 +274,8 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			if (m_tipQueue.size() > 0)
 			{
 				m_activeTip = m_tipQueue.front();
-							m_activeTip->Display();
-							m_tipQueue.pop_front();
-							SetTimer(barWnd, m_tipTimer, 10000, NULL);
-							m_replaceTip = false;
+				m_tipQueue.pop_front();
+				ShowTip(m_activeTip);
 			}
 		}
 		return 0;
@@ -300,7 +292,9 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			sizePercentage = atoi(msg_string + strlen("@boxBar.percentage"));
 			WriteInt(configFile, "boxBar.percentage:", sizePercentage);
+			readSettings();
 			calculateSizes();
+			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
 		}
 		else if (!strnicmp(msg_string, "@boxBar.vertical", strlen("@boxBar.vertical")))
 		{
@@ -310,6 +304,22 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			populateBar();
 			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 			PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
+		}
+		else if (!strnicmp(msg_string, "@boxBar.align.", strlen("@boxBar.align.")))
+		{
+			msg_string += strlen("@boxBar.align.");
+			if (!strnicmp(msg_string, "vertical.", strlen("vertical.")))
+			{
+				msg_string += strlen("vertical.");
+				WriteString(configFile, "boxBar.align.vertical:", msg_string);
+				readSettings();
+			}
+			else if (!strnicmp(msg_string, "horizontal.", strlen("horizontal.")))
+			{
+				msg_string += strlen("horizontal.");
+				WriteString(configFile, "boxBar.align.horizontal:", msg_string);
+				readSettings();
+			}
 		}
 		else if (toggleWithPlugins && (!stricmp(msg_string, "@BBHidePlugins")))
 		{
@@ -351,41 +361,60 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if ((wp->x > rightthirdX) || ((wp->x + wp->cx) == monRect.right))
 		{
 			barLocation = POS_RIGHT;
-			WriteInt(configFile, "boxBar.x:", wp->x + wp->cx - 1);
 		}
 		else
 		{
 			if (wp->x > leftthirdX)
 			{
 				barLocation = POS_CENTER;
-				WriteInt(configFile, "boxBar.x:", wp->x + wp->cx / 2);
 			}
 			else
 			{
 				barLocation = POS_LEFT;
-				WriteInt(configFile, "boxBar.x:", wp->x);
 			}
 		}
 		int third1Y = (monRect.bottom + 2 * monRect.top) / 3;
 		int third2Y = (2 * monRect.bottom + monRect.top) / 3;
-		TRACE("Bot edge %d bottom monitor %d",wp->y + wp->cy,monRect.bottom);
 		if ((wp->y > third2Y) || ((wp->y + wp->cy) == monRect.bottom))
 		{
 			barLocation += POS_BOTTOM;
-			WriteInt(configFile, "boxBar.y:", wp->y + wp->cy -1);
 		}
 		else
 		{
 			if (wp->y > third1Y)
 			{
 				barLocation += POS_VCENTER;
-				WriteInt(configFile, "boxBar.y:", wp->y + wp->cy / 2);
 			}
 			else
 			{
 				barLocation += POS_TOP;
-				WriteInt(configFile, "boxBar.y:", wp->y);
 			}
+		}
+		UINT hGrowth = (m_barHGrowth ? m_barHGrowth : barLocation);
+		UINT vGrowth = (m_barVGrowth ? m_barVGrowth : barLocation);
+		if (hGrowth & POS_RIGHT)
+		{
+			WriteInt(configFile, "boxBar.x:", wp->x + wp->cx - 1);
+		}
+		else if (hGrowth & POS_CENTER)
+		{
+			WriteInt(configFile, "boxBar.x:", wp->x + wp->cx / 2);
+		}
+		else
+		{
+			WriteInt(configFile, "boxBar.x:", wp->x);
+		}
+		if (vGrowth & POS_BOTTOM)
+		{
+			WriteInt(configFile, "boxBar.y:", wp->y + wp->cy - 1);
+		}
+		else if (vGrowth & POS_VCENTER)
+		{
+			WriteInt(configFile, "boxBar.y:", wp->y + wp->cy / 2);
+		}
+		else
+		{
+			WriteInt(configFile, "boxBar.y:", wp->y);
 		}
 		if (setMargin)
 		{
@@ -448,7 +477,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	break;
 	case WM_LBUTTONDOWN:
-		if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
+		if (!inSlit && GetAsyncKeyState(VK_CONTROL) & 0x8000)
 		{
 			moving = true;
 			PostMessage(hWnd, WM_SYSCOMMAND, SC_MOVE | 2, 0);
@@ -504,7 +533,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
   * @return Return the directions in which resizing actually occurred
   *
   * This function resizes the bar item using the base function, but also adjusts the size of the bar window.
-  * The bar window adjustment is dependant on the current alignemtn of the bar so that right aligned bars
+  * The bar window adjustment is dependent on the current alignment of the bar so that right aligned bars
   * grow to the left, left aligned bars grow to the right etc.
   */
 dimType clsBar::resize(int pX, int pY)
@@ -513,7 +542,6 @@ dimType clsBar::resize(int pX, int pY)
 	GetWindowRect(barWnd, &barRect);
 	int newX = barRect.left;
 	int newY = barRect.top;
-	TRACE("Before adjusts X %d Y %d pX %d pY %d, was %d %d", newX, newY, pX, pY, getSize(DIM_HORIZONTAL),getSize(DIM_VERTICAL));
 	if (pX < 0)
 	{
 		pX = getSize(DIM_HORIZONTAL);
@@ -521,9 +549,10 @@ dimType clsBar::resize(int pX, int pY)
 	else
 	{
 		int dX = getSize(DIM_HORIZONTAL) - pX;
-		if (barLocation&POS_LEFT)
+		UINT growth = (m_barHGrowth ? m_barHGrowth : barLocation);
+		if (growth&POS_LEFT)
 			newX = barRect.left;
-		else if (barLocation&POS_CENTER)
+		else if (growth&POS_CENTER)
 			newX = barRect.left + dX / 2;
 		else
 			newX = barRect.left + dX;
@@ -535,15 +564,15 @@ dimType clsBar::resize(int pX, int pY)
 	else
 	{
 		int dY = getSize(DIM_VERTICAL) - pY;
-		if (barLocation&POS_TOP)
+		UINT growth = (m_barVGrowth ? m_barVGrowth : barLocation);
+		if (growth&POS_TOP)
 			newY = barRect.top;
-		else if (barLocation&POS_VCENTER)
+		else if (growth&POS_VCENTER)
 			newY = barRect.top + dY / 2;
 		else
 			newY = barRect.top + dY;
 	}
-	TRACE("Going to do X %d Y %d pX %d pY %d", newX, newY, pX, pY);
-	SetWindowPos(barWnd, NULL, newX, newY, pX, pY, SWP_NOACTIVATE | SWP_NOZORDER | (inSlit ? SWP_NOMOVE : 0));
+	SetWindowPos(barWnd, NULL, newX, newY, pX, pY, SWP_NOACTIVATE | SWP_NOZORDER);
 	dimType tempReturn = clsItemCollection::resize(pX, pY);
 	bufferInfo.bmiHeader.biWidth = itemArea.right - itemArea.left;
 	bufferInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
@@ -554,7 +583,9 @@ dimType clsBar::resize(int pX, int pY)
 	RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 	PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 	if (inSlit)
-		PostMessage(slitWnd, SLIT_UPDATE, 0, reinterpret_cast<LPARAM>(barWnd));
+		SendMessage(slitWnd, SLIT_UPDATE, 0, reinterpret_cast<LPARAM>(barWnd));
+	if (margin)
+		SetDesktopMargin(barWnd, marginEdge, margin);
 	return tempReturn;
 }
 
@@ -564,12 +595,6 @@ dimType clsBar::resize(int pX, int pY)
   */
 void clsBar::calculateSizes(bool pSizeGiven)
 {
-	RECT monRect;
-	GetMonitorRect(barWnd, &monRect, GETMON_FROM_WINDOW);
-	if (vertical)
-		resize(-1, sizePercentage*(monRect.bottom - monRect.top) / 100);
-	else
-		resize(sizePercentage*(monRect.right - monRect.left) / 100, -1);
 	clsItemCollection::calculateSizes(true);
 	if (margin)
 		SetDesktopMargin(barWnd, marginEdge, margin);
@@ -592,9 +617,7 @@ void clsBar::QueueTip(Tip *p_tip)
 	else
 	{
 		m_activeTip = p_tip;
-		m_activeTip->Display();
-		m_replaceTip = false;
-		SetTimer(barWnd, m_tipTimer, 10000, NULL);
+		ShowTip(m_activeTip);
 	}
 }
 
@@ -621,10 +644,8 @@ void clsBar::KillTips(HWND p_hWnd, UINT p_uID)
 		if (m_tipQueue.size() > 0)
 		{
 			m_activeTip = m_tipQueue.front();
-			m_activeTip->Display();
 			m_tipQueue.pop_front();
-			SetTimer(barWnd, m_tipTimer, 10000, NULL);
-			m_replaceTip = false;
+			ShowTip(m_activeTip);
 		}
 	}
 }
@@ -667,7 +688,12 @@ void clsBar::populateBar()
 		}
 	}
 	while (strlen(barItems));
-
+	RECT monRect;
+	GetMonitorRect(barWnd, &monRect, GETMON_FROM_WINDOW);
+	if (vertical)
+		resize(-1, sizePercentage*(monRect.bottom - monRect.top) / 100);
+	else
+		resize(sizePercentage*(monRect.right - monRect.left) / 100, -1);
 	calculateSizes();
 }
 
@@ -677,10 +703,22 @@ void clsBar::populateBar()
   */
 void clsBar::configMenu(Menu *pMenu)
 {
-	Menu *subMenu = MakeNamedMenu("Bar", "Bar", true);
+	Menu *subMenu = MakeNamedMenu("Bar", "boxBar::bar", true);
 	MakeSubmenu(pMenu, subMenu, "Bar Configuration");
 	MakeMenuItemInt(subMenu, "Percentage Size", "@boxBar.percentage", sizePercentage, 0, 100);
 	MakeMenuItem(subMenu, "Vertical", "@boxBar.vertical", vertical);
+	Menu *subSubMenu = MakeNamedMenu("Vertical Alignment","boxBar::bar::verticalAlign", true);
+	MakeSubmenu(subMenu, subSubMenu, "Vertical Alignment");
+	MakeMenuItem(subSubMenu, "Top", "@boxBar.align.vertical.top", m_barVGrowth & POS_TOP);
+	MakeMenuItem(subSubMenu, "Center", "@boxBar.align.vertical.center", m_barVGrowth & POS_VCENTER);
+	MakeMenuItem(subSubMenu, "Bottom", "@boxBar.align.vertical.bottom", m_barVGrowth & POS_BOTTOM);
+	MakeMenuItem(subSubMenu, "Auto", "@boxBar.align.vertical.auto", !m_barVGrowth);
+	subSubMenu = MakeNamedMenu("Horizontal Alignment","boxBar::bar::horizontalAlign", true);
+	MakeSubmenu(subMenu, subSubMenu, "Horizontal Alignment");
+	MakeMenuItem(subSubMenu, "Left", "@boxBar.align.horizontal.left", m_barHGrowth & POS_LEFT);
+	MakeMenuItem(subSubMenu, "Center", "@boxBar.align.horizontal.center", m_barHGrowth & POS_CENTER);
+	MakeMenuItem(subSubMenu, "Right", "@boxBar.align.horizontal.right", m_barHGrowth & POS_RIGHT);
+	MakeMenuItem(subSubMenu, "Auto", "@boxBar.align.horizontal.auto", !m_barHGrowth);
 	clsItemCollection::configMenu(pMenu);
 }
 
@@ -693,11 +731,39 @@ void clsBar::readSettings()
 	sizePercentage = ReadInt(configFile, "boxBar.percentage:", 80);
 	if (!inSlit)
 	{
-	setMargin = ReadBool(configFile, "boxBar.setMargin:", true);
+		setMargin = ReadBool(configFile, "boxBar.setMargin:", true);
 	}
 	else
 	{
 		setMargin = false;
+	}
+	m_barVGrowth = 0;
+	const char * configString = ReadString(configFile, "boxBar.align.vertical:", "auto");
+	if (!stricmp(configString,"top"))
+	{
+		m_barVGrowth |= POS_TOP;
+	}
+	else if (!stricmp(configString,"center"))
+	{
+		m_barVGrowth |= POS_VCENTER;
+	}
+	else if (!stricmp(configString,"bottom"))
+	{
+		m_barVGrowth |= POS_BOTTOM;
+	}
+	m_barHGrowth = 0;
+	configString = ReadString(configFile, "boxBar.align.horizontal:", "auto");
+	if (!stricmp(configString,"left"))
+	{
+		m_barHGrowth |= POS_LEFT;
+	}
+	else if (!stricmp(configString,"center"))
+	{
+		m_barHGrowth |= POS_CENTER;
+	}
+	else if (!stricmp(configString,"right"))
+	{
+		m_barHGrowth |= POS_RIGHT;
 	}
 
 	vertical = ReadBool(configFile, "boxBar.vertical:", false);
@@ -745,5 +811,56 @@ void clsBar::readSettings()
 	barBlend.AlphaFormat = alphaDraw ? AC_SRC_ALPHA : 0;
 
 	fixed = (vertical ? DIM_HORIZONTAL : DIM_VERTICAL);
+	RECT monRect;
+	GetMonitorRect(barWnd, &monRect, GETMON_FROM_WINDOW);
+	if (vertical)
+		resize(-1, sizePercentage*(monRect.bottom - monRect.top) / 100);
+	else
+		resize(sizePercentage*(monRect.right - monRect.left) / 100, -1);
+	calculateSizes();
 }
+
+void clsBar::ShowTip(Tip *p_tip)
+{
+	RECT tipRect;
+	RECT barRect;
+	GetWindowRect(m_activeTip->getTipWindow(),&tipRect);
+	GetWindowRect(barWnd, &barRect);
+	if (vertical)
+	{
+		if (tipRect.right > barRect.left)
+		{
+			int move = tipRect.right - barRect.left - 1;
+			tipRect.right -= move;
+			tipRect.left -= move;
+		}
+		else if (tipRect.left < barRect.right)
+		{
+			int move = barRect.right - tipRect.left - 1;
+			tipRect.right += move;
+			tipRect.left += move;
+		}
+	}
+	else
+	{
+		if (tipRect.bottom > barRect.top)
+		{
+			int move = tipRect.bottom - barRect.top - 1;
+			tipRect.bottom -= move;
+			tipRect.top -= move;
+		}
+		else if (tipRect.top < barRect.bottom)
+		{
+			int move = barRect.bottom - tipRect.top - 1;
+			tipRect.bottom += move;
+			tipRect.top += move;
+		}
+	}
+	SetWindowPos(m_activeTip->getTipWindow(), NULL, tipRect.left, tipRect.top, tipRect.right - tipRect.left -1, tipRect.bottom - tipRect.top -1, SWP_NOACTIVATE | SWP_NOZORDER);
+	m_activeTip->Display();
+	m_replaceTip = false;
+	SetTimer(barWnd, m_tipTimer, 10000, NULL);
+}
+
+
 

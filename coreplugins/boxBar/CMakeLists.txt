@@ -36,6 +36,8 @@ clsTip.cpp
 ../utils/clsApiLoader.cpp
 ../../dynwinapi/clsUser32.cpp
 ../../dynwinapi/clsMsimg32.cpp
+
+../../utility/stringcopy.cpp
 )
 
 set (VERSION_MAJOR 0)
@@ -62,10 +64,22 @@ set_target_properties (boxBar PROPERTIES
 	PREFIX ""
 	VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
 )
+if (UNICODE_ENABLE)
+set_target_properties (boxBar PROPERTIES COMPILE_DEFINITIONS "UNICODE;_UNICODE;")
+endif (UNICODE_ENABLE)
+
 if (DEBUG_CODE)
-set_target_properties (boxBar PROPERTIES COMPILE_DEFINITIONS "UNICODE;_UNICODE;DEBUG")
+get_target_property(currentProperties boxBar COMPILE_DEFINITIONS)
+if (currentProperties STREQUAL currentProperties-NOTFOUND)
+set (currentProperties "")
+endif (currentProperties STREQUAL currentProperties-NOTFOUND)
+set_target_properties (boxBar PROPERTIES COMPILE_DEFINITIONS "${currentProperties}DEBUG")
 else (DEBUG_CODE)
-set_target_properties (boxBar PROPERTIES COMPILE_DEFINITIONS "UNICODE;_UNICODE;NDEBUG")
+get_target_property(currentProperties boxBar COMPILE_DEFINITIONS)
+if (currentProperties STREQUAL currentProperties-NOTFOUND)
+set (currentProperties "")
+endif (currentProperties STREQUAL currentProperties-NOTFOUND)
+set_target_properties (boxBar PROPERTIES COMPILE_DEFINITIONS "${currentProperties}NDEBUG")
 endif (DEBUG_CODE)
 if (MINGW)
 set_target_properties (boxBar PROPERTIES

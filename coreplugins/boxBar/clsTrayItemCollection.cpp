@@ -58,27 +58,48 @@ void clsTrayItemCollection::populateTray()
 			addItem(new clsItemCollection(!vertical));
 	}
 	list<clsItem*>::iterator column = itemList.begin();
+	list<clsItem*>::reverse_iterator columnRev = itemList.rbegin();
 	for (int i = (m_newFirst?GetTraySize()-1:0); (m_newFirst?(i>=0):(i < GetTraySize())); (m_newFirst?--i:++i))
 	{
 		systemTray *trayItem = GetTrayIcon(i);
 		if (numRowCols > 0)
 		{
-			((clsItemCollection*)(*column))->addItem(new clsTrayItem(trayItem, iconSize, vertical));
-			column++;
-			if (column == itemList.end())
-				column = itemList.begin();
+			if (m_reverseOrder && !vertical)
+			{
+				((clsItemCollection*)(*columnRev))->addItem(new clsTrayItem(trayItem, iconSize, vertical));
+				columnRev++;
+				if (columnRev == itemList.rend())
+					columnRev = itemList.rbegin();
+			}
+			else
+			{
+				((clsItemCollection*)(*column))->addItem(new clsTrayItem(trayItem, iconSize, vertical), m_reverseOrder);
+				column++;
+				if (column == itemList.end())
+					column = itemList.begin();
+			}
 		}
 		else
-			addItem(new clsTrayItem(trayItem, iconSize, vertical));
+			addItem(new clsTrayItem(trayItem, iconSize, vertical), m_reverseOrder);
 	}
 	if (numRowCols > 0)
 	{
 		for (int i=GetTraySize(); (i % numRowCols) != 0; ++i)
 		{
-			((clsItemCollection*)(*column))->addItem(new clsIconItem(NULL, iconSize, vertical));
-			column++;
-			if (column == itemList.end())
-				column = itemList.begin();
+			if (m_reverseOrder && !vertical)
+			{
+				((clsItemCollection*)(*columnRev))->addItem(new clsIconItem(NULL, iconSize, vertical));
+				columnRev++;
+				if (columnRev == itemList.rend())
+					columnRev = itemList.rbegin();
+			}
+			else
+			{
+				((clsItemCollection*)(*column))->addItem(new clsIconItem(NULL, iconSize, vertical), m_reverseOrder);
+				column++;
+				if (column == itemList.end())
+					column = itemList.begin();
+			}
 		}
 	}
 }
@@ -98,6 +119,7 @@ void clsTrayItemCollection::readSettings()
 	spacingBorder = ReadInt(configFile, "boxBar.tray.spacingBorder:", 0);
 	spacingItems = ReadInt(configFile, "boxBar.tray.spacingItems:", 2);
 	m_newFirst = ReadBool(configFile, "boxBar.tray.newIconsFirst:",false);
+	m_reverseOrder = ReadBool(configFile, "boxBar.tray.reverseOrder:", false);
 	populateTray();
 }
 

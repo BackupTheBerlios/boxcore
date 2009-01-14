@@ -28,6 +28,8 @@ public:
 	void Kill();
 	static LRESULT CALLBACK realWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+	HWND getTipWindow() const;
 private:
 	LPSTR m_info;
 	LPSTR m_infoTitle;

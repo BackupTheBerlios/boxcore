@@ -92,9 +92,9 @@ void Tip::Timeout()
 	KillTimer(m_tipWindow,1);
 	DestroyWindow(m_tipWindow);
 	if (m_notifyWindow)
-		{
-			PostMessage(m_notifyWindow, BOXBAR_BALLOONDONE, 0, reinterpret_cast<LPARAM>(this));
-		}
+	{
+		PostMessage(m_notifyWindow, BOXBAR_BALLOONDONE, 0, reinterpret_cast<LPARAM>(this));
+	}
 	switch (m_iconVersion)
 	{
 	case 4:
@@ -110,9 +110,9 @@ void Tip::Click()
 	KillTimer(m_tipWindow,1);
 	DestroyWindow(m_tipWindow);
 	if (m_notifyWindow)
-		{
-			PostMessage(m_notifyWindow, BOXBAR_BALLOONDONE, 0, reinterpret_cast<LPARAM>(this));
-		}
+	{
+		PostMessage(m_notifyWindow, BOXBAR_BALLOONDONE, 0, reinterpret_cast<LPARAM>(this));
+	}
 	switch (m_iconVersion)
 	{
 	case 4:
@@ -272,6 +272,11 @@ void Tip::Display()
 	default:
 		SendNotifyMessage(m_iconWnd, m_iconCallback, m_iconID, NIN_BALLOONSHOW);
 	}
+}
+
+HWND Tip::getTipWindow() const
+{
+	return m_tipWindow;
 }
 
 clsStyle Tip::bbStyle;

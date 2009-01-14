@@ -11,8 +11,7 @@
 #include "../utils/clsApiLoader.h"
 #include "../../dynwinapi/clsMsimg32.h"
 #include "../../debug/debug.h"
-
-extern clsMsimg32 msimg32;
+#include "../../utility/stringcopy.h"
 
 /** @enum dimType
   * @brief Dimensions for use in boxBar

@@ -47,7 +47,7 @@ clsItem::clsItem(bool pVertical)
 clsItem::~clsItem()
 {
 	delete tipText;
-		tipText = NULL;
+	tipText = NULL;
 	ClearTooltip();
 }
 
@@ -129,7 +129,7 @@ int clsItem::getSize(dimType pDim)
 	}
 }
 
-/** @brief Base sizing funtion for items
+/** @brief Base sizing function for items
   *
   * @param[in] pSizegiven Indicates whether the size of the item has been set externally
   *
@@ -386,16 +386,16 @@ bool clsItem::alphaDraw = true;
 void clsItem::ClearTooltip()
 {
 	if (!tooltipWnd)
-			initTooltips();
-		TOOLINFO toolInfo;
-		ZeroMemory(&toolInfo, sizeof(toolInfo));
-		toolInfo.cbSize = sizeof(toolInfo);
-		toolInfo.uFlags = TTF_SUBCLASS | TTF_TRANSPARENT;
-		toolInfo.hwnd = barWnd;
-		toolInfo.uId = (UINT_PTR)this;
-		toolInfo.rect = itemArea;
-		toolInfo.hinst = hInstance;
-			SendMessage(tooltipWnd, TTM_DELTOOL, 0, (LPARAM)&toolInfo);
+		initTooltips();
+	TOOLINFO toolInfo;
+	ZeroMemory(&toolInfo, sizeof(toolInfo));
+	toolInfo.cbSize = sizeof(toolInfo);
+	toolInfo.uFlags = TTF_SUBCLASS | TTF_TRANSPARENT;
+	toolInfo.hwnd = barWnd;
+	toolInfo.uId = (UINT_PTR)this;
+	toolInfo.rect = itemArea;
+	toolInfo.hinst = hInstance;
+	SendMessage(tooltipWnd, TTM_DELTOOL, 0, (LPARAM)&toolInfo);
 }
 
 
