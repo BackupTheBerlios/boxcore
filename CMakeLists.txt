@@ -11,6 +11,13 @@ set (VERSION_BUILD 0)
 set (VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
 option(USE_UNICOWS "Should we link against unicows.dll?" ON)
+option(UNICODE_ENABLE "Compile unicode versions of the core and plugins" ON)
+
+if (UNICODE_ENABLE)
+set (PACKAGE_CHARTYPE "unicode")
+else (UNICODE_ENABLE)
+set (PACKAGE_CHARTYPE "ansi")
+endif (UNICODE_ENABLE)
 
 if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL AMD64)
 set (ARCH amd64)
