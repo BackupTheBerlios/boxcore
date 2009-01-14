@@ -1,4 +1,6 @@
 project (Blackbox)
+cmake_minimum_required(VERSION 2.6)
+cmake_policy (SET CMP0008 NEW)
 
 if (NOT WINDRES)
 set (WINDRES windres.exe)

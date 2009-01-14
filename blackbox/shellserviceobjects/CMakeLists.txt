@@ -1,6 +1,6 @@
-#cmake_minimum_required(VERSION 2.6)
-
-#project (BLACKBOX)
+cmake_minimum_required(VERSION 2.6)
+cmake_policy (SET CMP0008 NEW)
+project (ShellServiceObjs)
 
 set (SSO_SRCS
 clsClsidSources.cpp
