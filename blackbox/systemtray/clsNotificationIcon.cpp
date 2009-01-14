@@ -110,6 +110,10 @@ eUpdateResult NotificationIcon::UpdateIcon(NID_INTERNAL & p_nid)
 		else
 		{
 			m_hIconOrig = p_nid.hIcon;
+			if (m_hIcon)
+			{
+				DestroyIcon(m_hIcon);
+			}
 			m_hIcon = CopyIcon(p_nid.hIcon);
 		}
 	}
