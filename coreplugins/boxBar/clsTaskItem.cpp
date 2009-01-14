@@ -8,11 +8,7 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVe
 	vertical = false;
 
 	taskWnd = pTask->hwnd;
-#ifdef UNICODE
-	MultiByteToWideChar(CP_ACP, 0, pTask->caption, -1, caption, 256);
-#else
-	strcpy(caption, pTask->caption);
-#endif
+	CopyString(caption, pTask->caption, 256);
 	readSettings();
 	if (iconSize > 16)
 		if (GlobalFindAtom(TEXT("boxCore::running")))
@@ -74,12 +70,7 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				{
 					if (task->hwnd == (HWND)wParam)
 					{
-
-#ifdef UNICODE
-						MultiByteToWideChar(CP_ACP, 0, task->caption, -1, caption, 256);
-#else
-						strcpy(caption, task->caption);
-#endif
+						CopyString(caption, task->caption, 256);
 						captionItem->setText(caption);
 						if (iconSize > 16)
 							if (GlobalFindAtom(TEXT("boxCore::running")))
@@ -130,7 +121,7 @@ void clsTaskItem::activateTask(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM l
 	clsTaskItem *realItem = dynamic_cast<clsTaskItem *>(pItem);
 	if (realItem)
 	{
-	PostMessage(hBlackboxWnd, BB_BRINGTOFRONT, 0,  (LPARAM)realItem->taskWnd);
+		PostMessage(hBlackboxWnd, BB_BRINGTOFRONT, 0,  (LPARAM)realItem->taskWnd);
 	}
 }
 
@@ -157,11 +148,7 @@ void clsTaskItem::readSettings()
 void clsTaskItem::configMenu(Menu *pMenu)
 {
 	char ansiCaption[256];
-#ifdef UNICODE
-	WideCharToMultiByte(CP_ACP, 0, caption, -1, ansiCaption, 256, 0, 0);
-#else
-	strcpy(ansiCaption, caption);
-#endif
+	CopyString(ansiCaption, caption, 256);
 	Menu *submenu = MakeNamedMenu(ansiCaption, ansiCaption, true);
 	MakeSubmenu(pMenu, submenu, ansiCaption);
 	char command[256];

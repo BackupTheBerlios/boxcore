@@ -35,6 +35,9 @@ public:
 	UINT GetTraySize();
 	void CleanTray();
 
+	NotificationIcon *LookupIcon(HWND p_hWnd, UINT p_uID);
+	NotificationIcon *LookupIcon(UINT p_index);
+
 	NotificationIcon *FindIconToShare(HICON p_icon);
 	eUpdateResult DeleteIcon(HWND p_hWnd, UINT p_uID);
 private:
@@ -42,8 +45,6 @@ private:
 	eUpdateResult DeleteIcon(NID_INTERNAL &p_nid);
 	eUpdateResult VersionIcon(NID_INTERNAL &p_nid);
 	eUpdateResult FocusIcon(NID_INTERNAL &p_nid);
-	NotificationIcon *LookupIcon(HWND p_hWnd, UINT p_uID);
-	NotificationIcon *LookupIcon(UINT p_index);
 
 	IconList m_IconList;
 

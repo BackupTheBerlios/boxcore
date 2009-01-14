@@ -6,6 +6,9 @@
 #include <functional>
 #include "../../debug/debug.h"
 
+#include <tchar.h>
+#include <cstdio>
+
 namespace ShellServices
 {
 struct SHELLTRAYDATA
@@ -46,6 +49,11 @@ private:
 HRESULT NotifyIconHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 {
 	SHELLTRAYDATA *trayData = reinterpret_cast<SHELLTRAYDATA*>(p_lpData);
+	if (trayData->dwMagic != 0x34753423)
+	{
+		TRACE("Bad Magic : %d",trayData->dwMagic);
+		return 0;
+	}
 	NID_ANSI & ansiNid = *reinterpret_cast<NID_ANSI*>(&(trayData->iconData));
 	NID_UNICODE & uniNid = *reinterpret_cast<NID_UNICODE*>(&(trayData->iconData));
 	NID_INTERNAL realNid;
@@ -124,7 +132,7 @@ HRESULT NotifyIconHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 		}
 		if (uniNid.uFlags & NIF_TIP)
 		{
-			lstrcpyW(realNid.szTip, uniNid.szTip);
+			wcscpy(realNid.szTip, uniNid.szTip);
 		}
 		if (uniNid.uFlags & NIF_STATE)
 		{
@@ -133,8 +141,8 @@ HRESULT NotifyIconHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 		}
 		if (uniNid.uFlags & NIF_INFO)
 		{
-			lstrcpyW(realNid.szInfo, uniNid.szInfo);
-			lstrcpyW(realNid.szInfoTitle, uniNid.szInfoTitle);
+			wcscpy(realNid.szInfo, uniNid.szInfo);
+			wcscpy(realNid.szInfoTitle, uniNid.szInfoTitle);
 			realNid.uTimeout = uniNid.uTimeout;
 			realNid.dwInfoFlags = uniNid.dwInfoFlags;
 		}
@@ -144,7 +152,7 @@ HRESULT NotifyIconHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 		}
 		if (uniNid.uFlags & NIF_TIP)
 		{
-			lstrcpyW(realNid.szTip, uniNid.szTip);
+			wcscpy(realNid.szTip, uniNid.szTip);
 		}
 		if (trayData->dwMessage == NIM_SETVERSION)
 		{
@@ -152,7 +160,7 @@ HRESULT NotifyIconHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 		}
 		break;
 	default:
-		TRACE("The size is %u. Options where %u %u", p_cbData,NID_XPA_SIZE, NID_XPW_SIZE);
+		TRACE("The size is %u. Options where %u %u", p_cbData,NID_WIN95_SIZE, NID_XPW_SIZE);
 	}
 
 	if (!IsWindow(realNid.hWnd))
@@ -166,6 +174,7 @@ HRESULT NotifyIconHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 	{
 		if (LookupIcon(realNid.hWnd, realNid.uID))
 		{
+			PRINT("Trying to add an icon that exists");
 			return FALSE;
 		}
 		eUpdateResult result = UpdateIcon(realNid);
@@ -183,6 +192,11 @@ HRESULT NotifyIconHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 	case NIM_MODIFY:
 
 	{
+		if (!LookupIcon(realNid.hWnd, realNid.uID))
+		{
+			PRINT("Trying to modify a non-existant icon");
+			return FALSE;
+		}
 		eUpdateResult result = UpdateIcon(realNid);
 		if ((result & ICON_MODIFIED))
 		{
@@ -324,7 +338,6 @@ eUpdateResult NotifyIconHandler::DeleteIcon(HWND p_hWnd, UINT p_uID)
 	{
 		if (((*i)->m_hWnd == p_hWnd) && ((*i)->m_uID == p_uID))
 			position = i;
-
 	}
 	if (m_IconList.end() != position)
 	{
@@ -465,8 +478,8 @@ eUpdateResult NotifyIconHandler::VersionIcon(NID_INTERNAL & p_nid)
 
 NotificationIcon *NotifyIconHandler::LookupIcon(HWND p_hWnd, UINT p_uID)
 {
-	NotificationIconPredicate iconTest(p_hWnd, p_uID);
-	IconList::iterator position = std::find_if(m_IconList.begin(), m_IconList.end(), iconTest);
+	//NotificationIconPredicate iconTest(p_hWnd, p_uID);
+	IconList::iterator position = m_IconList.end();// = std::find_if(m_IconList.begin(), m_IconList.end(), iconTest);
 	for (IconList::iterator i = m_IconList.begin();i != m_IconList.end();++i)
 	{
 		if (((*i)->m_hWnd == p_hWnd) && ((*i)->m_uID == p_uID))

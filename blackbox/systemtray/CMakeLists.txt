@@ -13,7 +13,13 @@ clsAppbarHandler.cpp
 )
 
 add_library (systemtray STATIC ${SYSTEMTRAY_SRCS})
-target_link_libraries (systemtray debuglib shlwapi)
+target_link_libraries (systemtray ${UNICOWSLIB} debuglib shlwapi)
+
+if (DEBUG_CODE)
+set_target_properties (systemtray PROPERTIES COMPILE_DEFINITIONS "DEBUG")
+else (DEBUG_CODE)
+set_target_properties (systemtray PROPERTIES COMPILE_DEFINITIONS "NDEBUG")
+endif (DEBUG_CODE)
 
 if (MINGW)
 set_target_properties (systemtray PROPERTIES

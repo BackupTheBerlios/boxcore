@@ -6,11 +6,7 @@ clsWorkspaceLabel::clsWorkspaceLabel(bool pVertical): clsLabelItem(pVertical)
 	PostMessage(hBlackboxWnd, BB_REGISTERMESSAGE, (WPARAM)barWnd, (LPARAM)msgs);
 	DesktopInfo deskinfo;
 	GetDesktopInfo(&deskinfo);
-#ifdef UNICODE
-	MultiByteToWideChar(CP_ACP, 0, deskinfo.name, -1, text, 256);
-#else
-	strcpy(text, deskinfo.name);
-#endif
+	CopyString(text, deskinfo.name, 256);
 	leftClick = nextWorkspace;
 	rightClick = prevWorkspace;
 }
@@ -33,11 +29,7 @@ LRESULT clsWorkspaceLabel::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 	case BB_DESKTOPINFO:
 	{
 		DesktopInfo *deskinfo = (DesktopInfo *)lParam;
-#ifdef UNICODE
-		MultiByteToWideChar(CP_ACP, 0, deskinfo->name, -1, text, 256);
-#else
-		strcpy(text, deskinfo->name);
-#endif
+		CopyString(text, deskinfo->name, 256);
 		PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 		return 0;
 	}

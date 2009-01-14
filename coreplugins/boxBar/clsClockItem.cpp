@@ -11,7 +11,7 @@ clsClockItem::clsClockItem(bool pVertical): clsLabelItem(pVertical)
 	readSettings();
 
 	rightClick = showMenu;
-	_tsetlocale(LC_ALL,L".ACP");
+	_tsetlocale(LC_ALL,TEXT(".ACP"));
 }
 
 clsClockItem::~clsClockItem()
@@ -77,17 +77,9 @@ void clsClockItem::readSettings()
 {
 	const CHAR *tempClockFormat;
 	tempClockFormat = ReadString(configFile, "boxBar.clock.format:", "%#H:%M");
-#ifdef UNICODE
-	MultiByteToWideChar(CP_ACP, 0, tempClockFormat, -1, clockFormat, 256);
-#else
-	strcpy(clockFormat, tempClockFormat);
-#endif
+	CopyString(clockFormat, tempClockFormat, 256);
 	tempClockFormat = ReadString(configFile, "boxBar.clock.tipformat:", "%A %d %B %Y");
-#ifdef UNICODE
-	MultiByteToWideChar(CP_ACP, 0, tempClockFormat, -1, clockTipFormat, 256);
-#else
-	strcpy(clockTipFormat, tempClockFormat);
-#endif
+	CopyString(clockTipFormat, tempClockFormat, 256);
 	SetTimer(barWnd, ClockTimer, 1, NULL);
 }
 

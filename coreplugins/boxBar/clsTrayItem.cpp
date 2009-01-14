@@ -3,8 +3,6 @@
 #include "../../dynwinapi/clsUser32.h"
 #include "clsTip.h"
 
-static clsUser32 user32;
-
 #ifndef NIN_POPUPOPEN
 #define NIN_POPUPOPEN 0x00000406
 #endif
@@ -48,11 +46,7 @@ clsTrayItem::clsTrayItem(systemTray *trayItem, UINT pIconSize, bool pVertical): 
 		if (strlen(trayItem->szTip))
 		{
 			tipText = new TCHAR[strlen(trayItem->szTip)+1];
-#ifdef UNICODE
-			MultiByteToWideChar(CP_ACP, 0, trayItem->szTip, -1, tipText, strlen(trayItem->szTip) + 1);
-#else
-			strcpy(tipText, trayItem->szTip);
-#endif
+			CopyString(tipText, trayItem->szTip, strlen(trayItem->szTip)+1);
 		}
 	}
 	iconCallback = trayItem->uCallbackMessage;
@@ -70,6 +64,15 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_MOUSEMOVE:
 	case WM_LBUTTONDOWN:
+		if ((msg == WM_LBUTTONDOWN) && GetAsyncKeyState(VK_MENU) & 0x8000)
+		{
+			CHAR className[256];
+			CHAR windowName[256];
+			GetClassNameA(iconWnd, className, 256);
+			GetWindowTextA(iconWnd, windowName, 256);
+			TRACE("You clicked icon belonging to %s of class %s", windowName, className);
+			break;
+		}
 	case WM_LBUTTONUP:
 	case WM_RBUTTONDOWN:
 	case WM_RBUTTONUP:
@@ -103,8 +106,8 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					break;
 				case WM_MOUSEMOVE:
 					if (popupVisible)
-								break;
-							popupVisible = true;
+						break;
+					popupVisible = true;
 					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(NIN_POPUPOPEN, iconID));
 					break;
 				case WM_MOUSELEAVE:
@@ -163,11 +166,7 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						if (strlen(trayItem->szTip))
 						{
 							tipText = new TCHAR[strlen(trayItem->szTip)+1];
-#ifdef UNICODE
-							MultiByteToWideChar(CP_ACP, 0, trayItem->szTip, -1, tipText, strlen(trayItem->szTip) + 1);
-#else
-							strcpy(tipText, trayItem->szTip);
-#endif
+							CopyString(tipText, trayItem->szTip, strlen(trayItem->szTip)+1);
 
 						}
 					}

@@ -4,7 +4,7 @@
 <docs>
 	<title>
 		<name>boxBar</name>
-		<version>0.1.3</version>
+		<version>0.1.4</version>
 	</title>
 	<leftSide>
 		<raised>
@@ -27,6 +27,16 @@
 		<raised>
 			<name>revision history</name>
 			<revision>
+				<version>0.1.4</version>
+				<date>2009-01-06</date>
+				<author>Carsomyr</author>
+				<mail>carsomyr@users.berlios.de</mail>
+				<list-dark>Add option for tray direction</list-dark>
+				<list-dark>Uses proposed Unicode api</list-dark>
+				<list-dark>Support unicode tray tooltips on boxCore</list-dark>
+				<list-dark>Fix positioning in multi-monitor setups</list-dark>
+			</revision>
+			<revision>
 				<version>0.1.3</version>
 				<date>2008-12-26</date>
 				<author>Carsomyr</author>
@@ -34,7 +44,7 @@
 				<list-dark>Add Slit support</list-dark>
 				<list-dark>Add support for toggle with plugins</list-dark>
 				<list-dark>Add task reorganising</list-dark>
-				<list-dark>Fix clock errors in some laguages</list-dark>
+				<list-dark>Fix clock errors in some languages</list-dark>
 				<list-dark>Fix some sizing bugs</list-dark>
 			</revision>
 			<revision>
@@ -114,14 +124,14 @@
 				names within the rc file do not change with the plugin
 				name, only the
 				name of the file read
-	</text>
+			</text>
 			<text>
 				Currently, boxBar supports the following settings which are
 				intended to be
 				changed by users.
 				They are included in the default rc
 				file.
-         </text>
+         	</text>
 			<settings>
 				<setting>
 					<name>boxBar.items</name>
@@ -185,32 +195,45 @@
 					<desc>Maximum number of icons per column. (0 disables)</desc>
 				</setting>
 				<setting>
-					<name>boxBar.tray.maxRows</name>
-					<range>0-256</range>
-					<desc>Maximum number of icons per column. (0 disables)</desc>
+					<name>boxBar.tray.newIconsfirst</name>
+					<range>true|false</range>
+					<desc>Changes the order in which tray icons are displayed</desc>
 				</setting>
 				<setting>
 					<name>boxBar.clock.format</name>
 					<range>%H:%M</range>
-               <desc>What is displayed on a clock label</desc>
-            </setting>
-	    <setting>
-               <name>boxBar.clock.tipFormat</name>
-               <range>%A %d %B %Y</range>
-               <desc>What is displayed on the clock tooltip</desc>
-            </setting>
-         </settings>
-	<text>
-		boxBar also supports the following settings, but use them with caution. They are not included in the default rc.
-         </text>
-         <settings>
-            <setting>
-               <name>boxBar.spacingBorder</name>
-               <range>0-100</range>
-               <desc>
-                  Bar border spacing
-               </desc>
-            </setting>
+               		<desc>What is displayed on a clock label</desc>
+            	</setting>
+	    		<setting>
+               		<name>boxBar.clock.tipFormat</name>
+               		<range>%A %d %B %Y</range>
+               		<desc>What is displayed on the clock tooltip</desc>
+            	</setting>
+         	</settings>
+			<text>
+				boxBar also supports the following settings, but use them with caution.
+         	</text>
+         	<settings>
+         		<setting>
+               		<name>boxBar.drawBackground</name>
+               		<range>true|false</range>
+               		<desc>Switches main bar style to none. Requires 2k/XP or better</desc>
+            	</setting>
+            	<setting>
+               		<name>boxBar.useAlphaBlend</name>
+               		<range>true|false</range>
+               		<desc>Enables alphablending draw when available (Win 98+)</desc>
+            	</setting>
+            	<setting>
+					<name>boxBar.tasks.stretchArea</name>
+					<range>true|false</range>
+					<desc>When false, task section does not expand. Experimental</desc>
+				</setting>
+            	<setting>
+               		<name>boxBar.spacingBorder</name>
+               		<range>0-100</range>
+               		<desc>Bar border spacing</desc>
+            	</setting>
 		<setting>
                <name>boxBar.spacingItems</name>
                <range>0-100</range>
@@ -280,6 +303,12 @@
 	<list>wslabel</list>
 	<text>A label to indicate your current workspace. Leftclick goes to next, rightclick to previous.</text>
 	</flat>
+	<flat>
+    	<name>Task reordering</name>
+        <text>
+        	boxBar allows you to change the order that tasks displayed in on the bar. To do this, access the right-click config menu, and then pin the menu which pops out for Task Reordering. Each task currently in your bar is listed in this menu. For each task you can either move it one to the left, one to the right, to the start or to the end of the bar. The order in the menu will not update, but you will see the changes in the bar itself. These arrangements are not currently remembered across sessions.
+        </text>
+    </flat>
       <flat>
          <name>additional notes</name>
          <text>

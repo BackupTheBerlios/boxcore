@@ -18,6 +18,7 @@ protected:
 	int numRowCols;
 private:
 	bool m_newFirst;
+	bool m_reverseOrder;
 };
 
 #endif // CLSTRAYITEMCOLLECTION_H

@@ -30,6 +30,8 @@ public:
 protected:
 	void populateBar();
 private:
+	void ShowTip(Tip *p_tip);
+
 	HDC buffer;
 	HBITMAP bufferBitmap;
 	HBITMAP origBitmap;
@@ -59,6 +61,8 @@ private:
 	int marginEdge;
 
 	UINT barLocation;
+	UINT m_barHGrowth;
+	UINT m_barVGrowth;
 	int sizePercentage;
 
 	deque<Tip *> m_tipQueue;

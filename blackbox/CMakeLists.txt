@@ -26,6 +26,7 @@ Pidl.cpp
 VolumeControl.cpp
 
 clsSystemTrayIcon.cpp
+../utility/stringcopy.cpp
 )
 
 set (BLACKBOX_NEW_SRCS
@@ -89,13 +90,18 @@ include_directories(blackbox ${CMAKE_CURRENT_BINARY_DIR})
 #add_custom_command (TARGET blackbox POST_BUILD
 #	COMMAND ${DLLTOOL} -d ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def -l ${CMAKE_CURRENT_BINARY_DIR}/libblackbox.a -D blackbox.exe
 #	COMMENT "Building proper library")
-target_link_libraries (blackbox 
+target_link_libraries (blackbox ${UNICOWSLIB}
 	debuglib shellserviceobjects systemtray shlwapi version ole32 uuid comctl32 comdlg32 shell32 advapi32 winmm gdi32)
 set_target_properties (blackbox PROPERTIES
 	WIN32_EXECUTABLE true
 	IMPORT_SUFFIX .a
 	ENABLE_EXPORTS true
 )
+if (DEBUG_CODE)
+set_target_properties (blackbox PROPERTIES COMPILE_DEFINITIONS "DEBUG")
+else (DEBUG_CODE)
+set_target_properties (blackbox PROPERTIES COMPILE_DEFINITIONS "NDEBUG")
+endif (DEBUG_CODE)
 
 if (MINGW)
 set_target_properties (blackbox PROPERTIES
