@@ -2510,11 +2510,11 @@ systemTray* GetTrayIcon(UINT idx)
 	return static_cast<SystemTrayIcon *>(data[0])->getSystemTray();
 }
 
-BOOL GetTrayInfoReal(ShellServices::NotificationIcon *p_icon, PVOID *p_trayInfo, ATOM *p_infoTypes, UINT p_numInfo)
+BOOL GetTrayInfoReal(ShellServices::NotificationIcon *p_icon, PVOID *p_trayInfo, ATOM *p_infoTypes, CONST UINT p_numInfo)
 {
 	static char ansiTip[128];
-	ShellServices::eNotificationIconInfo request[p_numInfo];
-	PVOID trayInfo[p_numInfo];
+	ShellServices::eNotificationIconInfo request[ShellServices::NI_ENUMSIZE];
+	PVOID trayInfo[ShellServices::NI_ENUMSIZE];
 	for (UINT i = 0; i< p_numInfo; ++i)
 	{
 		request[i] = g_trayInfoMapping[p_infoTypes[i]];
