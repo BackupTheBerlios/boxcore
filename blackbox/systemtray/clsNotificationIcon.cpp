@@ -116,15 +116,13 @@ eUpdateResult NotificationIcon::UpdateIcon(NID_INTERNAL & p_nid)
 
 	if (p_nid.uFlags & NIF_TIP)
 	{
-		lstrcpyW(m_szTip, p_nid.szTip);
+		wcscpy(m_szTip, p_nid.szTip);
 		m_showTip = true;
 	}
 	if (p_nid.uFlags & NIF_INFO)
 	{
-		lstrcpyW(m_szInfo, p_nid.szInfo);
-		OutputDebugStringW(m_szInfo);
-		lstrcpyW(m_szInfoTitle, p_nid.szInfoTitle);
-		OutputDebugStringW(m_szInfoTitle);
+		wcscpy(m_szInfo, p_nid.szInfo);
+		wcscpy(m_szInfoTitle, p_nid.szInfoTitle);
 		m_uTimeout = p_nid.uTimeout;
 		m_dwInfoFlags = p_nid.dwInfoFlags;
 		if (m_hBalloonIcon)
@@ -136,16 +134,6 @@ eUpdateResult NotificationIcon::UpdateIcon(NID_INTERNAL & p_nid)
 		{
 			m_hBalloonIcon = CopyIcon(p_nid.hBalloonIcon);
 		}
-	}
-	else
-	{
-		ZeroMemory(&m_szInfo, sizeof(m_szInfo));
-		ZeroMemory(&m_szInfoTitle, sizeof(m_szInfoTitle));
-		m_uTimeout = 0;
-		m_dwInfoFlags = 0;
-		if (m_hBalloonIcon)
-			DestroyIcon(m_hBalloonIcon);
-		m_hBalloonIcon = NULL;
 	}
 	if (p_nid.uFlags & NIF_GUID)
 	{
