@@ -52,9 +52,10 @@ struct IMMNotificationClient : public IUnknown
 
 #ifndef PROPERTYKEY_DEFINED
 #define PROPERTYKEY_DEFINED
-typedef struct {
-    GUID fmtid;
-    DWORD pid;
+typedef struct
+{
+	GUID fmtid;
+	DWORD pid;
 } PROPERTYKEY;
 #endif
 typedef PROPERTYKEY &REFPROPERTYKEY;

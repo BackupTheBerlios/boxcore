@@ -35,10 +35,10 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 		if (!strnicmp(msg_string, "@boxBar.tasks.iconSize", strlen("@boxBar.tasks.iconSize")))
 		{
 			msg_string += strlen("@boxBar.tasks.iconSize");
-												WriteInt(configFile, "boxBar.tasks.iconSize:",atoi(msg_string));
-												readSettings();
-												populateTasks();
-												SendMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
+			WriteInt(configFile, "boxBar.tasks.iconSize:",atoi(msg_string));
+			readSettings();
+			populateTasks();
+			SendMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
 		}
 		else if (!strnicmp(msg_string, "@boxBar.task.front.", strlen("@boxBar.task.front.")))
 		{
@@ -256,23 +256,23 @@ void clsTaskItemCollection::configMenu(Menu *pMenu, bool p_update)
 	Menu *subMenu = MakeNamedMenu("Tasks Configuration","boxBar.tasks", !p_update);
 	if (!p_update)
 	{
-	MakeSubmenu(pMenu, subMenu, "Tasks Configuration");
+		MakeSubmenu(pMenu, subMenu, "Tasks Configuration");
 	}
 	MakeMenuItemInt(subMenu, "Icon size", "@boxBar.tasks.iconsize", ReadInt(configFile, "boxBar.tasks.iconsize:", 16), 0, 256);
 	if (p_update)
-		{
-			ShowMenu(subMenu);
-		}
+	{
+		ShowMenu(subMenu);
+	}
 	subMenu = MakeNamedMenu("Task Ordering","boxBar.taskorder", !p_update);
 	if (!p_update)
 	{
-	MakeSubmenu(pMenu, subMenu, "Task Ordering");
+		MakeSubmenu(pMenu, subMenu, "Task Ordering");
 	}
 	clsItemCollection::configMenu(subMenu, p_update);
 	if (p_update)
-			{
-				ShowMenu(subMenu);
-			}
+	{
+		ShowMenu(subMenu);
+	}
 }
 
 

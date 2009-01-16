@@ -283,7 +283,7 @@ void clsItemCollection::sortItems()
  */
 void clsItemCollection::configMenu(Menu *pMenu, bool p_update)
 {
-	for(list<clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+	for (list<clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
 	{
 		(*i)->configMenu(pMenu, p_update);
 	}

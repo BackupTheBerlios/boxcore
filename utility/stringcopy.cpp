@@ -17,7 +17,7 @@ bool CopyString(LPSTR p_dest, LPCSTR p_src, UINT p_max)
 
 bool CopyString(LPSTR p_dest, LPCWSTR p_src, UINT p_max)
 {
-	if(WideCharToMultiByte(CP_ACP, 0 , p_src, -1, p_dest, p_max, NULL, NULL))
+	if (WideCharToMultiByte(CP_ACP, 0 , p_src, -1, p_dest, p_max, NULL, NULL))
 	{
 		p_dest[p_max-1] = '\0';
 		return true;
