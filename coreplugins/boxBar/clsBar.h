@@ -23,7 +23,7 @@ public:
 
 	virtual dimType resize(int pX, int pY);
 	virtual void readSettings();
-	virtual void configMenu(Menu *pMenu);
+	virtual void configMenu(Menu *pMenu, bool p_update = false);
 
 	void QueueTip(Tip *p_tip);
 	void KillTips(HWND p_hWnd, UINT p_uID);

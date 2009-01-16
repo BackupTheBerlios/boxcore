@@ -8,7 +8,7 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVe
 	vertical = false;
 
 	taskWnd = pTask->hwnd;
-	CopyString(caption, pTask->caption, 256);
+	CopyString(m_caption, pTask->caption, 256);
 	readSettings();
 	if (iconSize > 16)
 		if (GlobalFindAtom(TEXT("boxCore::running")))
@@ -17,7 +17,7 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVe
 			iconItem = new clsIconItem(pTask->icon, iconSize, vertical);
 	else
 		iconItem = new clsIconItem(pTask->icon, iconSize, vertical);
-	captionItem = new clsTextItem(caption, style, vertical);
+	captionItem = new clsTextItem(m_caption, style, vertical);
 	addItem(iconItem);
 	addItem(captionItem);
 	leftClick = activateTask;
@@ -70,8 +70,8 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				{
 					if (task->hwnd == (HWND)wParam)
 					{
-						CopyString(caption, task->caption, 256);
-						captionItem->setText(caption);
+						CopyString(m_caption, task->caption, 256);
+						captionItem->setText(m_caption);
 						if (iconSize > 16)
 							if (GlobalFindAtom(TEXT("boxCore::running")))
 								iconItem->setIcon(task->icon_big);
@@ -104,7 +104,7 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if ((clsTextItem *)lParam == captionItem)
 		{
 			if (wParam)
-				tipText = caption;
+				tipText = m_caption;
 			setTooltip();
 		}
 		break;
@@ -145,21 +145,23 @@ void clsTaskItem::readSettings()
   *
   * @todo: document this function
   */
-void clsTaskItem::configMenu(Menu *pMenu)
+void clsTaskItem::configMenu(Menu *pMenu, bool p_update)
 {
 	char ansiCaption[256];
-	CopyString(ansiCaption, caption, 256);
-	Menu *submenu = MakeNamedMenu(ansiCaption, ansiCaption, true);
-	MakeSubmenu(pMenu, submenu, ansiCaption);
 	char command[256];
+	CopyString(ansiCaption, m_caption, 256);
+	sprintf(command, "%s (%llu)", ansiCaption, (UINT64)taskWnd);
+	Menu *subMenu = MakeNamedMenu(command, command, !p_update);
+	MakeSubmenu(pMenu, subMenu, command);
+
 	sprintf(command, "@boxbar.task.front.%llu", (UINT64)taskWnd);
-	MakeMenuItem(submenu, "Move to start", command, false);
+	MakeMenuItem(subMenu, "Move to start", command, false);
 	sprintf(command, "@boxbar.task.left.%llu", (UINT64)taskWnd);
-	MakeMenuItem(submenu, "Move left/up", command, false);
+	MakeMenuItem(subMenu, "Move left/up", command, false);
 	sprintf(command, "@boxbar.task.right.%llu", (UINT64)taskWnd);
-	MakeMenuItem(submenu, "Move right/down", command, false);
+	MakeMenuItem(subMenu, "Move right/down", command, false);
 	sprintf(command, "@boxbar.task.end.%llu", (UINT64)taskWnd);
-	MakeMenuItem(submenu, "Move to end", command, false);
+	MakeMenuItem(subMenu, "Move to end", command, false);
 }
 
 int clsTaskItem::inactiveStyle = SN_TOOLBAR;

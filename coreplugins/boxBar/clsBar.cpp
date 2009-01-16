@@ -253,6 +253,12 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		return MA_NOACTIVATE;
 
 	case BOXBAR_UPDATESIZE:
+		if (wParam)
+		{
+			PRINT(TEXT("Major resize"));
+			resize(1,1);
+			readSettings();
+		}
 		calculateSizes();
 		if (enableTransparency)
 			PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
@@ -701,7 +707,7 @@ void clsBar::populateBar()
   *
   * This function adds a submenu for configuration of the main bar.
   */
-void clsBar::configMenu(Menu *pMenu)
+void clsBar::configMenu(Menu *pMenu, bool p_update)
 {
 	Menu *subMenu = MakeNamedMenu("Bar", "boxBar::bar", true);
 	MakeSubmenu(pMenu, subMenu, "Bar Configuration");
@@ -719,7 +725,7 @@ void clsBar::configMenu(Menu *pMenu)
 	MakeMenuItem(subSubMenu, "Center", "@boxBar.align.horizontal.center", m_barHGrowth & POS_CENTER);
 	MakeMenuItem(subSubMenu, "Right", "@boxBar.align.horizontal.right", m_barHGrowth & POS_RIGHT);
 	MakeMenuItem(subSubMenu, "Auto", "@boxBar.align.horizontal.auto", !m_barHGrowth);
-	clsItemCollection::configMenu(pMenu);
+	clsItemCollection::configMenu(pMenu, p_update);
 }
 
 /** @brief readSettings

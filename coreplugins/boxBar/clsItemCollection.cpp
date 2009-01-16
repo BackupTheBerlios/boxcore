@@ -281,9 +281,13 @@ void clsItemCollection::sortItems()
  *
  * This calls configMenu on each contained item
  */
-void clsItemCollection::configMenu(Menu *pMenu)
+void clsItemCollection::configMenu(Menu *pMenu, bool p_update)
 {
-	for_each(itemList.begin(), itemList.end(),
-			 bind2nd(mem_fun((void(clsItem::*)(Menu*)) &clsItem::configMenu),
-					 pMenu));
+	for(list<clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+	{
+		(*i)->configMenu(pMenu, p_update);
+	}
+	//for_each(itemList.begin(), itemList.end(),
+	//		 bind2nd(mem_fun((void(clsItem::*)(Menu*)) &clsItem::configMenu),
+	//				 pMenu));
 }

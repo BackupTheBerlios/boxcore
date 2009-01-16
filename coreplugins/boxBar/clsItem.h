@@ -66,7 +66,7 @@ public:
 
 	virtual void calculateSizes(bool pSizeGiven = false);
 
-	virtual void configMenu(Menu *pMenu);
+	virtual void configMenu(Menu *pMenu, bool p_update = false);
 
 	int getSize(dimType pDim);
 	bool hitTest(int pX, int pY);

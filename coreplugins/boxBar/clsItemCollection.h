@@ -17,7 +17,7 @@ public:
 	virtual void addItem(clsItem *p_item, bool p_front = false);
 	virtual void calculateSizes(bool pSizeGiven = false);
 	virtual void move(int pX, int pY);
-	virtual void configMenu(Menu *pMenu);
+	virtual void configMenu(Menu *pMenu, bool p_update = false);
 protected:
 	void sortItems();
 	list<clsItem *> itemList;

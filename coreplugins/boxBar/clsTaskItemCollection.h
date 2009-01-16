@@ -12,7 +12,7 @@ public:
 
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	virtual void readSettings();
-	virtual void configMenu(Menu *pMenu);
+	virtual void configMenu(Menu *pMenu, bool p_update = false);
 protected:
 	bool stretchTaskarea;
 	void populateTasks();

@@ -48,6 +48,7 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 				itemList.push_front(targetItem);
 			}
 			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+			configMenu(NULL, true);
 			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 		}
 		else if (!strnicmp(msg_string, "@boxBar.task.end.", strlen("@boxBar.task.end.")))
@@ -67,6 +68,7 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 				itemList.push_back(targetItem);
 			}
 			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+			configMenu(NULL, true);
 			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 		}
 		else if (!strnicmp(msg_string, "@boxBar.task.left.", strlen("@boxBar.task.left.")))
@@ -88,6 +90,7 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 				itemList.insert(prevIt, targetItem);
 			}
 			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+			configMenu(NULL, true);
 			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 		}
 		else if (!strnicmp(msg_string, "@boxBar.task.right.", strlen("@boxBar.task.right.")))
@@ -110,6 +113,7 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 				itemList.insert(nextIt, targetItem);
 			}
 			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+			//configMenu(NULL, true);
 			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 		}
 		if (vertical && stretchTaskarea)
@@ -159,6 +163,7 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 				itemList.push_back(backSpacer);
 			}
 			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+			//configMenu(NULL, true);
 			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 		}
 		return 0;
@@ -170,6 +175,7 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			itemMapping.erase((HWND)wParam);
 			delete removedTask;
 			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+			//configMenu(NULL, true);
 			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 		}
 		return 0;
@@ -236,14 +242,28 @@ void clsTaskItemCollection::readSettings()
   * as well as specific task properties (as read by clsTaskItem). The messages generated will be
   * handled separately by these two classes
   */
-void clsTaskItemCollection::configMenu(Menu *pMenu)
+void clsTaskItemCollection::configMenu(Menu *pMenu, bool p_update)
 {
-	Menu *subMenu = MakeNamedMenu("Tasks Configuration","boxBar.tasks", true);
+	Menu *subMenu = MakeNamedMenu("Tasks Configuration","boxBar.tasks", !p_update);
+	if (!p_update)
+	{
 	MakeSubmenu(pMenu, subMenu, "Tasks Configuration");
+	}
 	MakeMenuItemInt(subMenu, "Icon size", "@boxBar.tasks.iconsize", ReadInt(configFile, "boxBar.tasks.iconsize:", 16), 0, 256);
-	subMenu = MakeNamedMenu("Task Ordering","boxBar.taskorder", true);
+	if (p_update)
+		{
+			ShowMenu(subMenu);
+		}
+	subMenu = MakeNamedMenu("Task Ordering","boxBar.taskorder", !p_update);
+	if (!p_update)
+	{
 	MakeSubmenu(pMenu, subMenu, "Task Ordering");
-	clsItemCollection::configMenu(subMenu);
+	}
+	clsItemCollection::configMenu(subMenu, p_update);
+	if (p_update)
+			{
+				ShowMenu(subMenu);
+			}
 }
 
 

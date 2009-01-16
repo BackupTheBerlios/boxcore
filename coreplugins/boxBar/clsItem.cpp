@@ -356,7 +356,7 @@ void clsItem::readSettings()
   * Each item should handle message which these items will generate itself. This stub does nothing,
   * and is present so that items can ignore this function if they do not need it.
   */
-void clsItem::configMenu(Menu *pMenu)
+void clsItem::configMenu(Menu *pMenu, bool p_update)
 {
 }
 
