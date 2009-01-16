@@ -48,7 +48,7 @@ LRESULT clsTrayItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 					readSettings();
 					populateTray();
 					configMenu(NULL, true);
-					SendMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+					PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 				}
 				else if (!stricmp(msg_string, "reverseOrder"))
 				{
@@ -56,7 +56,7 @@ LRESULT clsTrayItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 					readSettings();
 					populateTray();
 					configMenu(NULL, true);
-					SendMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+					PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 				}
 				else if (!stricmp(msg_string, "newIconsFirst"))
 								{
@@ -64,7 +64,7 @@ LRESULT clsTrayItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 									readSettings();
 									populateTray();
 									configMenu(NULL, true);
-									SendMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+									PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 								}
 				else if (!strnicmp(msg_string, "maxRows", strlen("maxRows")))
 				{
@@ -73,7 +73,7 @@ LRESULT clsTrayItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 					readSettings();
 					populateTray();
 					configMenu(NULL, true);
-					SendMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
+					PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
 				}
 				else if (!strnicmp(msg_string, "maxCols", strlen("maxCols")))
 				{
@@ -82,7 +82,7 @@ LRESULT clsTrayItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 					readSettings();
 					populateTray();
 					configMenu(NULL, true);
-					SendMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
+					PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
 				}
 				else if (!strnicmp(msg_string, "iconSize", strlen("iconSize")))
 								{
@@ -91,7 +91,7 @@ LRESULT clsTrayItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 									readSettings();
 									populateTray();
 									configMenu(NULL, true);
-									SendMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
+									PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
 								}
 			}
 			return 0;
