@@ -1,5 +1,23 @@
 #include "clsItem.h"
-#include "commctrl.h"
+#include <commctrl.h>
+#include <tchar.h>
+
+#ifndef TTS_USEVISUALSTYLE
+#define TTS_USEVISUALSTYLE 0x100
+#endif
+
+bool clsItem::AssignButton(LPCSTR p_data, mouseFunction & p_hook, LPCSTR & p_broamSlot)
+{
+	if (p_data[0] == '@')
+	{
+		LPSTR broamContent = new CHAR[strlen(p_data)+1];
+		p_broamSlot = broamContent;
+		CopyString(broamContent, p_data, strlen(p_data)+1);
+		p_hook = broam;
+		return true;
+	}
+	return false;
+}
 
 /** @brief Base constructor
   *
@@ -12,14 +30,24 @@ clsItem::clsItem(bool pVertical)
 	vertical = pVertical;
 	style = 0;
 	itemArea.left = itemArea.right = itemArea.top = itemArea.bottom = 0;
-	fixed = DIM_NONE;
+	m_knowsSize = DIM_NONE;
+	m_wantsStretch = DIM_NONE;
 	mouseDown = false;
+	m_dblClk = false;
 	mouseButton = 0;
 	minSizeX = 0;
 	minSizeY = 0;
+	m_minSizeX = 0;
+	m_minSizeY = 0;
+
+	m_broamLeft = NULL;
+	m_broamLeftDbl = NULL;
+	m_broamRight = NULL;
+	m_broamMid = NULL;
 
 	tipText = NULL;
 	leftClick = NULL;
+	m_leftDblClick = NULL;
 	rightClick = NULL;
 	midClick = NULL;
 	X1Click = NULL;
@@ -46,7 +74,11 @@ clsItem::clsItem(bool pVertical)
   */
 clsItem::~clsItem()
 {
-	delete tipText;
+	delete[] tipText;
+	delete[] m_broamLeft;
+	delete[] m_broamLeftDbl;
+	delete[] m_broamMid;
+	delete[] m_broamRight;
 	tipText = NULL;
 	ClearTooltip();
 }
@@ -95,7 +127,14 @@ dimType clsItem::resize(int pX, int pY)
 	dimType done = DIM_NONE;
 	if (pX >= 0)
 	{
-		itemArea.right = itemArea.left + pX;
+		if (pX > m_minSizeX)
+		{
+			itemArea.right = itemArea.left + pX;
+		}
+		else
+		{
+			itemArea.right = itemArea.left + minSizeX;
+		}
 		done = DIM_HORIZONTAL;
 	}
 	if (pY >= 0)
@@ -141,8 +180,8 @@ void clsItem::calculateSizes(bool pSizeGiven)
 {
 	if (!pSizeGiven)
 	{
-		minSizeX = 0;
-		minSizeY = 0;
+		minSizeX = m_minSizeX;
+		minSizeY = m_minSizeY;
 		resize(minSizeX, minSizeY);
 	}
 }
@@ -156,6 +195,8 @@ LRESULT clsItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
+	case WM_LBUTTONDBLCLK:
+		m_dblClk = true;
 	case WM_LBUTTONDOWN:
 		mouseDown = true;
 		mouseButton |= MK_LBUTTON;
@@ -183,28 +224,37 @@ LRESULT clsItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONUP:
 		if (mouseDown && (mouseButton & MK_LBUTTON))
 		{
+			if (m_dblClk && m_leftDblClick)
+			{
+				m_leftDblClick(this, msg, wParam, lParam);
+			}
+			else if (leftClick)
+			{
+				leftClick(this, msg, wParam, lParam);
+			}
 			mouseButton = 0;
 			mouseDown = false;
-			if (leftClick)
-				leftClick(this, msg, wParam, lParam);
+			m_dblClk = false;
 		}
 		break;
 	case WM_RBUTTONUP:
 		if (mouseDown && (mouseButton & MK_RBUTTON))
 		{
-			mouseButton = 0;
-			mouseDown = false;
 			if (rightClick)
 				rightClick(this, msg, wParam, lParam);
+			mouseButton = 0;
+			mouseDown = false;
+			m_dblClk = false;
 		}
 		break;
 	case WM_MBUTTONUP:
 		if (mouseDown && (mouseButton & MK_MBUTTON))
 		{
-			mouseButton = 0;
-			mouseDown = false;
 			if (midClick)
 				midClick(this, msg, wParam, lParam);
+			mouseButton = 0;
+			mouseDown = false;
+			m_dblClk = false;
 		}
 		break;
 	case WM_XBUTTONUP:
@@ -213,19 +263,21 @@ LRESULT clsItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case XBUTTON1:
 			if (mouseDown && (mouseButton & MK_XBUTTON1))
 			{
-				mouseButton = 0;
-				mouseDown = false;
 				if (X1Click)
 					X1Click(this, msg, wParam, lParam);
+				mouseButton = 0;
+				mouseDown = false;
+				m_dblClk = false;
 			}
 			break;
 		case XBUTTON2:
 			if (mouseDown && (mouseButton & MK_XBUTTON2))
 			{
-				mouseButton = 0;
-				mouseDown = false;
 				if (X2Click)
 					X2Click(this, msg, wParam, lParam);
+				mouseButton = 0;
+				mouseDown = false;
+				m_dblClk = false;
 			}
 			break;
 		}
@@ -245,10 +297,32 @@ void clsItem::setTooltip()
 {
 	if (!tooltipWnd)
 		initTooltips();
+	if (tipText)
+	{
+		UINT writeLoc = 0;
+		TCHAR tempTip[256];
+		bool skipAmp = false;
+		for (UINT i = 0; i <= _tcslen(tipText); ++i)
+		{
+			if (!(skipAmp && tipText[i] == TEXT('&')))
+			{
+				tempTip[writeLoc++] = tipText[i];
+				if (!(tipText[i] == TEXT('&')))
+				{
+					skipAmp = false;
+				}
+			}
+			if (!skipAmp && tipText[i] == TEXT('&'))
+			{
+				skipAmp = true;
+			}
+		}
+		CopyString(tipText, tempTip, _tcslen(tipText)+1);
+	}
 	TOOLINFO toolInfo;
 	ZeroMemory(&toolInfo, sizeof(toolInfo));
 	toolInfo.cbSize = sizeof(toolInfo);
-	toolInfo.uFlags = TTF_SUBCLASS | TTF_TRANSPARENT;
+	toolInfo.uFlags = TTF_SUBCLASS | TTF_TRANSPARENT | TTF_PARSELINKS;
 	toolInfo.hwnd = barWnd;
 	toolInfo.uId = (UINT_PTR)this;
 	toolInfo.rect = itemArea;
@@ -281,7 +355,7 @@ void clsItem::initTooltips()
 					 WS_EX_TOPMOST,
 					 TOOLTIPS_CLASS,
 					 NULL,
-					 WS_POPUP | TTS_ALWAYSTIP | TTS_NOPREFIX,
+					 TTS_ALWAYSTIP | TTS_USEVISUALSTYLE | TTS_NOPREFIX,
 					 CW_USEDEFAULT,
 					 CW_USEDEFAULT,
 					 CW_USEDEFAULT,
@@ -397,5 +471,23 @@ void clsItem::ClearTooltip()
 	toolInfo.hinst = hInstance;
 	SendMessage(tooltipWnd, TTM_DELTOOL, 0, (LPARAM)&toolInfo);
 }
+
+void clsItem::broam(clsItem *p_item, UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)
+{
+	switch (p_msg)
+	{
+	case WM_LBUTTONUP:
+		PostMessage(hBlackboxWnd, BB_BROADCAST, 0, reinterpret_cast<LPARAM>(p_item->m_broamLeft));
+		break;
+	case WM_RBUTTONUP:
+		PostMessage(hBlackboxWnd, BB_BROADCAST, 0, reinterpret_cast<LPARAM>(p_item->m_broamRight));
+		break;
+	case WM_MBUTTONUP:
+		PostMessage(hBlackboxWnd, BB_BROADCAST, 0, reinterpret_cast<LPARAM>(p_item->m_broamMid));
+		break;
+	}
+}
+
+
 
 

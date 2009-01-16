@@ -3,9 +3,15 @@
 clsFlexiSpacer::clsFlexiSpacer(bool pVertical): clsItem(pVertical)
 {
 	if (vertical)
-		fixed = DIM_HORIZONTAL;
+	{
+		m_knowsSize = DIM_NONE;
+		m_wantsStretch = DIM_VERTICAL;
+	}
 	else
-		fixed = DIM_VERTICAL;
+	{
+		m_knowsSize = DIM_NONE;
+		m_wantsStretch = DIM_HORIZONTAL;
+	}
 }
 
 clsFlexiSpacer::~clsFlexiSpacer()

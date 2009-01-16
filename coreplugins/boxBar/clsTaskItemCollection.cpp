@@ -182,10 +182,10 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			removedTask = itemMapping[(HWND)wParam];
 			itemList.remove(removedTask);
 			itemMapping.erase((HWND)wParam);
+			SendMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 			delete removedTask;
-			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 			//configMenu(NULL, true);
-			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
+			//RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 		}
 		return 0;
 		}
@@ -237,10 +237,15 @@ void clsTaskItemCollection::readSettings()
 	spacingBorder = ReadInt(configFile, "boxBar.tasks.spacingBorder:", 0);
 	spacingItems = ReadInt(configFile, "boxBar.tasks.spacingItems:", 2);
 
+	m_knowsSize = DIM_VERTICAL;
 	if (stretchTaskarea)
-		fixed = (vertical ? DIM_HORIZONTAL : DIM_VERTICAL);
+	{
+		m_wantsStretch = DIM_BOTH;
+	}
 	else
-		fixed = DIM_BOTH;
+	{
+		m_wantsStretch = DIM_NONE;
+	}
 }
 
 /** @brief Add submenu for tasks configuration

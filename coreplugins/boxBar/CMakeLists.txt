@@ -33,6 +33,8 @@ clsBar.cpp
 
 clsTip.cpp
 
+clsItButton.cpp
+
 ../utils/clsApiLoader.cpp
 ../../dynwinapi/clsUser32.cpp
 ../../dynwinapi/clsMsimg32.cpp
@@ -89,6 +91,10 @@ set_target_properties (boxBar PROPERTIES
 endif (MINGW)
 
 install(TARGETS boxBar LIBRARY DESTINATION plugins/${PROJECT_NAME} COMPONENT ${PROJECT_NAME})
+if (UPDATE_PACKAGE)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/config/boxBar.rc DESTINATION plugins/${PROJECT_NAME}/sampleconfig COMPONENT ${PROJECT_NAME}Config)
+else (UPDATE_PACKAGE)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/config/boxBar.rc DESTINATION plugins/${PROJECT_NAME} COMPONENT ${PROJECT_NAME}Config)
+endif (UPDATE_PACKAGE)
 
 set (CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_CURRENT_BINARY_DIR};${PROJECT_NAME};ALL;/" PARENT_SCOPE)

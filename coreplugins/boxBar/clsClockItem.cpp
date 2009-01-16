@@ -10,7 +10,7 @@ clsClockItem::clsClockItem(bool pVertical): clsLabelItem(pVertical)
 	ClockTimer = getTimerID();
 	readSettings();
 
-	rightClick = showMenu;
+	m_leftDblClick = TimeControlPanel;
 	_tsetlocale(LC_ALL,TEXT(".ACP"));
 }
 
@@ -69,18 +69,47 @@ void clsClockItem::showMenu(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lPar
 	PostMessage(hBlackboxWnd, BB_BROADCAST, 0, (LPARAM)"@bbCore.ShowMenu");
 }
 
+#include <string>
+
+void clsClockItem::TimeControlPanel(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	BBExecute(NULL, "open", "control.exe","timedate.cpl",NULL,SW_SHOWNORMAL, true);
+}
+
 /** @brief readSettings
   *
   * @todo: document this function
   */
 void clsClockItem::readSettings()
 {
-	const CHAR *tempClockFormat;
-	tempClockFormat = ReadString(configFile, "boxBar.clock.format:", "%#H:%M");
-	CopyString(clockFormat, tempClockFormat, 256);
-	tempClockFormat = ReadString(configFile, "boxBar.clock.tipformat:", "%A %d %B %Y");
-	CopyString(clockTipFormat, tempClockFormat, 256);
+	LPCSTR textBuffer;
+	textBuffer = ReadString(configFile, "boxBar.clock.format:", "%#H:%M");
+	CopyString(clockFormat, textBuffer, 256);
+	textBuffer = ReadString(configFile, "boxBar.clock.tipformat:", "%A %d %B %Y");
+	CopyString(clockTipFormat, textBuffer, 256);
+	textBuffer = ReadString(configFile, "boxBar.clock.leftClick:","");
+	AssignButton(textBuffer, leftClick, m_broamLeft);
+	textBuffer = ReadString(configFile, "boxBar.clock.leftDblClick:","TimeControlPanel");
+	AssignButton(textBuffer, m_leftDblClick, m_broamLeftDbl);
+	textBuffer = ReadString(configFile, "boxBar.clock.rightClick:","@bbCore.ShowMenu");
+	AssignButton(textBuffer, rightClick, m_broamRight);
 	SetTimer(barWnd, ClockTimer, 1, NULL);
 }
+
+bool clsClockItem::AssignButton(LPCSTR p_data, mouseFunction &p_hook, LPCSTR &p_broamSlot)
+{
+	if (clsItem::AssignButton(p_data, p_hook, p_broamSlot))
+	{
+		return true;
+	}
+	else if (!stricmp(p_data, "TimeControlPanel"))
+	{
+		p_hook = TimeControlPanel;
+		return true;
+	}
+	return false;
+}
+
+
 
 

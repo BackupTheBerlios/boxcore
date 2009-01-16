@@ -4,7 +4,8 @@
 
 clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVertical)
 {
-	fixed = DIM_VERTICAL;
+	m_knowsSize = DIM_VERTICAL;
+	m_wantsStretch = DIM_HORIZONTAL;
 	vertical = false;
 
 	taskWnd = pTask->hwnd;
@@ -119,7 +120,7 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 void clsTaskItem::activateTask(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	clsTaskItem *realItem = dynamic_cast<clsTaskItem *>(pItem);
-	if (realItem)
+	if (realItem && IsWindow(realItem->taskWnd))
 	{
 		PostMessage(hBlackboxWnd, BB_BRINGTOFRONT, 0,  (LPARAM)realItem->taskWnd);
 	}

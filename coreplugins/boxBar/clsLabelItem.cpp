@@ -4,7 +4,8 @@
 
 clsLabelItem::clsLabelItem(bool pVertical) : clsTextItem(NULL, SN_TOOLBARCLOCK, pVertical)
 {
-	fixed = DIM_BOTH;
+	m_knowsSize = DIM_BOTH;
+	m_wantsStretch = DIM_NONE;
 	style = SN_TOOLBARLABEL;
 	_tcscpy(text,TEXT("Label"));
 }

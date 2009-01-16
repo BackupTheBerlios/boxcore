@@ -10,7 +10,8 @@ using std::bind2nd;
 clsItemCollection::clsItemCollection(bool pVertical) :
 		clsItem(pVertical)
 {
-	fixed = DIM_BOTH;
+	m_knowsSize = DIM_BOTH;
+	m_wantsStretch = DIM_NONE;
 	lastMouse = NULL;
 	spacingBorder = 0;
 	spacingItems = 2;
@@ -126,7 +127,7 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 	for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end(); ++i)
 	{
 		(*i)->calculateSizes();
-		dimType itemFixed = (*i)->getFixed();
+		dimType itemFixed = (*i)->getKnowsSize();
 		if (itemFixed & additiveDim)
 		{
 			int itemSize = (*i)->getSize(additiveDim);
@@ -135,34 +136,36 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 		else
 		{
 			fixedItemUsed += spacingItems;
+		}
+
+		if (additiveDim && (*i)->getWantsStretch())
+		{
 			flexibleItemCount++;
 		}
+
 		if (itemFixed & maxDim)
 		{
 			int itemMax = (*i)->getSize(maxDim);
-			if (itemMax > maxSize)
-				maxSize = itemMax;
+			maxSize = std::max(maxSize, itemMax);
 		}
 	}
 	fixedItemUsed += spacingBorder - spacingItems;
 
 	if (pSizeGiven && ((flexibleItemCount || (itemList.size() == 0)) || !isBar))
 	{
+		//minSizeY = std::max(getSize(DIM_VERTICAL),m_minSizeY);
+		//minSizeX = std::max(getSize(DIM_HORIZONTAL),m_minSizeX);
 		minSizeY = getSize(DIM_VERTICAL);
 		minSizeX = getSize(DIM_HORIZONTAL);
 		if (vertical)
 		{
-			if (maxSize < (minSizeX - 2 * spacingBorder))
-				maxSize = minSizeX - 2 * spacingBorder;
-			else
-				minSizeX = maxSize + 2 * spacingBorder;
+			maxSize = std::max(maxSize, minSizeX - 2 * spacingBorder);
+			minSizeX = maxSize + 2 * spacingBorder;
 		}
 		else
 		{
-			if (maxSize < (minSizeY - 2 * spacingBorder))
-				maxSize = minSizeY - 2 * spacingBorder;
-			else
-				minSizeY = maxSize + 2 * spacingBorder;
+			maxSize = std::max(maxSize, minSizeY - 2 * spacingBorder);
+			minSizeY = maxSize + 2 * spacingBorder;
 		}
 
 	}
@@ -170,13 +173,15 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 	{
 		if (vertical)
 		{
-			minSizeY = fixedItemUsed;
-			minSizeX = maxSize + 2 * spacingBorder;
+			minSizeY = std::max(fixedItemUsed, m_minSizeY);
+			minSizeX = std::max(maxSize + 2 * spacingBorder, m_minSizeX);
+			maxSize = minSizeX - 2 * spacingBorder;
 		}
 		else
 		{
-			minSizeX = fixedItemUsed;
-			minSizeY = maxSize + 2 * spacingBorder;
+			minSizeX = std::max(fixedItemUsed, m_minSizeX);
+			minSizeY = std::max(maxSize + 2 * spacingBorder, m_minSizeY);
+			maxSize = minSizeY - 2 * spacingBorder;
 		}
 	}
 	if (flexibleItemCount)
@@ -189,8 +194,8 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 		for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end(); ++i)
 		{
 			(*i)->calculateSizes();
-			dimType itemFixed = (*i)->getFixed();
-			if (!(itemFixed & additiveDim))
+			dimType itemStretch = (*i)->getWantsStretch();
+			if (itemStretch & additiveDim)
 			{
 				if (vertical)
 					(*i)->resize(-1, flexibleItemSize);

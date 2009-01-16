@@ -5,7 +5,8 @@
 
 clsTrayItemCollection::clsTrayItemCollection(bool pVertical):clsItemCollection(pVertical)
 {
-	fixed = DIM_BOTH;
+	m_knowsSize = DIM_BOTH;
+	m_wantsStretch = DIM_NONE;
 	m_broamPrefix = "@boxBar.tray.";
 	readSettings();
 

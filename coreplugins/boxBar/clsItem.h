@@ -58,15 +58,21 @@ public:
 	void drawNow();
 	virtual dimType resize(int pX, int pY);
 	virtual void move(int pX, int pY);
-	virtual dimType getFixed()
+	dimType getKnowsSize()
 	{
-		return fixed;
+		return m_knowsSize;
+	}
+	dimType getWantsStretch()
+	{
+		return m_wantsStretch;
 	}
 	virtual void readSettings();
 
 	virtual void calculateSizes(bool pSizeGiven = false);
 
 	virtual void configMenu(Menu *pMenu, bool p_update = false);
+
+	virtual bool AssignButton(LPCSTR p_data, mouseFunction &p_hook, LPCSTR &p_broamSlot);
 
 	int getSize(dimType pDim);
 	bool hitTest(int pX, int pY);
@@ -78,10 +84,13 @@ protected:
 	bool vertical;
 
 	/** @brief Directions in which the item can calculate its size
-		  *
-		  * Set to DIM_BOTH if the item can calculate complete dimensions
-		  */
-	dimType fixed;
+	  *
+	  * Set to DIM_BOTH if the item can calculate complete dimensions
+	  */
+	dimType m_knowsSize;
+
+	/** @brief Directions in which the item wants to be stretched if possible*/
+	dimType m_wantsStretch;
 
 	/** @brief The area occupied by the item
 	  *
@@ -92,6 +101,9 @@ protected:
 
 	int minSizeX;
 	int minSizeY;
+
+	INT m_minSizeX;
+	INT m_minSizeY;
 
 	/** @brief The styleitem to be used for drawing
 	  *
@@ -107,6 +119,7 @@ protected:
 	BYTE itemAlpha;
 
 	bool mouseDown;
+	bool m_dblClk;
 	int mouseButton;
 
 
@@ -121,6 +134,8 @@ protected:
 	  * This member should be set if the item wants to respond to normal Left-clicks
 	  */
 	mouseFunction leftClick;
+
+	mouseFunction m_leftDblClick;
 
 	/** @brief Mid-click mouse hook
 	  *
@@ -163,6 +178,13 @@ protected:
 	void setTooltip();
 	void ClearTooltip();
 	TCHAR *tipText;
+
+	static void broam(clsItem *p_item, UINT p_msg, WPARAM p_wParam, LPARAM p_lParam);
+
+	const char* m_broamLeft;
+	const char* m_broamLeftDbl;
+	const char* m_broamRight;
+	const char* m_broamMid;
 private:
 	BLENDFUNCTION itemBlend;
 	BITMAPINFO itemBitmapInfo;

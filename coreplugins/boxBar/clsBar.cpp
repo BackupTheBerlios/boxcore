@@ -5,6 +5,7 @@
 #include "clsTaskItemCollection.h"
 #include "clsFlexiSpacer.h"
 #include "clsWorkspaceLabel.h"
+#include "clsItButton.h"
 
 #include "clsTip.h"
 
@@ -692,6 +693,10 @@ void clsBar::populateBar()
 		{
 			addItem(new clsWorkspaceLabel(vertical));
 		}
+		else if (!stricmp(barItem, "button"))
+		{
+			addItem(new ItButton());
+		}
 	}
 	while (strlen(barItems));
 	RECT monRect;
@@ -816,7 +821,8 @@ void clsBar::readSettings()
 	barBlend.SourceConstantAlpha = itemAlpha;
 	barBlend.AlphaFormat = alphaDraw ? AC_SRC_ALPHA : 0;
 
-	fixed = (vertical ? DIM_HORIZONTAL : DIM_VERTICAL);
+	m_knowsSize = (vertical ? DIM_HORIZONTAL : DIM_VERTICAL);
+	m_wantsStretch = DIM_NONE;
 	RECT monRect;
 	GetMonitorRect(barWnd, &monRect, GETMON_FROM_WINDOW);
 	if (vertical)

@@ -2,14 +2,19 @@
 #include "clsTextItem.h"
 #include <tchar.h>
 
-clsTextItem::clsTextItem(TCHAR *pText, UINT pStyle, bool pVertical): clsItem(pVertical)
+clsTextItem::clsTextItem(CONST TCHAR *pText, UINT pStyle, bool pVertical, dimType p_knowsSize): clsItem(pVertical)
 {
-	fixed = DIM_VERTICAL;
+	m_knowsSize = p_knowsSize;
+	m_wantsStretch = ((m_knowsSize & DIM_HORIZONTAL) ? DIM_NONE : DIM_HORIZONTAL);
 	fontStyle = pStyle;
 	if (pText)
+	{
 		_tcscpy(text, pText);
+	}
 	else
+	{
 		text[0] = TEXT('\0');
+	}
 }
 
 clsTextItem::~clsTextItem()
@@ -112,7 +117,7 @@ void clsTextItem::calculateSizes(bool pSizeGiven)
 		SelectObject(tempDC, oldFont);
 		DeleteDC(tempDC);
 		minSizeX = textSize.cx;
-		minSizeY = textSize.cy ;
+		minSizeY = textSize.cy;
 		resize(minSizeX, minSizeY);
 	}
 }
@@ -121,9 +126,20 @@ void clsTextItem::calculateSizes(bool pSizeGiven)
   *
   * @todo: document this function
   */
-void clsTextItem::setText(TCHAR *pText)
+void clsTextItem::setText(CONST CHAR *pText)
 {
-	_tcscpy(text, pText);
+	CopyString(text, pText, 256);
+	InvalidateRect(barWnd, &itemArea, TRUE);
+	PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
+}
+
+/** @brief setText
+  *
+  * @todo: document this function
+  */
+void clsTextItem::setText(CONST WCHAR *pText)
+{
+	CopyString(text, pText, 256);
 	InvalidateRect(barWnd, &itemArea, TRUE);
 	PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 }
