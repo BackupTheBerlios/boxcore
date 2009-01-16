@@ -9,9 +9,29 @@
 #include "clsNotifyIconHandler.h"
 #include <algorithm>
 #include "../../debug/debug.h"
+#include <string.h>
 
 namespace ShellServices
 {
+
+static void StripAmp(LPWSTR p_dest, LPCWSTR p_src)
+{
+	UINT destLoc = 0;
+	bool skipAmp = false;
+	for (UINT i=0; i<=wcslen(p_src); ++i)
+	{
+		if (!(skipAmp && p_src[i] == L'&'))
+		{
+			p_dest[destLoc++] = p_src[i];
+			if (!(p_src[i] == L'&'))
+				skipAmp = false;
+		}
+		if (!skipAmp && p_src[i] == L'&')
+		{
+			skipAmp = true;
+		}
+	}
+}
 
 NotificationIcon::NotificationIcon(LegacyNotificationIcon *p_legacyData, NotifyIconHandler *p_handler)
 {
@@ -120,7 +140,7 @@ eUpdateResult NotificationIcon::UpdateIcon(NID_INTERNAL & p_nid)
 
 	if (p_nid.uFlags & NIF_TIP)
 	{
-		wcscpy(m_szTip, p_nid.szTip);
+		StripAmp(m_szTip, p_nid.szTip);
 		m_showTip = true;
 	}
 	if (p_nid.uFlags & NIF_INFO)
