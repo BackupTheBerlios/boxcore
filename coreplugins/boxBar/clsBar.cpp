@@ -257,7 +257,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			PRINT(TEXT("Major resize"));
 			resize(1,1);
-			readSettings();
+			populateBar();
 		}
 		calculateSizes();
 		if (enableTransparency)
@@ -666,7 +666,7 @@ void clsBar::populateBar()
 	}
 	itemList.clear();
 
-	const CHAR * barItems = ReadString(configFile, "boxBar.items:", "tasks,tray, clock");
+	const CHAR * barItems = ReadString(configFile, "boxBar.items:", "tasks,tray,clock");
 	CHAR barItem[MAX_PATH];
 	do
 	{
