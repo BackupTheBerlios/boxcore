@@ -60,7 +60,7 @@ config/stickywindows.ini
 
 set (VERSION_MAJOR 0)
 set (VERSION_MINOR 2)
-set (VERSION_PATCH 0)
+set (VERSION_PATCH 1)
 set (VERSION_BUILD 0)
 
 set (PLUGININFO_NAME ${PROJECT_NAME})
@@ -68,9 +68,6 @@ set (VERSION "(boxCore ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})")
 set (PLUGININFO_AUTHOR Carsomyr)
 set (PLUGININFO_URL http://developer.berlios.de/projects/boxcore/)
 set (PLUGININFO_EMAIL "carsomyr@users.berlios.de")
-
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resource.rc.in
-${CMAKE_CURRENT_BINARY_DIR}/resource.rc)
 
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/version.h.in
 ${CMAKE_CURRENT_BINARY_DIR}/version.h)
@@ -83,9 +80,13 @@ if(MINGW)
                                          -o ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
   SET(BLACKBOX_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
   set (RC_MANIFEST_LINE "APP_MANIFEST RT_MANIFEST blackbox.exe.manifest")
+  message (STATUS "Mingw compiles detected")
 else(MINGW)
   SET(BLACKBOX_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/resource.rc)
 endif(MINGW)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resource.rc.in
+${CMAKE_CURRENT_BINARY_DIR}/resource.rc)
 
 add_executable (blackbox ${BLACKBOX_CORE_SRCS} ${BLACKBOX_MENU_SRCS} ${BLACKBOX_NEW_SRCS} ${BLACKBOX_RESOURCES} )
 include_directories(blackbox ${CMAKE_CURRENT_BINARY_DIR})
