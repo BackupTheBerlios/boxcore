@@ -2,6 +2,7 @@
 #include "clsTaskItemCollection.h"
 #include "clsTaskItem.h"
 #include "clsFlexiSpacer.h"
+#include <cstdlib>
 
 clsTaskItemCollection::clsTaskItemCollection(bool pVertical): clsItemCollection(pVertical)
 {
@@ -31,7 +32,15 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			backSpacer = itemList.back();
 			itemList.pop_back();
 		}
-		if (!strnicmp(msg_string, "@boxBar.task.front.", strlen("@boxBar.task.front.")))
+		if (!strnicmp(msg_string, "@boxBar.tasks.iconSize", strlen("@boxBar.tasks.iconSize")))
+		{
+			msg_string += strlen("@boxBar.tasks.iconSize");
+												WriteInt(configFile, "boxBar.tasks.iconSize:",atoi(msg_string));
+												readSettings();
+												populateTasks();
+												SendMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
+		}
+		else if (!strnicmp(msg_string, "@boxBar.task.front.", strlen("@boxBar.task.front.")))
 		{
 			HWND targetTask;
 			sscanf(msg_string + strlen("@boxBar.task.front."), "%llu", (UINT64 *)&targetTask);
