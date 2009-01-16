@@ -59,6 +59,10 @@ typedef struct {
 #endif
 typedef PROPERTYKEY &REFPROPERTYKEY;
 
+#ifdef __MINGW32__
+typedef PROPVARIANT &REFPROPVARIANT;
+#endif
+
 #ifndef __IPropertyStore_INTERFACE_DEFINED__
 #define __IPropertyStore_INTERFACE_DEFINED__
 struct IPropertyStore : public IUnknown

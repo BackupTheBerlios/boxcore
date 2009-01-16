@@ -2,8 +2,8 @@
  ============================================================================
 
   This file is part of the bbLean source code
-  Copyright © 2001-2003 The Blackbox for Windows Development Team
-  Copyright © 2004 grischka
+  Copyright ï¿½ 2001-2003 The Blackbox for Windows Development Team
+  Copyright ï¿½ 2004 grischka
 
   http://bb4win.sourceforge.net/bblean
   http://sourceforge.net/projects/bb4win
@@ -780,7 +780,7 @@ int exec_pidl(const _ITEMIDLIST *pidl, LPCSTR verb, LPCSTR arguments)
 //===========================================================================
 
 #ifndef SHCNF_ACCEPT_INTERRUPTS
-#ifdef MINGW && !_WIN64
+#if __MINGW32__ && !WIN64
 struct _SHChangeNotifyEntry
 {
 	const _ITEMIDLIST *pidl;
