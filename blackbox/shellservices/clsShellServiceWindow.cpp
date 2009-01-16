@@ -70,7 +70,10 @@ ShellServiceWindow::ShellServiceWindow(HINSTANCE pInstance, bool pTopmost)
 	hTrayWnd = CreateWindowEx( WS_EX_TOOLWINDOW | (pTopmost ? WS_EX_TOPMOST : 0), TEXT("Shell_TrayWnd"), NULL,
 							   WS_POPUP | WS_DISABLED | WS_OVERLAPPED | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
 							   0, 0, 0, 0, NULL, NULL, hInstance, NULL);
-	createChild(createChild(hTrayWnd, TEXT("TrayNotifyWnd")), TEXT("TrayClockWClass"));
+	HWND tempParent = createChild(hTrayWnd, TEXT("TrayNotifyWnd"));
+	createChild(tempParent, TEXT("TrayClockWClass"));
+	createChild(createChild(tempParent, TEXT("SysPager")), TEXT("ToolbarWindow32"), TEXT("Notification Area"));
+	createChild(createChild(tempParent, TEXT("SysPager")), TEXT("ToolbarWindow32"), TEXT("System Control Area"));
 	SetClassLongPtr(hTrayWnd, 0, (LONG_PTR)this);
 	announceWindow();
 }
@@ -138,7 +141,7 @@ void ShellServiceWindow::announceWindow()
   *
   * @todo: document this function
   */
-HWND ShellServiceWindow::createChild(HWND pParent, LPCTSTR pClsName)
+HWND ShellServiceWindow::createChild(HWND pParent, LPCTSTR pClsName, LPCTSTR p_windowTitle)
 {
 	WNDCLASSEX wndClass;
 	ZeroMemory(&wndClass, sizeof(wndClass));
@@ -148,7 +151,7 @@ HWND ShellServiceWindow::createChild(HWND pParent, LPCTSTR pClsName)
 	wndClass.lpszClassName = pClsName;
 	RegisterClassEx(&wndClass);
 
-	HWND childWindow = CreateWindowEx( 0, pClsName, NULL,
+	HWND childWindow = CreateWindowEx( 0, pClsName, p_windowTitle,
 									   WS_CHILD | WS_DISABLED, 0, 0, 0, 0, pParent, NULL, hInstance, NULL);
 	return childWindow;
 }

@@ -71,7 +71,7 @@ private:
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK childWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void announceWindow();
-	HWND createChild(HWND pParent, LPCTSTR pClsName);
+	HWND createChild(HWND pParent, LPCTSTR pClsName, LPCTSTR p_windowTitle = NULL);
 };
 
 }
