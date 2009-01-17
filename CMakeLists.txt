@@ -14,6 +14,7 @@ set (VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
 option(USE_UNICOWS "Should we link against unicows.dll?" ON)
 option(UNICODE_ENABLE "Compile unicode versions of the core and plugins" ON)
+option(UPDATE_PACKAGE "Should we move configs to a sample folder" OFF)
 
 if (UNICODE_ENABLE)
 set (PACKAGE_CHARTYPE "unicode")
