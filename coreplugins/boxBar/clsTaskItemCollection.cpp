@@ -6,8 +6,19 @@
 
 clsTaskItemCollection::clsTaskItemCollection(bool pVertical): clsItemCollection(pVertical)
 {
+	m_dragTask = NULL;
+	m_dragTimer = getTimerID();
 	readSettings();
 	populateTasks();
+	m_dropTarget = new DropTarget(this, DragAction);
+	RegisterDragDrop(barWnd, m_dropTarget);
+
+}
+
+clsTaskItemCollection::~clsTaskItemCollection()
+{
+	RevokeDragDrop(barWnd);
+	m_dropTarget->Release();
 }
 
 /** @brief wndProc
@@ -18,6 +29,38 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 {
 	switch (msg)
 	{
+	case WM_LBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+	case WM_MBUTTONDOWN:
+	case WM_XBUTTONDOWN:
+	{
+		for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end();)
+		{
+			clsTaskItem *taskItem = dynamic_cast<clsTaskItem *>(*i);
+			++i;
+			if (taskItem)
+			{
+				if (!IsWindow(taskItem->GetTaskWnd()))
+				{
+					itemMapping.erase(taskItem->GetTaskWnd());
+					itemList.remove(taskItem);
+					delete taskItem;
+					SendMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+				}
+			}
+		}
+		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
+	}
+	case WM_TIMER:
+		if (wParam == m_dragTimer)
+		{
+			if (m_dragTask)
+			{
+				SendMessage(hBlackboxWnd, BB_BRINGTOFRONT, 0,  (LPARAM)m_dragTask->GetTaskWnd());
+				m_dragTask = NULL;
+				KillTimer(barWnd, m_dragTimer);
+			}
+		}
 	case BB_RECONFIGURE:
 		readSettings();
 		populateTasks();
@@ -32,6 +75,107 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			backSpacer = itemList.back();
 			itemList.pop_back();
 		}
+		if (!strnicmp(msg_string, "@boxBar.", strlen("@boxBar.")))
+		{
+			msg_string += strlen("@boxBar.");
+			if (!strnicmp(msg_string, "tasks.", strlen("tasks.")))
+			{
+				msg_string += strlen("tasks.");
+			}
+			else if (!strnicmp(msg_string, "task.", strlen("task.")))
+			{
+				msg_string += strlen("tasks.");
+				if (!strnicmp(msg_string, "front.", strlen("front.")))
+				{
+					HWND targetTask;
+					msg_string += strlen("front.");
+					sscanf(msg_string, "%llu", (UINT64 *)&targetTask);
+					list<clsItem *>::iterator targetIt;
+					for (targetIt = itemList.begin(); targetIt != itemList.end(); ++ targetIt)
+					{
+						if (static_cast<clsTaskItem *>(*targetIt)->GetTaskWnd() == targetTask)
+							break;
+					}
+					if (targetIt != itemList.end())
+					{
+						clsTaskItem *targetItem = static_cast<clsTaskItem *>(*targetIt);
+						itemList.erase(targetIt);
+						itemList.push_front(targetItem);
+					}
+					PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+					configMenu(NULL, true);
+					RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
+				}
+				else if (!strnicmp(msg_string, "end.", strlen("end.")))
+				{
+					HWND targetTask;
+					msg_string += strlen("end.");
+					sscanf(msg_string, "%llu", (UINT64 *)&targetTask);
+					list<clsItem *>::iterator targetIt;
+					for (targetIt = itemList.begin(); targetIt != itemList.end(); ++ targetIt)
+					{
+						if (static_cast<clsTaskItem *>(*targetIt)->GetTaskWnd() == targetTask)
+							break;
+					}
+					if (targetIt != itemList.end())
+					{
+						clsTaskItem *targetItem = static_cast<clsTaskItem *>(*targetIt);
+						itemList.erase(targetIt);
+						itemList.push_back(targetItem);
+					}
+					PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+					configMenu(NULL, true);
+					RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
+				}
+				else if (!strnicmp(msg_string, "left.", strlen("left.")))
+				{
+					HWND targetTask;
+					msg_string += strlen("left.");
+					sscanf(msg_string, "%llu", (UINT64 *)&targetTask);
+					list<clsItem *>::iterator targetIt;
+					for (targetIt = itemList.begin(); targetIt != itemList.end(); ++ targetIt)
+					{
+						if (static_cast<clsTaskItem *>(*targetIt)->GetTaskWnd() == targetTask)
+							break;
+					}
+					if (targetIt != itemList.end())
+					{
+						list<clsItem *>::iterator prevIt = targetIt;
+						prevIt--;
+						clsTaskItem *targetItem = static_cast<clsTaskItem *>(*targetIt);
+						itemList.erase(targetIt);
+						itemList.insert(prevIt, targetItem);
+					}
+					PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+					configMenu(NULL, true);
+					RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
+				}
+				else if (!strnicmp(msg_string, "right.", strlen("right.")))
+				{
+					HWND targetTask;
+					msg_string += strlen("right.");
+					sscanf(msg_string, "%llu", (UINT64 *)&targetTask);
+					list<clsItem *>::iterator targetIt;
+					for (targetIt = itemList.begin(); targetIt != itemList.end(); ++ targetIt)
+					{
+						if (static_cast<clsTaskItem *>(*targetIt)->GetTaskWnd() == targetTask)
+							break;
+					}
+					if (targetIt != itemList.end())
+					{
+						list<clsItem *>::iterator nextIt = targetIt;
+						nextIt++;
+						nextIt++;
+						clsTaskItem *targetItem = static_cast<clsTaskItem *>(*targetIt);
+						itemList.erase(targetIt);
+						itemList.insert(nextIt, targetItem);
+					}
+					PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+					//configMenu(NULL, true);
+					RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
+				}
+			}
+		}
 		if (!strnicmp(msg_string, "@boxBar.tasks.iconSize", strlen("@boxBar.tasks.iconSize")))
 		{
 			msg_string += strlen("@boxBar.tasks.iconSize");
@@ -39,91 +183,6 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			readSettings();
 			populateTasks();
 			SendMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
-		}
-		else if (!strnicmp(msg_string, "@boxBar.task.front.", strlen("@boxBar.task.front.")))
-		{
-			HWND targetTask;
-			sscanf(msg_string + strlen("@boxBar.task.front."), "%llu", (UINT64 *)&targetTask);
-			list<clsItem *>::iterator targetIt;
-			for (targetIt = itemList.begin(); targetIt != itemList.end(); ++ targetIt)
-			{
-				if (static_cast<clsTaskItem *>(*targetIt)->GetTaskWnd() == targetTask)
-					break;
-			}
-			if (targetIt != itemList.end())
-			{
-				clsTaskItem *targetItem = static_cast<clsTaskItem *>(*targetIt);
-				itemList.erase(targetIt);
-				itemList.push_front(targetItem);
-			}
-			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
-			configMenu(NULL, true);
-			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
-		}
-		else if (!strnicmp(msg_string, "@boxBar.task.end.", strlen("@boxBar.task.end.")))
-		{
-			HWND targetTask;
-			sscanf(msg_string + strlen("@boxBar.task.end."), "%llu", (UINT64 *)&targetTask);
-			list<clsItem *>::iterator targetIt;
-			for (targetIt = itemList.begin(); targetIt != itemList.end(); ++ targetIt)
-			{
-				if (static_cast<clsTaskItem *>(*targetIt)->GetTaskWnd() == targetTask)
-					break;
-			}
-			if (targetIt != itemList.end())
-			{
-				clsTaskItem *targetItem = static_cast<clsTaskItem *>(*targetIt);
-				itemList.erase(targetIt);
-				itemList.push_back(targetItem);
-			}
-			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
-			configMenu(NULL, true);
-			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
-		}
-		else if (!strnicmp(msg_string, "@boxBar.task.left.", strlen("@boxBar.task.left.")))
-		{
-			HWND targetTask;
-			sscanf(msg_string + strlen("@boxBar.task.left."), "%llu", (UINT64 *)&targetTask);
-			list<clsItem *>::iterator targetIt;
-			for (targetIt = itemList.begin(); targetIt != itemList.end(); ++ targetIt)
-			{
-				if (static_cast<clsTaskItem *>(*targetIt)->GetTaskWnd() == targetTask)
-					break;
-			}
-			if (targetIt != itemList.end())
-			{
-				list<clsItem *>::iterator prevIt = targetIt;
-				prevIt--;
-				clsTaskItem *targetItem = static_cast<clsTaskItem *>(*targetIt);
-				itemList.erase(targetIt);
-				itemList.insert(prevIt, targetItem);
-			}
-			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
-			configMenu(NULL, true);
-			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
-		}
-		else if (!strnicmp(msg_string, "@boxBar.task.right.", strlen("@boxBar.task.right.")))
-		{
-			HWND targetTask;
-			sscanf(msg_string + strlen("@boxBar.task.right."), "%llu", (UINT64 *)&targetTask);
-			list<clsItem *>::iterator targetIt;
-			for (targetIt = itemList.begin(); targetIt != itemList.end(); ++ targetIt)
-			{
-				if (static_cast<clsTaskItem *>(*targetIt)->GetTaskWnd() == targetTask)
-					break;
-			}
-			if (targetIt != itemList.end())
-			{
-				list<clsItem *>::iterator nextIt = targetIt;
-				nextIt++;
-				nextIt++;
-				clsTaskItem *targetItem = static_cast<clsTaskItem *>(*targetIt);
-				itemList.erase(targetIt);
-				itemList.insert(nextIt, targetItem);
-			}
-			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
-			//configMenu(NULL, true);
-			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 		}
 		if (vertical && stretchTaskarea)
 		{
@@ -264,6 +323,7 @@ void clsTaskItemCollection::configMenu(Menu *pMenu, bool p_update)
 		MakeSubmenu(pMenu, subMenu, "Tasks Configuration");
 	}
 	MakeMenuItemInt(subMenu, "Icon size", "@boxBar.tasks.iconsize", ReadInt(configFile, "boxBar.tasks.iconsize:", 16), 0, 256);
+	MakeMenuItemInt(subMenu, "Maximum TaskWidth", "@boxBar.tasks.task.maxsize.x", ReadInt(configFile, "boxBar.tasks.task.maxsize.x:", 16), 0, 1000);
 	if (p_update)
 	{
 		ShowMenu(subMenu);
@@ -279,5 +339,42 @@ void clsTaskItemCollection::configMenu(Menu *pMenu, bool p_update)
 		ShowMenu(subMenu);
 	}
 }
+
+void clsTaskItemCollection::DragAction(clsItem * p_item, eDragDropState p_state, INT p_x, INT p_y)
+{
+	clsTaskItemCollection *taskCollection = dynamic_cast<clsTaskItemCollection *>(p_item);
+	if (taskCollection)
+	{
+		switch (p_state)
+		{
+		case DRAG_OVER:
+		{
+			POINT point = {p_x, p_y};
+			ScreenToClient(barWnd, &point);
+			for (list<clsItem *>::iterator i = taskCollection->itemList.begin(); i
+					!= taskCollection->itemList.end(); ++i)
+			{
+				if ((*i)->hitTest(point.x, point.y))
+				{
+					if (taskCollection->m_dragTask != (*i))
+					{
+						SetTimer(taskCollection->barWnd, taskCollection->m_dragTimer, 500, NULL);
+						taskCollection->m_dragTask = dynamic_cast<clsTaskItem *>(*i);
+					}
+				}
+			}
+			break;
+		}
+		case DRAG_ENTER:
+		case DRAG_LEAVE:
+		case DRAG_DROP:
+			KillTimer(barWnd, taskCollection->m_dragTimer);
+			taskCollection->m_dragTask = NULL;
+			break;
+		}
+	}
+}
+
+
 
 
