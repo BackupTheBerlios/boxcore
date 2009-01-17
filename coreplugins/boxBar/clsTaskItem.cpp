@@ -1,6 +1,7 @@
 #include "clsTaskItem.h"
 #include "clsTextItem.h"
 #include "clsFlexiSpacer.h"
+#include <limits.h>
 
 clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVertical)
 {
@@ -120,7 +121,7 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 void clsTaskItem::activateTask(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	clsTaskItem *realItem = dynamic_cast<clsTaskItem *>(pItem);
-	if (realItem && IsWindow(realItem->taskWnd))
+	if (realItem)
 	{
 		PostMessage(hBlackboxWnd, BB_BRINGTOFRONT, 0,  (LPARAM)realItem->taskWnd);
 	}
@@ -135,6 +136,11 @@ void clsTaskItem::readSettings()
 	iconSize = ReadInt(configFile, "boxBar.tasks.iconsize:", 16);
 	spacingBorder = ReadInt(configFile, "boxBar.tasks.task.spacingBorder:", 2);
 	spacingItems = ReadInt(configFile, "boxBar.tasks.task.spacingItems:", 2);
+	m_maxSizeX = ReadInt(configFile, "boxBar.tasks.task.maxSize.X:", 0);
+	if (m_maxSizeX <= 0)
+	{
+		m_maxSizeX = INT_MAX;
+	}
 
 	activeAlpha = ReadInt(configFile, "boxBar.tasks.active.alpha:", 255);
 	inactiveAlpha = ReadInt(configFile, "boxBar.tasks.inactive.alpha:", 255);

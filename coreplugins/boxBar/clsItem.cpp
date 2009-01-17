@@ -1,6 +1,8 @@
 #include "clsItem.h"
 #include <commctrl.h>
 #include <tchar.h>
+#include <algorithm>
+#include <limits.h>
 
 #ifndef TTS_USEVISUALSTYLE
 #define TTS_USEVISUALSTYLE 0x100
@@ -39,6 +41,8 @@ clsItem::clsItem(bool pVertical)
 	minSizeY = 0;
 	m_minSizeX = 0;
 	m_minSizeY = 0;
+	m_maxSizeX = INT_MAX;
+	m_maxSizeY = INT_MAX;
 
 	m_broamLeft = NULL;
 	m_broamLeftDbl = NULL;
@@ -127,18 +131,13 @@ dimType clsItem::resize(int pX, int pY)
 	dimType done = DIM_NONE;
 	if (pX >= 0)
 	{
-		if (pX > m_minSizeX)
-		{
-			itemArea.right = itemArea.left + pX;
-		}
-		else
-		{
-			itemArea.right = itemArea.left + minSizeX;
-		}
+		pX = std::min(std::max(pX, m_minSizeX),m_maxSizeX);
+		itemArea.right = itemArea.left + pX;
 		done = DIM_HORIZONTAL;
 	}
 	if (pY >= 0)
 	{
+		pY = std::min(std::max(pY, m_minSizeY),m_maxSizeY);
 		itemArea.bottom = itemArea.top + pY;
 		done = ((done == DIM_HORIZONTAL) ? DIM_BOTH : DIM_VERTICAL);
 	}

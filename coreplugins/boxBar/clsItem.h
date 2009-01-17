@@ -104,6 +104,8 @@ protected:
 
 	INT m_minSizeX;
 	INT m_minSizeY;
+	INT m_maxSizeX;
+	INT m_maxSizeY;
 
 	/** @brief The styleitem to be used for drawing
 	  *
