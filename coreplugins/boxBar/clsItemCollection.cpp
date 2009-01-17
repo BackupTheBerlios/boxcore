@@ -153,10 +153,8 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 
 	if (pSizeGiven && ((flexibleItemCount || (itemList.size() == 0)) || !isBar))
 	{
-		//minSizeY = std::max(getSize(DIM_VERTICAL),m_minSizeY);
-		//minSizeX = std::max(getSize(DIM_HORIZONTAL),m_minSizeX);
-		minSizeY = getSize(DIM_VERTICAL);
-		minSizeX = getSize(DIM_HORIZONTAL);
+		minSizeY = std::max(getSize(DIM_VERTICAL),m_minSizeY);
+		minSizeX = std::max(getSize(DIM_HORIZONTAL),m_minSizeX);
 		if (vertical)
 		{
 			maxSize = std::max(maxSize, minSizeX - 2 * spacingBorder);
@@ -191,6 +189,7 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 			flexibleItemSize = (minSizeY - fixedItemUsed) / flexibleItemCount;
 		else
 			flexibleItemSize = (minSizeX - fixedItemUsed) / flexibleItemCount;
+		flexibleItemSize = std::max(flexibleItemSize, 0);
 		for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end(); ++i)
 		{
 			(*i)->calculateSizes();
@@ -266,7 +265,6 @@ void clsItemCollection::sortItems()
 	{
 		if (vertical)
 		{
-
 			(*i)->move(itemArea.left + (available
 										- (*i)->getSize(DIM_HORIZONTAL)) / 2, pos);
 			pos += (*i)->getSize(DIM_VERTICAL) + spacingItems;
