@@ -34,21 +34,7 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 	case WM_MBUTTONDOWN:
 	case WM_XBUTTONDOWN:
 	{
-		for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end();)
-		{
-			clsTaskItem *taskItem = dynamic_cast<clsTaskItem *>(*i);
-			++i;
-			if (taskItem)
-			{
-				if (!IsWindow(taskItem->GetTaskWnd()))
-				{
-					itemMapping.erase(taskItem->GetTaskWnd());
-					itemList.remove(taskItem);
-					delete taskItem;
-					SendMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
-				}
-			}
-		}
+
 		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
 	}
 	case WM_TIMER:
@@ -195,6 +181,23 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 		{
 		case TASKITEM_ACTIVATED:
 		case TASKITEM_MODIFIED:
+			for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end();)
+					{
+						clsTaskItem *taskItem = dynamic_cast<clsTaskItem *>(*i);
+						++i;
+						if (taskItem)
+						{
+							if (!IsWindow(taskItem->GetTaskWnd()))
+							{
+								itemMapping[taskItem->GetTaskWnd()] = NULL;
+								itemMapping.erase(taskItem->GetTaskWnd());
+								itemList.remove(taskItem);
+								delete taskItem;
+								PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+								//taskItem->ClearTooltip();
+							}
+						}
+					}
 			clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
 			InvalidateRect(barWnd, &itemArea, TRUE);
 			PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
@@ -240,9 +243,12 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			clsItem *removedTask;
 			removedTask = itemMapping[(HWND)wParam];
 			itemList.remove(removedTask);
+			itemMapping[(HWND)wParam] = NULL;
 			itemMapping.erase((HWND)wParam);
-			SendMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+			removedTask->ClearTooltip();
 			delete removedTask;
+			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+			//removedTask->ClearTooltip();
 			//configMenu(NULL, true);
 			//RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 		}
