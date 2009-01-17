@@ -29,14 +29,6 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 {
 	switch (msg)
 	{
-	case WM_LBUTTONDOWN:
-	case WM_RBUTTONDOWN:
-	case WM_MBUTTONDOWN:
-	case WM_XBUTTONDOWN:
-	{
-
-		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
-	}
 	case WM_TIMER:
 		if (wParam == m_dragTimer)
 		{
@@ -53,14 +45,7 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 		break;
 	case BB_BROADCAST:
 	{
-		TRACE((LPCSTR) lParam);
 		LPCSTR msg_string = (LPCSTR)lParam;
-		clsItem * backSpacer;
-		if (vertical && stretchTaskarea)
-		{
-			backSpacer = itemList.back();
-			itemList.pop_back();
-		}
 		if (!strnicmp(msg_string, "@boxBar.", strlen("@boxBar.")))
 		{
 			msg_string += strlen("@boxBar.");
@@ -70,96 +55,7 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			}
 			else if (!strnicmp(msg_string, "task.", strlen("task.")))
 			{
-				msg_string += strlen("tasks.");
-				if (!strnicmp(msg_string, "front.", strlen("front.")))
-				{
-					HWND targetTask;
-					msg_string += strlen("front.");
-					sscanf(msg_string, "%llu", (UINT64 *)&targetTask);
-					list<clsItem *>::iterator targetIt;
-					for (targetIt = itemList.begin(); targetIt != itemList.end(); ++ targetIt)
-					{
-						if (static_cast<clsTaskItem *>(*targetIt)->GetTaskWnd() == targetTask)
-							break;
-					}
-					if (targetIt != itemList.end())
-					{
-						clsTaskItem *targetItem = static_cast<clsTaskItem *>(*targetIt);
-						itemList.erase(targetIt);
-						itemList.push_front(targetItem);
-					}
-					PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
-					configMenu(NULL, true);
-					RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
-				}
-				else if (!strnicmp(msg_string, "end.", strlen("end.")))
-				{
-					HWND targetTask;
-					msg_string += strlen("end.");
-					sscanf(msg_string, "%llu", (UINT64 *)&targetTask);
-					list<clsItem *>::iterator targetIt;
-					for (targetIt = itemList.begin(); targetIt != itemList.end(); ++ targetIt)
-					{
-						if (static_cast<clsTaskItem *>(*targetIt)->GetTaskWnd() == targetTask)
-							break;
-					}
-					if (targetIt != itemList.end())
-					{
-						clsTaskItem *targetItem = static_cast<clsTaskItem *>(*targetIt);
-						itemList.erase(targetIt);
-						itemList.push_back(targetItem);
-					}
-					PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
-					configMenu(NULL, true);
-					RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
-				}
-				else if (!strnicmp(msg_string, "left.", strlen("left.")))
-				{
-					HWND targetTask;
-					msg_string += strlen("left.");
-					sscanf(msg_string, "%llu", (UINT64 *)&targetTask);
-					list<clsItem *>::iterator targetIt;
-					for (targetIt = itemList.begin(); targetIt != itemList.end(); ++ targetIt)
-					{
-						if (static_cast<clsTaskItem *>(*targetIt)->GetTaskWnd() == targetTask)
-							break;
-					}
-					if (targetIt != itemList.end())
-					{
-						list<clsItem *>::iterator prevIt = targetIt;
-						prevIt--;
-						clsTaskItem *targetItem = static_cast<clsTaskItem *>(*targetIt);
-						itemList.erase(targetIt);
-						itemList.insert(prevIt, targetItem);
-					}
-					PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
-					configMenu(NULL, true);
-					RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
-				}
-				else if (!strnicmp(msg_string, "right.", strlen("right.")))
-				{
-					HWND targetTask;
-					msg_string += strlen("right.");
-					sscanf(msg_string, "%llu", (UINT64 *)&targetTask);
-					list<clsItem *>::iterator targetIt;
-					for (targetIt = itemList.begin(); targetIt != itemList.end(); ++ targetIt)
-					{
-						if (static_cast<clsTaskItem *>(*targetIt)->GetTaskWnd() == targetTask)
-							break;
-					}
-					if (targetIt != itemList.end())
-					{
-						list<clsItem *>::iterator nextIt = targetIt;
-						nextIt++;
-						nextIt++;
-						clsTaskItem *targetItem = static_cast<clsTaskItem *>(*targetIt);
-						itemList.erase(targetIt);
-						itemList.insert(nextIt, targetItem);
-					}
-					PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
-					//configMenu(NULL, true);
-					RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
-				}
+				msg_string += strlen("task.");
 			}
 		}
 		if (!strnicmp(msg_string, "@boxBar.tasks.iconSize", strlen("@boxBar.tasks.iconSize")))
@@ -170,10 +66,6 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			populateTasks();
 			SendMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
 		}
-		if (vertical && stretchTaskarea)
-		{
-			itemList.push_back(backSpacer);
-		}
 	}
 	break;
 	case BB_TASKSUPDATE:
@@ -181,78 +73,14 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 		{
 		case TASKITEM_ACTIVATED:
 		case TASKITEM_MODIFIED:
-			for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end();)
-					{
-						clsTaskItem *taskItem = dynamic_cast<clsTaskItem *>(*i);
-						++i;
-						if (taskItem)
-						{
-							if (!IsWindow(taskItem->GetTaskWnd()))
-							{
-								itemMapping[taskItem->GetTaskWnd()] = NULL;
-								itemMapping.erase(taskItem->GetTaskWnd());
-								itemList.remove(taskItem);
-								delete taskItem;
-								PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
-								//taskItem->ClearTooltip();
-							}
-						}
-					}
 			clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
 			InvalidateRect(barWnd, &itemArea, TRUE);
 			PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 			return 0;
 		case TASKITEM_ADDED:
-		{
-			clsItem * backSpacer;
-			if (vertical && stretchTaskarea)
-			{
-				backSpacer = itemList.back();
-				itemList.pop_back();
-			}
-			if (!itemMapping[(HWND)wParam])
-			{
-				tasklist *task = GetTaskListPtr();
-				for (int i = 0; i < GetTaskListSize(); ++i)
-				{
-					if (task->hwnd == (HWND)wParam)
-					{
-						clsTaskItem *newTask = new clsTaskItem(task, vertical);
-						addItem(newTask);
-						itemMapping[task->hwnd] = newTask;
-						break;
-					}
-					task = task->next;
-				}
-			}
-			else
-			{
-				clsItemCollection::wndProc(hWnd, BB_TASKSUPDATE, wParam, TASKITEM_MODIFIED);
-			}
-			if (vertical && stretchTaskarea)
-			{
-				itemList.push_back(backSpacer);
-			}
-			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
-			//configMenu(NULL, true);
-			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
-		}
-		return 0;
 		case TASKITEM_REMOVED:
-		{
-			clsItem *removedTask;
-			removedTask = itemMapping[(HWND)wParam];
-			itemList.remove(removedTask);
-			itemMapping[(HWND)wParam] = NULL;
-			itemMapping.erase((HWND)wParam);
-			removedTask->ClearTooltip();
-			delete removedTask;
-			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
-			//removedTask->ClearTooltip();
-			//configMenu(NULL, true);
-			//RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
-		}
-		return 0;
+			populateTasks();
+			break;
 		}
 		break;
 	}
@@ -278,7 +106,6 @@ void clsTaskItemCollection::populateTasks()
 	{
 		clsTaskItem *newTask = new clsTaskItem(task, vertical);
 		addItem(newTask);
-		itemMapping[task->hwnd] = newTask;
 		task = task->next;
 	}
 	if (vertical && stretchTaskarea)
@@ -330,16 +157,6 @@ void clsTaskItemCollection::configMenu(Menu *pMenu, bool p_update)
 	}
 	MakeMenuItemInt(subMenu, "Icon size", "@boxBar.tasks.iconsize", ReadInt(configFile, "boxBar.tasks.iconsize:", 16), 0, 256);
 	MakeMenuItemInt(subMenu, "Maximum TaskWidth", "@boxBar.tasks.task.maxsize.x", ReadInt(configFile, "boxBar.tasks.task.maxsize.x:", 16), 0, 1000);
-	if (p_update)
-	{
-		ShowMenu(subMenu);
-	}
-	subMenu = MakeNamedMenu("Task Ordering","boxBar.taskorder", !p_update);
-	if (!p_update)
-	{
-		MakeSubmenu(pMenu, subMenu, "Task Ordering");
-	}
-	clsItemCollection::configMenu(subMenu, p_update);
 	if (p_update)
 	{
 		ShowMenu(subMenu);
