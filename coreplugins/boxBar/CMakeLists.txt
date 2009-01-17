@@ -35,6 +35,8 @@ clsTip.cpp
 
 clsItButton.cpp
 
+clsDropTarget.cpp
+
 ../utils/clsApiLoader.cpp
 ../../dynwinapi/clsUser32.cpp
 ../../dynwinapi/clsMsimg32.cpp
@@ -61,7 +63,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/CPackConfig.cmake.in ${CMAKE_CURRENT
 
 add_library(boxBar MODULE ${BOXBAR_SRCS})
 include_directories(boxBar ../../blackbox ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(boxBar ${UNICOWSLIB} debuglib blackbox comctl32 gdi32)
+target_link_libraries(boxBar ${UNICOWSLIB} debuglib blackbox comctl32 gdi32 ole32 uuid)
 set_target_properties (boxBar PROPERTIES
 	PREFIX ""
 	VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
