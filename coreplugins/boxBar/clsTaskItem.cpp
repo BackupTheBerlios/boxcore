@@ -12,6 +12,16 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVe
 	taskWnd = pTask->hwnd;
 	CopyString(m_caption, pTask->caption, 256);
 	readSettings();
+	if (pTask->active)
+		{
+			style = activeStyle;
+			itemAlpha = activeAlpha;
+		}
+		else
+		{
+			style = inactiveStyle;
+			itemAlpha = inactiveAlpha;
+		}
 	if (iconSize > 16)
 		if (GlobalFindAtom(TEXT("boxCore::running")))
 			iconItem = new clsIconItem(pTask->icon_big, iconSize, vertical);
@@ -24,16 +34,7 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVe
 	addItem(captionItem);
 	leftClick = activateTask;
 
-	if (pTask->active)
-	{
-		style = activeStyle;
-		itemAlpha = activeAlpha;
-	}
-	else
-	{
-		style = inactiveStyle;
-		itemAlpha = inactiveAlpha;
-	}
+
 }
 
 /** @brief TaskItem destructer
@@ -136,7 +137,7 @@ void clsTaskItem::readSettings()
 	iconSize = ReadInt(configFile, "boxBar.tasks.iconsize:", 16);
 	spacingBorder = ReadInt(configFile, "boxBar.tasks.task.spacingBorder:", 2);
 	spacingItems = ReadInt(configFile, "boxBar.tasks.task.spacingItems:", 2);
-	m_maxSizeX = ReadInt(configFile, "boxBar.tasks.task.maxSize.X:", 0);
+	m_maxSizeX = ReadInt(configFile, "boxBar.tasks.maxsize.x:", 0);
 	if (m_maxSizeX <= 0)
 	{
 		m_maxSizeX = INT_MAX;
