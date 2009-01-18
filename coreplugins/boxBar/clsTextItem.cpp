@@ -152,8 +152,6 @@ void clsTextItem::setText(CONST WCHAR *pText)
 void clsTextItem::setStyle(UINT pStyle)
 {
 	fontStyle = pStyle;
-	InvalidateRect(barWnd, &itemArea, TRUE);
-	PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 }
 
 
