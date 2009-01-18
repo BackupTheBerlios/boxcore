@@ -36,9 +36,10 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			{
 				SendMessage(hBlackboxWnd, BB_BRINGTOFRONT, 0,  (LPARAM)m_dragTask->GetTaskWnd());
 				m_dragTask = NULL;
-				KillTimer(barWnd, m_dragTimer);
 			}
+			KillTimer(barWnd, m_dragTimer);
 		}
+		break;
 	case BB_RECONFIGURE:
 		readSettings();
 		populateTasks();
@@ -52,20 +53,29 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			if (!strnicmp(msg_string, "tasks.", strlen("tasks.")))
 			{
 				msg_string += strlen("tasks.");
+				if (!strnicmp(msg_string, "iconSize", strlen("iconSize")))
+						{
+							msg_string += strlen("iconSize");
+							WriteInt(configFile, "boxBar.tasks.iconSize:",atoi(msg_string));
+							readSettings();
+							populateTasks();
+							PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
+						}
+				else if (!strnicmp(msg_string, "maxsize.x", strlen("maxsize.x")))
+				{
+					msg_string += strlen("maxsize.x");
+					WriteInt(configFile, "boxBar.tasks.maxsize.x:",atoi(msg_string));
+					readSettings();
+					populateTasks();
+					PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
+				}
 			}
 			else if (!strnicmp(msg_string, "task.", strlen("task.")))
 			{
 				msg_string += strlen("task.");
 			}
 		}
-		if (!strnicmp(msg_string, "@boxBar.tasks.iconSize", strlen("@boxBar.tasks.iconSize")))
-		{
-			msg_string += strlen("@boxBar.tasks.iconSize");
-			WriteInt(configFile, "boxBar.tasks.iconSize:",atoi(msg_string));
-			readSettings();
-			populateTasks();
-			SendMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
-		}
+
 	}
 	break;
 	case BB_TASKSUPDATE:
@@ -78,6 +88,8 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 			return 0;
 		case TASKITEM_ADDED:
+			populateTasks();
+			break;
 		case TASKITEM_REMOVED:
 			populateTasks();
 			break;
@@ -156,7 +168,7 @@ void clsTaskItemCollection::configMenu(Menu *pMenu, bool p_update)
 		MakeSubmenu(pMenu, subMenu, "Tasks Configuration");
 	}
 	MakeMenuItemInt(subMenu, "Icon size", "@boxBar.tasks.iconsize", ReadInt(configFile, "boxBar.tasks.iconsize:", 16), 0, 256);
-	MakeMenuItemInt(subMenu, "Maximum TaskWidth", "@boxBar.tasks.task.maxsize.x", ReadInt(configFile, "boxBar.tasks.task.maxsize.x:", 16), 0, 1000);
+	MakeMenuItemInt(subMenu, "Maximum TaskWidth", "@boxBar.tasks.maxsize.x", ReadInt(configFile, "boxBar.tasks.maxsize.x:", 0), 0, 1000);
 	if (p_update)
 	{
 		ShowMenu(subMenu);
