@@ -1,22 +1,32 @@
 boxBar.x: 0
 boxBar.y: 0
-boxBar.vertical: true
-boxBar.items: tasks,tray,clock
+boxBar.align.horizontal: auto
+boxBar.align.vertical: auto
+boxBar.vertical: false
+boxBar.items: button,tasks,tray,clock
 boxBar.percentage: 100
 boxBar.useSlit: true
 boxBar.toggleWithPlugins: true
 
-boxBar.tasks.iconsize: 16
+boxBar.tasks.iconsize: 32
 boxBar.tasks.stretchArea: true
+boxBar.tasks.maxsize.x: 200
 
-boxBar.tray.vertical: false
+boxBar.tray.vertical: true
 boxBar.tray.iconsize: 16
 boxBar.tray.maxRows: 2
 boxBar.tray.maxCols: 5
-boxBar.tray.newIconsFirst: true
+boxBar.tray.reverseOrder: true
+boxBar.tray.newIconsFirst: false
 
 boxBar.clock.format: %H:%M
 boxBar.clock.tipFormat: %A %d %B %Y
+
+boxBar.button.text: boxButton
+boxBar.button.minsize.x: 80
+boxBar.button.leftClick: @bbCore.ShowMenu
+boxBar.button.midclick: @bbCore.MinimizeAll
+boxBar.button.rightclick: @bbCore.RestoreAll
 
 boxBar.drawBackground: true
 boxBar.useAlphaBlend: false
