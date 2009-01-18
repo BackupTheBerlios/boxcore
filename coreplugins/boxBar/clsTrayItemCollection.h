@@ -18,7 +18,6 @@ protected:
 	UINT iconSize;
 	int numRowCols;
 private:
-	const char * m_broamPrefix;
 	bool m_newFirst;
 	bool m_reverseOrder;
 };

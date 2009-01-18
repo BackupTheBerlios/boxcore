@@ -8,6 +8,8 @@ clsTaskItemCollection::clsTaskItemCollection(bool pVertical): clsItemCollection(
 {
 	m_dragTask = NULL;
 	m_dragTimer = getTimerID();
+	m_itemPrefix = new CHAR[strlen("Tasks")+1];
+	strcpy(m_itemPrefix, "Tasks");
 	readSettings();
 	populateTasks();
 	m_dropTarget = new DropTarget(this, DragAction);
@@ -47,35 +49,33 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 	case BB_BROADCAST:
 	{
 		LPCSTR msg_string = (LPCSTR)lParam;
-		if (!strnicmp(msg_string, "@boxBar.", strlen("@boxBar.")))
+		LPCSTR element = NULL;
+		msg_string += 1;
+		if (!strnicmp(msg_string, m_pluginPrefix, strlen(m_pluginPrefix)))
 		{
-			msg_string += strlen("@boxBar.");
-			if (!strnicmp(msg_string, "tasks.", strlen("tasks.")))
+			msg_string += strlen(m_pluginPrefix) + 1;
+			if (!strnicmp(msg_string, m_itemPrefix, strlen(m_itemPrefix)))
 			{
-				msg_string += strlen("tasks.");
-				if (!strnicmp(msg_string, "iconSize", strlen("iconSize")))
-						{
-							msg_string += strlen("iconSize");
-							WriteInt(configFile, "boxBar.tasks.iconSize:",atoi(msg_string));
-							readSettings();
-							populateTasks();
-							PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
-						}
-				else if (!strnicmp(msg_string, "maxsize.x", strlen("maxsize.x")))
+				CHAR buffer[256];
+				msg_string += strlen(m_itemPrefix) + 1;
+				if ((element = "iconSize") && !strnicmp(msg_string, element, strlen(element)))
 				{
-					msg_string += strlen("maxsize.x");
-					WriteInt(configFile, "boxBar.tasks.maxsize.x:",atoi(msg_string));
+					msg_string += strlen(element);
+					WriteInt(configFile, ItemRCKey(buffer, element),atoi(msg_string));
+					readSettings();
+					populateTasks();
+					PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
+				}
+				else if ((element = "MaxSize.X") && !strnicmp(msg_string, element, strlen(element)))
+				{
+					msg_string += strlen(element);
+					WriteInt(configFile, ItemRCKey(buffer, element),atoi(msg_string));
 					readSettings();
 					populateTasks();
 					PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
 				}
 			}
-			else if (!strnicmp(msg_string, "task.", strlen("task.")))
-			{
-				msg_string += strlen("task.");
-			}
 		}
-
 	}
 	break;
 	case BB_TASKSUPDATE:
@@ -162,13 +162,16 @@ void clsTaskItemCollection::readSettings()
   */
 void clsTaskItemCollection::configMenu(Menu *pMenu, bool p_update)
 {
-	Menu *subMenu = MakeNamedMenu("Tasks Configuration","boxBar.tasks", !p_update);
+	CHAR buffer[256];
+	LPCSTR menuTitle = "Tasks Configuration";
+	sprintf(buffer, "%s.%s", m_pluginPrefix, m_itemPrefix);
+	Menu *subMenu = MakeNamedMenu(menuTitle, buffer, !p_update);
 	if (!p_update)
 	{
-		MakeSubmenu(pMenu, subMenu, "Tasks Configuration");
+		MakeSubmenu(pMenu, subMenu, menuTitle);
 	}
-	MakeMenuItemInt(subMenu, "Icon size", "@boxBar.tasks.iconsize", ReadInt(configFile, "boxBar.tasks.iconsize:", 16), 0, 256);
-	MakeMenuItemInt(subMenu, "Maximum TaskWidth", "@boxBar.tasks.maxsize.x", ReadInt(configFile, "boxBar.tasks.maxsize.x:", 0), 0, 1000);
+	MakeMenuItemInt(subMenu, "Icon size", ItemBroam(buffer, "iconSize"), ReadInt(configFile, ItemRCKey(buffer,"iconSize"), 16), 0, 256);
+	MakeMenuItemInt(subMenu, "Maximum TaskWidth", ItemBroam(buffer, "maxSize.X"), ReadInt(configFile, ItemRCKey(buffer,"maxSize.X"), 0), 0, 1000);
 	if (p_update)
 	{
 		ShowMenu(subMenu);

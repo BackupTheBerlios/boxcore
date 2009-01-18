@@ -2,14 +2,15 @@
 #include "clsTrayItemCollection.h"
 #include "clsTrayItem.h"
 #include <cstdlib>
+#include <tchar.h>
 
 clsTrayItemCollection::clsTrayItemCollection(bool pVertical):clsItemCollection(pVertical)
 {
 	m_knowsSize = DIM_BOTH;
 	m_wantsStretch = DIM_NONE;
-	m_broamPrefix = "@boxBar.tray.";
+	m_itemPrefix = new CHAR[strlen("Tray")+1];
+	strcpy(m_itemPrefix, "Tray");
 	readSettings();
-
 	populateTray();
 }
 
@@ -40,59 +41,66 @@ LRESULT clsTrayItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 	case BB_BROADCAST:
 	{
 		const char *msg_string = (LPCSTR)lParam;
-		if (!strnicmp(msg_string, m_broamPrefix, strlen(m_broamPrefix)))
+		LPCSTR element = NULL;
+		msg_string += 1;
+		if (!strnicmp(msg_string, m_pluginPrefix, strlen(m_pluginPrefix)))
 		{
-			msg_string += strlen(m_broamPrefix);
-			if (!stricmp(msg_string, "vertical"))
+			msg_string += strlen(m_pluginPrefix) + 1;
+			if (!strnicmp(msg_string, m_itemPrefix, strlen(m_itemPrefix)))
 			{
-				WriteBool(configFile, "boxBar.tray.vertical:", !vertical);
-				readSettings();
-				populateTray();
-				configMenu(NULL, true);
-				PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
-			}
-			else if (!stricmp(msg_string, "reverseOrder"))
-			{
-				WriteBool(configFile, "boxBar.tray.reverseOrder:", !m_reverseOrder);
-				readSettings();
-				populateTray();
-				configMenu(NULL, true);
-				PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
-			}
-			else if (!stricmp(msg_string, "newIconsFirst"))
-			{
-				WriteBool(configFile, "boxBar.tray.newIconsFirst:", !m_newFirst);
-				readSettings();
-				populateTray();
-				configMenu(NULL, true);
-				PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
-			}
-			else if (!strnicmp(msg_string, "maxRows", strlen("maxRows")))
-			{
-				msg_string += strlen("maxRows");
-				WriteInt(configFile, "boxBar.tray.maxRows:",atoi(msg_string));
-				readSettings();
-				populateTray();
-				configMenu(NULL, true);
-				PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
-			}
-			else if (!strnicmp(msg_string, "maxCols", strlen("maxCols")))
-			{
-				msg_string += strlen("maxCols");
-				WriteInt(configFile, "boxBar.tray.maxCols:",atoi(msg_string));
-				readSettings();
-				populateTray();
-				configMenu(NULL, true);
-				PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
-			}
-			else if (!strnicmp(msg_string, "iconSize", strlen("iconSize")))
-			{
-				msg_string += strlen("iconSize");
-				WriteInt(configFile, "boxBar.tray.iconSize:",atoi(msg_string));
-				readSettings();
-				populateTray();
-				configMenu(NULL, true);
-				PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
+				CHAR buffer[256];
+				msg_string += strlen(m_itemPrefix) + 1;
+				if ((element = "vertical") && !stricmp(msg_string, element))
+				{
+					WriteBool(configFile, ItemRCKey(buffer, element), !vertical);
+					readSettings();
+					populateTray();
+					configMenu(NULL, true);
+					PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+				}
+				else if ((element = "ReverseOrder") && !stricmp(msg_string, element))
+				{
+					WriteBool(configFile, ItemRCKey(buffer, element), !m_reverseOrder);
+					readSettings();
+					populateTray();
+					configMenu(NULL, true);
+					PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+				}
+				else if ((element = "NewIconsFirst") && !stricmp(msg_string, element))
+				{
+					WriteBool(configFile, ItemRCKey(buffer, element), !m_newFirst);
+					readSettings();
+					populateTray();
+					configMenu(NULL, true);
+					PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+				}
+				else if (!strnicmp(msg_string, "maxRows", strlen("maxRows")))
+				{
+					msg_string += strlen("maxRows");
+					WriteInt(configFile, "boxBar.tray.maxRows:",atoi(msg_string));
+					readSettings();
+					populateTray();
+					configMenu(NULL, true);
+					PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
+				}
+				else if (!strnicmp(msg_string, "maxCols", strlen("maxCols")))
+				{
+					msg_string += strlen("maxCols");
+					WriteInt(configFile, "boxBar.tray.maxCols:",atoi(msg_string));
+					readSettings();
+					populateTray();
+					configMenu(NULL, true);
+					PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
+				}
+				else if (!strnicmp(msg_string, "iconSize", strlen("iconSize")))
+				{
+					msg_string += strlen("iconSize");
+					WriteInt(configFile, "boxBar.tray.iconSize:",atoi(msg_string));
+					readSettings();
+					populateTray();
+					configMenu(NULL, true);
+					PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
+				}
 			}
 		}
 		return 0;
@@ -109,23 +117,26 @@ LRESULT clsTrayItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
   */
 void clsTrayItemCollection::configMenu(Menu *pMenu, bool p_update)
 {
-	Menu *subMenu = MakeNamedMenu("Tray Configuration","boxBar.tray", !p_update);
-	if (!p_update)
+	CHAR buffer[256];
+	LPCSTR menuTitle = "Tray Configuration";
+	sprintf(buffer, "%s.%s", m_pluginPrefix, m_itemPrefix);
+	Menu *subMenu = MakeNamedMenu(menuTitle ,buffer, !p_update);
+	if (pMenu)
 	{
-		MakeSubmenu(pMenu,subMenu,"Tray Configuration");
+		MakeSubmenu(pMenu,subMenu,menuTitle);
 	}
-	MakeMenuItem(subMenu,"Vertical","@boxBar.tray.vertical",vertical);
-	MakeMenuItemInt(subMenu, "Icon Size", "@boxBar.tray.iconSize",iconSize,1,64);
+	MakeMenuItem(subMenu,"Vertical",ItemBroam(buffer, "vertical"),vertical);
+	MakeMenuItemInt(subMenu, "Icon Size", ItemBroam(buffer, "iconSize"),iconSize,1,64);
 	if (vertical)
 	{
-		MakeMenuItemInt(subMenu, "Maximum rows", "@boxBar.tray.maxRows",numRowCols,0,255);
+		MakeMenuItemInt(subMenu, "Maximum rows", ItemBroam(buffer, "maxRows"),numRowCols,0,255);
 	}
 	else
 	{
-		MakeMenuItemInt(subMenu, "Maximum columns", "@boxBar.tray.maxCols",numRowCols,0,255);
+		MakeMenuItemInt(subMenu, "Maximum columns", ItemBroam(buffer, "maxCols"),numRowCols,0,255);
 	}
-	MakeMenuItem(subMenu,"Reverse Order","@boxBar.tray.reverseOrder",m_reverseOrder);
-	MakeMenuItem(subMenu,"New Icons First","@boxBar.tray.newIconsFirst",m_newFirst);
+	MakeMenuItem(subMenu,"Reverse Order",ItemBroam(buffer, "reverseOrder"),m_reverseOrder);
+	MakeMenuItem(subMenu,"New Icons First",ItemBroam(buffer, "newIconsFirst"),m_newFirst);
 	if (p_update)
 	{
 		ShowMenu(subMenu);
@@ -198,15 +209,16 @@ void clsTrayItemCollection::populateTray()
   */
 void clsTrayItemCollection::readSettings()
 {
-	vertical = ReadBool(configFile, "boxBar.tray.vertical:", vertical);
-	iconSize = ReadInt(configFile, "boxBar.tray.iconsize:", 16);
+	CHAR buffer[256];
+	vertical = ReadBool(configFile, ItemRCKey(buffer,"vertical"), vertical);
+	iconSize = ReadInt(configFile, ItemRCKey(buffer,"iconSize"), 16);
 	if (vertical)
-		numRowCols = ReadInt(configFile, "boxBar.tray.maxRows:", 0);
+		numRowCols = ReadInt(configFile, ItemRCKey(buffer,"maxRows"), 0);
 	else
-		numRowCols = ReadInt(configFile, "boxBar.tray.maxCols:", 0);
-	spacingBorder = ReadInt(configFile, "boxBar.tray.spacingBorder:", 0);
-	spacingItems = ReadInt(configFile, "boxBar.tray.spacingItems:", 2);
-	m_newFirst = ReadBool(configFile, "boxBar.tray.newIconsFirst:",false);
+		numRowCols = ReadInt(configFile, ItemRCKey(buffer,"maxCols"), 0);
+	spacingBorder = ReadInt(configFile, ItemRCKey(buffer,"spacingBorder"), 0);
+	spacingItems = ReadInt(configFile, ItemRCKey(buffer,"spacingItems"), 2);
+	m_newFirst = ReadBool(configFile, ItemRCKey(buffer,"newIconsFirst"),false);
 	m_reverseOrder = ReadBool(configFile, "boxBar.tray.reverseOrder:", false);
 	populateTray();
 }
