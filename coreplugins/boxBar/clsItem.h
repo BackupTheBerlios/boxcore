@@ -171,6 +171,14 @@ protected:
 	static HWND hBlackboxWnd;
 	static HINSTANCE hInstance;
 
+	static LPSTR m_pluginPrefix;
+	LPSTR m_itemPrefix;
+
+	LPCSTR PluginBroam(LPSTR p_buffer, LPCSTR p_broam);
+	LPCSTR ItemBroam(LPSTR p_buffer, LPCSTR p_broam);
+
+	LPCSTR ItemRCKey(LPSTR p_buffer, LPCSTR p_key);
+
 	static int getTimerID()
 	{
 		static int id = 10;

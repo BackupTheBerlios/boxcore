@@ -57,6 +57,8 @@ clsItem::clsItem(bool pVertical)
 	X1Click = NULL;
 	X2Click = NULL;
 
+	m_itemPrefix = NULL;
+
 	itemAlpha = 255;
 
 	itemBlend.BlendOp = AC_SRC_OVER;
@@ -83,6 +85,7 @@ clsItem::~clsItem()
 	delete[] m_broamLeftDbl;
 	delete[] m_broamMid;
 	delete[] m_broamRight;
+	delete[] m_itemPrefix;
 	tipText = NULL;
 	ClearTooltip();
 }
@@ -455,6 +458,7 @@ clsStyle clsItem::bbStyle;
 HWND clsItem::hBlackboxWnd = NULL;
 HINSTANCE clsItem::hInstance = NULL;
 bool clsItem::alphaDraw = true;
+LPSTR clsItem::m_pluginPrefix = NULL;
 
 void clsItem::ClearTooltip()
 {
@@ -487,6 +491,23 @@ void clsItem::broam(clsItem *p_item, UINT p_msg, WPARAM p_wParam, LPARAM p_lPara
 	}
 }
 
+LPCSTR clsItem::PluginBroam(LPSTR p_buffer, LPCSTR p_broam)
+{
+	sprintf(p_buffer, "@%s.%s", m_pluginPrefix, p_broam);
+	return p_buffer;
+}
+
+LPCSTR clsItem::ItemBroam(LPSTR p_buffer, LPCSTR p_broam)
+{
+	sprintf(p_buffer, "@%s.%s.%s", m_pluginPrefix, m_itemPrefix, p_broam);
+	return p_buffer;
+}
+
+LPCSTR clsItem::ItemRCKey(LPSTR p_buffer, LPCSTR p_key)
+{
+	sprintf(p_buffer, "%s.%s.%s:", m_pluginPrefix, m_itemPrefix, p_key);
+	return p_buffer;
+}
 
 
 
