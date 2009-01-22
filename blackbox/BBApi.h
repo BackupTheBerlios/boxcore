@@ -2,9 +2,9 @@
   * @brief Contains the defintions for use by plugins
   *
   * This file is part of the boxCore source code @n
-  * <!-- Copyright © 2001-2003 The Blackbox for Windows Development Team -->
-  * <!-- Copyright © 2004-2007 grischka -->
-  * <!-- Copyright © 2008 Carsomyr -->
+  * <!-- Copyright ï¿½ 2001-2003 The Blackbox for Windows Development Team -->
+  * <!-- Copyright ï¿½ 2004-2007 grischka -->
+  * <!-- Copyright ï¿½ 2008 Carsomyr -->
   * Copyright &copy; 2001-2003 The Blackbox for Windows Development Team @n
   * Copyright &copy; 2004-2007 grischka @n
   * Copyright &copy; 2008 Carsomyr
@@ -53,7 +53,9 @@
 /*------------------------------------------ */
 
 #define WIN32_LEAN_AND_MEAN
+#ifndef WINVER
 #define WINVER 0x0502
+#endif
 #include <windows.h>
 #include <stdio.h>
 
