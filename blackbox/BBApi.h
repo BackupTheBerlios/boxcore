@@ -2,12 +2,12 @@
   * @brief Contains the defintions for use by plugins
   *
   * This file is part of the boxCore source code @n
-  * <!-- Copyright � 2001-2003 The Blackbox for Windows Development Team -->
-  * <!-- Copyright � 2004-2007 grischka -->
-  * <!-- Copyright � 2008 Carsomyr -->
+  * <!-- Copyright (C) 2001-2003 The Blackbox for Windows Development Team -->
+  * <!-- Copyright (C) 2004-2007 grischka -->
+  * <!-- Copyright (C) 2008-2009 Carsomyr -->
   * Copyright &copy; 2001-2003 The Blackbox for Windows Development Team @n
   * Copyright &copy; 2004-2007 grischka @n
-  * Copyright &copy; 2008 Carsomyr
+  * Copyright &copy; 2008-2009 Carsomyr
   * @par Links:
   * http://developer.berlios.de/projects/boxcore @n
   * http://bb4win.sourceforge.net/bblean @n
@@ -46,6 +46,35 @@
 
 #ifndef DLL_EXPORT
 #define DLL_EXPORT __declspec(dllexport)
+#endif
+
+#ifndef __BBCORE__
+#if defined(__GNUC__)
+#define DEPRECATED_API(func) func __attribute__((deprecated))
+#ifndef APIHELP_NOVERSIONWARNINGS
+#define WARNING_BBLEAN(func) func __attribute__((warning ("You are using a bbLean specific function, this may affect plugin portability")))
+//#define WARNING_NOTXOBLITE(func) func __attribute__((warning ("You are using a function not available in xoblite. Your plugin will not work there")))
+#endif
+#elif defined(_MSC_VER) //defined(__GNUC__)
+#define DEPRECATED_API(func) __declspec(deprecated("This API is deprecated")) func
+#ifndef APIHELP_NOVERSIONWARNINGS
+#define WARNING_BBLEAN(func) __declspec(deprecated("You are using a bbLean specific function, this may affect plugin portability")) func
+//#define WARNING_NOTXOBLITE(func) __declspec(deprecated("You are using a function not available in xoblite. Your plugin will not work there")) func
+#endif
+#else //defined(_MSC_VER)
+#warning "Your compiler does not currently have support for function warnings"
+#define DEPRECATED_API(func) func
+#endif //__GNUC__
+#else //__BBCORE__
+#define DEPRECATED_API(func) func
+#endif //__BBCORE__
+
+#ifndef WARNING_BBLEAN
+#define WARNING_BBLEAN(func) func
+#endif
+
+#ifndef WARNING_NOTXOBLITE
+#define WARNING_NOTXOBLITE(func) func
 #endif
 
 /*------------------------------------------ */
@@ -296,35 +325,35 @@
 
 /** @brief lParam: An existing task was modified
   *
-  * wParam is the HWND of the modified task
+  * Used with ::BB_TASKUPDATE. wParam is the HWND of the modified task
   * @ingroup bbapi_tasks
   */
 #define TASKITEM_MODIFIED 1
 
 /** @brief lParam: The active task has changed
   *
-  * wParam is the HWND of the new active task
+  * Used with ::BB_TASKUPDATE. wParam is the HWND of the new active task
   * @ingroup bbapi_tasks
   */
 #define TASKITEM_ACTIVATED 2
 
 /** @brief lParam: A task has been removed from the list
   *
-  * wParam is the HWND that the task had, before being removed
+  * Used with ::BB_TASKUPDATE. wParam is the HWND that the task had, before being removed
   * @ingroup bbapi_tasks
   */
 #define TASKITEM_REMOVED 3
 
 /** @brief lParam: An existing task has changed workspaces
   *
-  * wParam is NULL
+  * Used with ::BB_TASKUPDATE. wParam is NULL
   * @ingroup bbapi_tasks
   */
 #define TASKITEM_REFRESH 4
 
 /** @brief lParam: An existing task is trying to get attention
   *
-  * wParam is the HWND of the task whose icon should be flashed
+  * Used with ::BB_TASKUPDATE. wParam is the HWND of the task whose icon should be flashed
   * @ingroup bbapi_tasks
   */
 #define TASKITEM_FLASHED 5
@@ -342,14 +371,20 @@
 #define BB_TRAYUPDATE           10507
 
 /** @brief lParam: A new icon has been added to the tray
+  *
+  * Used with ::BB_TRAYUPDATE.
   * @ingroup bbapi_tray
   */
 #define TRAYICON_ADDED 0
 /** @brief lParam: An existing icon in the tray has changed
+  *
+  * Used with ::BB_TRAYUPDATE.
   * @ingroup bbapi_tray
   */
 #define TRAYICON_MODIFIED 1
 /** @brief lParam: An icon has been removed from the tray
+  *
+  * Used with ::BB_TRAYUPDATE.
   * @ingroup bbapi_tray
   */
 #define TRAYICON_REMOVED 2
@@ -621,46 +656,55 @@ enum eSettings
 	  * @warning This is an internal structure and is not defined in the API
 	  */
 	SN_STYLESTRUCT,
+
 	/** @brief Fetch the toolbar style
 	  * @par GetSettingPtr will return
 	  * StyleItem *
 	  */
 	SN_TOOLBAR,
+
 	/** @brief Fetch the unpressed toolbar button style
 	  * @par GetSettingPtr will return
 	  * StyleItem *
 	  */
 	SN_TOOLBARBUTTON,
+
 	/** @brief Fetch the pressed toolbar button style
 	  * @par GetSettingPtr will return
 	  * StyleItem *
 	  */
 	SN_TOOLBARBUTTONP,
+
 	/** @brief Fetch the unpressed toolbar label style
 	  * @par GetSettingPtr will return
 	  * StyleItem *
 	  */
 	SN_TOOLBARLABEL,
+
 	/** @brief Fetch the toolbar windowlabel style
 	  * @par GetSettingPtr will return
 	  * StyleItem *
 	  */
 	SN_TOOLBARWINDOWLABEL,
+
 	/** @brief Fetch the toolbar clock style
 	  * @par GetSettingPtr will return
 	  * StyleItem *
 	  */
 	SN_TOOLBARCLOCK,
+
 	/** @brief Fetch the menu title style
 	  * @par GetSettingPtr will return
 	  * StyleItem *
 	  */
 	SN_MENUTITLE,
+
 	/** @brief Fetch the menu frame style (This is most of the menu)
 	  * @par GetSettingPtr will return
 	  * StyleItem *
 	  */
 	SN_MENUFRAME,
+
 	/** @brief Fetch the menu highlight style
 	  * @par GetSettingPtr will return
 	  * StyleItem *
@@ -686,36 +730,42 @@ enum eSettings
 	  * StyleItem *
 	  */
 	SN_WINFOCUS_TITLE,
+
 	/** @brief Fetch the label style for focused windows
 	  * @par GetSettingPtr will return
 	  * StyleItem *
 	  * @version Defined under all releases except normal bb4win
 	  */
 	SN_WINFOCUS_LABEL,
+
 	/** @brief Fetch the handle style for focused windows
 	  * @par GetSettingPtr will return
 	  * StyleItem *
 	  * @version Defined under all releases except normal bb4win
 	  */
 	SN_WINFOCUS_HANDLE,
+
 	/** @brief Fetch the grip style for focused windows
 	  * @par GetSettingPtr will return
 	  * StyleItem *
 	  * @version Defined under all releases except normal bb4win
 	  */
 	SN_WINFOCUS_GRIP,
+
 	/** @brief Fetch the unpressed button style for focused windows
 	  * @par GetSettingPtr will return
 	  * StyleItem *
 	  * @version Defined under all releases except normal bb4win
 	  */
 	SN_WINFOCUS_BUTTON,
+
 	/** @brief Fetch the pressed button style for focused windows
 	  * @par GetSettingPtr will return
 	  * StyleItem *
 	  * @version Defined under all releases except normal bb4win
 	  */
 	SN_WINFOCUS_BUTTONP,
+
 	/** @brief Fetch the title style for unfocused windows
 	  * @par GetSettingPtr will return
 	  * StyleItem *
@@ -728,18 +778,21 @@ enum eSettings
 	  * @version Defined under all releases except normal bb4win
 	  */
 	SN_WINUNFOCUS_LABEL,
+
 	/** @brief Fetch the handle style for focused windows
 	  * @par GetSettingPtr will return
 	  * StyleItem *
 	  * @version Defined under all releases except normal bb4win
 	  */
 	SN_WINUNFOCUS_HANDLE,
+
 	/** @brief Fetch the grip style for ufocused windows
 	  * @par GetSettingPtr will return
 	  * StyleItem *
 	  * @version Defined under all releases except normal bb4win
 	  */
 	SN_WINUNFOCUS_GRIP,
+
 	/** @brief Fetch the unpressed button style for unfocused windows
 	  * @par GetSettingPtr will return
 	  * StyleItem *
@@ -748,24 +801,28 @@ enum eSettings
 	  * press the button the window will be focused.
 	  */
 	SN_WINUNFOCUS_BUTTON,
+
 	/** @brief Fetch the frame color for focused windows
 	  * @par GetSettingPtr will return
 	  * COLORREF *
 	  * @version Defined under all releases except normal bb4win
 	  */
 	SN_WINFOCUS_FRAME_COLOR,
+
 	/** @brief Fetch the frame color for unfocused windows
 	  * @par GetSettingPtr will return
 	  * COLORREF *
 	  * @version Defined under all releases except normal bb4win
 	  */
 	SN_WINUNFOCUS_FRAME_COLOR,
+
 	/** @brief Is the core/style using new metrics?
 	  * @par GetSettingPtr will return
 	  * bool
 	  * @version Defined under all releases except normal bb4win
 	  */
 	SN_NEWMETRICS,
+
 	/** @brief Fetch the menu seperator style
 	  * @par GetSettingPtr will return
 	  * StyleItem *
@@ -773,6 +830,7 @@ enum eSettings
 	  * Defined by boxCore header but not implemented.
 	  */
 	SN_MENUSEPARATOR,
+
 	/** @brief Fetch the menu volume slider style
 	  * @par GetSettingPtr will return
 	  * StyleItem *
@@ -781,10 +839,11 @@ enum eSettings
 	  * Also present in bbClean releases but has a different value
 	  */
 	SN_MENUVOLUME,
+
 	/** @brief One greater than the last valid constant
-		  * @par GetSettingPtr will return
-		  * Nothing
-		  */
+	  * @par GetSettingPtr will return
+	  * Nothing
+	  */
 	SN_LAST
 };
 
@@ -824,11 +883,14 @@ extern "C"
 	API_EXPORT void WriteString(LPCSTR fileName, LPCSTR szKey, LPCSTR value);
 	API_EXPORT void WriteColor(LPCSTR fileName, LPCSTR szKey, COLORREF value);
 
-	/* Delete/Rename Setting */
-	/// @ingroup bbapi_bblean
-	API_EXPORT bool DeleteSetting(LPCSTR fileName, LPCSTR szKey); /* wildcards supported for keyword */
-	/// @ingroup bbapi_bblean
-	API_EXPORT bool RenameSetting(LPCSTR fileName, LPCSTR old_keyword, LPCSTR new_keyword);
+	/** @brief Delete a setting from an RC file */
+	WARNING_BBLEAN(
+		API_EXPORT bool DeleteSetting(LPCSTR fileName, LPCSTR szKey)
+	);
+	/** @brief Rename a setting in an RC file */
+	WARNING_BBLEAN(
+		API_EXPORT bool RenameSetting(LPCSTR fileName, LPCSTR old_keyword, LPCSTR new_keyword)
+	);
 
 	/* ------------------------------------ */
 	/* Direct access to Settings variables / styleitems / colors */
@@ -923,10 +985,14 @@ extern "C"
 	API_EXPORT int MBoxErrorFile(LPCSTR szFile);
 	API_EXPORT int MBoxErrorValue(LPCSTR szValue);
 	/// @ingroup bbapi_bblean
-	API_EXPORT int BBMessageBox(int flg, const char *fmt, ...);
+	WARNING_BBLEAN(
+		API_EXPORT int BBMessageBox(int flg, const char *fmt, ...)
+	);
 
 	/* debugging */
-	API_EXPORT void dbg_printf(const char *fmt, ...);
+	WARNING_BBLEAN(
+		API_EXPORT void dbg_printf(const char *fmt, ...)
+	);
 
 	/* ------------------------------------ */
 	/* Helpers */
@@ -939,9 +1005,14 @@ extern "C"
 	/* ------------------------------------ */
 	/* Painting */
 
-	/* Generic Gradient Function */
-	API_EXPORT void MakeGradient(HDC hdc, RECT rect, int gradientType, COLORREF colourFrom, COLORREF colourTo, bool interlaced, int bevelStyle, int bevelPosition, int bevelWidth, COLORREF borderColour, int borderWidth);
-	/* Draw a Gradient Rectangle from StyleItem, optional using the style border. */
+	/** Generic Gradient Function
+	  * @deprecated This function is deprecated in favour of MakeStyleGradient(). This is to
+	  * allow plugins to make use of new styles without modifications.
+	  */
+	DEPRECATED_API(
+		API_EXPORT void MakeGradient(HDC hdc, RECT rect, int gradientType, COLORREF colourFrom, COLORREF colourTo, bool interlaced, int bevelStyle, int bevelPosition, int bevelWidth, COLORREF borderColour, int borderWidth)
+	);
+	/** @brief Draw a Gradient Rectangle from StyleItem, optional using the style border. */
 	API_EXPORT void MakeStyleGradient(HDC hDC, RECT* p_rect, StyleItem * m_si, bool withBorder);
 	/* Draw a Border */
 	API_EXPORT void CreateBorder(HDC hdc, RECT* p_rect, COLORREF borderColour, int borderWidth);
@@ -977,11 +1048,15 @@ extern "C"
 	  'Cmd' optionally may be a Broam which is then sent on user click
 	  with "%s" in the broam string replaced by the selected filename */
 	/// @ingroup bbapi_bblean
-	API_EXPORT MenuItem* MakePathMenu(Menu *ParentMenu, LPCSTR Title, LPCSTR path, LPCSTR Cmd ISNULL);
+	WARNING_BBLEAN(
+		API_EXPORT MenuItem* MakePathMenu(Menu *ParentMenu, LPCSTR Title, LPCSTR path, LPCSTR Cmd ISNULL)
+	);
 
 	/* set disabled state (menu.frame.disabledColor) for last added MenuItem */
 	/// @ingroup bbapi_bblean
-	API_EXPORT void DisableLastItem(Menu *PluginMenu);
+	WARNING_BBLEAN(
+		API_EXPORT void DisableLastItem(Menu *PluginMenu)
+	);
 
 	/* shows the menu */
 	API_EXPORT void ShowMenu(Menu *PluginMenu);
@@ -1070,11 +1145,12 @@ extern "C"
 	  * @ingroup bbapi_tasks
 	  */
 	API_EXPORT int GetActiveTask(void);
+
 	/** @brief Retrieve a pointer to the internal TaskList
 	  * @version Not available in xoblite
 	  * @ingroup bbapi_tasks
 	  */
-	API_EXPORT struct tasklist *GetTaskListPtr(void);
+	WARNING_NOTXOBLITE(API_EXPORT struct tasklist *GetTaskListPtr(void));
 
 	/** @brief Task information for GetTaskLocation()and SetTaskLocation()
 	  * @ingroup bbapi_bblean
@@ -1204,36 +1280,47 @@ extern "C"
 	  * @{
 	  */
 
-	/** @brief PluginInfo: Plugin should return its name
-	  */
-#define PLUGIN_NAME         1
-	/** @brief PluginInfo: Plugin should return its version
-	  */
-#define PLUGIN_VERSION      2
-	/** @brief PluginInfo: Plugin should return its author(s)
-	  */
-#define PLUGIN_AUTHOR       3
-	/** @brief PluginInfo: Plugin should return its release date
-	  */
-#define PLUGIN_RELEASE      4
-	/** @brief PluginInfo: Plugin should return its release date
-	  */
-#define PLUGIN_RELEASEDATE  4   /* xoblite */
-	/** @brief PluginInfo: Plugin should return a link to its homepage
-	  */
-#define PLUGIN_LINK         5
-	/** @brief PluginInfo: Plugin should return a contact email
-	  */
-#define PLUGIN_EMAIL        6
-	/** @brief PluginInfo: Plugin should return a list of its bro@ms
-	  *
-	  * The should be one long string. Bro@@ms are split based on the @ so no spaces are needed between.
-	  * This is used by xoblite to generate a menu with the plugins bro@@ms in it.
-	  */
-#define PLUGIN_BROAMS       7   /* xoblite */
-	/** @brief PluginInfo: Plugin should return a url where an update metafile can be found, if supported
-	  */
-#define PLUGIN_UPDATE_URL   8   /* for Kaloth's BBPlugManager */
+	/** @brief Possible values for requested plugin information */
+	enum ePluginInfo
+	{
+		PLUGIN_UNUSED,
+
+		/** @brief Plugin should return its name */
+		PLUGIN_NAME,
+
+		/** @brief Plugin should return its version */
+		PLUGIN_VERSION,
+
+		/** @brief Plugin should return its author(s) */
+		PLUGIN_AUTHOR,
+
+		/** @brief Plugin should return its release date */
+		PLUGIN_RELEASE,
+
+		/** @brief Same as ::PLUGIN_RELEASE
+		  * @version xoblite
+		  */
+		PLUGIN_RELEASEDATE = PLUGIN_RELEASE,
+
+		/** @brief Plugin should return a link to its homepage */
+		PLUGIN_LINK,
+
+		/** @brief Plugin should return a contact email */
+		PLUGIN_EMAIL,
+
+		/** @brief Plugin should return a list of its bro@ms
+		  *
+		  * The should be one long string. Bro@@ms are split based on the @ so no spaces are needed between.
+		  * This is used by xoblite to generate a menu with the plugins bro@@ms in it.
+		  * @version xoblite
+		  */
+		PLUGIN_BROAMS,
+
+		/** @brief Plugin should return a url where an update metafile can be found, if supported
+		  * @version Kaloth's BBPlugManager
+		  */
+		PLUGIN_UPDATE_URL
+	};
 
 #ifndef __BBCORE__
 	/** @brief Basic plugin startup function
@@ -1260,16 +1347,18 @@ extern "C"
 	  * beginPluginEx(hInstance, hSlit);
 	  * @endcode
 	  */
-	DLL_EXPORT int beginSlitPlugin(HINSTANCE hInstance, HWND hSlit);
+	DLL_EXPORT int beginSlitPlugin(HINSTANCE p_hInstance, HWND p_hSlit);
+
 	/** @brief Flexible plugin startup function
 	  * @param[in] hInstance The instance handle of the plugins DLL. Use when registering window classes etc.
 	  * @param[in] hSlit The window handle of the slit. May be NULL if the slit is not present.
 	  *
 	  * This is the most recent addition to the plugin interface functions. When loaded with this function
 	  * the slit information is available to a plugin. The plugin is expected to control whether it is located
-	  * in the lsit or freestadning by checking its own config file.
+	  * in the slit or free-standing by checking its own config file.
 	  */
-	DLL_EXPORT int beginPluginEx(HINSTANCE hInstance, HWND hSlit);
+	DLL_EXPORT int beginPluginEx(HINSTANCE p_hInstance, HWND p_hSlit);
+
 	/** @brief Plugin shutdown function
 	  * @param[in] hInstance The instance handle of the plugins DLL. Use to deregister window classes etc.
 	  *
@@ -1277,17 +1366,18 @@ extern "C"
 	  * all windows are destroyed, window classes unregistered and any other cleanup performed. Once
 	  * you return from this function your plugin will not be able to execute anything else.
 	  */
-	DLL_EXPORT void endPlugin(HINSTANCE hInstance);
-	/** @brief Pluginn information function
+	DLL_EXPORT void endPlugin(HINSTANCE p_hInstance);
+
+	/** @brief Plugin information function
 	  * @param[in] index The type of information the plugin should return. The value will be one of
 	  * ::PLUGIN_NAME, ::PLUGIN_VERSION, ::PLUGIN_AUTHOR, ::PLUGIN_RELEASE, ::PLUGIN_LINK, ::PLUGIN_EMAIL,
 	  * ::PLUGIN_BROAMS or ::PLUGIN_UPDATE_URL.
 	  *
 	  * This function should return the information requested by the index parameter. If the parameter
-	  * is not one of the above values it is stadnard practice to return a string containing
+	  * is not one of the above values you should return a string containing
 	  * the plugin name and plugin version.
 	  */
-	DLL_EXPORT LPCSTR pluginInfo(int index);
+	DLL_EXPORT LPCSTR pluginInfo(INT p_uIndex);
 /// @}
 #endif
 

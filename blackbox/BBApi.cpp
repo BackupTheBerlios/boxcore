@@ -3,9 +3,9 @@
   * @brief Contains the implementations for some plugin API functions and helpers
   *
   * This file is part of the boxCore source code @n
-  * <!-- Copyright � 2001-2003 The Blackbox for Windows Development Team -->
-  * <!-- Copyright � 2004-2007 grischka -->
-  * <!-- Copyright � 2008 Carsomyr -->
+  * <!-- Copyright (C) 2001-2003 The Blackbox for Windows Development Team -->
+  * <!-- Copyright (C) 2004-2007 grischka -->
+  * <!-- Copyright (C) 2008-2009 Carsomyr -->
   * Copyright &copy; 2001-2003 The Blackbox for Windows Development Team @n
   * Copyright &copy; 2004-2007 grischka @n
   * Copyright &copy; 2008 Carsomyr
@@ -800,8 +800,7 @@ void WriteValue(LPCSTR path, LPCSTR szKey, LPCSTR value)
 	mark_rc_dirty(fl);
 }
 
-/** @brief Delete a setting from an RC file
-  * @param[in] path Path to the RC file
+/** @param[in] path Path to the RC file
   * @param[in] szKey The setting key to delete
   * @version This function is only supported under bbLean (and derivatives)
   * @par Alternatives:
@@ -836,8 +835,7 @@ bool DeleteSetting(LPCSTR path, LPCSTR szKey)
 	return 0 != dirty;
 }
 
-/** @brief Delete a setting from an RC file
-  * @param[in] path The path to the RC file
+/** @param[in] path The path to the RC file
   * @param[in] szKey The key to rename
   * @param[in] new_keyword The new name of the key
   * @version This function is only supported under bbLean (and derivatives)
@@ -883,8 +881,7 @@ void WriteString(LPCSTR fileName, LPCSTR szKey, LPCSTR value)
 	WriteValue(fileName, szKey, value);
 }
 
-/** @brief Create or update a boolean key to a RC file
-  * @param[in] fileName The name of the RC file to update
+/** @param[in] fileName The name of the RC file to update
   * @param[in] szKey The name of the key to update
   * @param[in] value The key value (true or false)
   */
