@@ -62,6 +62,9 @@ public:
 	void SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom, UINT pEdge);
 private:
 	UINT TaskbarCreated;
+	static UINT m_forwarderModuleMsg;
+	static HMODULE m_forwarderModule;
+
 	HWND hTrayWnd;
 	std::map<ULONG_PTR, ShellServiceHandler *> handlers;
 	HINSTANCE hInstance;

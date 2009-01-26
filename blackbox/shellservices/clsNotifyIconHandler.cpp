@@ -192,11 +192,11 @@ HRESULT NotifyIconHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 	case NIM_MODIFY:
 
 	{
-		if (!LookupIcon(realNid.hWnd, realNid.uID))
-		{
-			PRINT("Trying to modify a non-existant icon");
-			return FALSE;
-		}
+		//if (!LookupIcon(realNid.hWnd, realNid.uID))
+		//{
+		//	PRINT("Trying to modify a non-existant icon");
+		//	return FALSE;
+		//}
 		eUpdateResult result = UpdateIcon(realNid);
 		if ((result & ICON_MODIFIED))
 		{
