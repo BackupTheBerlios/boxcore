@@ -109,7 +109,17 @@ endif (DEBUG_CODE)
 if (MINGW)
 set_target_properties (blackbox PROPERTIES
 	LINK_FLAGS " -s ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def"
-	COMPILE_FLAGS "-Os -Wall -fno-rtti -fno-exceptions"
+	COMPILE_FLAGS "-Os -Wall -fno-rtti -fno-exceptions -fmessage-length=0"
+)
+endif (MINGW)
+
+add_library(TrayForwarder SHARED hooks/TrayForwarder.cpp)
+set_target_properties (TrayForwarder  PROPERTIES PREFIX "")
+
+if (MINGW)
+set_target_properties (TrayForwarder PROPERTIES
+	LINK_FLAGS " -s"
+	COMPILE_FLAGS "-Os -Wall -fno-rtti -fno-exceptions -fmessage-length=0"
 )
 endif (MINGW)
 
