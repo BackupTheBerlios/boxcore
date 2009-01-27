@@ -8,6 +8,8 @@ clsNotifyIconHandler.cpp
 clsNotificationIcon.cpp
 clsAppbarHandler.cpp
 
+hash.cpp
+
 ../../dynwinapi/clsShlwapi.cpp
 ../../dynwinapi/clsUser32.cpp
 )

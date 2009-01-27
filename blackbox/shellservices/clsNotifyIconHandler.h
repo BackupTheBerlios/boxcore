@@ -4,6 +4,8 @@
 #include "clsNotificationIcon.h"
 #include "nid.h"
 #include <list>
+#include <map>
+#include <utility>
 
 namespace ShellServices
 {
@@ -19,10 +21,12 @@ enum eTrayCallbackType {TCALLBACK_ADD, TCALLBACK_MOD, TCALLBACK_DEL};
 typedef void (*NotificationIconCallback)(void *);
 typedef LegacyNotificationIcon *(*LegacyNotficationIconFactory)();
 
+typedef std::pair<HWND, UINT> iconPair_t;
+
 class NotifyIconHandler : public ShellServiceHandler
 {
 public:
-	NotifyIconHandler(LegacyNotficationIconFactory p_legacyFactory);
+	NotifyIconHandler(LegacyNotficationIconFactory p_legacyFactory, bool p_enableProxy);
 	virtual ~NotifyIconHandler();
 
 	void RegisterCallback(eTrayCallbackType p_type, NotificationIconCallback p_callback);
@@ -53,6 +57,18 @@ private:
 	NotificationIconCallback createdCallback;
 	NotificationIconCallback modifiedCallback;
 	NotificationIconCallback deletedCallback;
+
+	bool m_proxyEnabled;
+	std::map<UINT, iconPair_t> m_iconLookup;
+	std::map<iconPair_t, UINT> m_iconLookupReverse;
+	UINT currentHash;
+	HWND m_proxyWnd;
+	UINT m_lastPopup;
+	std::pair<HWND, UINT> m_lastTarget;
+	UINT m_lastMessage;
+
+	static LRESULT CALLBACK ExtProxyWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK ProxyWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
 
 }

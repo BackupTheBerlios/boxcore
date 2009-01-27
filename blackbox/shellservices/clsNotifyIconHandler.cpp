@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <functional>
 #include "../../debug/debug.h"
+#include "hash.h"
+#include "../../dynwinapi/clsUser32.h"
 
 #include <tchar.h>
 #include <cstdio>
@@ -17,16 +19,58 @@ struct SHELLTRAYDATA
 	DWORD dwMessage;
 	NOTIFYICONDATA iconData;
 };
-NotifyIconHandler::NotifyIconHandler(LegacyNotficationIconFactory p_legacyFactory)
+
+NotifyIconHandler::NotifyIconHandler(LegacyNotficationIconFactory p_legacyFactory, bool p_enableProxy) : m_lastTarget(NULL, 0)
 {
 	m_legacyFactory = p_legacyFactory;
 	createdCallback = NULL;
 	modifiedCallback = NULL;
 	deletedCallback = NULL;
+	currentHash = 0xd0d0d0d0;
+
+	m_lastPopup = 0;
+
+	m_proxyEnabled = p_enableProxy;
+
+	if (m_proxyEnabled)
+	{
+	WNDCLASSEX wc;
+	ZeroMemory(&wc, sizeof wc);
+	wc.cbSize = sizeof(wc);
+	wc.lpfnWndProc      = ExtProxyWndProc;
+	wc.cbClsExtra = sizeof(this);
+	wc.hInstance        = GetModuleHandle(NULL);
+	wc.lpszClassName    = TEXT("ProxyTrayWindow");
+	wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
+	wc.style            = CS_DBLCLKS;
+
+	RegisterClassEx(&wc);
+
+	m_proxyWnd = CreateWindowEx(
+					 WS_EX_TOOLWINDOW ,   // window ex-style
+					 TEXT("ProxyTrayWindow"),          // window class name
+					 NULL,               // window caption text
+					 WS_POPUP, // window style
+					 0,            // x position
+					 0,            // y position
+					 1,           // window width
+					 1,          // window height
+					 NULL,               // parent window
+					 NULL,               // window menu
+					 GetModuleHandle(NULL),          // hInstance of .dll
+					 this                // creation data
+				 );
+	}
 }
 
 NotifyIconHandler::~NotifyIconHandler()
 {
+	if (m_proxyEnabled)
+	{
+	DestroyWindow(m_proxyWnd);
+	m_proxyWnd = NULL;
+	UnregisterClass(TEXT("ProxyTrayWindow"), GetModuleHandle(NULL));
+	}
 }
 
 class NotificationIconPredicate
@@ -167,6 +211,25 @@ HRESULT NotifyIconHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 	{
 		PRINT("Converting to delete request");
 		trayData->dwMessage = NIM_DELETE;
+	}
+
+	if (m_proxyEnabled)
+	{
+	iconPair_t thisPair(realNid.hWnd, realNid.uID);
+	std::map<iconPair_t, UINT>::iterator thisIt = m_iconLookupReverse.find(thisPair);
+	if ( thisIt != m_iconLookupReverse.end())
+	{
+		realNid.hWnd = m_proxyWnd;
+		realNid.uID = thisIt->second;
+	}
+	else
+	{
+		IconHash(realNid.hWnd, realNid.uID, currentHash);
+		m_iconLookup[currentHash] = thisPair;
+		m_iconLookupReverse[thisPair] = currentHash;
+		realNid.hWnd = m_proxyWnd;
+		realNid.uID = currentHash;
+	}
 	}
 	switch (trayData->dwMessage)
 	{
@@ -363,6 +426,12 @@ eUpdateResult NotifyIconHandler::DeleteIcon(HWND p_hWnd, UINT p_uID)
 		{
 			prevIcon->m_legacyData->updateLegacyNext(nextIcon);
 		}
+		if (m_proxyEnabled)
+		{
+		iconPair_t delPair = m_iconLookup[(*position)->m_uID];
+		m_iconLookup.erase((*position)->m_uID);
+		m_iconLookupReverse.erase(delPair);
+		}
 		delete (*position);
 		m_IconList.erase(position);
 		return ICON_DELETED;
@@ -555,6 +624,127 @@ NotificationIcon *NotifyIconHandler::LookupIcon(UINT p_index)
 	}
 	//advance(n, p_index);
 	return *n;
+}
+
+LRESULT CALLBACK NotifyIconHandler::ExtProxyWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	NotifyIconHandler *owner = NULL;
+	if (uMsg == WM_NCCREATE)
+	{
+		owner = reinterpret_cast<NotifyIconHandler *>(((CREATESTRUCT *)lParam)->lpCreateParams);
+		SetClassLongPtr(hWnd, 0, reinterpret_cast<LONG_PTR>(owner));
+	}
+	else
+	{
+		owner = reinterpret_cast<NotifyIconHandler *>(GetClassLongPtr(hWnd, 0));
+	}
+
+	if (owner)
+	{
+		return owner->ProxyWndProc(hWnd, uMsg, wParam, lParam);
+	}
+	else
+	{
+		return DefWindowProc(hWnd, uMsg, wParam, lParam);
+	}
+}
+
+#ifndef NIN_POPUPOPEN
+#define NIN_POPUPOPEN 0x00000406
+#endif
+#ifndef NIN_POPUPCLOSE
+#define NIN_POPUPCLOSE 0x00000407
+#endif
+
+LRESULT CALLBACK NotifyIconHandler::ProxyWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	POINT mousePos;
+				GetCursorPos(&mousePos);
+
+	if (uMsg == WM_TIMER)
+	{
+		if (m_lastPopup)
+		{
+			SendNotifyMessage(m_lastTarget.first, m_lastMessage, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(NIN_POPUPCLOSE, m_lastTarget.second));
+			m_lastPopup = 0;
+			KillTimer(hWnd, 1);
+		}
+		return TRUE;
+	}
+	else if (uMsg >= WM_USER)
+	{
+		UINT uID = wParam;
+		std::map<UINT, iconPair_t>::iterator target = m_iconLookup.find(uID);
+		UINT targetMsg;
+		if (target != m_iconLookup.end())
+		{
+			targetMsg = lParam;
+		}
+		else
+		{
+			return FALSE;
+		}
+		HWND targetWnd = target->second.first;
+		UINT targetID = target->second.second;
+		NotificationIcon *targetIcon = LookupIcon(hWnd, uID);
+		if (IsWindow(targetWnd))
+		{
+			DWORD pid;
+			if (WM_MOUSEMOVE != targetMsg
+					&& user32.AllowSetForegroundWindow
+					&& GetWindowThreadProcessId(targetWnd, &pid))
+			{
+				user32.AllowSetForegroundWindow(pid);
+			}
+			if (m_lastPopup != uID)
+			{
+				SendNotifyMessage(m_lastTarget.first, m_lastMessage, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(NIN_POPUPCLOSE, m_lastTarget.second));
+				m_lastPopup = 0;
+			}
+			switch (targetIcon->m_uVersion)
+			{
+			case 4:
+			{
+				switch (targetMsg)
+				{
+				case WM_RBUTTONUP:
+					SendNotifyMessage(targetWnd, uMsg, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(WM_CONTEXTMENU, targetID));
+					break;
+				case WM_MOUSEMOVE:
+					if (m_lastPopup != uID)
+					{
+						SendNotifyMessage(targetWnd, uMsg, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(NIN_POPUPOPEN, targetID));
+						m_lastPopup = uID;
+						m_lastTarget = target->second;
+						m_lastMessage = uMsg;
+					}
+					SetTimer(hWnd, 1, 5000, NULL);
+					break;
+				case WM_MOUSELEAVE:
+					SendNotifyMessage(targetWnd, uMsg, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(NIN_POPUPCLOSE, targetID));
+					m_lastPopup = 0;
+					KillTimer(hWnd, 1);
+					break;
+				default:
+					SendNotifyMessage(targetWnd, uMsg, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(targetMsg, targetID));
+				}
+				break;
+			}
+			default:
+				SendNotifyMessage(targetWnd, uMsg, targetID, targetMsg);
+			}
+			return TRUE;
+		}
+		else
+		{
+			CleanTray();
+			return FALSE;
+		}
+	}
+	else
+	{
+		return DefWindowProc(hWnd, uMsg, wParam, lParam);
+	}
 }
 
 }
