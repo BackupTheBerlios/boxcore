@@ -8,7 +8,7 @@
   * <!-- Copyright (C) 2008-2009 Carsomyr -->
   * Copyright &copy; 2001-2003 The Blackbox for Windows Development Team @n
   * Copyright &copy; 2004-2007 grischka @n
-  * Copyright &copy; 2008 Carsomyr
+  * Copyright &copy; 2008-2009 Carsomyr
   * @par Links:
   * http://developer.berlios.de/projects/boxcore @n
   * http://bb4win.sourceforge.net/bblean @n
@@ -871,8 +871,8 @@ bool RenameSetting(LPCSTR path, LPCSTR szKey, LPCSTR new_keyword)
 
 //===========================================================================
 
-/** @brief Create or update a string key to a RC file
-  * @param[in] fileName The name of the RC file to update
+
+/** @param[in] fileName The name of the RC file to update
   * @param[in] szKey The name of the key to update
   * @param[in] value The string value to write
   */
@@ -890,8 +890,7 @@ void WriteBool(LPCSTR fileName, LPCSTR szKey, bool value)
 	WriteValue(fileName, szKey, value ? "true" : "false");
 }
 
-/** @brief Create or update an integer key to a RC file
-  * @param[in] fileName The name of the RC file to update
+/** @param[in] fileName The name of the RC file to update
   * @param[in] szKey The name of the key to update
   * @param[in] value The integer to write
   */
@@ -901,8 +900,7 @@ void WriteInt(LPCSTR fileName, LPCSTR szKey, int value)
 	WriteValue(fileName, szKey, itoa(value, buff, 10));
 }
 
-/** @brief Create or update a color key to a RC file
-  * @param[in] fileName The name of the RC file to update
+/** @param[in] fileName The name of the RC file to update
   * @param[in] szKey The name of the key to update
   * @param[in] value The color value to write
   */
@@ -916,8 +914,8 @@ void WriteColor(LPCSTR fileName, LPCSTR szKey, COLORREF value)
 
 //===========================================================================
 
-/** @brief Read a boolean value from a RC file
-  * @param[in] fileName The name of the RC file to read
+
+/** @param[in] fileName The name of the RC file to read
   * @param[in] szKey The name of the key to read
   * @param[in] bDefault A default value for the key
   * @return The value read from the RC file if found
@@ -934,8 +932,7 @@ bool ReadBool(LPCSTR fileName, LPCSTR szKey, bool bDefault)
 	return bDefault;
 }
 
-/** @brief Read an integer value from a RC file
-  * @param[in] fileName The name of the RC file to read
+/** @param[in] fileName The name of the RC file to read
   * @param[in] szKey The name of the key to read
   * @param[in] nDefault A default value for the key
   * @return The value read from the RC file if found
@@ -947,8 +944,7 @@ int ReadInt(LPCSTR fileName, LPCSTR szKey, int nDefault)
 	return szValue ? atoi(szValue) : nDefault;
 }
 
-/** @brief Read a string value from a RC file
-  * @param[in] fileName The name of the RC file to read
+/** @param[in] fileName The name of the RC file to read
   * @param[in] szKey The name of the key to read
   * @param[in] szDefault A default value for the key
   * @return The value read from the RC file if found
@@ -960,8 +956,7 @@ LPCSTR ReadString(LPCSTR fileName, LPCSTR szKey, LPCSTR szDefault)
 	return szValue ? szValue : szDefault;
 }
 
-/** @brief Read a color value from a RC file
-  * @param[in] fileName The name of the RC file to read
+/** @param[in] fileName The name of the RC file to read
   * @param[in] szKey The name of the key to read
   * @param[in] defaultString A default value for the key
   * @return The value read from the RC file if found

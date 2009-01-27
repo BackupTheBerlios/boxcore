@@ -864,10 +864,16 @@ extern "C"
 	/* ------------------------------------ */
 	/* Resource File API */
 
-	/* Read Settings */
+	/** @brief Read a boolean value from a RC file */
 	API_EXPORT bool ReadBool(LPCSTR fileName, LPCSTR szKey, bool defaultBool);
+
+	/** @brief Read an integer value from a RC file */
 	API_EXPORT int ReadInt(LPCSTR fileName, LPCSTR szKey, int defaultInt);
+
+	/** @brief Read a string value from a RC file */
 	API_EXPORT LPCSTR ReadString(LPCSTR fileName, LPCSTR szKey, LPCSTR defaultString);
+
+	/** @brief Read a color value from a RC file */
 	API_EXPORT COLORREF ReadColor(LPCSTR fileName, LPCSTR szKey, LPCSTR defaultString);
 
 	/* Read a rc-value as string. If 'ptr' is specified, it can read a sequence of items with the same name. */
@@ -877,16 +883,23 @@ extern "C"
 	API_EXPORT int FoundLastValue(void);
 	/* Returns: 0=not found, 1=found exact value, 2=found matching wildcard*/
 
-	/* Write Settings */
+	/** @brief Create or update a boolean key to a RC file */
 	API_EXPORT void WriteBool(LPCSTR fileName, LPCSTR szKey, bool value);
+
+	/** @brief Create or update an integer key to a RC file */
 	API_EXPORT void WriteInt(LPCSTR fileName, LPCSTR szKey, int value);
+
+	/** @brief Create or update a string key to a RC file */
 	API_EXPORT void WriteString(LPCSTR fileName, LPCSTR szKey, LPCSTR value);
+
+	/** @brief Create or update a color key to a RC file */
 	API_EXPORT void WriteColor(LPCSTR fileName, LPCSTR szKey, COLORREF value);
 
 	/** @brief Delete a setting from an RC file */
 	WARNING_BBLEAN(
 		API_EXPORT bool DeleteSetting(LPCSTR fileName, LPCSTR szKey)
 	);
+
 	/** @brief Rename a setting in an RC file */
 	WARNING_BBLEAN(
 		API_EXPORT bool RenameSetting(LPCSTR fileName, LPCSTR old_keyword, LPCSTR new_keyword)
