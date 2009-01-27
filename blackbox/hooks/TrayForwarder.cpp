@@ -58,7 +58,7 @@ extern "C" BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvRe
 		hInstance = hinstDLL;
 		hTrayWnd = FindWindow(TEXT("Shell_TrayWnd"), NULL);
 		forwarderModuleMessage = RegisterWindowMessage(TEXT("TRAYFORWARDER_MODULE"));
-		hOurTrayWnd = FindWindow(TEXT("BBShell_TrayWnd"), NULL);
+		hOurTrayWnd = FindWindow(TEXT("HandlerShell_TrayWnd"), NULL);
 		if (hOurTrayWnd)
 		{
 			origWndProc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(hTrayWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(ForwarderProc)));

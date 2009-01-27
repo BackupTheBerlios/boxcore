@@ -95,7 +95,7 @@ ShellServiceWindow::ShellServiceWindow(HINSTANCE pInstance, bool pTopmost)
 	wndClass.cbClsExtra = sizeof(this);
 	if (trayInjected)
 	{
-		wndClass.lpszClassName = TEXT("BBShell_TrayWnd");
+		wndClass.lpszClassName = TEXT("HandlerShell_TrayWnd");
 	}
 	else
 	{
