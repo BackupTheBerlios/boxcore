@@ -528,26 +528,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	/* This seems to inizialize some things and free some memory at startup. */
 	SendMessage(GetDesktopWindow(), 0x400, 0, 0); /* 0x400 = WM_USER */
 
-	/* Hack to terminate the XP welcome screen... */
-	HANDLE hSRE;
-	hSRE = OpenEvent(EVENT_MODIFY_STATE, FALSE, "Global\\msgina: ShellReadyEvent");
-	if (hSRE)
+	// Welcome screen termination for XP and Vista
+	LPCTSR events[] = { TEXT("Global\\msgina: ShellReadyEvent"), TEXT("msgina: ShellReadyEvent"), "ShellDesktopSwitchEvent" };
+	for(int i=0; i<= sizeof(events)/sizeof(events[0]); ++i)
 	{
-		SetEvent(hSRE), CloseHandle(hSRE);
+		HANDLE hSRE = OpenEvent(EVENT_MODIFY_STATE, FALSE, events[i]);
+		if (hSRE)
+		{
+			SetEvent(hSRE);
+			CloseHandle(hSRE);
+		}
 	}
-	hSRE = OpenEvent(EVENT_MODIFY_STATE, FALSE, "msgina: ShellReadyEvent");
-	if (hSRE)
-	{
-		SetEvent(hSRE), CloseHandle(hSRE);
-	}
-	//Terminate the vista welcome screen?
-	hSRE = OpenEvent(EVENT_MODIFY_STATE, FALSE, "ShellDesktopSwitchEvent");
-	if (hSRE)
-	{
-		SetEvent(hSRE), CloseHandle(hSRE);
-	}
-	/*hSRE = CreateEvent(NULL, 0, 0, "ShellReadyEvent");
-	if (hSRE) { SetEvent(hSRE); }*/
 
 	// ------------------------------------------
 	/* get things running */
@@ -564,7 +555,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	Desk_Init();
 	InitTrayMapping();
 	g_pShellServiceWindow = new ShellServices::ShellServiceWindow(hMainInstance, true);
-	g_pNotificationIconHandler = new ShellServices::NotifyIconHandler(SystemTrayIconFactory);
+	g_pNotificationIconHandler = new ShellServices::NotifyIconHandler(SystemTrayIconFactory, true);
 	g_pNotificationIconHandler->RegisterCallback(ShellServices::TCALLBACK_ADD,broadcastAdd);
 	g_pNotificationIconHandler->RegisterCallback(ShellServices::TCALLBACK_MOD,broadcastMod);
 	g_pNotificationIconHandler->RegisterCallback(ShellServices::TCALLBACK_DEL,broadcastRemove);
