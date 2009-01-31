@@ -25,12 +25,13 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertica
 	brushBitmap = NULL;
 	eraseBrush = NULL;
 	hInstance = pInstance;
-	_tcscpy(className, pClassName);
-
+	CopyString(className, pClassName, 100);
 	hBlackboxWnd = GetBBWnd();
 	char rcname[100];
 	char pluginpath[MAX_PATH];
 	CopyString(rcname, pClassName, 95);
+	m_pluginPrefix = new CHAR[_tcslen(className)+1];
+	CopyString(m_pluginPrefix, className, _tcslen(className)+1);
 	strcat(rcname, ".rc");
 	GetModuleFileNameA(hInstance, pluginpath, MAX_PATH);
 	if (strrchr(pluginpath, '\\'))
@@ -136,6 +137,7 @@ clsBar::~clsBar()
 		delete (*i);
 	itemList.clear();
 	bbApiLoader.freeLibrary();
+	delete[] m_pluginPrefix;
 	if (eraseBrush)
 		DeleteObject(eraseBrush);
 	if (brushBitmap)
