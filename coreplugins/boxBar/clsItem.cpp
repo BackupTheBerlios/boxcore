@@ -80,6 +80,10 @@ clsItem::clsItem(bool pVertical)
   */
 clsItem::~clsItem()
 {
+	for (int i = 0; i < m_workers.size(); ++i)
+	{
+		delete m_workers[i];
+	}
 	delete[] tipText;
 	delete[] m_broamLeft;
 	delete[] m_broamLeftDbl;
@@ -415,13 +419,17 @@ void clsItem::draw(HDC pContext)
 }
 
 
-/** @brief Stub for reading settings from the RC file
+/** @brief Base for reading settings from the RC file
   *
-  * Items should implement this if they need settings from the RC file. This stub does nothing,
-  * and is present so that items can ignore this function if they do not need it.
+  * Items should implement this if they need to perform additional processing besides just having
+  * their RCWorkers driven.
   */
 void clsItem::readSettings()
 {
+	for (std::vector<RCWorkers::RCWorker *>::iterator i = m_workers.begin(); i != m_workers.end(); ++i)
+	{
+		(*i)->ReadValue();
+	}
 }
 
 /** @brief Stub for config menu addition

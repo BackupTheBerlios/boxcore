@@ -13,6 +13,9 @@
 #include "../../debug/debug.h"
 #include "../../utility/stringcopy.h"
 
+#include <vector>
+#include "rcworker/clsRCWorker.h"
+
 /** @enum dimType
   * @brief Dimensions for use in boxBar
   *
@@ -195,6 +198,8 @@ protected:
 	const char* m_broamLeftDbl;
 	const char* m_broamRight;
 	const char* m_broamMid;
+
+	std::vector<RCWorkers::RCWorker *> m_workers;
 private:
 	BLENDFUNCTION itemBlend;
 	BITMAPINFO itemBitmapInfo;
