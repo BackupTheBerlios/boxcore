@@ -4,12 +4,20 @@
 #include "clsFlexiSpacer.h"
 #include <cstdlib>
 
+#include "rcworker/clsRCInt.h"
+#include "rcworker/clsRCBool.h"
+
 clsTaskItemCollection::clsTaskItemCollection(bool pVertical): clsItemCollection(pVertical)
 {
+	CHAR buffer[256];
 	m_dragTask = NULL;
 	m_dragTimer = getTimerID();
+	m_knowsSize = DIM_VERTICAL;
 	m_itemPrefix = new CHAR[strlen("Tasks")+1];
 	strcpy(m_itemPrefix, "Tasks");
+	m_workers.push_back(new RCWorkers::RCBool(configFile, ItemRCKey(buffer, "stretcharea"), stretchTaskarea, true));
+	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"SpacingBorder"), spacingBorder, 0));
+	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"SpacingItems"), spacingItems, 2));
 	readSettings();
 	populateTasks();
 	m_dropTarget = new DropTarget(this, DragAction);
@@ -137,11 +145,8 @@ void clsTaskItemCollection::populateTasks()
   */
 void clsTaskItemCollection::readSettings()
 {
-	stretchTaskarea = ReadBool(configFile, "boxBar.tasks.stretcharea:", true);
-	spacingBorder = ReadInt(configFile, "boxBar.tasks.spacingBorder:", 0);
-	spacingItems = ReadInt(configFile, "boxBar.tasks.spacingItems:", 2);
+	clsItem::readSettings();
 
-	m_knowsSize = DIM_VERTICAL;
 	if (stretchTaskarea)
 	{
 		m_wantsStretch = DIM_BOTH;
