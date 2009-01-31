@@ -1509,6 +1509,22 @@ void exec_boxcore_broam(const char *broam)
 		int right = atoi(NextToken(buffer, &core_args));
 		int bottom = atoi(NextToken(buffer, &core_args));
 		UINT edge = atoi(NextToken(buffer, &core_args));
+		POINT barPoint = {left, top};
+		RECT monRect;
+		GetMonitorRect(&barPoint, &monRect, GETMON_FROM_POINT);
+		switch(edge)
+		{
+		case ABE_TOP:
+		case ABE_BOTTOM:
+			left = monRect.left;
+			right = monRect.right;
+			break;
+		case ABE_LEFT:
+		case ABE_RIGHT:
+			top = monRect.top;
+			bottom = monRect.bottom;
+			break;
+		}
 		g_pShellServiceWindow->SetTaskbarPos(left,top,right,bottom,edge);
 	}
 }
