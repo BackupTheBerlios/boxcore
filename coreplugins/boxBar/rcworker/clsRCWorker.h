@@ -25,11 +25,13 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-/** @brief Contains RCWorker and its concrete types */
+/** @internal
+  * @brief Contains RCWorker and its concrete types */
 namespace RCWorkers
 {
 
-/** @brief This class presents a basic interface for classes which link an RC file entry with a
+/** @internal
+  * @brief This class presents a basic interface for classes which link an RC file entry with a
   * program variable
   *
   * This class defines the interfaces through which a specific entry in an RC file can be read or written
