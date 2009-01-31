@@ -34,32 +34,32 @@ NotifyIconHandler::NotifyIconHandler(LegacyNotficationIconFactory p_legacyFactor
 
 	if (m_proxyEnabled)
 	{
-	WNDCLASSEX wc;
-	ZeroMemory(&wc, sizeof wc);
-	wc.cbSize = sizeof(wc);
-	wc.lpfnWndProc      = ExtProxyWndProc;
-	wc.cbClsExtra = sizeof(this);
-	wc.hInstance        = GetModuleHandle(NULL);
-	wc.lpszClassName    = TEXT("ProxyTrayWindow");
-	wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
-	wc.style            = CS_DBLCLKS;
+		WNDCLASSEX wc;
+		ZeroMemory(&wc, sizeof wc);
+		wc.cbSize = sizeof(wc);
+		wc.lpfnWndProc      = ExtProxyWndProc;
+		wc.cbClsExtra = sizeof(this);
+		wc.hInstance        = GetModuleHandle(NULL);
+		wc.lpszClassName    = TEXT("ProxyTrayWindow");
+		wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
+		wc.style            = CS_DBLCLKS;
 
-	RegisterClassEx(&wc);
+		RegisterClassEx(&wc);
 
-	m_proxyWnd = CreateWindowEx(
-					 WS_EX_TOOLWINDOW ,   // window ex-style
-					 TEXT("ProxyTrayWindow"),          // window class name
-					 NULL,               // window caption text
-					 WS_POPUP, // window style
-					 0,            // x position
-					 0,            // y position
-					 1,           // window width
-					 1,          // window height
-					 NULL,               // parent window
-					 NULL,               // window menu
-					 GetModuleHandle(NULL),          // hInstance of .dll
-					 this                // creation data
-				 );
+		m_proxyWnd = CreateWindowEx(
+						 WS_EX_TOOLWINDOW ,   // window ex-style
+						 TEXT("ProxyTrayWindow"),          // window class name
+						 NULL,               // window caption text
+						 WS_POPUP, // window style
+						 0,            // x position
+						 0,            // y position
+						 1,           // window width
+						 1,          // window height
+						 NULL,               // parent window
+						 NULL,               // window menu
+						 GetModuleHandle(NULL),          // hInstance of .dll
+						 this                // creation data
+					 );
 	}
 }
 
@@ -67,9 +67,9 @@ NotifyIconHandler::~NotifyIconHandler()
 {
 	if (m_proxyEnabled)
 	{
-	DestroyWindow(m_proxyWnd);
-	m_proxyWnd = NULL;
-	UnregisterClass(TEXT("ProxyTrayWindow"), GetModuleHandle(NULL));
+		DestroyWindow(m_proxyWnd);
+		m_proxyWnd = NULL;
+		UnregisterClass(TEXT("ProxyTrayWindow"), GetModuleHandle(NULL));
 	}
 }
 
@@ -154,6 +154,7 @@ HRESULT NotifyIconHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 			realNid.uVersion = ansiNid.uVersion;
 		}
 		break;
+	default:
 	case NID_VISTAW_SIZE:
 		if ((uniNid.uFlags & NIF_INFO) && (uniNid.dwInfoFlags & NIIF_USER) && uniNid.hBalloonIcon)
 		{
@@ -203,8 +204,6 @@ HRESULT NotifyIconHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 			realNid.uVersion = uniNid.uVersion;
 		}
 		break;
-	default:
-		TRACE("The size is %u. Options where %u %u", p_cbData,NID_WIN95_SIZE, NID_XPW_SIZE);
 	}
 
 	if (!IsWindow(realNid.hWnd))
@@ -215,21 +214,21 @@ HRESULT NotifyIconHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 
 	if (m_proxyEnabled)
 	{
-	iconPair_t thisPair(realNid.hWnd, realNid.uID);
-	std::map<iconPair_t, UINT>::iterator thisIt = m_iconLookupReverse.find(thisPair);
-	if ( thisIt != m_iconLookupReverse.end())
-	{
-		realNid.hWnd = m_proxyWnd;
-		realNid.uID = thisIt->second;
-	}
-	else
-	{
-		IconHash(realNid.hWnd, realNid.uID, currentHash);
-		m_iconLookup[currentHash] = thisPair;
-		m_iconLookupReverse[thisPair] = currentHash;
-		realNid.hWnd = m_proxyWnd;
-		realNid.uID = currentHash;
-	}
+		iconPair_t thisPair(realNid.hWnd, realNid.uID);
+		std::map<iconPair_t, UINT>::iterator thisIt = m_iconLookupReverse.find(thisPair);
+		if ( thisIt != m_iconLookupReverse.end())
+		{
+			realNid.hWnd = m_proxyWnd;
+			realNid.uID = thisIt->second;
+		}
+		else
+		{
+			IconHash(realNid.hWnd, realNid.uID, currentHash);
+			m_iconLookup[currentHash] = thisPair;
+			m_iconLookupReverse[thisPair] = currentHash;
+			realNid.hWnd = m_proxyWnd;
+			realNid.uID = currentHash;
+		}
 	}
 	switch (trayData->dwMessage)
 	{
@@ -428,9 +427,9 @@ eUpdateResult NotifyIconHandler::DeleteIcon(HWND p_hWnd, UINT p_uID)
 		}
 		if (m_proxyEnabled)
 		{
-		iconPair_t delPair = m_iconLookup[(*position)->m_uID];
-		m_iconLookup.erase((*position)->m_uID);
-		m_iconLookupReverse.erase(delPair);
+			iconPair_t delPair = m_iconLookup[(*position)->m_uID];
+			m_iconLookup.erase((*position)->m_uID);
+			m_iconLookupReverse.erase(delPair);
 		}
 		delete (*position);
 		m_IconList.erase(position);
@@ -513,7 +512,7 @@ bool NotifyIconHandler::GetNotificationIconInfo(NotificationIcon *p_icon, PVOID 
 			}
 			break;
 		case NI_VERSION:
-			p_return[i] = reinterpret_cast<PVOID>(p_icon->m_uVersion);
+			p_return[i] = reinterpret_cast<PVOID>(m_proxyEnabled ? 0 : p_icon->m_uVersion);
 			break;
 		case NI_LEGACY:
 			p_return[i] = reinterpret_cast<PVOID>(p_icon->m_legacyData);
@@ -659,7 +658,7 @@ LRESULT CALLBACK NotifyIconHandler::ExtProxyWndProc(HWND hWnd, UINT uMsg, WPARAM
 LRESULT CALLBACK NotifyIconHandler::ProxyWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	POINT mousePos;
-				GetCursorPos(&mousePos);
+	GetCursorPos(&mousePos);
 
 	if (uMsg == WM_TIMER)
 	{
