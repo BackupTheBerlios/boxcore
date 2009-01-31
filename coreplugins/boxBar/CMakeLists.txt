@@ -37,6 +37,11 @@ clsItButton.cpp
 
 clsDropTarget.cpp
 
+rcworker/clsRCWorker.cpp
+rcworker/clsRCInt.cpp
+rcworker/clsRCBool.cpp
+rcworker/clsRCConditional.cpp
+
 ../utils/clsApiLoader.cpp
 ../../dynwinapi/clsUser32.cpp
 ../../dynwinapi/clsMsimg32.cpp
@@ -88,7 +93,7 @@ endif (DEBUG_CODE)
 if (MINGW)
 set_target_properties (boxBar PROPERTIES
 	LINK_FLAGS "-s"
-	COMPILE_FLAGS "-Wall -Os -fno-exceptions"
+	COMPILE_FLAGS "-Wall -Os -fno-exceptions -fmessage-length=0"
 )
 endif (MINGW)
 

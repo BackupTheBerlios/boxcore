@@ -3,6 +3,9 @@
 #include "clsTrayItem.h"
 #include <cstdlib>
 #include <tchar.h>
+#include "rcworker/clsRCInt.h"
+#include "rcworker/clsRCConditional.h"
+#include "rcworker/clsRCBool.h"
 
 clsTrayItemCollection::clsTrayItemCollection(bool pVertical):clsItemCollection(pVertical)
 {
@@ -10,6 +13,15 @@ clsTrayItemCollection::clsTrayItemCollection(bool pVertical):clsItemCollection(p
 	m_wantsStretch = DIM_NONE;
 	m_itemPrefix = new CHAR[strlen("Tray")+1];
 	strcpy(m_itemPrefix, "Tray");
+	CHAR buffer[256];
+	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"IconSize"), iconSize, 16));
+	m_workers.push_back(new RCWorkers::RCBool(configFile, ItemRCKey(buffer, "Vertical"), vertical, vertical));
+	m_workers.push_back(new RCWorkers::RCConditional(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"maxRows"), numRowCols, 0), vertical, true));
+	m_workers.push_back(new RCWorkers::RCConditional(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"maxCols"), numRowCols, 0), vertical, false));
+	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"SpacingBorder"), spacingBorder, 0));
+	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"SpacingItems"), spacingItems, 2));
+	m_workers.push_back(new RCWorkers::RCBool(configFile, ItemRCKey(buffer, "NewIconsFirst"), m_newFirst, false));
+	m_workers.push_back(new RCWorkers::RCBool(configFile, ItemRCKey(buffer, "ReverseOrder"), m_reverseOrder, false));
 	readSettings();
 	populateTray();
 }
@@ -48,56 +60,55 @@ LRESULT clsTrayItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			msg_string += strlen(m_pluginPrefix) + 1;
 			if (!strnicmp(msg_string, m_itemPrefix, strlen(m_itemPrefix)))
 			{
-				CHAR buffer[256];
 				msg_string += strlen(m_itemPrefix) + 1;
 				if ((element = "vertical") && !stricmp(msg_string, element))
 				{
-					WriteBool(configFile, ItemRCKey(buffer, element), !vertical);
+					vertical = !vertical;
+					writeSettings();
 					readSettings();
-					populateTray();
 					configMenu(NULL, true);
 					PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 				}
 				else if ((element = "ReverseOrder") && !stricmp(msg_string, element))
 				{
-					WriteBool(configFile, ItemRCKey(buffer, element), !m_reverseOrder);
+					m_reverseOrder = !m_reverseOrder;
+					writeSettings();
 					readSettings();
-					populateTray();
 					configMenu(NULL, true);
 					PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 				}
 				else if ((element = "NewIconsFirst") && !stricmp(msg_string, element))
 				{
-					WriteBool(configFile, ItemRCKey(buffer, element), !m_newFirst);
+					m_newFirst = !m_newFirst;
+					writeSettings();
 					readSettings();
-					populateTray();
 					configMenu(NULL, true);
 					PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 				}
 				else if (!strnicmp(msg_string, "maxRows", strlen("maxRows")))
 				{
 					msg_string += strlen("maxRows");
-					WriteInt(configFile, "boxBar.tray.maxRows:",atoi(msg_string));
+					numRowCols = atoi(msg_string);
+					writeSettings();
 					readSettings();
-					populateTray();
 					configMenu(NULL, true);
 					PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
 				}
 				else if (!strnicmp(msg_string, "maxCols", strlen("maxCols")))
 				{
 					msg_string += strlen("maxCols");
-					WriteInt(configFile, "boxBar.tray.maxCols:",atoi(msg_string));
+					numRowCols = atoi(msg_string);
+					writeSettings();
 					readSettings();
-					populateTray();
 					configMenu(NULL, true);
 					PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
 				}
 				else if (!strnicmp(msg_string, "iconSize", strlen("iconSize")))
 				{
 					msg_string += strlen("iconSize");
-					WriteInt(configFile, "boxBar.tray.iconSize:",atoi(msg_string));
+					iconSize = atoi(msg_string);
+					writeSettings();
 					readSettings();
-					populateTray();
 					configMenu(NULL, true);
 					PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
 				}
@@ -203,23 +214,21 @@ void clsTrayItemCollection::populateTray()
 	}
 }
 
+void clsTrayItemCollection::writeSettings()
+{
+	for (std::vector<RCWorkers::RCWorker *>::iterator i = m_workers.begin(); i != m_workers.end(); ++i)
+	{
+		(*i)->WriteValue();
+	}
+}
+
 /** @brief Reads settings from the RC file
   *
   * Reads the tray icon size, tray orientation, max number of rows and max number of columns
   */
 void clsTrayItemCollection::readSettings()
 {
-	CHAR buffer[256];
-	vertical = ReadBool(configFile, ItemRCKey(buffer,"vertical"), vertical);
-	iconSize = ReadInt(configFile, ItemRCKey(buffer,"iconSize"), 16);
-	if (vertical)
-		numRowCols = ReadInt(configFile, ItemRCKey(buffer,"maxRows"), 0);
-	else
-		numRowCols = ReadInt(configFile, ItemRCKey(buffer,"maxCols"), 0);
-	spacingBorder = ReadInt(configFile, ItemRCKey(buffer,"spacingBorder"), 0);
-	spacingItems = ReadInt(configFile, ItemRCKey(buffer,"spacingItems"), 2);
-	m_newFirst = ReadBool(configFile, ItemRCKey(buffer,"newIconsFirst"),false);
-	m_reverseOrder = ReadBool(configFile, "boxBar.tray.reverseOrder:", false);
+	clsItem::readSettings();
 	populateTray();
 }
 

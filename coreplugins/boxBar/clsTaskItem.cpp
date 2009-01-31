@@ -3,25 +3,39 @@
 #include "clsFlexiSpacer.h"
 #include <limits.h>
 
+#include "rcworker/clsRCBool.h"
+#include "rcworker/clsRCInt.h"
+
 clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVertical)
 {
+	CHAR buffer[256];
+	m_itemPrefix = new CHAR[strlen("Tasks")+1];
+	CopyString(m_itemPrefix, "Tasks", strlen("Tasks")+1);
 	m_knowsSize = DIM_VERTICAL;
 	m_wantsStretch = DIM_HORIZONTAL;
 	vertical = false;
 
 	taskWnd = pTask->hwnd;
 	CopyString(m_caption, pTask->caption, 256);
+	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"iconsize"), iconSize, 16));
+	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"task.spacingBorder"), spacingBorder, 2));
+	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"task.spacingItems"), spacingItems, 2));
+	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"maxsize.x"), m_maxSizeX, 0));
+	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"active.alpha"), activeAlpha, 255));
+	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"inactive.alpha"), inactiveAlpha, 255));
+	m_workers.push_back(new RCWorkers::RCBool(configFile, ItemRCKey(buffer, "active.background"), s_activeBackground, true));
+	m_workers.push_back(new RCWorkers::RCBool(configFile, ItemRCKey(buffer, "inactive.background"), s_inactiveBackground, true));
 	readSettings();
 	if (pTask->active)
-		{
-			style = activeStyle;
-			itemAlpha = activeAlpha;
-		}
-		else
-		{
-			style = inactiveStyle;
-			itemAlpha = inactiveAlpha;
-		}
+	{
+		style = activeStyle;
+		itemAlpha = activeAlpha;
+	}
+	else
+	{
+		style = inactiveStyle;
+		itemAlpha = inactiveAlpha;
+	}
 	if (iconSize > 16)
 		if (GlobalFindAtom(TEXT("boxCore::running")))
 			iconItem = new clsIconItem(pTask->icon_big, iconSize, vertical);
@@ -33,8 +47,6 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVe
 	addItem(iconItem);
 	addItem(captionItem);
 	leftClick = activateTask;
-
-
 }
 
 /** @brief TaskItem destructer
@@ -134,19 +146,13 @@ void clsTaskItem::activateTask(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM l
   */
 void clsTaskItem::readSettings()
 {
-	iconSize = ReadInt(configFile, "boxBar.tasks.iconsize:", 16);
-	spacingBorder = ReadInt(configFile, "boxBar.tasks.task.spacingBorder:", 2);
-	spacingItems = ReadInt(configFile, "boxBar.tasks.task.spacingItems:", 2);
-	m_maxSizeX = ReadInt(configFile, "boxBar.tasks.maxsize.x:", 0);
+	clsItem::readSettings();
 	if (m_maxSizeX <= 0)
 	{
 		m_maxSizeX = INT_MAX;
 	}
-
-	activeAlpha = ReadInt(configFile, "boxBar.tasks.active.alpha:", 255);
-	inactiveAlpha = ReadInt(configFile, "boxBar.tasks.inactive.alpha:", 255);
-	activeStyle = ReadBool(configFile, "boxBar.tasks.active.background:", true) ? SN_TOOLBARWINDOWLABEL : 0;
-	inactiveStyle = ReadBool(configFile, "boxBar.tasks.inactive.background:", true) ? SN_TOOLBAR : 0;
+	activeStyle = s_activeBackground ? SN_TOOLBARWINDOWLABEL : 0;
+	inactiveStyle = s_inactiveBackground ? SN_TOOLBAR : 0;
 }
 
 /** @brief configMenu
@@ -172,6 +178,8 @@ void clsTaskItem::configMenu(Menu *pMenu, bool p_update)
 	MakeMenuItem(subMenu, "Move to end", command, false);
 }
 
+bool clsTaskItem::s_activeBackground = true;
+bool clsTaskItem::s_inactiveBackground = true;
 int clsTaskItem::inactiveStyle = SN_TOOLBAR;
 int clsTaskItem::activeStyle = SN_TOOLBARWINDOWLABEL;
 int clsTaskItem::inactiveAlpha = 255;

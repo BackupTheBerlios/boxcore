@@ -31,6 +31,9 @@ protected:
 	clsTextItem *captionItem;
 	clsIconItem *iconItem;
 
+	static bool s_activeBackground;
+	static bool s_inactiveBackground;
+
 	static int inactiveStyle;
 	static int activeStyle;
 	static int activeAlpha;
