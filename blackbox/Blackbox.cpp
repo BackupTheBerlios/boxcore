@@ -48,7 +48,6 @@
 #include <locale.h>
 
 #include "blackbox.h"
-//#include "systemtray/clsSystemTray.h"
 #include "shellserviceobjects/clsShellServiceObjects.h"
 #include "clsSystemInfo.h"
 #include "../debug/debug.h"
@@ -529,8 +528,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SendMessage(GetDesktopWindow(), 0x400, 0, 0); /* 0x400 = WM_USER */
 
 	// Welcome screen termination for XP and Vista
-	LPCTSR events[] = { TEXT("Global\\msgina: ShellReadyEvent"), TEXT("msgina: ShellReadyEvent"), "ShellDesktopSwitchEvent" };
-	for(int i=0; i<= sizeof(events)/sizeof(events[0]); ++i)
+	LPCTSTR events[] = { TEXT("Global\\msgina: ShellReadyEvent"), TEXT("msgina: ShellReadyEvent"), "ShellDesktopSwitchEvent" };
+	for (UINT i=0; i<= sizeof(events)/sizeof(events[0]); ++i)
 	{
 		HANDLE hSRE = OpenEvent(EVENT_MODIFY_STATE, FALSE, events[i]);
 		if (hSRE)
