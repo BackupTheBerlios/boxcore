@@ -1293,48 +1293,6 @@ extern "C"
 	  * @{
 	  */
 
-	/** @brief Possible values for requested plugin information */
-	enum ePluginInfo
-	{
-		PLUGIN_UNUSED,
-
-		/** @brief Plugin should return its name */
-		PLUGIN_NAME,
-
-		/** @brief Plugin should return its version */
-		PLUGIN_VERSION,
-
-		/** @brief Plugin should return its author(s) */
-		PLUGIN_AUTHOR,
-
-		/** @brief Plugin should return its release date */
-		PLUGIN_RELEASE,
-
-		/** @brief Same as ::PLUGIN_RELEASE
-		  * @version xoblite
-		  */
-		PLUGIN_RELEASEDATE = PLUGIN_RELEASE,
-
-		/** @brief Plugin should return a link to its homepage */
-		PLUGIN_LINK,
-
-		/** @brief Plugin should return a contact email */
-		PLUGIN_EMAIL,
-
-		/** @brief Plugin should return a list of its bro@ms
-		  *
-		  * The should be one long string. Bro@@ms are split based on the @ so no spaces are needed between.
-		  * This is used by xoblite to generate a menu with the plugins bro@@ms in it.
-		  * @version xoblite
-		  */
-		PLUGIN_BROAMS,
-
-		/** @brief Plugin should return a url where an update metafile can be found, if supported
-		  * @version Kaloth's BBPlugManager
-		  */
-		PLUGIN_UPDATE_URL
-	};
-
 #ifndef __BBCORE__
 	/** @brief Basic plugin startup function
 	  * @param[in] hInstance The instance handle of the plugins DLL. Use when registering window classes etc.
@@ -1391,8 +1349,52 @@ extern "C"
 	  * the plugin name and plugin version.
 	  */
 	DLL_EXPORT LPCSTR pluginInfo(INT p_uIndex);
-/// @}
+
 #endif
+
+	/** @brief Possible values for requested plugin information */
+	enum ePluginInfo
+	{
+		PLUGIN_UNUSED,
+
+		/** @brief Plugin should return its name */
+		PLUGIN_NAME,
+
+		/** @brief Plugin should return its version */
+		PLUGIN_VERSION,
+
+		/** @brief Plugin should return its author(s) */
+		PLUGIN_AUTHOR,
+
+		/** @brief Plugin should return its release date */
+		PLUGIN_RELEASE,
+
+		/** @brief Same as ::PLUGIN_RELEASE
+		  * @version xoblite
+		  */
+		PLUGIN_RELEASEDATE = PLUGIN_RELEASE,
+
+		/** @brief Plugin should return a link to its homepage */
+		PLUGIN_LINK,
+
+		/** @brief Plugin should return a contact email */
+		PLUGIN_EMAIL,
+
+		/** @brief Plugin should return a list of its bro@ms
+		  *
+		  * The should be one long string. Bro@@ms are split based on the @ so no spaces are needed between.
+		  * This is used by xoblite to generate a menu with the plugins bro@@ms in it.
+		  * @version xoblite
+		  */
+		PLUGIN_BROAMS,
+
+		/** @brief Plugin should return a url where an update metafile can be found, if supported
+		  * @version Kaloth's BBPlugManager
+		  */
+		PLUGIN_UPDATE_URL
+	};
+
+	/// @}
 
 #ifdef __cplusplus
 }
