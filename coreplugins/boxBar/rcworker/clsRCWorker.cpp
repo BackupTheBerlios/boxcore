@@ -23,8 +23,8 @@ RCWorker::RCWorker(LPCSTR p_configFile, LPCSTR p_RCKey)
 	m_configFile = p_configFile;
 	if (p_RCKey)
 	{
-	m_RCKey = new CHAR[strlen(p_RCKey)+1];
-	strcpy(m_RCKey, p_RCKey);
+		m_RCKey = new CHAR[strlen(p_RCKey)+1];
+		strcpy(m_RCKey, p_RCKey);
 	}
 	else
 	{
