@@ -27,12 +27,6 @@
 //#include "bbLeanBar.h"
 //#include "bbLeanClasses.h"
 
-typedef BOOL(*fnGetTrayInfo)(HWND, UINT, PVOID*, ATOM*, UINT);
-static fnGetTrayInfo GetTrayInfo = NULL;
-
-#include "../utils/clsApiLoader.h"
-static clsApiLoader bbApiLoader;
-
 // possible bar items
 enum
 {
@@ -661,42 +655,7 @@ public:
 				{
 					pAllowSetForegroundWindow(pid);
 				}
-				// Reroute the mouse message to the tray icon's host window...
-				//SendNotifyMessage(iconWnd, icon->uCallbackMessage, icon->uID, message);
-				if (message != WM_MOUSEMOVE)
-				{
-					int version = 0;
-					if (GetTrayInfo == NULL)
-					{
-						if (bbApiLoader.requestApiPresence(TEXT("boxCore::hasGetTrayInfo")))
-							GetTrayInfo = (fnGetTrayInfo)bbApiLoader.requestApiPointer("GetTrayInfo");
-					}
-					if (GetTrayInfo)
-					{
-						PVOID info[1];
-						ATOM infoTypes[1];
-						infoTypes[0]=FindAtom(TEXT("TrayIcon::Version"));
-						if (GetTrayInfo(iconWnd,icon->uID,info,infoTypes,1))
-						{
-							version = reinterpret_cast<UINT_PTR>(info[0]);
-						}
-					}
-					switch (version)
-					{
-					case 4:
-						switch (message)
-						{
-						case WM_RBUTTONUP:
-							SendNotifyMessage(iconWnd, icon->uCallbackMessage, MAKEWPARAM(mx, my), MAKELPARAM(WM_CONTEXTMENU, icon->uID));
-							break;
-						default:
-							SendNotifyMessage(iconWnd, icon->uCallbackMessage, MAKEWPARAM(mx, my), MAKELPARAM(message, icon->uID));
-						}
-						break;
-					default:
-						SendNotifyMessage(iconWnd, icon->uCallbackMessage, icon->uID, message);
-					}
-				}
+				SendNotifyMessage(iconWnd, icon->uCallbackMessage, icon->uID, message);
 			}
 			else
 			{
