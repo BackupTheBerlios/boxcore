@@ -25,7 +25,7 @@ bool clsItem::AssignButton(LPCSTR p_data, mouseFunction & p_hook, LPCSTR & p_bro
   *
   * @param[in] pVertical Sets if this item is vertical or not
   *
-  * Initializes all members to safe values, and sets an items vertical state as requested
+  * Initialises all members to safe values, and sets an items vertical state as requested
   */
 clsItem::clsItem(bool pVertical)
 {
@@ -80,7 +80,7 @@ clsItem::clsItem(bool pVertical)
   */
 clsItem::~clsItem()
 {
-	for (int i = 0; i < m_workers.size(); ++i)
+	for (UINT i = 0; i < m_workers.size(); ++i)
 	{
 		delete m_workers[i];
 	}
