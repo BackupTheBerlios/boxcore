@@ -295,47 +295,52 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	case BB_BROADCAST:
 	{
-		const char *msg_string = (LPCSTR)lParam;
-		TRACE(msg_string);
-		if (!strnicmp(msg_string, "@boxBar.percentage", strlen("@boxBar.percentage")))
+		const char *msg_string = (LPCSTR)lParam + 1;
+		const char *element = NULL;
+		if (!strnicmp(msg_string, m_pluginPrefix, strlen(m_pluginPrefix)))
 		{
-			sizePercentage = atoi(msg_string + strlen("@boxBar.percentage"));
-			WriteInt(configFile, "boxBar.percentage:", sizePercentage);
-			readSettings();
-			calculateSizes();
-			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
-		}
-		else if (!strnicmp(msg_string, "@boxBar.vertical", strlen("@boxBar.vertical")))
-		{
-			vertical = !vertical;
-			WriteBool(configFile, "boxBar.vertical:", vertical);
-			resize(1, 1);
-			populateBar();
-			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
-			PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
-		}
-		else if (!strnicmp(msg_string, "@boxBar.align.", strlen("@boxBar.align.")))
-		{
-			msg_string += strlen("@boxBar.align.");
-			if (!strnicmp(msg_string, "vertical.", strlen("vertical.")))
+			msg_string += strlen(m_pluginPrefix) + 1;
+			if ((element = "percentage") && !strnicmp(msg_string, element, strlen(element)))
 			{
-				msg_string += strlen("vertical.");
-				WriteString(configFile, "boxBar.align.vertical:", msg_string);
+				msg_string += strlen(element);
+				sizePercentage = atoi(msg_string);
+				WriteInt(configFile, "boxBar.percentage:", sizePercentage);
 				readSettings();
+				calculateSizes();
+				RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
 			}
-			else if (!strnicmp(msg_string, "horizontal.", strlen("horizontal.")))
+			else if ((element = "vertical") && !strnicmp(msg_string, element, strlen(element)))
 			{
-				msg_string += strlen("horizontal.");
-				WriteString(configFile, "boxBar.align.horizontal:", msg_string);
-				readSettings();
+				vertical = !vertical;
+				WriteBool(configFile, "boxBar.vertical:", vertical);
+				resize(1, 1);
+				populateBar();
+				RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
+				PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
+			}
+			else if ((element = "align") && !strnicmp(msg_string, element, strlen(element)))
+			{
+				msg_string += strlen(element) + 1;
+				if ((element = "vertical") && !strnicmp(msg_string, element, strlen(element)))
+				{
+					msg_string += strlen(element) + 1;
+					WriteString(configFile, "boxBar.align.vertical:", msg_string);
+					readSettings();
+				}
+				else if ((element = "horizontal") && !strnicmp(msg_string, element, strlen(element)))
+				{
+					msg_string += strlen(element) + 1;
+					WriteString(configFile, "boxBar.align.horizontal:", msg_string);
+					readSettings();
+				}
 			}
 		}
-		else if (toggleWithPlugins && (!stricmp(msg_string, "@BBHidePlugins")))
+		else if (toggleWithPlugins && (element = "@BBHidePlugins") && (!stricmp(msg_string, element)))
 		{
 			ShowWindow(barWnd, SW_HIDE);
 			SetDesktopMargin(hWnd, 0, 0);
 		}
-		else if (toggleWithPlugins && (!stricmp(msg_string, "@BBShowPlugins")))
+		else if (toggleWithPlugins && (element = "@BBShowPlugins") && (!stricmp(msg_string, element)))
 		{
 			ShowWindow(barWnd, SW_SHOW);
 			if (margin)
@@ -367,7 +372,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		GetMonitorRect(hWnd, &monRect, GETMON_FROM_WINDOW);
 		int leftthirdX = (monRect.right + 2 * monRect.left) / 3;
 		int rightthirdX = (2 * monRect.right + monRect.left) / 3;
-		if ((wp->x > rightthirdX) || ((wp->x + wp->cx) == monRect.right))
+		if ((wp->x > rightthirdX))
 		{
 			barLocation = POS_RIGHT;
 		}
@@ -384,7 +389,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		int third1Y = (monRect.bottom + 2 * monRect.top) / 3;
 		int third2Y = (2 * monRect.bottom + monRect.top) / 3;
-		if ((wp->y > third2Y) || ((wp->y + wp->cy) == monRect.bottom))
+		if ((wp->y > third2Y))
 		{
 			barLocation += POS_BOTTOM;
 		}
@@ -716,22 +721,27 @@ void clsBar::populateBar()
   */
 void clsBar::configMenu(Menu *pMenu, bool p_update)
 {
+	CHAR buffer[256];
+	LPCSTR menuTitle;
 	Menu *subMenu = MakeNamedMenu("Bar", "boxBar::bar", true);
 	MakeSubmenu(pMenu, subMenu, "Bar Configuration");
-	MakeMenuItemInt(subMenu, "Percentage Size", "@boxBar.percentage", sizePercentage, 0, 100);
-	MakeMenuItem(subMenu, "Vertical", "@boxBar.vertical", vertical);
-	Menu *subSubMenu = MakeNamedMenu("Vertical Alignment","boxBar::bar::verticalAlign", true);
-	MakeSubmenu(subMenu, subSubMenu, "Vertical Alignment");
-	MakeMenuItem(subSubMenu, "Top", "@boxBar.align.vertical.top", m_barVGrowth & POS_TOP);
-	MakeMenuItem(subSubMenu, "Center", "@boxBar.align.vertical.center", m_barVGrowth & POS_VCENTER);
-	MakeMenuItem(subSubMenu, "Bottom", "@boxBar.align.vertical.bottom", m_barVGrowth & POS_BOTTOM);
-	MakeMenuItem(subSubMenu, "Auto", "@boxBar.align.vertical.auto", !m_barVGrowth);
-	subSubMenu = MakeNamedMenu("Horizontal Alignment","boxBar::bar::horizontalAlign", true);
-	MakeSubmenu(subMenu, subSubMenu, "Horizontal Alignment");
-	MakeMenuItem(subSubMenu, "Left", "@boxBar.align.horizontal.left", m_barHGrowth & POS_LEFT);
-	MakeMenuItem(subSubMenu, "Center", "@boxBar.align.horizontal.center", m_barHGrowth & POS_CENTER);
-	MakeMenuItem(subSubMenu, "Right", "@boxBar.align.horizontal.right", m_barHGrowth & POS_RIGHT);
-	MakeMenuItem(subSubMenu, "Auto", "@boxBar.align.horizontal.auto", !m_barHGrowth);
+	MakeMenuItemInt(subMenu, "Percentage Size", PluginBroam(buffer, "Percentage"), sizePercentage, 0, 100);
+	MakeMenuItem(subMenu, "Vertical", PluginBroam(buffer, "Vertical"), vertical);
+	menuTitle = "Vertical Alignment";
+	Menu *subSubMenu = MakeNamedMenu(menuTitle,"boxBar::bar::verticalAlign", true);
+	MakeSubmenu(subMenu, subSubMenu, menuTitle);
+	MakeMenuItem(subSubMenu, "Top", PluginBroam(buffer, "align.vertical.top"), m_barVGrowth & POS_TOP);
+	MakeMenuItem(subSubMenu, "Center", PluginBroam(buffer, "align.vertical.center"), m_barVGrowth & POS_VCENTER);
+	MakeMenuItem(subSubMenu, "Bottom", PluginBroam(buffer, "align.vertical.bottom"), m_barVGrowth & POS_BOTTOM);
+	MakeMenuItem(subSubMenu, "Auto", PluginBroam(buffer, "align.vertical.auto"), !m_barVGrowth);
+
+	menuTitle = "Horizontal Alignment";
+	subSubMenu = MakeNamedMenu(menuTitle, "boxBar::bar::horizontalAlign", true);
+	MakeSubmenu(subMenu, subSubMenu, menuTitle);
+	MakeMenuItem(subSubMenu, "Left", PluginBroam(buffer, "align.horizontal.left"), m_barHGrowth & POS_LEFT);
+	MakeMenuItem(subSubMenu, "Center", PluginBroam(buffer, "align.horizontal.center"), m_barHGrowth & POS_CENTER);
+	MakeMenuItem(subSubMenu, "Right", PluginBroam(buffer, "align.horizontal.right"), m_barHGrowth & POS_RIGHT);
+	MakeMenuItem(subSubMenu, "Auto", PluginBroam(buffer, "align.horizontal.auto"), !m_barHGrowth);
 	clsItemCollection::configMenu(pMenu, p_update);
 }
 
