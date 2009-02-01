@@ -14,7 +14,25 @@ class NotificationIcon;
 
 typedef std::list<NotificationIcon *> IconList;
 
-enum eNotificationIconInfo {NI_HWND, NI_ID, NI_CALLBACKMESSAGE, NI_ICON, NI_TIP, NI_INFOTEXT, NI_INFOTITLE, NI_INFOTIMEOUT, NI_INFOFLAGS, NI_INFOICON, NI_VERSION, NI_LEGACY, NI_ENUMSIZE};
+/** @internal
+  * @brief Types of information which can be retrieved from a notification icon
+  */
+enum eNotificationIconInfo
+{
+	NI_HWND, ///< @brief The owning window
+	NI_ID, ///< @brief The id associated with this icon
+	NI_CALLBACKMESSAGE, ///< @brief The message to send to the owning window
+	NI_ICON, ///< @brief The icon to display in the tray
+	NI_TIP, ///< @brief The tooltip text
+	NI_INFOTITLE, ///< @brief The title for the balloon tooltip
+	NI_INFOTEXT, ///< @brief The text for the balloon tooltip
+	NI_INFOTIMEOUT, ///< @brief The timeout value for the balloon tooltip
+	NI_INFOFLAGS, ///< @brief Flags with information on the balloon tooltip
+	NI_INFOICON, ///< @brief The icon to use in the balloon tooltip
+	NI_VERSION, ///< @brief The version of desired tray behaviour
+	NI_LEGACY, ///< @brief The legacy data item of the icon (implementation dependant)
+	NI_ENUMSIZE ///< @brief Number of elements in this enumeration
+};
 
 enum eTrayCallbackType {TCALLBACK_ADD, TCALLBACK_MOD, TCALLBACK_DEL};
 

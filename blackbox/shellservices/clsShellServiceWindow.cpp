@@ -63,7 +63,6 @@ ShellServiceWindow::ShellServiceWindow(HINSTANCE pInstance, bool pTopmost)
 	WCHAR trayForwardName[MAX_PATH];
 	bool trayInjected = false;
 	DWORD trayProcessId = 0;
-	HANDLE remoteThread = NULL;
 	LPVOID injectName = NULL;
 	LPVOID loadLibraryWAddr = NULL;
 	HANDLE proc = NULL;

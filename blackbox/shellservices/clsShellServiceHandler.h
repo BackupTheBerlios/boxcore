@@ -5,8 +5,8 @@
   * ShellServiceHandler is part of the Shell Services implementation used by boxCore.
   *
   * This file is part of the boxCore source code @n
-  * <!-- Copyright © 2008 Carsomyr -->
-  * Copyright &copy; 2008 Carsomyr
+  * <!-- Copyright © 2008-2009 Carsomyr -->
+  * Copyright &copy; 2008-2009 Carsomyr
   * @par links
   * http://developer.berlios.de/projects/boxcore @n
   * @par License
@@ -31,10 +31,15 @@
 
 #ifndef CLSSHELLSERVICEHANDLER_H
 #define CLSSHELLSERVICEHANDLER_H
+
+/** @internal
+  * @brief Contains classes and functions which provide some sort of service to the shell
+  */
 namespace ShellServices
 {
 
-/** @brief This class represents an interface for use with ShellServiceWindow
+/** @internal
+  * @brief This class represents an interface for use with ShellServiceWindow
   *
   * Classes implementing this interface will be able to register themselves with an instance
   * of ShellServiceWindow to allow them to process WM_COPYDATA messages sent to Shell_TrayWnd.

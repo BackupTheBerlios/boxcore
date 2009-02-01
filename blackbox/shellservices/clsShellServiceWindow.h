@@ -39,13 +39,20 @@
 
 #include "clsShellServiceHandler.h"
 
+/** @internal
+  * @brief Contains classes and functions which provide some sort of service to the shell
+  */
 namespace ShellServices
 {
 
 /** @internal
   * @brief Handler types for WM_COPYDATA messages to the shell window
   */
-enum eShellHandlers {HANDLER_APPBAR, HANDLER_NOTIFYICON};
+enum eShellHandlers
+{
+	HANDLER_APPBAR, ///< @brief Indicates a handler for messages from SHAppbarMessage()
+	HANDLER_NOTIFYICON ///< @brief Indicates a handler for messages from Shell_Notifyicon()
+};
 
 /** @internal
   * @brief Creates a Shell_Traywnd and provides hooks to
