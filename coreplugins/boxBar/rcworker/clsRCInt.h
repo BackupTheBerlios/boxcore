@@ -27,7 +27,8 @@
 namespace RCWorkers
 {
 
-/** @brief This class provides a connector between an integer and an RC entry
+/** @internal
+  * @brief This class provides a connector between an integer and an RC entry
   *
   * This class allows the linking of both signed and unsigned integers to RC entries
   * by having two constructors.
