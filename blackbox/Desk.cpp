@@ -31,7 +31,7 @@
 #include "Desk.h"
 #include "Settings.h"
 #include "Workspaces.h"
-#include "MessageManager.h"
+#include "managers.h"
 #include <shlobj.h>
 #include <shellapi.h>
 #include <process.h>
@@ -298,7 +298,7 @@ ST LRESULT CALLBACK Desk_WndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	case WM_CREATE:
 		hDesktopWnd = hwnd;
 		MakeSticky(hwnd);
-		MessageManager_AddMessages(hwnd, msgs);
+		g_pMessageManager->AddMessages(hwnd, msgs);
 		Desk_SetPosition();
 		init_DeskDropTarget(hwnd);
 		break;
@@ -306,7 +306,7 @@ ST LRESULT CALLBACK Desk_WndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		//====================
 	case WM_DESTROY:
 		exit_DeskDropTarget(hwnd);
-		MessageManager_RemoveMessages(hwnd, msgs);
+		g_pMessageManager->RemoveMessages(hwnd, msgs);
 		RemoveSticky(hwnd);
 		break;
 

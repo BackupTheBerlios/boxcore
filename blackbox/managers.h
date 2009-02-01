@@ -36,4 +36,7 @@ extern clsSystemInfo SystemInfo;
 extern ShellServices::NotifyIconHandler *g_pNotificationIconHandler;
 extern std::map<ATOM,ShellServices::eNotificationIconInfo> g_trayInfoMapping;
 
+#include "clsMessageManager.h"
+extern MessageManager *g_pMessageManager;
+
 #endif

@@ -13,7 +13,6 @@ Utils.cpp
 BImage.cpp
 Settings.cpp
 PluginManager.cpp
-MessageManager.cpp
 Workspaces.cpp
 Desk.cpp
 Toolbar.cpp
@@ -26,13 +25,14 @@ BBRoot.cpp
 BBVWM.cpp
 Pidl.cpp
 VolumeControl.cpp
-
-clsSystemTrayIcon.cpp
-../utility/stringcopy.cpp
 )
 
 set (BLACKBOX_NEW_SRCS
+clsSystemTrayIcon.cpp
 clsSystemInfo.cpp
+clsMessageManager.cpp
+
+../utility/stringcopy.cpp
 )
 
 set (BLACKBOX_MENU_SRCS

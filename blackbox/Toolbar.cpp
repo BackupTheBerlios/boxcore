@@ -2,8 +2,8 @@
  ============================================================================
 
   This file is part of the bbLean source code
-  Copyright © 2001-2003 The Blackbox for Windows Development Team
-  Copyright © 2004 grischka
+  Copyright ï¿½ 2001-2003 The Blackbox for Windows Development Team
+  Copyright ï¿½ 2004 grischka
 
   http://bb4win.sourceforge.net/bblean
   http://sourceforge.net/projects/bb4win
@@ -36,7 +36,7 @@ ToolbarInfo TBInfo;
 
 #if 1
 // -------------------------
-#include "MessageManager.h"
+#include "managers.h"
 #include "Workspaces.h"
 #include "Menu/MenuMaker.h"
 
@@ -585,7 +585,7 @@ ST LRESULT CALLBACK Toolbar_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
 		//====================
 	case WM_CREATE:
 		TBInfo.hwnd = Toolbar_hwnd = hwnd;
-		MessageManager_AddMessages (hwnd, msgs);
+		g_pMessageManager->AddMessages (hwnd, msgs);
 		MakeSticky(hwnd);
 		Toolbar_UpdatePosition();
 		break;
@@ -593,7 +593,7 @@ ST LRESULT CALLBACK Toolbar_WndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
 		//====================
 	case WM_DESTROY:
 		RemoveSticky(hwnd);
-		MessageManager_RemoveMessages (hwnd, msgs);
+		g_pMessageManager->RemoveMessages (hwnd, msgs);
 		SetDesktopMargin(Toolbar_hwnd, 0, 0);
 		if (Toolbar_hFont) DeleteObject(Toolbar_hFont), Toolbar_hFont = NULL;
 		TBInfo.hwnd = Toolbar_hwnd = NULL;

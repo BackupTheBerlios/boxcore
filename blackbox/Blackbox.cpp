@@ -29,7 +29,7 @@
 
 #include "BB.h"
 #include "Settings.h"
-#include "MessageManager.h"
+#include "clsMessageManager.h"
 #include "PluginManager.h"
 #include "Workspaces.h"
 #include "Desk.h"
@@ -110,6 +110,8 @@ std::map<ATOM,ShellServices::eNotificationIconInfo> g_trayInfoMapping;
 //SystemTray SystemTrayManager(hMainInstance);
 clsShellServiceObjects ShellServiceObjectsManager;
 clsSystemInfo SystemInfo;
+
+MessageManager *g_pMessageManager;
 
 LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -505,7 +507,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	/* reset desktop margins */
 	SetDesktopMargin(NULL, BB_DM_RESET, 0);
-	MessageManager_Init();
 
 	// ------------------------------------------
 	/* create the main message window... */
@@ -548,6 +549,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	/* end */
 	Settings_ReadStyleSettings();
 	set_opaquemove();
+	g_pMessageManager = new MessageManager;
 	MenuMaker_Init();
 	MenuMaker_Configure();
 	Workspaces_Init();
@@ -599,10 +601,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// ------------------------------------------
 	/* clean up */
 	RemoveApiExtensions();
+	delete g_pMessageManager;
 	DestroyWindow(BBhwnd);
 	UnregisterClass(szBlackboxClass, hMainInstance);
 
-	MessageManager_Exit();
 	free_nls();
 	ClearSticky();
 
@@ -949,11 +951,11 @@ case_bb_restart:
 
 		//====================
 	case BB_REGISTERMESSAGE:
-		MessageManager_AddMessages((HWND)wParam, (UINT*)lParam);
+		g_pMessageManager->AddMessages((HWND)wParam, (UINT*)lParam);
 		break;
 
 	case BB_UNREGISTERMESSAGE:
-		MessageManager_RemoveMessages((HWND)wParam, (UINT*)lParam);
+		g_pMessageManager->RemoveMessages((HWND)wParam, (UINT*)lParam);
 		break;
 
 		// This one is registered as a workaround (see MenuMaker.cpp)
@@ -1153,7 +1155,7 @@ p2:
 		if (uMsg >= BB_MSGFIRST && uMsg < BB_MSGLAST)
 		{
 dispatch_bb_message:
-			return MessageManager_SendMessage(uMsg, wParam, lParam);
+			return g_pMessageManager->BroadcastMessage(uMsg, wParam, lParam);
 		}
 
 		return DefWindowProc(hwnd, uMsg, wParam, lParam);
@@ -1593,7 +1595,7 @@ bool exec_broam(const char *broam) // 'true' for done, 'false' for broadcast
 		volume_set( nv=(volume_get() + atoi(broam+11)) );
 		char tmp[128];
 		sprintf(tmp, "Vol %d%%", nv);
-		MessageManager_SendMessage(BB_SETTOOLBARLABEL, 0, (LPARAM)tmp);
+		g_pMessageManager->BroadcastMessage(BB_SETTOOLBARLABEL, 0, (LPARAM)tmp);
 		return true;
 	}
 
