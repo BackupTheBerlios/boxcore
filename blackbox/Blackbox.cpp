@@ -529,7 +529,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	// Welcome screen termination for XP and Vista
 	LPCTSTR events[] = { TEXT("Global\\msgina: ShellReadyEvent"), TEXT("msgina: ShellReadyEvent"), "ShellDesktopSwitchEvent" };
-	for (UINT i=0; i<= sizeof(events)/sizeof(events[0]); ++i)
+	for (UINT i=0; i< sizeof(events)/sizeof(events[0]); ++i)
 	{
 		HANDLE hSRE = OpenEvent(EVENT_MODIFY_STATE, FALSE, events[i]);
 		if (hSRE)
@@ -1512,7 +1512,7 @@ void exec_boxcore_broam(const char *broam)
 		POINT barPoint = {left, top};
 		RECT monRect;
 		GetMonitorRect(&barPoint, &monRect, GETMON_FROM_POINT);
-		switch(edge)
+		switch (edge)
 		{
 		case ABE_TOP:
 		case ABE_BOTTOM:
