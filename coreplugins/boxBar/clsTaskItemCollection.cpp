@@ -12,7 +12,6 @@ clsTaskItemCollection::clsTaskItemCollection(bool pVertical): clsItemCollection(
 	CHAR buffer[256];
 	m_dragTask = NULL;
 	m_dragTimer = getTimerID();
-	m_knowsSize = DIM_VERTICAL;
 	m_itemPrefix = new CHAR[strlen("Tasks")+1];
 	strcpy(m_itemPrefix, "Tasks");
 	m_workers.push_back(new RCWorkers::RCBool(configFile, ItemRCKey(buffer, "stretcharea"), stretchTaskarea, true));
@@ -150,10 +149,19 @@ void clsTaskItemCollection::readSettings()
 	if (stretchTaskarea)
 	{
 		m_wantsStretch = DIM_BOTH;
+		if (vertical)
+		{
+			m_knowsSize = DIM_NONE;
+		}
+		else
+		{
+			m_knowsSize = DIM_VERTICAL;
+		}
 	}
 	else
 	{
 		m_wantsStretch = DIM_NONE;
+		m_knowsSize = DIM_VERTICAL;
 	}
 }
 
