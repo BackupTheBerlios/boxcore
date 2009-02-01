@@ -41,17 +41,17 @@ LRESULT MessageManager::BroadcastMessage(UINT msg, WPARAM wParam, LPARAM lParam)
 	tMessageMap::iterator mapEntry = m_messageMap.find(msg);
 	if (mapEntry != m_messageMap.end())
 	{
-	tWindowList &windowList = mapEntry->second;
-	LRESULT retVal = 0;
-	for(tWindowList::iterator i = windowList.begin(); i != windowList.end(); ++i)
-	{
-		retVal = SendMessage(*i, msg, wParam, lParam);
-		if (retVal && msg == BB_DRAGTODESKTOP)
+		tWindowList &windowList = mapEntry->second;
+		LRESULT retVal = 0;
+		for (tWindowList::iterator i = windowList.begin(); i != windowList.end(); ++i)
 		{
-			return retVal;
+			retVal = SendMessage(*i, msg, wParam, lParam);
+			if (retVal && msg == BB_DRAGTODESKTOP)
+			{
+				return retVal;
+			}
 		}
-	}
-	return retVal;
+		return retVal;
 	}
 	else
 	{
@@ -66,7 +66,7 @@ LRESULT MessageManager::BroadcastMessage(UINT msg, WPARAM wParam, LPARAM lParam)
   */
 void MessageManager::AddMessages(HWND p_window, UINT *p_messages)
 {
-	while(*p_messages != 0)
+	while (*p_messages != 0)
 	{
 		m_messageMap[*p_messages].insert(p_window);
 		++p_messages;
@@ -80,7 +80,7 @@ void MessageManager::AddMessages(HWND p_window, UINT *p_messages)
   */
 void MessageManager::RemoveMessages(HWND p_window, UINT *p_messages)
 {
-	while(*p_messages != 0)
+	while (*p_messages != 0)
 	{
 		m_messageMap[*p_messages].erase(p_window);
 		if (m_messageMap[*p_messages].size() == 0)
