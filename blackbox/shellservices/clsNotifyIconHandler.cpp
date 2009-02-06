@@ -662,16 +662,18 @@ LRESULT CALLBACK NotifyIconHandler::ProxyWndProc(HWND hWnd, UINT uMsg, WPARAM wP
 
 	if (uMsg == WM_TIMER)
 	{
+		OutputDebugString(TEXT("Timer message"));
 		if (m_lastPopup)
 		{
 			SendNotifyMessage(m_lastTarget.first, m_lastMessage, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(NIN_POPUPCLOSE, m_lastTarget.second));
 			m_lastPopup = 0;
-			KillTimer(hWnd, 1);
 		}
+		KillTimer(hWnd, 1);
 		return TRUE;
 	}
 	else if (uMsg >= WM_USER)
 	{
+		OutputDebugString(TEXT("Proxying a message"));
 		UINT uID = wParam;
 		std::map<UINT, iconPair_t>::iterator target = m_iconLookup.find(uID);
 		UINT targetMsg;
@@ -736,7 +738,7 @@ LRESULT CALLBACK NotifyIconHandler::ProxyWndProc(HWND hWnd, UINT uMsg, WPARAM wP
 		}
 		else
 		{
-			CleanTray();
+			DeleteIcon(hWnd, uID);
 			return FALSE;
 		}
 	}
