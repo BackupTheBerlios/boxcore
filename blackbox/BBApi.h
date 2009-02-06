@@ -136,9 +136,7 @@
   */
 
 ///@{
-/** @brief A gradient from the left edge to the right
-  */
-#define B_HORIZONTAL 0
+#define B_HORIZONTAL 0 ///<@brief A gradient from the left edge to the right
 /** @brief A gradient from the top edge to the bottom
   */
 #define B_VERTICAL   1
@@ -307,56 +305,25 @@
   * This message is sent by the core when a task is added, deleted or otherwise modified.
   * Plugins should never send this message, only recieve it.
   * @par wParam value:
-  * An HWND indicating the affected task, except when the lParam is  ::TASKITEM_REFRESH where it is NULL.
+  * An HWND indicating the affected task, except when the lParam is ::TASKITEM_REFRESH where it is NULL.
   * @par lParam value:
-  * Possible lParams are ::TASKITEM_ADDED, ::TASKITEM_MODIFIED, ::TASKITEM_ACTIVATED,
-  * ::TASKITEM_REMOVED, ::TASKITEM_REFRESH or ::TASKITEM_FLASHED.
-  * See individual items for information on why they are set
+  * The lParam is one of the values in ::eTaskUpdateLparam
   * @ingroup bbapi_tasks
   */
 #define BB_TASKSUPDATE          10506
 
-/** @brief lParam: A new task was added to the list
-  *
-  * wParam is the HWND of the new task
+/** @brief Possible lParam values for ::BB_TASKUPDATE
   * @ingroup bbapi_tasks
   */
-#define TASKITEM_ADDED 0
-
-/** @brief lParam: An existing task was modified
-  *
-  * Used with ::BB_TASKUPDATE. wParam is the HWND of the modified task
-  * @ingroup bbapi_tasks
-  */
-#define TASKITEM_MODIFIED 1
-
-/** @brief lParam: The active task has changed
-  *
-  * Used with ::BB_TASKUPDATE. wParam is the HWND of the new active task
-  * @ingroup bbapi_tasks
-  */
-#define TASKITEM_ACTIVATED 2
-
-/** @brief lParam: A task has been removed from the list
-  *
-  * Used with ::BB_TASKUPDATE. wParam is the HWND that the task had, before being removed
-  * @ingroup bbapi_tasks
-  */
-#define TASKITEM_REMOVED 3
-
-/** @brief lParam: An existing task has changed workspaces
-  *
-  * Used with ::BB_TASKUPDATE. wParam is NULL
-  * @ingroup bbapi_tasks
-  */
-#define TASKITEM_REFRESH 4
-
-/** @brief lParam: An existing task is trying to get attention
-  *
-  * Used with ::BB_TASKUPDATE. wParam is the HWND of the task whose icon should be flashed
-  * @ingroup bbapi_tasks
-  */
-#define TASKITEM_FLASHED 5
+enum eTaskUpdateLparam
+{
+	TASKITEM_ADDED,///< A new task was added to the list, HWND is new task
+	TASKITEM_MODIFIED, ///< An existing task was modified, HWND is modified task
+	TASKITEM_ACTIVATED, ///< The active task has changed, HWND is new active task
+	TASKITEM_REMOVED, ///< A task has been removed from the list, HWND is the task that was removed
+	TASKITEM_REFRESH, ///< An existing task has changed workspaces, no HWND given
+	TASKITEM_FLASHED ///< An existing task is trying to get attention, HWND is task trying to get attention
+};
 
 /** @brief Window Message: A tray icon has been updated
   *
@@ -365,29 +332,20 @@
   * @par wParam:
   * The value of the wParam is not consistent between branches, do not use it
   * @par lParam:
-  * The possible values for the lParam are ::TRAYICON_ADDED, ::TRAYICON_MODIFIED or ::TRAYICON_REMOVED.
+  * The lParam will be one of the values of ::eTrayUpdateLparam.
   * @ingroup bbapi_tray
   */
 #define BB_TRAYUPDATE           10507
 
-/** @brief lParam: A new icon has been added to the tray
-  *
-  * Used with ::BB_TRAYUPDATE.
+/** @brief Possible values for the lParam of ::BB_TRAYUPDATE
   * @ingroup bbapi_tray
   */
-#define TRAYICON_ADDED 0
-/** @brief lParam: An existing icon in the tray has changed
-  *
-  * Used with ::BB_TRAYUPDATE.
-  * @ingroup bbapi_tray
-  */
-#define TRAYICON_MODIFIED 1
-/** @brief lParam: An icon has been removed from the tray
-  *
-  * Used with ::BB_TRAYUPDATE.
-  * @ingroup bbapi_tray
-  */
-#define TRAYICON_REMOVED 2
+enum eTrayUpdateLparam
+{
+	TRAYICON_ADDED,   ///< A new icon has been added to the tray
+	TRAYICON_MODIFIED,///< An existing icon in the tray has changed
+	TRAYICON_REMOVED  ///< An icon has been removed from the tray
+};
 
 /** @brief Window Message: The tray must be cleaned
   *
@@ -543,10 +501,9 @@
 
 
 
-///@brief The lowest value a Blackbox window message will have
-#define BB_MSGFIRST             10000
-///@brief The highest value a Blackbox window message will have
-#define BB_MSGLAST              13000
+
+#define BB_MSGFIRST             10000 ///<@brief The lowest value a Blackbox window message will have
+#define BB_MSGLAST              13000 ///<@brief The highest value a Blackbox window message will have
 
 /*=========================================================================== */
 /* extended Style-info for convenience and other purposes (backwards compatible) */
@@ -567,7 +524,7 @@ struct StyleItem
 	/** @brief Indicates that only the border should be drawn when true
 	  */
 	bool parentRelative;
-	/** @brief Inidcates if this item should be drawn interlaced
+	/** @brief Indicates if this item should be drawn interlaced
 	  * @todo Get better description
 	  */
 	bool interlaced;
@@ -1095,12 +1052,16 @@ extern "C"
 	  */
 	struct systemTray
 	{
-		HWND    hWnd;
-		UINT    uID;
-		UINT    uCallbackMessage;
-		HICON   hIcon;
-		char    szTip[256 - 4];
-		struct systemTrayBalloon *pBalloon; /* NULL when not present */
+		HWND    hWnd; ///< The window that owns the system tray icon
+		UINT    uID; ///< The ID that the owner has assigned to this icon
+		UINT    uCallbackMessage; ///< The callback message for communicating with the owner
+		HICON   hIcon; ///< The icon to display
+		char    szTip[256 - 4]; ///< The tooltip to display for this icon
+		struct systemTrayBalloon *pBalloon;
+		/**<@brief Information on balloon tooltip, if present
+		  *
+		  * @version Present in bbLean up to version 1.16, and derivatives of this version
+		  */
 	};
 
 	/** @brief Represents a bbLean balloon tooltip for a system tray icon
@@ -1151,8 +1112,8 @@ extern "C"
 	  */
 	API_EXPORT int GetTaskListSize(void);
 	/** @brief Get tasks HWND by index
-	* @ingroup bbapi_tasks
-	*/
+	  * @ingroup bbapi_tasks
+	  */
 	API_EXPORT HWND GetTask(int index);
 	/** @brief Get the index of the currently active task
 	  * @ingroup bbapi_tasks
@@ -1185,20 +1146,26 @@ extern "C"
 	/** @brief Get workspace and original position/size for window
 	  * @ingroup bbapi_bblean
 	  */
-	API_EXPORT bool GetTaskLocation(HWND, struct taskinfo *pti);
+	WARNING_BBLEAN(API_EXPORT bool GetTaskLocation(HWND, struct taskinfo *pti));
 
 	/** @brief Set workspace and/or position for window
 	  * @ingroup bbapi_bblean
 	  */
-	API_EXPORT bool SetTaskLocation(HWND, struct taskinfo *pti, UINT flags);
+	WARNING_BBLEAN(API_EXPORT bool SetTaskLocation(HWND, struct taskinfo *pti, UINT flags));
 	/* where flags are: */
 #define BBTI_SETDESK    1 /* move window to desk as specified */
 #define BBTI_SETPOS     2 /* move window to x/ypos as spec'd */
 #define BBTI_SWITCHTO   4 /* switch workspace after move */
 
 	/* experimental: */
+	/** @brief
+	  * @ingroup bbapi_bblean
+	  */
 	typedef BOOL (*TASKENUMPROC)(struct tasklist *, LPARAM);
-	API_EXPORT void EnumTasks (TASKENUMPROC lpEnumFunc, LPARAM lParam);
+	/** @brief
+	  * @ingroup bbapi_bblean
+	  */
+	WARNING_BBLEAN(API_EXPORT void EnumTasks (TASKENUMPROC lpEnumFunc, LPARAM lParam));
 
 	/* ------------------------------------ */
 	/* Get the workspace number for a task */
