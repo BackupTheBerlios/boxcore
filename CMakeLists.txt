@@ -108,6 +108,8 @@ add_subdirectory (coreplugins/bbLeanBar)
 add_subdirectory (coreplugins/boxBar)
 endif (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/coreplugins/)
 
+add_subdirectory (plugins/boxVolume)
+
 set (CPACK_COMPONENT_GROUP_CORE_DISPLAY_NAME "Blackbox Core")
 set (CPACK_COMPONENT_GROUP_CORE_EXPANDED True)
 set (CPACK_COMPONENT_GROUP_CORE_DESCRIPTION
