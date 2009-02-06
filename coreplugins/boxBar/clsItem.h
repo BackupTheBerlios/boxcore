@@ -43,7 +43,7 @@ class clsItem;
   */
 typedef void (*mouseFunction)(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
 
-/** @class clsItem
+/** @internal
   * @brief Base class for boxBar
   *
   * clsItem implements common functionality for all parts of boxBar. The functions

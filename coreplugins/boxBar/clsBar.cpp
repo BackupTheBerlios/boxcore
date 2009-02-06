@@ -255,6 +255,9 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEACTIVATE:
 		return MA_NOACTIVATE;
 
+	case WM_DISPLAYCHANGE:
+		break;
+
 	case BOXBAR_UPDATESIZE:
 		if (wParam)
 		{
