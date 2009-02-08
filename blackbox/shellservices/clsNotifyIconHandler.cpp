@@ -691,8 +691,7 @@ LRESULT CALLBACK NotifyIconHandler::ProxyWndProc(HWND hWnd, UINT uMsg, WPARAM wP
 		if (IsWindow(targetWnd))
 		{
 			DWORD pid;
-			if (WM_MOUSEMOVE != targetMsg
-					&& user32.AllowSetForegroundWindow
+			if ( user32.AllowSetForegroundWindow
 					&& GetWindowThreadProcessId(targetWnd, &pid))
 			{
 				user32.AllowSetForegroundWindow(pid);
