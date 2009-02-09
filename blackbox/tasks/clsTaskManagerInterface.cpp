@@ -24,18 +24,33 @@
 
 #include "clsTaskManagerInterface.h"
 
-namespace WindowManagement
+namespace TaskManagement
 {
 
-TaskManagerInterface::TaskManagerInterface()
+TaskManagerInterface::TaskManagerInterface(VWMInterface *p_vwm)
 {
-	// TODO Auto-generated constructor stub
-
+	m_vwm = p_vwm;
 }
 
 TaskManagerInterface::~TaskManagerInterface()
 {
-	// TODO Auto-generated destructor stub
+}
+
+VWMInterface *TaskManagerInterface::GetVWM()
+{
+	return m_vwm;
+}
+
+void TaskManagerInterface::RegisterCallback(eTaskCallbackType p_type, fnTaskCallback p_callback)
+{
+	if (p_callback)
+	{
+		m_callbacks[p_type] = p_callback;
+	}
+	else
+	{
+		m_callbacks.erase(p_type);
+	}
 }
 
 }

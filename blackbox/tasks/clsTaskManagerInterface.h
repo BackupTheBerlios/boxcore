@@ -27,16 +27,36 @@
 #ifndef CLSTASKMANAGERINTERFACE_H_
 #define CLSTASKMANAGERINTERFACE_H_
 
-#include "../vwm/clsVWMInterface.h"
+#define _WIN32_WINNT 0x0501
 
-namespace WindowManagement
+#include "../vwm/clsVWMInterface.h"
+#include <map>
+
+namespace TaskManagement
 {
+
+typedef void (*fnTaskCallback)(HWND p_window);
+enum eTaskCallbackType {TASK_ADDED};
 
 class TaskManagerInterface
 {
 public:
-	TaskManagerInterface(VWMInterface p_vwm);
+	TaskManagerInterface(VWMInterface *p_vwm);
 	virtual ~TaskManagerInterface();
+
+	virtual void Reload() PURE;
+	virtual void SwitchToWindow(HWND p_window, bool p_force) PURE;
+	virtual LRESULT ProcessShellMessage(WPARAM p_wParam, HWND p_hWnd) PURE;
+
+	virtual HWND GetTopTask() PURE;
+
+	virtual UINT GetTaskInfo(HWND p_window, PVOID p_info[], ATOM p_infoType[], UINT p_numInfo) PURE;
+
+	VWMInterface *GetVWM();
+	void RegisterCallback(eTaskCallbackType p_type, fnTaskCallback p_callback);
+protected:
+	std::map<eTaskCallbackType, fnTaskCallback> m_callbacks;
+	VWMInterface *m_vwm;
 };
 
 }
