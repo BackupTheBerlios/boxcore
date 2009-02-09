@@ -137,6 +137,8 @@ ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def)
 
 add_subdirectory (shellserviceobjects)
 add_subdirectory (shellservices)
+add_subdirectory (tasks)
+add_subdirectory (vwm)
 
 install(TARGETS blackbox RUNTIME DESTINATION . COMPONENT Blackbox)
 #install (FILES ${CMAKE_CURRENT_BINARY_DIR}/blackbox.exe.manifest DESTINATION . COMPONENT Blackbox)
