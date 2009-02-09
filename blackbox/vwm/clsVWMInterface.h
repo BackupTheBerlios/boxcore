@@ -27,7 +27,7 @@
 
 #include <windows.h>
 
-namespace WindowManagement
+namespace TaskManagement
 {
 
 class VWMInterface
