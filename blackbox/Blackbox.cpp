@@ -94,15 +94,23 @@ BOOL save_opaquemove;
 #include "shellservices/clsShellServiceWindow.h"
 #include "shellservices/clsNotifyIconHandler.h"
 #include "shellservices/clsAppbarHandler.h"
+#include "tasks/clsTaskManager.h"
 #include "clsSystemTrayIcon.h"
+#include "clsBBTask.h"
 
 ShellServices::ShellServiceWindow *g_pShellServiceWindow;
 ShellServices::NotifyIconHandler *g_pNotificationIconHandler;
 ShellServices::AppbarHandler *g_pAppbarHandler;
+TaskManagement::TaskManagerInterface *g_pTaskManager;
 
 ShellServices::LegacyNotificationIcon *SystemTrayIconFactory()
 {
 	return new SystemTrayIcon;
+}
+
+TaskManagement::LegacyTask *TaskFactory()
+{
+	return new BBTask;
 }
 
 std::map<ATOM,ShellServices::eNotificationIconInfo> g_trayInfoMapping;
@@ -553,6 +561,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	MenuMaker_Init();
 	MenuMaker_Configure();
 	Workspaces_Init();
+	g_pTaskManager = new TaskManagement::TaskManager(TaskFactory, NULL);
 	Desk_Init();
 	InitTrayMapping();
 	g_pShellServiceWindow = new ShellServices::ShellServiceWindow(hMainInstance, true);
@@ -669,6 +678,8 @@ void shutdown_blackbox()
 	g_pShellServiceWindow = NULL;
 	Desk_Exit();
 	Workspaces_Exit();
+	delete g_pTaskManager;
+	g_pTaskManager = NULL;
 	MenuMaker_Exit();
 }
 
@@ -1147,6 +1158,7 @@ case_bb_restart:
 				return 0;
 			}
 			TaskWndProc(wParam, (HWND)lParam);
+			g_pTaskManager->ProcessShellMessage(wParam, reinterpret_cast<HWND>(lParam));
 p2:
 			PostMessage(hwnd, uMsg, lParam, extended);
 			break;

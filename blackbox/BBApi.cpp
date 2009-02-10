@@ -40,6 +40,7 @@
 
 #include "clsSystemTrayIcon.h"
 #include "../debug/debug.h"
+#include "clsBBTask.h"
 
 #define ST static
 
@@ -2501,6 +2502,29 @@ systemTray* GetTrayIcon(UINT idx)
 	ShellServices::eNotificationIconInfo info[1] = {ShellServices::NI_LEGACY};
 	g_pNotificationIconHandler->GetNotificationIconInfo(idx, data,info, 1);
 	return static_cast<SystemTrayIcon *>(data[0])->getSystemTray();
+}
+
+//===========================================================================
+// API: GetTaskListSize - returns the number of currently registered tasks
+
+int GetTaskListSize(void)
+{
+	CHAR msg[256];
+	sprintf(msg,"Number of tasks : %u", g_pTaskManager->GetNumTasks());
+	OutputDebugStringA(msg);
+	return g_pTaskManager->GetNumTasks();
+}
+
+//===========================================================================
+// API: GetTaskListPtr - returns the raw task-list
+
+struct tasklist *GetTaskListPtr(void)
+{
+	HWND firstTask = GetTask(0);
+	PVOID info[1];
+	TaskManagement::eTaskInfo infoType[1] = {TaskManagement::TI_LEGACY};
+	g_pTaskManager->GetTaskInfo(firstTask, info, infoType, 1);
+	return reinterpret_cast<BBTask *>(info[0])->GetTaskList();
 }
 
 BOOL GetTrayInfoReal(ShellServices::NotificationIcon *p_icon, PVOID *p_trayInfo, ATOM *p_infoTypes, CONST UINT p_numInfo)

@@ -2,8 +2,8 @@
  ============================================================================
 
   This file is part of the bbLean source code
-  Copyright © 2001-2003 The Blackbox for Windows Development Team
-  Copyright © 2004 grischka
+  Copyright ï¿½ 2001-2003 The Blackbox for Windows Development Team
+  Copyright ï¿½ 2004 grischka
 
   http://bb4win.sourceforge.net/bblean
   http://sourceforge.net/projects/bb4win
@@ -1305,23 +1305,7 @@ hshell_windowactivated:
 
 //===========================================================================
 
-//===========================================================================
-// API: GetTaskListSize - returns the number of currently registered tasks
 
-int GetTaskListSize(void)
-{
-	return listlen(taskList);
-}
-
-//===========================================================================
-// API: GetTaskListPtr - returns the raw task-list
-
-struct tasklist *GetTaskListPtr(void)
-{
-	struct tasklist *tl;
-	dolist (tl, taskList) tl->wkspc = vwm_get_desk(tl->hwnd);
-	return taskList;
-}
 
 //===========================================================================
 // API: GetTask - returns the HWND of the task by index
