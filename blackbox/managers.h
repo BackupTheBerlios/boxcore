@@ -39,4 +39,7 @@ extern std::map<ATOM,ShellServices::eNotificationIconInfo> g_trayInfoMapping;
 #include "clsMessageManager.h"
 extern MessageManager *g_pMessageManager;
 
+#include "tasks/clsTaskManagerInterface.h"
+extern TaskManagement::TaskManagerInterface *g_pTaskManager;
+
 #endif
