@@ -4,6 +4,7 @@ project (TaskManagement)
 
 set (TASKMAN_SRCS
 clsTask.cpp
+clsLegacyTask.cpp
 clsTaskManager.cpp
 clsTaskManagerInterface.cpp
 )

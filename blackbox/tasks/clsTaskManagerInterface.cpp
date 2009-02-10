@@ -53,4 +53,13 @@ void TaskManagerInterface::RegisterCallback(eTaskCallbackType p_type, fnTaskCall
 	}
 }
 
+void TaskManagerInterface::DoCallback(eTaskCallbackType p_type, HWND p_window)
+{
+	tTaskCallbackMap::iterator callbackIt = m_callbacks.find(TASK_ADDED);
+	if (callbackIt != m_callbacks.end())
+	{
+		callbackIt->second(p_window);
+	}
+}
+
 }

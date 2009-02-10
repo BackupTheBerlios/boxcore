@@ -15,31 +15,41 @@ namespace TaskManagement
 {
 
 class Task;
+class LegacyTask;
+
+typedef LegacyTask *(*fnLegacyFactory)();
 
 typedef std::list<Task *> tTaskList;
 
 class TaskManager: public TaskManagerInterface
 {
 public:
-	TaskManager(VWMInterface *p_vwm);
+	TaskManager(fnLegacyFactory p_factory, VWMInterface *p_vwm);
 	virtual ~TaskManager();
 
 	virtual void Reload();
 	virtual void SwitchToWindow(HWND p_window, bool p_force);
 	virtual LRESULT ProcessShellMessage(WPARAM p_wParam, HWND p_hWnd);
 	virtual HWND GetTopTask();
-	virtual UINT GetTaskInfo(HWND p_window, PVOID p_info[], ATOM p_infoType[], UINT p_numInfo);
+	virtual UINT GetTaskInfo(HWND p_window, PVOID p_info[], eTaskInfo p_infoType[], UINT p_numInfo);
+
+	virtual UINT GetNumTasks();
 private:
+	fnLegacyFactory m_legacyFactory;
 	tTaskList m_taskList;
 	HWND m_replacingWindow;
+	Task *m_activeTask;
+
+	static WINBOOL CALLBACK EnumProc(HWND p_hWnd, LPARAM p_lParam);
 
 	bool IsTask(HWND p_hWnd);
 
-	LRESULT CreateTask(HWND p_hWnd);
-	LRESULT DestroyTask(HWND p_hWnd);
-	LRESULT ActivateTask(HWND p_hWnd, bool p_rudeApp);
-	LRESULT RedrawTask(HWND p_hWnd, bool p_rudeApp);
-	LRESULT ReplaceTask(HWND m_replace, HWND p_replaceWith);
+	LRESULT CreateTask(HWND p_created);
+	LRESULT DestroyTask(HWND p_destroyed);
+	LRESULT ActivateTask(HWND p_activated, bool p_rudeApp);
+	LRESULT RedrawTask(HWND p_redraw, bool p_rudeApp);
+	LRESULT ReplaceTask(HWND p_hWnd);
+	tTaskList::iterator FindTask(HWND p_hWnd);
 };
 
 }
