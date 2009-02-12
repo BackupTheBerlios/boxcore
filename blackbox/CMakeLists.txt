@@ -32,6 +32,7 @@ clsSystemTrayIcon.cpp
 clsSystemInfo.cpp
 clsMessageManager.cpp
 clsBBTask.cpp
+callbacks.cpp
 
 ../utility/stringcopy.cpp
 )
