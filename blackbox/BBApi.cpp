@@ -2509,9 +2509,6 @@ systemTray* GetTrayIcon(UINT idx)
 
 int GetTaskListSize(void)
 {
-	CHAR msg[256];
-	sprintf(msg,"Number of tasks : %u", g_pTaskManager->GetNumTasks());
-	OutputDebugStringA(msg);
 	return g_pTaskManager->GetNumTasks();
 }
 
