@@ -51,6 +51,7 @@
 #include "shellserviceobjects/clsShellServiceObjects.h"
 #include "clsSystemInfo.h"
 #include "../debug/debug.h"
+#include "callbacks.h"
 
 //====================
 
@@ -269,24 +270,6 @@ void unregister_shellhook(HWND hwnd)
 void set_opaquemove(void)
 {
 	SystemParametersInfo(SPI_SETDRAGFULLWINDOWS, Settings_opaqueMove, NULL, SPIF_SENDCHANGE);
-}
-
-void broadcastAdd(void *p_data)
-{
-	PRINT("BROADCAST: Icon Added");
-	PostMessage(BBhwnd, BB_TRAYUPDATE, reinterpret_cast<WPARAM>(p_data), TRAYICON_ADDED);
-}
-
-void broadcastRemove(void *p_data)
-{
-	PRINT("BROADCAST: Icon Deleted");
-	PostMessage(BBhwnd, BB_TRAYUPDATE, reinterpret_cast<WPARAM>(p_data), TRAYICON_REMOVED);
-}
-
-void broadcastMod(void *p_data)
-{
-	//PRINT("BROADCAST: Icon Modified");
-	PostMessage(BBhwnd, BB_TRAYUPDATE, reinterpret_cast<WPARAM>(p_data), TRAYICON_MODIFIED);
 }
 
 //===========================================================================
@@ -562,6 +545,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	MenuMaker_Configure();
 	Workspaces_Init();
 	g_pTaskManager = new TaskManagement::TaskManager(TaskFactory, NULL);
+	g_pTaskManager->RegisterCallback(TaskManagement::TASK_ADDED, TaskAddedCallback);
+	g_pTaskManager->RegisterCallback(TaskManagement::TASK_UPDATED, TaskUpdatedCallback);
+	g_pTaskManager->RegisterCallback(TaskManagement::TASK_FLASHED, TaskFlashedCallback);
 	Desk_Init();
 	InitTrayMapping();
 	g_pShellServiceWindow = new ShellServices::ShellServiceWindow(hMainInstance, true);
@@ -1154,11 +1140,16 @@ case_bb_restart:
 			case HSHELL_REDRAW:
 				uMsg = BB_REDRAWTASK;
 				break;
+			case HSHELL_WINDOWREPLACING:
+			case HSHELL_WINDOWREPLACED:
+				uMsg = 0;
+				break;
 			default:
 				return 0;
 			}
-			TaskWndProc(wParam, (HWND)lParam);
 			g_pTaskManager->ProcessShellMessage(wParam, reinterpret_cast<HWND>(lParam));
+			TaskWndProc(wParam, (HWND)lParam);
+
 p2:
 			PostMessage(hwnd, uMsg, lParam, extended);
 			break;
