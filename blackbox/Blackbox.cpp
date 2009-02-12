@@ -1,31 +1,32 @@
-/*
- ============================================================================
-
-  This file is part of the bbLean source code
-  Copyright © 2001-2003 The Blackbox for Windows Development Team
-  Copyright © 2004 grischka
-
-  http://bb4win.sourceforge.net/bblean
-  http://sourceforge.net/projects/bb4win
-
- ============================================================================
-
-  bbLean and bb4win are free software, released under the GNU General
-  Public License (GPL version 2 or later), with an extension that allows
-  linking of proprietary modules under a controlled interface. This means
-  that plugins etc. are allowed to be released under any license the author
-  wishes. For details see:
-
-  http://www.fsf.org/licenses/gpl.html
-  http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
-
-  This program is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-  or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-  for more details.
-
- ============================================================================
-*/
+/** @internal
+  * @brief Main source file for blackbox
+  *
+  * This file is part of the boxCore source code @n
+  * <!-- Copyright (C) 2001-2003 The Blackbox for Windows Development Team -->
+  * <!-- Copyright (C) 2004-2007 grischka -->
+  * <!-- Copyright (C) 2008-2009 Carsomyr -->
+  * Copyright &copy; 2001-2003 The Blackbox for Windows Development Team @n
+  * Copyright &copy; 2004-2007 grischka @n
+  * Copyright &copy; 2008-2009 Carsomyr
+  * @par Links:
+  * http://developer.berlios.de/projects/boxcore @n
+  * http://bb4win.sourceforge.net/bblean @n
+  * http://sourceforge.net/projects/bb4win @n
+  * @par License:
+  * boxCore, bbLean and bb4win are free software, released under the GNU General
+  * Public License (GPL version 2 or later), with an extension that allows
+  * linking of proprietary modules under a controlled interface. This means
+  * that plugins etc. are allowed to be released under any license the author
+  * wishes. For details see:
+  * @par
+  * http://www.fsf.org/licenses/gpl.html @n
+  * http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
+  * @par
+  * This program is distributed in the hope that it will be useful, but
+  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+  * for more details.
+  */
 
 #include "BB.h"
 #include "Settings.h"
@@ -277,7 +278,7 @@ void set_opaquemove(void)
 void bb_about(void)
 {
 	BBMessageBox(MB_OK,
-				 "%s - © 2003-2005 grischka, © 2008 carsomyr"
+				 "%s - © 2003-2005 grischka, © 2008-2009 carsomyr"
 				 "\n%s",
 				 GetBBVersion(),
 				 NLS2("$BBAbout$",
