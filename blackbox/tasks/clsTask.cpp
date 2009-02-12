@@ -11,15 +11,18 @@
 namespace TaskManagement
 {
 
-Task::Task(HWND p_hWnd, LegacyTask *p_legacy)
+Task::Task(HWND p_hWnd, LegacyTask *p_legacy, tTaskCallbackMap &p_callbacks) : m_callbacks(p_callbacks)
 {
 	m_smallIcon = NULL;
 	m_largeIcon = NULL;
+	m_origSmallIcon = NULL;
+	m_origLargeIcon = NULL;
 	m_caption[0] = L'\0';
 	m_hWnd = p_hWnd;
 	m_active = false;
 	m_flashing = false;
 	m_legacy = p_legacy;
+	m_newTask = true;
 	Update();
 }
 
@@ -38,6 +41,16 @@ Task::~Task()
 void Task::ReplaceTask(HWND p_hWnd)
 {
 	m_hWnd = p_hWnd;
+	if (m_smallIcon)
+	{
+		DestroyIcon(m_smallIcon);
+	}
+	if (m_largeIcon)
+	{
+		DestroyIcon(m_largeIcon);
+	}
+	m_origSmallIcon = NULL;
+	m_origLargeIcon = NULL;
 	Update();
 }
 
@@ -45,6 +58,11 @@ void Task::Flash(bool p_status)
 {
 	m_flashing = p_status;
 	UpdateLegacy();
+
+	if (p_status)
+	{
+		DoCallback(TASK_FLASHED, m_hWnd);
+	}
 }
 
 void Task::Activate(bool p_status)
@@ -56,53 +74,7 @@ void Task::Activate(bool p_status)
 void Task::Update()
 {
 	GetWindowTextW(m_hWnd, m_caption, sizeof(m_caption)/sizeof(WCHAR));
-	HICON icon = NULL;
-	SendMessageTimeout(m_hWnd, WM_GETICON, ICON_SMALL, 0, SMTO_ABORTIFHUNG|SMTO_NORMAL, 2000, (DWORD_PTR*)&icon);
-	if (!icon)
-	{
-		icon = reinterpret_cast<HICON>(GetClassLongPtr(m_hWnd, GCLP_HICONSM));
-	}
-	if (icon && icon != m_origSmallIcon)
-	{
-		if (m_smallIcon)
-		{
-			DestroyIcon(m_smallIcon);
-		}
-		m_origSmallIcon = icon;
-		m_smallIcon = CopyIcon(m_origSmallIcon);
-	}
-	icon = NULL;
-	SendMessageTimeout(m_hWnd, WM_GETICON, ICON_BIG, 0, SMTO_ABORTIFHUNG|SMTO_NORMAL, 2000, (DWORD_PTR*)&icon);
-	if (!icon)
-	{
-		icon = reinterpret_cast<HICON>(GetClassLongPtr(m_hWnd, GCLP_HICON));
-	}
-	if (!icon)
-	{
-		icon = m_origSmallIcon;
-	}
-	if (icon && icon != m_origLargeIcon)
-	{
-		if (m_largeIcon)
-		{
-			DestroyIcon(m_largeIcon);
-		}
-		m_origLargeIcon = icon;
-		m_largeIcon = CopyIcon(m_origLargeIcon);
-	}
-	if (!m_origSmallIcon)
-	{
-		if (icon && icon != m_origSmallIcon)
-		{
-			if (m_smallIcon)
-			{
-				DestroyIcon(m_smallIcon);
-			}
-			m_origSmallIcon = icon;
-			m_smallIcon = CopyIcon(m_origSmallIcon);
-		}
-	}
-	UpdateLegacy();
+	SendMessageCallback(m_hWnd, WM_GETICON, ICON_SMALL, 0, SmallIconProc, reinterpret_cast<ULONG_PTR>(this));
 }
 
 void Task::UpdateLegacy()
@@ -110,6 +82,98 @@ void Task::UpdateLegacy()
 	if (m_legacy)
 	{
 		m_legacy->Update(this);
+	}
+}
+
+VOID CALLBACK Task::SmallIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult)
+{
+	if (IsWindow(p_hWnd))
+	{
+		Task *task = reinterpret_cast<Task *>(p_dwData);;
+		if (p_lResult)
+		{
+			task->SetSmallIcon(reinterpret_cast<HICON>(p_lResult));
+		}
+		else
+		{
+			task->SetSmallIcon(reinterpret_cast<HICON>(GetClassLongPtr(task->m_hWnd, GCLP_HICONSM)));
+		}
+		if (task)
+		{
+			SendMessageCallback(task->m_hWnd, WM_GETICON, ICON_BIG, 0, LargeIconProc, reinterpret_cast<ULONG_PTR>(task));
+		}
+	}
+}
+
+VOID CALLBACK Task::LargeIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult)
+{
+	if (IsWindow(p_hWnd))
+	{
+		Task *task = reinterpret_cast<Task *>(p_dwData);
+		if (p_lResult)
+		{
+			task->SetLargeIcon(reinterpret_cast<HICON>(p_lResult));
+		}
+		else
+		{
+			task->SetLargeIcon(reinterpret_cast<HICON>(GetClassLongPtr(task->m_hWnd, GCLP_HICON)));
+			if (!task->m_origLargeIcon)
+			{
+				task->SetLargeIcon(task->m_origSmallIcon);
+			}
+		}
+
+		if (!task->m_origSmallIcon)
+		{
+			task->SetSmallIcon(task->m_origLargeIcon);
+		}
+
+		task->UpdateLegacy();
+
+		if (task->m_newTask)
+		{
+			task->m_newTask = false;
+			task->DoCallback(TASK_ADDED, task->m_hWnd);
+		}
+		else
+		{
+			task->DoCallback(TASK_UPDATED, task->m_hWnd);
+		}
+	}
+}
+
+void Task::SetSmallIcon(HICON p_icon)
+{
+	if (p_icon && p_icon != m_origSmallIcon)
+	{
+		if (m_smallIcon)
+		{
+			DestroyIcon(m_smallIcon);
+		}
+		m_origSmallIcon = p_icon;
+		m_smallIcon = CopyIcon(m_origSmallIcon);
+	}
+}
+
+void Task::SetLargeIcon(HICON p_icon)
+{
+	if (p_icon && p_icon != m_origLargeIcon)
+	{
+		if (m_largeIcon)
+		{
+			DestroyIcon(m_largeIcon);
+		}
+		m_origLargeIcon = p_icon;
+		m_largeIcon = CopyIcon(m_origLargeIcon);
+	}
+}
+
+void Task::DoCallback(eTaskCallbackType p_type, HWND p_window)
+{
+	tTaskCallbackMap::iterator callbackIt = m_callbacks.find(p_type);
+	if (callbackIt != m_callbacks.end())
+	{
+		callbackIt->second(p_window);
 	}
 }
 

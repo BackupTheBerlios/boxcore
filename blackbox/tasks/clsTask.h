@@ -8,7 +8,9 @@
 #ifndef CLSTASK_H_
 #define CLSTASK_H_
 
+#include "clsTaskManagerInterface.h"
 #include <windows.h>
+#include <map>
 
 namespace TaskManagement
 {
@@ -18,7 +20,7 @@ class LegacyTask;
 class Task
 {
 public:
-	Task(HWND p_hWnd, LegacyTask *p_legacy);
+	Task(HWND p_hWnd, LegacyTask *p_legacy, tTaskCallbackMap &p_callbacks);
 	virtual ~Task();
 
 	void ReplaceTask(HWND p_hWnd);
@@ -69,10 +71,21 @@ private:
 	bool m_flashing;
 	LegacyTask *m_legacy;
 
+	bool m_newTask;
+
+	tTaskCallbackMap &m_callbacks;
+	void DoCallback(eTaskCallbackType p_type, HWND p_window);
+
 	HICON m_origSmallIcon;
 	HICON m_origLargeIcon;
 
 	void UpdateLegacy();
+
+	static VOID CALLBACK SmallIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult);
+	static VOID CALLBACK LargeIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult);
+
+	void SetSmallIcon(HICON p_icon);
+	void SetLargeIcon(HICON p_icon);
 
 	friend class TaskManager;
 };

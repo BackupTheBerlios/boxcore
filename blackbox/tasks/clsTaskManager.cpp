@@ -15,6 +15,7 @@ namespace TaskManagement
 
 TaskManager::TaskManager(fnLegacyFactory p_factory, VWMInterface *p_vwm) : TaskManagerInterface(p_vwm)
 {
+	s_taskMan = this;
 	m_legacyFactory = p_factory;
 	EnumWindows(EnumProc, reinterpret_cast<LPARAM>(this));
 }
@@ -49,7 +50,7 @@ LRESULT TaskManager::ProcessShellMessage(WPARAM p_wParam, HWND p_hWnd)
 		//OutputDebugStringA("We know who to replace");
 		return TRUE;
 	case HSHELL_WINDOWREPLACED:
-		CleanTasks();
+		SetTimer(NULL, 0, 5000, TimerProc);
 		return TRUE;
 		//return ReplaceTask(p_hWnd);
 	case HSHELL_WINDOWACTIVATED:
@@ -125,7 +126,7 @@ LRESULT TaskManager::CreateTask(HWND p_hWnd)
 		{
 			newLegacy = m_legacyFactory();
 		}
-		Task *newTask = new Task(p_hWnd, newLegacy);
+		Task *newTask = new Task(p_hWnd, newLegacy, m_callbacks);
 		m_taskList.push_back(newTask);
 		tTaskList::iterator taskIt = m_taskList.end();
 		taskIt--;
@@ -142,7 +143,6 @@ LRESULT TaskManager::CreateTask(HWND p_hWnd)
 				oldTip->UpdateNext(newTask);
 			}
 		}
-		DoCallback(TASK_ADDED, p_hWnd);
 		return TRUE;
 	}
 	else
@@ -227,7 +227,6 @@ LRESULT TaskManager::RedrawTask(HWND p_redraw, bool p_rudeApp)
 		Task *task = *taskIt;
 		task->Update();
 		task->Flash(p_rudeApp);
-		DoCallback(p_rudeApp ? TASK_FLASHED : TASK_UPDATED, p_redraw);
 		return TRUE;
 	}
 	else
@@ -283,14 +282,22 @@ WINBOOL CALLBACK TaskManager::EnumProc(HWND p_hWnd, LPARAM p_lParam)
 void TaskManager::CleanTasks()
 {
 	for (tTaskList::iterator i = m_taskList.begin(); i != m_taskList.end(); ++i)
+	{
+		if (!IsTask((*i)->m_hWnd))
 		{
-			if (!IsTask((*i)->m_hWnd))
-			{
-				DestroyTask((*i)->m_hWnd);
-				CleanTasks();
-				break;
-			}
+			DestroyTask((*i)->m_hWnd);
+			CleanTasks();
+			break;
 		}
+	}
 }
+
+VOID CALLBACK TaskManager::TimerProc(HWND p_hWnd, UINT p_uMsg, UINT_PTR p_idEvent, DWORD p_dwTime)
+{
+	KillTimer(NULL, p_idEvent);
+	s_taskMan->CleanTasks();
+}
+
+TaskManager *TaskManager::s_taskMan;
 
 }
