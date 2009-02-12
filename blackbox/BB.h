@@ -53,7 +53,7 @@
 /* compiler specifics */
 
 #define WINVER 0x0502
-#define _WIN32_WINNT 0x0500
+#define _WIN32_WINNT 0x0502
 #define _WIN32_IE 0x0501
 #define NO_INTSHCUT_GUIDS
 #define NO_SHDOCVW_GUIDS
