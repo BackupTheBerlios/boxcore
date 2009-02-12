@@ -45,10 +45,13 @@ LRESULT TaskManager::ProcessShellMessage(WPARAM p_wParam, HWND p_hWnd)
 	case HSHELL_FLASH:
 		return RedrawTask(p_hWnd, true);
 	case HSHELL_WINDOWREPLACING:
-		m_replacingWindow = p_hWnd;
+		//m_replacingWindow = p_hWnd;
+		//OutputDebugStringA("We know who to replace");
 		return TRUE;
 	case HSHELL_WINDOWREPLACED:
-		return ReplaceTask(p_hWnd);
+		CleanTasks();
+		return TRUE;
+		//return ReplaceTask(p_hWnd);
 	case HSHELL_WINDOWACTIVATED:
 		return ActivateTask(p_hWnd, false);
 	case HSHELL_RUDEAPPACTIVATED:
@@ -151,9 +154,11 @@ LRESULT TaskManager::CreateTask(HWND p_hWnd)
 
 LRESULT TaskManager::DestroyTask(HWND p_destroyed)
 {
+	OutputDebugStringA("Desire destruction");
 	tTaskList::iterator taskIt = FindTask(p_destroyed);
 	if (taskIt != m_taskList.end())
 	{
+		OutputDebugStringA("Destruction");
 		Task *toDestroy = *taskIt;
 		tTaskList::iterator prev = taskIt;
 		tTaskList::iterator next = taskIt;
@@ -233,13 +238,14 @@ LRESULT TaskManager::RedrawTask(HWND p_redraw, bool p_rudeApp)
 
 LRESULT TaskManager::ReplaceTask(HWND p_replaceWith)
 {
-	DestroyTask(p_replaceWith);
+	//DestroyTask(p_replaceWith);
 	tTaskList::iterator taskIt = FindTask(m_replacingWindow);
 	if (taskIt != m_taskList.end())
 	{
+		OutputDebugStringA("Replacing them");
 		Task *toReplace = *taskIt;
 		toReplace->ReplaceTask(p_replaceWith);
-		DoCallback(TASK_REMOVED, m_replacingWindow);
+		//DestroyTask(m_replacingWindow);
 		DoCallback(TASK_ADDED, p_replaceWith);
 		m_replacingWindow = NULL;
 		return TRUE;
@@ -272,6 +278,19 @@ WINBOOL CALLBACK TaskManager::EnumProc(HWND p_hWnd, LPARAM p_lParam)
 	TaskManager *taskMan = reinterpret_cast<TaskManager *>(p_lParam);
 	taskMan->CreateTask(p_hWnd);
 	return TRUE;
+}
+
+void TaskManager::CleanTasks()
+{
+	for (tTaskList::iterator i = m_taskList.begin(); i != m_taskList.end(); ++i)
+		{
+			if (!IsTask((*i)->m_hWnd))
+			{
+				DestroyTask((*i)->m_hWnd);
+				CleanTasks();
+				break;
+			}
+		}
 }
 
 }

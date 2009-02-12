@@ -51,7 +51,7 @@ public:
 	virtual void SwitchToWindow(HWND p_window, bool p_force) PURE;
 	virtual LRESULT ProcessShellMessage(WPARAM p_wParam, HWND p_hWnd) PURE;
 	virtual UINT GetNumTasks() PURE;
-
+	virtual void CleanTasks() PURE;
 	virtual HWND GetTopTask() PURE;
 
 	virtual UINT GetTaskInfo(HWND p_window, PVOID p_info[], eTaskInfo p_infoType[], UINT p_numInfo) PURE;

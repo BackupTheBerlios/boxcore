@@ -33,6 +33,7 @@ public:
 	virtual HWND GetTopTask();
 	virtual UINT GetTaskInfo(HWND p_window, PVOID p_info[], eTaskInfo p_infoType[], UINT p_numInfo);
 
+	virtual void CleanTasks();
 	virtual UINT GetNumTasks();
 private:
 	fnLegacyFactory m_legacyFactory;
