@@ -2520,8 +2520,14 @@ struct tasklist *GetTaskListPtr(void)
 	HWND firstTask = GetTask(0);
 	PVOID info[1];
 	TaskManagement::eTaskInfo infoType[1] = {TaskManagement::TI_LEGACY};
-	g_pTaskManager->GetTaskInfo(firstTask, info, infoType, 1);
+	if (g_pTaskManager->GetTaskInfo(firstTask, info, infoType, 1))
+	{
 	return reinterpret_cast<BBTask *>(info[0])->GetTaskList();
+	}
+	else
+	{
+		return NULL;
+	}
 }
 
 BOOL GetTrayInfoReal(ShellServices::NotificationIcon *p_icon, PVOID *p_trayInfo, ATOM *p_infoTypes, CONST UINT p_numInfo)
