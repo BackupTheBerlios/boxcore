@@ -27,7 +27,9 @@
 #ifndef CLSTASKMANAGERINTERFACE_H_
 #define CLSTASKMANAGERINTERFACE_H_
 
-#define _WIN32_WINNT 0x0501
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0502
+#endif
 
 #include "../vwm/clsVWMInterface.h"
 #include <map>
@@ -62,6 +64,8 @@ protected:
 	void DoCallback(eTaskCallbackType p_type, HWND p_window);
 	tTaskCallbackMap m_callbacks;
 	VWMInterface *m_vwm;
+
+	CRITICAL_SECTION m_critSection;
 };
 
 }
