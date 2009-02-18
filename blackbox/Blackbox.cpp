@@ -547,6 +547,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	Workspaces_Init();
 	g_pTaskManager = new TaskManagement::TaskManager(TaskFactory, NULL);
 	g_pTaskManager->RegisterCallback(TaskManagement::TASK_ADDED, TaskAddedCallback);
+	g_pTaskManager->RegisterCallback(TaskManagement::TASK_REMOVED, TaskRemovedCallback);
 	g_pTaskManager->RegisterCallback(TaskManagement::TASK_UPDATED, TaskUpdatedCallback);
 	g_pTaskManager->RegisterCallback(TaskManagement::TASK_FLASHED, TaskFlashedCallback);
 	Desk_Init();
@@ -912,6 +913,9 @@ case_bb_restart:
 		goto dispatch_bb_message;
 
 		//======================================================
+	case BB_BRINGTOFRONT:
+		g_pTaskManager->SwitchToWindow(reinterpret_cast<HWND>(lParam), false);
+		break;
 	case BB_WINDOWLOWER:
 	case BB_WINDOWRAISE:
 	case BB_WINDOWSHADE:
@@ -924,7 +928,6 @@ case_bb_restart:
 	case BB_SWITCHTON:
 	case BB_LISTDESKTOPS:
 
-	case BB_BRINGTOFRONT:
 	case BB_WINDOWMINIMIZE:
 	case BB_WINDOWMAXIMIZE:
 	case BB_WINDOWRESTORE:
