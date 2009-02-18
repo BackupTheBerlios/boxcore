@@ -7,6 +7,8 @@ clsTask.cpp
 clsLegacyTask.cpp
 clsTaskManager.cpp
 clsTaskManagerInterface.cpp
+
+helpers.cpp
 )
 
 add_library (taskmanager STATIC ${TASKMAN_SRCS})
