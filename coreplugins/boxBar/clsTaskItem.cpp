@@ -80,7 +80,6 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				tasklist *task = GetTaskListPtr();
 				tipText = NULL;
-				ClearTooltip();
 				for (int i = 0; i < GetTaskListSize(); ++i)
 				{
 					if (task->hwnd == (HWND)wParam)
@@ -120,7 +119,10 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			if (wParam)
 				tipText = m_caption;
+			if (!m_hasTooltip)
+			{
 			setTooltip();
+			}
 		}
 		break;
 	}

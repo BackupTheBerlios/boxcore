@@ -83,6 +83,7 @@ LRESULT clsItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam,
 		break;
 	case BOXBAR_NEEDTIP:
 	case WM_TIMER:
+	case WM_NOTIFY:
 		for (list<clsItem *>::iterator i = itemList.begin(); i
 				!= itemList.end(); ++i)
 		{

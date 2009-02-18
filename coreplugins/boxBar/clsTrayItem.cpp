@@ -171,7 +171,17 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						}
 					}
 
-					setTooltip();
+					if (tipText)
+					{
+						OutputDebugString(tipText);
+						if (!m_hasTooltip)
+							setTooltip();
+					}
+					else
+					{
+						ClearTooltip();
+					}
+
 					if (trayItem->pBalloon && trayItem->pBalloon->uInfoTimeout && strlen(trayItem->pBalloon->szInfo))
 					{
 						POINT iconPos;
@@ -191,7 +201,7 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 		}
 	}
-	return DefWindowProc(hWnd, msg, wParam, lParam);
+	return clsItem::wndProc(hWnd, msg, wParam, lParam);
 }
 
 fnGetTrayInfo clsTrayItem::GetTrayInfo = NULL;

@@ -191,6 +191,7 @@ protected:
 	void setTooltip();
 	void ClearTooltip();
 	TCHAR *tipText;
+	bool m_hasTooltip;
 
 	static void broam(clsItem *p_item, UINT p_msg, WPARAM p_wParam, LPARAM p_lParam);
 

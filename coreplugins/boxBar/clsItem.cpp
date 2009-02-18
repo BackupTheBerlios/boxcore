@@ -50,6 +50,7 @@ clsItem::clsItem(bool pVertical)
 	m_broamMid = NULL;
 
 	tipText = NULL;
+	m_hasTooltip = false;
 	leftClick = NULL;
 	m_leftDblClick = NULL;
 	rightClick = NULL;
@@ -96,7 +97,7 @@ clsItem::~clsItem()
 
 /** @brief Test if point is within the item
   *
-  * For use on mouse events, when it is neccesary to determine if an item was clicked
+  * For use on mouse events, when it is necessary to determine if an item was clicked
   */
 bool clsItem::hitTest(int pX, int pY)
 {
@@ -288,6 +289,26 @@ LRESULT clsItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		break;
+		case WM_NOTIFY:
+		{
+			NMHDR &messageHeader = *reinterpret_cast<NMHDR*>(lParam);
+		switch(messageHeader.code)
+		{
+		case TTN_NEEDTEXT:
+		{
+			if (tipText) OutputDebugString(tipText);
+			NMTTDISPINFO &tooltipInfo = *reinterpret_cast<NMTTDISPINFO*>(lParam);
+			if (tooltipInfo.hdr.idFrom == reinterpret_cast<UINT_PTR>(this))
+			{
+				tooltipInfo.lpszText = tipText;
+				tooltipInfo.hinst = NULL;
+				return TRUE;
+			}
+			return FALSE;
+		}
+		}
+		}
+		break;
 	}
 
 	return DefWindowProc(hWnd, msg, wParam, lParam);
@@ -328,19 +349,15 @@ void clsItem::setTooltip()
 	TOOLINFO toolInfo;
 	ZeroMemory(&toolInfo, sizeof(toolInfo));
 	toolInfo.cbSize = sizeof(toolInfo);
-	toolInfo.uFlags = TTF_SUBCLASS | TTF_TRANSPARENT | TTF_PARSELINKS;
 	toolInfo.hwnd = barWnd;
 	toolInfo.uId = (UINT_PTR)this;
+	toolInfo.uFlags = TTF_SUBCLASS | TTF_TRANSPARENT | TTF_PARSELINKS;
 	toolInfo.rect = itemArea;
 	toolInfo.hinst = hInstance;
-	toolInfo.lpszText = tipText;
-	if (tipText)
-	{
-		SendMessage(tooltipWnd, TTM_DELTOOL, 0, (LPARAM)&toolInfo);
-		SendMessage(tooltipWnd, TTM_ADDTOOL, 0, (LPARAM)&toolInfo);
-	}
-	else
-		SendMessage(tooltipWnd, TTM_DELTOOL, 0, (LPARAM)&toolInfo);
+	toolInfo.lpszText = LPSTR_TEXTCALLBACK;
+	SendMessage(tooltipWnd, TTM_DELTOOL, 0, (LPARAM)&toolInfo);
+	SendMessage(tooltipWnd, TTM_ADDTOOL, 0, (LPARAM)&toolInfo);
+	m_hasTooltip = true;
 }
 
 /** @brief Create a tooltip control for use by items
@@ -481,6 +498,7 @@ void clsItem::ClearTooltip()
 	toolInfo.rect = itemArea;
 	toolInfo.hinst = hInstance;
 	SendMessage(tooltipWnd, TTM_DELTOOL, 0, (LPARAM)&toolInfo);
+	m_hasTooltip = false;
 }
 
 void clsItem::broam(clsItem *p_item, UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)
