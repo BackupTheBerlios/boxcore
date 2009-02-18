@@ -121,7 +121,7 @@ void clsTaskItemCollection::populateTasks()
 	itemMapping.clear();
 
 	tasklist *task = GetTaskListPtr();
-	for (int i = 0; i < GetTaskListSize(); ++i)
+	while (task)
 	{
 		clsTaskItem *newTask = new clsTaskItem(task, vertical);
 		addItem(newTask);
