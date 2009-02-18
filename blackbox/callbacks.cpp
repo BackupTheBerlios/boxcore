@@ -17,6 +17,15 @@ void TaskAddedCallback(HWND p_window)
 	}
 }
 
+void TaskRemovedCallback(HWND p_window)
+{
+	if (g_pMessageManager)
+	{
+		g_pMessageManager->BroadcastMessage(BB_REMOVETASK, reinterpret_cast<WPARAM>(p_window), 0);
+		g_pMessageManager->BroadcastMessage(BB_TASKSUPDATE, reinterpret_cast<WPARAM>(p_window), TASKITEM_REMOVED);
+	}
+}
+
 void TaskUpdatedCallback(HWND p_window)
 {
 	if (g_pMessageManager)

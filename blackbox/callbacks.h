@@ -13,6 +13,7 @@ void broadcastRemove(void *p_data);
 void broadcastMod(void *p_data);
 
 void TaskAddedCallback(HWND p_window);
+void TaskRemovedCallback(HWND p_window);
 void TaskUpdatedCallback(HWND p_window);
 void TaskFlashedCallback(HWND p_window);
 
