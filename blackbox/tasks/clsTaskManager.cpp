@@ -76,6 +76,17 @@ HWND TaskManager::GetTopTask()
 	return NULL;
 }
 
+HWND TaskManager::GetTaskWindow(UINT p_taskNum)
+{
+	if (p_taskNum<m_taskList.size())
+	{
+		tTaskList::iterator task = m_taskList.begin();
+		advance(task,p_taskNum);
+		return (*task)->getHWnd();
+	}
+	return NULL;
+}
+
 UINT TaskManager::GetTaskInfo(HWND p_window, PVOID p_info[], eTaskInfo p_infoType[], UINT p_numInfo)
 {
 	UINT numDone = 0;

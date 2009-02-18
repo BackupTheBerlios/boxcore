@@ -58,6 +58,8 @@ public:
 
 	virtual UINT GetTaskInfo(HWND p_window, PVOID p_info[], eTaskInfo p_infoType[], UINT p_numInfo) PURE;
 
+	virtual HWND GetTaskWindow(UINT p_taskNum) PURE;
+
 	VWMInterface *GetVWM();
 	void RegisterCallback(eTaskCallbackType p_type, fnTaskCallback p_callback);
 protected:

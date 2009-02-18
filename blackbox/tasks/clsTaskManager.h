@@ -35,6 +35,7 @@ public:
 
 	virtual void CleanTasks();
 	virtual UINT GetNumTasks();
+	virtual HWND GetTaskWindow(UINT p_taskNum);
 private:
 	fnLegacyFactory m_legacyFactory;
 	tTaskList m_taskList;
