@@ -1118,6 +1118,7 @@ case_bb_restart:
 	default:
 		if (uMsg == WM_ShellHook)
 		{
+			g_pTaskManager->ProcessShellMessage(wParam, reinterpret_cast<HWND>(lParam));
 			LPARAM extended = 0 != (wParam & 0x8000);
 			switch (wParam & 0x7fff)
 			{
@@ -1126,12 +1127,6 @@ case_bb_restart:
 				lParam = (GetAsyncKeyState(VK_RWIN) & 1) ? VK_RWIN : VK_LWIN;
 				goto p2;
 
-			case HSHELL_WINDOWCREATED:
-				uMsg = BB_ADDTASK;
-				break;
-			case HSHELL_WINDOWDESTROYED:
-				uMsg = BB_REMOVETASK;
-				break;
 			case HSHELL_ACTIVATESHELLWINDOW:
 				uMsg = BB_ACTIVATESHELLWINDOW;
 				break;
@@ -1144,14 +1139,9 @@ case_bb_restart:
 			case HSHELL_REDRAW:
 				uMsg = BB_REDRAWTASK;
 				break;
-			case HSHELL_WINDOWREPLACING:
-			case HSHELL_WINDOWREPLACED:
-				uMsg = 0;
-				break;
 			default:
 				return 0;
 			}
-			g_pTaskManager->ProcessShellMessage(wParam, reinterpret_cast<HWND>(lParam));
 			TaskWndProc(wParam, (HWND)lParam);
 
 p2:
