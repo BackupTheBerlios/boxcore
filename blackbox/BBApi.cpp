@@ -2505,6 +2505,18 @@ systemTray* GetTrayIcon(UINT idx)
 }
 
 //===========================================================================
+// API: GetTask - returns the HWND of the task by index
+
+HWND GetTask(int index)
+{
+	if (index >= 0)
+	{
+		return g_pTaskManager->GetTaskWindow(index);
+	}
+	return NULL;
+}
+
+//===========================================================================
 // API: GetTaskListSize - returns the number of currently registered tasks
 
 int GetTaskListSize(void)
@@ -2517,12 +2529,12 @@ int GetTaskListSize(void)
 
 struct tasklist *GetTaskListPtr(void)
 {
-	HWND firstTask = GetTask(0);
+	HWND firstTask = g_pTaskManager->GetTaskWindow(0);
 	PVOID info[1];
 	TaskManagement::eTaskInfo infoType[1] = {TaskManagement::TI_LEGACY};
 	if (g_pTaskManager->GetTaskInfo(firstTask, info, infoType, 1))
 	{
-	return reinterpret_cast<BBTask *>(info[0])->GetTaskList();
+		return reinterpret_cast<BBTask *>(info[0])->GetTaskList();
 	}
 	else
 	{

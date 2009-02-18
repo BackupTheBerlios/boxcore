@@ -1186,22 +1186,22 @@ void TaskWndProc(WPARAM wParam, HWND hwnd)
 	switch (code)
 	{
 		//====================
-	case HSHELL_WINDOWCREATED:
-		// windows reshown by the vwm also trigger the HSHELL_WINDOWCREATED
-		if (hwnd && NULL == tl)
-		{
-			AddTask(hwnd);
-		}
-		break;
+		/*case HSHELL_WINDOWCREATED:
+			// windows reshown by the vwm also trigger the HSHELL_WINDOWCREATED
+			if (hwnd && NULL == tl)
+			{
+				AddTask(hwnd);
+			}
+			break;*/
 
 		//====================
-	case HSHELL_WINDOWDESTROYED:
+	/*case HSHELL_WINDOWDESTROYED:
 		// windows hidden by the vwm also trigger the HSHELL_WINDOWDESTROYED
 		if (tl && false == is_valid_task(hwnd))
 		{
 			RemoveTask(tl);
 		}
-		break;
+		break;*/
 
 		//====================
 	case HSHELL_WINDOWACTIVATED:
@@ -1306,19 +1306,6 @@ hshell_windowactivated:
 //===========================================================================
 
 
-
-//===========================================================================
-// API: GetTask - returns the HWND of the task by index
-
-HWND GetTask(int index)
-{
-	if (index >= 0)
-	{
-		struct tasklist *tl = (struct tasklist *)nth_node(taskList, index);
-		if (tl) return tl->hwnd;
-	}
-	return NULL;
-}
 
 //===========================================================================
 // API: GetActiveTask - returns index of current active task or -1, if none or BB
