@@ -296,7 +296,6 @@ LRESULT clsItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 		case TTN_NEEDTEXT:
 		{
-			if (tipText) OutputDebugString(tipText);
 			NMTTDISPINFO &tooltipInfo = *reinterpret_cast<NMTTDISPINFO*>(lParam);
 			if (tooltipInfo.hdr.idFrom == reinterpret_cast<UINT_PTR>(this))
 			{

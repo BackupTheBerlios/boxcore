@@ -173,7 +173,6 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 					if (tipText)
 					{
-						OutputDebugString(tipText);
 						if (!m_hasTooltip)
 							setTooltip();
 					}
