@@ -7,6 +7,7 @@
 
 #include "clsTask.h"
 #include "clsLegacyTask.h"
+#include "helpers.h"
 
 namespace TaskManagement
 {
@@ -87,7 +88,8 @@ void Task::UpdateLegacy()
 
 VOID CALLBACK Task::SmallIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult)
 {
-	if (IsWindow(p_hWnd))
+	OutputDebugString("Trying SMALL");
+	if (IsTask(p_hWnd))
 	{
 		Task *task = reinterpret_cast<Task *>(p_dwData);;
 		if (p_lResult)
@@ -98,16 +100,14 @@ VOID CALLBACK Task::SmallIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, 
 		{
 			task->SetSmallIcon(reinterpret_cast<HICON>(GetClassLongPtr(task->m_hWnd, GCLP_HICONSM)));
 		}
-		if (task)
-		{
-			SendMessageCallback(task->m_hWnd, WM_GETICON, ICON_BIG, 0, LargeIconProc, reinterpret_cast<ULONG_PTR>(task));
-		}
+		SendMessageCallback(task->m_hWnd, WM_GETICON, ICON_BIG, 0, LargeIconProc, reinterpret_cast<ULONG_PTR>(task));
 	}
 }
 
 VOID CALLBACK Task::LargeIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult)
 {
-	if (IsWindow(p_hWnd))
+	OutputDebugString("Trying LARGE");
+	if (IsTask(p_hWnd))
 	{
 		Task *task = reinterpret_cast<Task *>(p_dwData);
 		if (p_lResult)
@@ -117,13 +117,13 @@ VOID CALLBACK Task::LargeIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, 
 		else
 		{
 			task->SetLargeIcon(reinterpret_cast<HICON>(GetClassLongPtr(task->m_hWnd, GCLP_HICON)));
-			if (!task->m_origLargeIcon)
+			if (!task->m_largeIcon && task->m_smallIcon)
 			{
 				task->SetLargeIcon(task->m_origSmallIcon);
 			}
 		}
 
-		if (!task->m_origSmallIcon)
+		if (!task->m_smallIcon)
 		{
 			task->SetSmallIcon(task->m_origLargeIcon);
 		}
@@ -149,6 +149,7 @@ void Task::SetSmallIcon(HICON p_icon)
 		if (m_smallIcon)
 		{
 			DestroyIcon(m_smallIcon);
+			m_smallIcon = NULL;
 		}
 		m_origSmallIcon = p_icon;
 		m_smallIcon = CopyIcon(m_origSmallIcon);
@@ -162,6 +163,7 @@ void Task::SetLargeIcon(HICON p_icon)
 		if (m_largeIcon)
 		{
 			DestroyIcon(m_largeIcon);
+			m_largeIcon = NULL;
 		}
 		m_origLargeIcon = p_icon;
 		m_largeIcon = CopyIcon(m_origLargeIcon);
