@@ -8,6 +8,7 @@
 #include "clsTaskManager.h"
 #include "clsTask.h"
 #include "clsLegacyTask.h"
+#include "helpers.h"
 #include <stdio.h>
 
 namespace TaskManagement
@@ -31,6 +32,15 @@ void TaskManager::Reload()
 
 void TaskManager::SwitchToWindow(HWND p_window, bool p_force)
 {
+	if (IsTask(p_window))
+	{
+		if (IsIconic(p_window)) PostMessage(p_window, WM_SYSCOMMAND, SC_RESTORE, 0);
+		SetForegroundWindow(p_window);
+	}
+	else
+	{
+		CleanTasks();
+	}
 }
 
 LRESULT TaskManager::ProcessShellMessage(WPARAM p_wParam, HWND p_hWnd)
@@ -89,36 +99,9 @@ UINT TaskManager::GetTaskInfo(HWND p_window, PVOID p_info[], eTaskInfo p_infoTyp
 	return numDone;
 }
 
-bool TaskManager::IsTask(HWND p_hWnd)
-{
-	if (!IsWindow(p_hWnd))
-	{
-		return false;
-	}
-
-	LONG_PTR style = GetWindowLongPtr(p_hWnd, GWL_STYLE);
-	if (GetParent(p_hWnd) || !IsWindowVisible(p_hWnd) || (style & WS_DISABLED))
-	{
-		return false;
-	}
-
-	LONG_PTR exStyle = GetWindowLongPtr(p_hWnd, GWL_EXSTYLE);
-	HWND owner = GetWindow(p_hWnd, GW_OWNER);
-	if (exStyle & WS_EX_APPWINDOW)
-	{
-		return true;
-	}
-	if ((exStyle & WS_EX_TOOLWINDOW))
-	{
-		return false;
-	}
-
-	return true;
-}
-
 LRESULT TaskManager::CreateTask(HWND p_hWnd)
 {
-	if (IsTask(p_hWnd))
+	if (IsTask(p_hWnd) && (FindTask(p_hWnd) == m_taskList.end()))
 	{
 		OutputDebugString(TEXT("A task!"));
 		LegacyTask *newLegacy = NULL;
@@ -159,37 +142,38 @@ LRESULT TaskManager::DestroyTask(HWND p_destroyed)
 	if (taskIt != m_taskList.end())
 	{
 		OutputDebugStringA("Destruction");
-		Task *toDestroy = *taskIt;
-		tTaskList::iterator prev = taskIt;
-		tTaskList::iterator next = taskIt;
-		next++;
-		if (prev != m_taskList.begin())
+		if (taskIt == m_taskList.begin())
 		{
-			prev--;
+			tTaskList::iterator next = taskIt;
+			next++;
+			if (next != m_taskList.end())
+			{
+				(*next)->getLegacy()->UpdatePrev(NULL);
+			}
+			delete (*taskIt);
+			m_taskList.erase(taskIt);
 		}
-		if (next != m_taskList.end())
+		else
 		{
-			if (prev!=taskIt)
+			tTaskList::iterator prev = taskIt;
+			tTaskList::iterator next = taskIt;
+			next++;
+			prev--;
+			if (next != m_taskList.end())
 			{
 				(*next)->getLegacy()->UpdatePrev(*prev);
 				(*prev)->getLegacy()->UpdateNext(*next);
 			}
 			else
 			{
-				(*next)->getLegacy()->UpdatePrev(NULL);
-			}
-		}
-		else
-		{
-			if (prev!=taskIt)
-			{
 				(*prev)->getLegacy()->UpdateNext(NULL);
 			}
+			delete (*taskIt);
+			m_taskList.erase(taskIt);
 		}
-		m_taskList.remove(toDestroy);
-		delete toDestroy;
 		DoCallback(TASK_REMOVED, p_destroyed);
 		return TRUE;
+
 	}
 	else
 	{

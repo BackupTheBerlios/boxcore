@@ -46,8 +46,6 @@ private:
 	static VOID CALLBACK TimerProc(HWND p_hWnd, UINT p_uMsg, UINT_PTR p_idEvent, DWORD p_dwTime);
 	static TaskManager *s_taskMan;
 
-	bool IsTask(HWND p_hWnd);
-
 	LRESULT CreateTask(HWND p_created);
 	LRESULT DestroyTask(HWND p_destroyed);
 	LRESULT ActivateTask(HWND p_activated, bool p_rudeApp);
