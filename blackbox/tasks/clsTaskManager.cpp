@@ -121,9 +121,7 @@ LRESULT TaskManager::CreateTask(HWND p_hWnd)
 			newLegacy = m_legacyFactory();
 		}
 		Task *newTask = new Task(p_hWnd, newLegacy, m_callbacks);
-		m_taskList.push_back(newTask);
-		tTaskList::iterator taskIt = m_taskList.end();
-		taskIt--;
+		tTaskList::iterator taskIt = m_taskList.insert(m_taskList.end(), newTask);
 		if (taskIt != m_taskList.begin())
 		{
 			taskIt--;
