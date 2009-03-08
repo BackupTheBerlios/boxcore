@@ -16,7 +16,7 @@ WNDPROC origWndProc = NULL;
 UINT forwarderModuleMessage = 0;
 bool moduleSent = false;
 
-WINAPI DWORD DieProc(LPVOID p_param)
+DWORD WINAPI DieProc(LPVOID p_param)
 {
 	OutputDebugString("Entering death throes");
 	SetWindowLongPtr(hTrayWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(origWndProc));
