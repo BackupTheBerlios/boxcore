@@ -37,6 +37,7 @@ TaskManager::TaskManager(fnLegacyFactory p_factory, VWMInterface *p_vwm) : TaskM
 	s_taskMan = this;
 	m_replacingWindow = NULL;
 	m_legacyFactory = p_factory;
+	m_activeTask = NULL;
 	EnumWindows(EnumProc, reinterpret_cast<LPARAM>(this));
 }
 
@@ -191,8 +192,6 @@ LRESULT TaskManager::DestroyTask(HWND p_destroyed)
 			{
 				(*next)->getLegacy()->UpdatePrev(NULL);
 			}
-			delete (*taskIt);
-			m_taskList.erase(taskIt);
 		}
 		else
 		{
@@ -209,9 +208,13 @@ LRESULT TaskManager::DestroyTask(HWND p_destroyed)
 			{
 				(*prev)->getLegacy()->UpdateNext(NULL);
 			}
+		}
+		if (m_activeTask == *taskIt)
+			{
+				m_activeTask = NULL;
+			}
 			delete (*taskIt);
 			m_taskList.erase(taskIt);
-		}
 		DoCallback(TASK_REMOVED, p_destroyed, NULL);
 		return TRUE;
 

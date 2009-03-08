@@ -42,7 +42,7 @@ private:
 	HWND m_replacingWindow;
 	Task *m_activeTask;
 
-	static WINBOOL CALLBACK EnumProc(HWND p_hWnd, LPARAM p_lParam);
+	static BOOL CALLBACK EnumProc(HWND p_hWnd, LPARAM p_lParam);
 
 	static VOID CALLBACK TimerProc(HWND p_hWnd, UINT p_uMsg, UINT_PTR p_idEvent, DWORD p_dwTime);
 	static TaskManager *s_taskMan;
