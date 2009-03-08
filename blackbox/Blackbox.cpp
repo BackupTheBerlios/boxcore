@@ -52,7 +52,9 @@
 #include "shellserviceobjects/clsShellServiceObjects.h"
 #include "clsSystemInfo.h"
 #include "../debug/debug.h"
+#include "../utility/stringcopy.h"
 #include "callbacks.h"
+
 
 //====================
 
@@ -97,6 +99,7 @@ BOOL save_opaquemove;
 #include "shellservices/clsNotifyIconHandler.h"
 #include "shellservices/clsAppbarHandler.h"
 #include "tasks/clsTaskManager.h"
+#include "vwm/clsNullVWM.h"
 #include "clsSystemTrayIcon.h"
 #include "clsBBTask.h"
 
@@ -104,6 +107,7 @@ ShellServices::ShellServiceWindow *g_pShellServiceWindow;
 ShellServices::NotifyIconHandler *g_pNotificationIconHandler;
 ShellServices::AppbarHandler *g_pAppbarHandler;
 TaskManagement::TaskManagerInterface *g_pTaskManager;
+TaskManagement::VWMInterface *g_pVirtualWindowManager;
 
 ShellServices::LegacyNotificationIcon *SystemTrayIconFactory()
 {
@@ -544,23 +548,32 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	g_pMessageManager = new MessageManager;
 	MenuMaker_Init();
 	MenuMaker_Configure();
+	PRINT("VWM");
 	Workspaces_Init();
-	g_pTaskManager = new TaskManagement::TaskManager(TaskFactory, NULL);
+	g_pVirtualWindowManager = new TaskManagement::NullVWM();
+	PRINT("Creating TaskManager");
+	g_pTaskManager = new TaskManagement::TaskManager(TaskFactory, g_pVirtualWindowManager);
 	g_pTaskManager->RegisterCallback(TaskManagement::TASK_ADDED, TaskAddedCallback);
 	g_pTaskManager->RegisterCallback(TaskManagement::TASK_REMOVED, TaskRemovedCallback);
 	g_pTaskManager->RegisterCallback(TaskManagement::TASK_UPDATED, TaskUpdatedCallback);
 	g_pTaskManager->RegisterCallback(TaskManagement::TASK_FLASHED, TaskFlashedCallback);
+	g_pTaskManager->RegisterCallback(TaskManagement::TASK_ACTIVATED, TaskActivatedCallback);
+	g_pTaskManager->RegisterCallback(TaskManagement::TASK_GETRECT, TaskGetRectCallback);
+	PRINT("Starting desktop");
 	Desk_Init();
+	PRINT("Creating tray message mapping");
 	InitTrayMapping();
 	g_pShellServiceWindow = new ShellServices::ShellServiceWindow(hMainInstance, true);
+	PRINT("Starting NotifyIcon Handler");
 	g_pNotificationIconHandler = new ShellServices::NotifyIconHandler(SystemTrayIconFactory, true);
 	g_pNotificationIconHandler->RegisterCallback(ShellServices::TCALLBACK_ADD,broadcastAdd);
 	g_pNotificationIconHandler->RegisterCallback(ShellServices::TCALLBACK_MOD,broadcastMod);
 	g_pNotificationIconHandler->RegisterCallback(ShellServices::TCALLBACK_DEL,broadcastRemove);
 	g_pShellServiceWindow->RegisterHandler(ShellServices::HANDLER_NOTIFYICON, g_pNotificationIconHandler);
+	PRINT("Starting AppBar Handler");
 	g_pAppbarHandler = new ShellServices::AppbarHandler();
 	g_pShellServiceWindow->RegisterHandler(ShellServices::HANDLER_APPBAR, g_pAppbarHandler);
-
+	PRINT("Starting SSO's");
 	if (!underExplorer)
 	{
 		if (SystemInfo.isOsVista())
@@ -583,9 +596,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			ShellServiceObjectsManager.startServiceObjects(normalKey);
 		}
 	}
-
+	PRINT("Initialising API extensions");
 	InitApiExtensions();
-
+	PRINT("Starting Plugins");
 	start_plugins();
 
 	if (bRunStartup) SetTimer(BBhwnd, BB_RUNSTARTUP_TIMER, 500, NULL);
@@ -593,6 +606,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	Session_UpdateSession();
 
 	/* Message Loop */
+	PRINT("Entering Message Loop");
 	RetCode = message_loop();
 
 	// ------------------------------------------
@@ -668,6 +682,8 @@ void shutdown_blackbox()
 	Workspaces_Exit();
 	delete g_pTaskManager;
 	g_pTaskManager = NULL;
+	delete g_pVirtualWindowManager;
+	g_pVirtualWindowManager = NULL;
 	MenuMaker_Exit();
 }
 
@@ -752,6 +768,18 @@ void adjust_style(void) // temporary fix for bbStyleMaker 1.2
 		mStyle.MenuHilite.disabledColor =
 			mStyle.MenuHilite.TextColor;
 
+}
+
+void DesktopUpdate()
+{
+	static DesktopInfo deskInfo;
+	deskInfo.number = g_pVirtualWindowManager->GetCurrentWorkspace(NULL);
+	CopyString(deskInfo.name, g_pVirtualWindowManager->GetWorkspaceName(NULL, deskInfo.number), 32);
+	deskInfo.isCurrent = true;
+	deskInfo.ScreensX = g_pVirtualWindowManager->GetNumWorkspaces(NULL);
+	deskInfo.deskNames = NULL;
+	g_pMessageManager->BroadcastMessage(BB_DESKTOPINFO, 0, reinterpret_cast<LPARAM>(&deskInfo));
+	g_pMessageManager->BroadcastMessage(BB_REDRAWTASK, 0, 0); //Apparently for bbPager
 }
 
 //===========================================================================
@@ -925,6 +953,17 @@ case_bb_restart:
 			lParam = wParam;
 
 	case BB_WORKSPACE:
+		switch (wParam)
+		{
+		case BBWS_DESKLEFT:
+			g_pVirtualWindowManager->PrevWorkspace(NULL);
+			DesktopUpdate();
+			return g_pMessageManager->BroadcastMessage(uMsg, wParam, lParam);
+		case BBWS_DESKRIGHT:
+			g_pVirtualWindowManager->NextWorkspace(NULL);
+			DesktopUpdate();
+			return g_pMessageManager->BroadcastMessage(uMsg, wParam, lParam);
+		}
 	case BB_SWITCHTON:
 	case BB_LISTDESKTOPS:
 
@@ -1118,35 +1157,21 @@ case_bb_restart:
 	default:
 		if (uMsg == WM_ShellHook)
 		{
-			g_pTaskManager->ProcessShellMessage(wParam, reinterpret_cast<HWND>(lParam));
 			LPARAM extended = 0 != (wParam & 0x8000);
 			switch (wParam & 0x7fff)
 			{
 			case HSHELL_TASKMAN:
 				uMsg = BB_WINKEY;
 				lParam = (GetAsyncKeyState(VK_RWIN) & 1) ? VK_RWIN : VK_LWIN;
-				goto p2;
+				PostMessage(hwnd, uMsg, lParam, extended);
+				break;
 
 			case HSHELL_ACTIVATESHELLWINDOW:
-				uMsg = BB_ACTIVATESHELLWINDOW;
+				PRINT("ActivateShellWindow recieved");
 				break;
-			case HSHELL_WINDOWACTIVATED:
-				uMsg = BB_ACTIVETASK;
-				break;
-			case HSHELL_GETMINRECT:
-				uMsg = BB_MINMAXTASK;
-				break;
-			case HSHELL_REDRAW:
-				uMsg = BB_REDRAWTASK;
-				break;
-			default:
-				return 0;
 			}
-			TaskWndProc(wParam, (HWND)lParam);
-
-p2:
-			PostMessage(hwnd, uMsg, lParam, extended);
-			break;
+			//TaskWndProc(wParam, (HWND)lParam);
+			return g_pTaskManager->ProcessShellMessage(wParam, reinterpret_cast<HWND>(lParam));
 		}
 
 		if (uMsg >= BB_MSGFIRST && uMsg < BB_MSGLAST)

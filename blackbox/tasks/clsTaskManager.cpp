@@ -11,12 +11,31 @@
 #include "helpers.h"
 #include <stdio.h>
 
+#include "../../debug/debug.h"
+
 namespace TaskManagement
 {
+
+/** @internal
+  * @brief Structure for the LPARAM of HSHELL_GETMINRECT messages
+  *
+  * This structure uses SHORT's for the coordinates rather than the RECT that is documented.
+  * The SHORT's work, while if you make it a RECT it crashes or just does nothing.
+  * Credit to jimrandomh from #lsdev for figuring this out.
+  */
+struct MINRECTINFO
+{
+	HWND hWnd;
+	SHORT left;
+	SHORT top;
+	SHORT right;
+	SHORT bottom;
+};
 
 TaskManager::TaskManager(fnLegacyFactory p_factory, VWMInterface *p_vwm) : TaskManagerInterface(p_vwm)
 {
 	s_taskMan = this;
+	m_replacingWindow = NULL;
 	m_legacyFactory = p_factory;
 	EnumWindows(EnumProc, reinterpret_cast<LPARAM>(this));
 }
@@ -49,6 +68,7 @@ LRESULT TaskManager::ProcessShellMessage(WPARAM p_wParam, HWND p_hWnd)
 	{
 	case HSHELL_WINDOWCREATED:
 		return CreateTask(p_hWnd);
+		break;
 	case HSHELL_WINDOWDESTROYED:
 		return DestroyTask(p_hWnd);
 	case HSHELL_REDRAW:
@@ -56,7 +76,7 @@ LRESULT TaskManager::ProcessShellMessage(WPARAM p_wParam, HWND p_hWnd)
 	case HSHELL_FLASH:
 		return RedrawTask(p_hWnd, true);
 	case HSHELL_WINDOWREPLACING:
-		//m_replacingWindow = p_hWnd;
+		m_replacingWindow = p_hWnd;
 		//OutputDebugStringA("We know who to replace");
 		return TRUE;
 	case HSHELL_WINDOWREPLACED:
@@ -67,6 +87,13 @@ LRESULT TaskManager::ProcessShellMessage(WPARAM p_wParam, HWND p_hWnd)
 		return ActivateTask(p_hWnd, false);
 	case HSHELL_RUDEAPPACTIVATED:
 		return ActivateTask(p_hWnd, true);
+	case HSHELL_GETMINRECT:
+	{
+		MINRECTINFO &info = *reinterpret_cast<MINRECTINFO *>(p_hWnd);
+		TRACE("The window is %p", info.hWnd);
+		DoCallback(TASK_GETRECT, info.hWnd, &info.left);
+		return TRUE;
+	}
 	}
 	return 0;
 }
@@ -121,6 +148,11 @@ LRESULT TaskManager::CreateTask(HWND p_hWnd)
 			newLegacy = m_legacyFactory();
 		}
 		Task *newTask = new Task(p_hWnd, newLegacy, m_callbacks);
+		if (m_vwm)
+		{
+			HMONITOR mon = MonitorFromWindow(p_hWnd, MONITOR_DEFAULTTOPRIMARY);
+			m_vwm->SetWindowWorkspace(p_hWnd, mon, m_vwm->GetCurrentWorkspace(mon), false);
+		}
 		tTaskList::iterator taskIt = m_taskList.insert(m_taskList.end(), newTask);
 		if (taskIt != m_taskList.begin())
 		{
@@ -180,7 +212,7 @@ LRESULT TaskManager::DestroyTask(HWND p_destroyed)
 			delete (*taskIt);
 			m_taskList.erase(taskIt);
 		}
-		DoCallback(TASK_REMOVED, p_destroyed);
+		DoCallback(TASK_REMOVED, p_destroyed, NULL);
 		return TRUE;
 
 	}
@@ -203,7 +235,7 @@ LRESULT TaskManager::ActivateTask(HWND p_activated, bool p_rudeApp)
 		Task *task = *taskIt;
 		task->Activate(true);
 		m_activeTask = task;
-		DoCallback(TASK_ACTIVATED, p_activated);
+		DoCallback(TASK_ACTIVATED, p_activated, NULL);
 		return TRUE;
 	}
 	else
@@ -238,7 +270,7 @@ LRESULT TaskManager::ReplaceTask(HWND p_replaceWith)
 		Task *toReplace = *taskIt;
 		toReplace->ReplaceTask(p_replaceWith);
 		//DestroyTask(m_replacingWindow);
-		DoCallback(TASK_ADDED, p_replaceWith);
+		DoCallback(TASK_ADDED, p_replaceWith, NULL);
 		m_replacingWindow = NULL;
 		return TRUE;
 	}
@@ -265,7 +297,7 @@ tTaskList::iterator TaskManager::FindTask(HWND p_hWnd)
 	return m_taskList.end();
 }
 
-WINBOOL CALLBACK TaskManager::EnumProc(HWND p_hWnd, LPARAM p_lParam)
+BOOL CALLBACK TaskManager::EnumProc(HWND p_hWnd, LPARAM p_lParam)
 {
 	TaskManager *taskMan = reinterpret_cast<TaskManager *>(p_lParam);
 	taskMan->CreateTask(p_hWnd);

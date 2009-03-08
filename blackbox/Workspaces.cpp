@@ -1378,27 +1378,7 @@ void EnumTasks (TASKENUMPROC lpEnumFunc, LPARAM lParam)
 	}
 }
 
-//===========================================================================
-// API: GetDesktopInfo
 
-void GetDesktopInfo(DesktopInfo *deskInfo)
-{
-	get_desktop_info(deskInfo, currentScreen);
-}
-
-//===========================================================================
-// API: EnumDesks
-
-void EnumDesks (DESKENUMPROC lpEnumFunc, LPARAM lParam)
-{
-	for (int n = 0; n < Settings_workspaces; n++)
-	{
-		DesktopInfo DI;
-		get_desktop_info(&DI, n);
-		if (FALSE == lpEnumFunc(&DI, lParam))
-			break;
-	}
-}
 
 
 //===========================================================================

@@ -29,13 +29,13 @@ namespace TaskManagement
 
 TaskManagerInterface::TaskManagerInterface(VWMInterface *p_vwm)
 {
-	InitializeCriticalSection(&m_critSection);
+	//InitializeCriticalSection(&m_critSection);
 	m_vwm = p_vwm;
 }
 
 TaskManagerInterface::~TaskManagerInterface()
 {
-	DeleteCriticalSection(&m_critSection);
+	//DeleteCriticalSection(&m_critSection);
 }
 
 VWMInterface *TaskManagerInterface::GetVWM()
@@ -55,12 +55,12 @@ void TaskManagerInterface::RegisterCallback(eTaskCallbackType p_type, fnTaskCall
 	}
 }
 
-void TaskManagerInterface::DoCallback(eTaskCallbackType p_type, HWND p_window)
+void TaskManagerInterface::DoCallback(eTaskCallbackType p_type, HWND p_window, PVOID p_extra)
 {
 	tTaskCallbackMap::iterator callbackIt = m_callbacks.find(p_type);
 	if (callbackIt != m_callbacks.end())
 	{
-		callbackIt->second(p_window);
+		callbackIt->second(p_window, p_extra);
 	}
 	/// @todo Update the VWM as well here
 }

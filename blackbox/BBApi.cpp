@@ -40,6 +40,7 @@
 
 #include "clsSystemTrayIcon.h"
 #include "../debug/debug.h"
+#include "../utility/stringcopy.h"
 #include "clsBBTask.h"
 
 #define ST static
@@ -1671,6 +1672,7 @@ BOOL BBExecute_command(const char *command, const char *arguments, bool no_error
 	replace_shellfolders(parsed_command, command, true);
 	char workdir[MAX_PATH];
 	get_directory(workdir, parsed_command);
+	PRINT("About to return from BBExecute_command");
 	return BBExecute(NULL, NULL, parsed_command, arguments, workdir, SW_SHOWNORMAL, no_errors);
 }
 
@@ -2539,6 +2541,41 @@ struct tasklist *GetTaskListPtr(void)
 	else
 	{
 		return NULL;
+	}
+}
+
+void GetDesktopInfo(DesktopInfo *p_deskInfo, UINT p_workspace)
+{
+	p_deskInfo->number = p_workspace;
+	CopyString(p_deskInfo->name, g_pVirtualWindowManager->GetWorkspaceName(NULL, p_workspace), 32);
+	p_deskInfo->deskNames = NULL;
+	p_deskInfo->ScreensX = g_pVirtualWindowManager->GetNumWorkspaces(NULL);
+	p_deskInfo->isCurrent = p_workspace == g_pVirtualWindowManager->GetCurrentWorkspace(NULL);
+}
+
+//===========================================================================
+// API: GetDesktopInfo
+
+void GetDesktopInfo(DesktopInfo *deskInfo)
+{
+	deskInfo->number = g_pVirtualWindowManager->GetCurrentWorkspace(NULL);
+	CopyString(deskInfo->name, g_pVirtualWindowManager->GetWorkspaceName(NULL,deskInfo->number),32);
+	deskInfo->deskNames = NULL; //Not supported
+	deskInfo->ScreensX = g_pVirtualWindowManager->GetNumWorkspaces(NULL);
+	deskInfo->isCurrent = true;
+}
+
+//===========================================================================
+// API: EnumDesks
+
+void EnumDesks (DESKENUMPROC lpEnumFunc, LPARAM lParam)
+{
+	for (int n = 0; n < g_pVirtualWindowManager->GetNumWorkspaces(NULL); n++)
+	{
+		DesktopInfo DI;
+		GetDesktopInfo(&DI, n);
+		if (FALSE == lpEnumFunc(&DI, lParam))
+			break;
 	}
 }
 

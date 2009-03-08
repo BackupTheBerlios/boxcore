@@ -42,4 +42,7 @@ extern MessageManager *g_pMessageManager;
 #include "tasks/clsTaskManagerInterface.h"
 extern TaskManagement::TaskManagerInterface *g_pTaskManager;
 
+#include "vwm/clsVWMInterface.h"
+extern TaskManagement::VWMInterface *g_pVirtualWindowManager;
+
 #endif

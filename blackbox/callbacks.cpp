@@ -8,7 +8,7 @@
 #include "BBApi.h"
 #include "managers.h"
 
-void TaskAddedCallback(HWND p_window)
+void TaskAddedCallback(HWND p_window, PVOID p_extra)
 {
 	if (g_pMessageManager)
 	{
@@ -17,7 +17,7 @@ void TaskAddedCallback(HWND p_window)
 	}
 }
 
-void TaskRemovedCallback(HWND p_window)
+void TaskRemovedCallback(HWND p_window, PVOID p_extra)
 {
 	if (g_pMessageManager)
 	{
@@ -26,7 +26,7 @@ void TaskRemovedCallback(HWND p_window)
 	}
 }
 
-void TaskUpdatedCallback(HWND p_window)
+void TaskUpdatedCallback(HWND p_window, PVOID p_extra)
 {
 	if (g_pMessageManager)
 	{
@@ -35,11 +35,28 @@ void TaskUpdatedCallback(HWND p_window)
 	}
 }
 
-void TaskFlashedCallback(HWND p_window)
+void TaskActivatedCallback(HWND p_window, PVOID p_extra)
+{
+	if (g_pMessageManager)
+	{
+		g_pMessageManager->BroadcastMessage(BB_ACTIVETASK, reinterpret_cast<WPARAM>(p_window), 0);
+		g_pMessageManager->BroadcastMessage(BB_TASKSUPDATE, reinterpret_cast<WPARAM>(p_window), TASKITEM_ACTIVATED);
+	}
+}
+
+void TaskFlashedCallback(HWND p_window, PVOID p_extra)
 {
 	if (g_pMessageManager)
 	{
 		g_pMessageManager->BroadcastMessage(BB_TASKSUPDATE, reinterpret_cast<WPARAM>(p_window), TASKITEM_FLASHED);
+	}
+}
+
+void TaskGetRectCallback(HWND p_window, PVOID p_extra)
+{
+	if (g_pMessageManager)
+	{
+		g_pMessageManager->BroadcastMessage(BB_MINMAXTASK, reinterpret_cast<WPARAM>(p_window), reinterpret_cast<LPARAM>(p_extra));
 	}
 }
 

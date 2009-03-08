@@ -37,8 +37,8 @@
 namespace TaskManagement
 {
 
-typedef void (*fnTaskCallback)(HWND p_window);
-enum eTaskCallbackType {TASK_ADDED, TASK_REMOVED, TASK_ACTIVATED, TASK_UPDATED, TASK_FLASHED};
+typedef void (*fnTaskCallback)(HWND p_window, PVOID p_extra);
+enum eTaskCallbackType {TASK_ADDED, TASK_REMOVED, TASK_ACTIVATED, TASK_UPDATED, TASK_FLASHED, TASK_GETRECT};
 typedef std::map<eTaskCallbackType, fnTaskCallback> tTaskCallbackMap;
 
 enum eTaskInfo {TI_LEGACY};
@@ -63,7 +63,7 @@ public:
 	VWMInterface *GetVWM();
 	void RegisterCallback(eTaskCallbackType p_type, fnTaskCallback p_callback);
 protected:
-	void DoCallback(eTaskCallbackType p_type, HWND p_window);
+	void DoCallback(eTaskCallbackType p_type, HWND p_window, PVOID p_extra);
 	tTaskCallbackMap m_callbacks;
 	VWMInterface *m_vwm;
 

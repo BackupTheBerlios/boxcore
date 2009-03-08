@@ -2,8 +2,8 @@
  ============================================================================
 
   This file is part of the bbLean source code
-  Copyright © 2001-2003 The Blackbox for Windows Development Team
-  Copyright © 2004 grischka
+  Copyright ï¿½ 2001-2003 The Blackbox for Windows Development Team
+  Copyright ï¿½ 2004 grischka
 
   http://bb4win.sourceforge.net/bblean
   http://sourceforge.net/projects/bb4win
@@ -48,7 +48,7 @@ HWND GetTopTask(void);
 void get_desktop_info(DesktopInfo *deskInfo, int i);
 
 extern int currentScreen;
-extern int Settings_workspaces;
+//extern int Settings_workspaces;
 
 //===========================================================================
 #endif

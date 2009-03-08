@@ -40,8 +40,15 @@ public:
 
 	virtual void SwitchToWorkspace(HMONITOR p_monitor, UINT p_workspace) PURE;
 	virtual void GatherWindows() PURE;
-	virtual UINT GetWindowDesk(HWND p_window) PURE;
+	virtual void SetWindowWorkspace(HWND p_hwnd, HMONITOR p_monitor, UINT p_workspace, bool p_switch) PURE;
+	virtual UINT GetWindowWorkspace(HWND p_window) PURE;
 	virtual UINT GetWindowStatus(HWND p_window) PURE;
+	virtual UINT GetCurrentWorkspace(HMONITOR p_monitor) PURE;
+	virtual LPCTSTR GetWorkspaceName(HMONITOR p_monitor, UINT p_workspace) PURE;
+	virtual UINT GetNumWorkspaces(HMONITOR p_monitor) PURE;
+
+	virtual void PrevWorkspace(HMONITOR _monitor) PURE;
+	virtual void NextWorkspace(HMONITOR _monitor) PURE;
 };
 
 }

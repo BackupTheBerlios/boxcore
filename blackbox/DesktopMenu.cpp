@@ -2,8 +2,8 @@
  ============================================================================
 
   This file is part of the bbLean source code
-  Copyright © 2001-2003 The Blackbox for Windows Development Team
-  Copyright © 2004 grischka
+  Copyright ï¿½ 2001-2003 The Blackbox for Windows Development Team
+  Copyright ï¿½ 2004 grischka
 
   http://bb4win.sourceforge.net/bblean
   http://sourceforge.net/projects/bb4win
@@ -31,6 +31,7 @@
 #include "Workspaces.h"
 #include "Menu/MenuMaker.h"
 #include "Menu/Menu.h"
+#include "managers.h"
 
 //===========================================================================
 struct en
@@ -117,7 +118,7 @@ Menu* MakeDesktopMenu(bool popup)
 	MakeSubmenu(m, s, CFG);
 
 	MakeMenuItem(s, NLS0("New Workspace"), "@BBCore.AddWorkspace", false);
-	if (Settings_workspaces>1) MakeMenuItem(s, NLS0("Remove Last"), "@BBCore.DelWorkspace", false);
+	if (g_pVirtualWindowManager->GetNumWorkspaces(NULL)>1) MakeMenuItem(s, NLS0("Remove Last"), "@BBCore.DelWorkspace", false);
 	MakeMenuItem(s, NLS0("Edit Workspace Names"), "@BBCore.EditWorkspaceNames", false);
 
 	return m;

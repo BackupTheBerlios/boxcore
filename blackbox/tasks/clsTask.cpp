@@ -62,7 +62,7 @@ void Task::Flash(bool p_status)
 
 	if (p_status)
 	{
-		DoCallback(TASK_FLASHED, m_hWnd);
+		DoCallback(TASK_FLASHED, m_hWnd, NULL);
 	}
 }
 
@@ -133,11 +133,11 @@ VOID CALLBACK Task::LargeIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, 
 		if (task->m_newTask)
 		{
 			task->m_newTask = false;
-			task->DoCallback(TASK_ADDED, task->m_hWnd);
+			task->DoCallback(TASK_ADDED, task->m_hWnd, NULL);
 		}
 		else
 		{
-			task->DoCallback(TASK_UPDATED, task->m_hWnd);
+			task->DoCallback(TASK_UPDATED, task->m_hWnd, NULL);
 		}
 	}
 }
@@ -170,12 +170,12 @@ void Task::SetLargeIcon(HICON p_icon)
 	}
 }
 
-void Task::DoCallback(eTaskCallbackType p_type, HWND p_window)
+void Task::DoCallback(eTaskCallbackType p_type, HWND p_window, PVOID p_extra)
 {
 	tTaskCallbackMap::iterator callbackIt = m_callbacks.find(p_type);
 	if (callbackIt != m_callbacks.end())
 	{
-		callbackIt->second(p_window);
+		callbackIt->second(p_window, p_extra);
 	}
 }
 

@@ -74,7 +74,7 @@ private:
 	bool m_newTask;
 
 	tTaskCallbackMap &m_callbacks;
-	void DoCallback(eTaskCallbackType p_type, HWND p_window);
+	void DoCallback(eTaskCallbackType p_type, HWND p_window, PVOID p_extra);
 
 	HICON m_origSmallIcon;
 	HICON m_origLargeIcon;
