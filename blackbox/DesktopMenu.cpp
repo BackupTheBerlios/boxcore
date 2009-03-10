@@ -28,7 +28,7 @@
 */
 
 #include "BB.h"
-#include "Workspaces.h"
+//#include "Workspaces.h"
 #include "Menu/MenuMaker.h"
 #include "Menu/Menu.h"
 #include "managers.h"
@@ -63,7 +63,7 @@ static Menu * build_task_folder(int desk, const char *title, bool popup)
 	Menu *m = MakeNamedMenu(title, buf, popup);
 	if (m)
 	{
-		struct en en = { m, desk, GetTopTask(), 0 };
+		struct en en = { m, desk, g_pTaskManager->GetTopTask(), 0 };
 		EnumTasks(task_enum_func, (LPARAM)&en);
 	}
 	return m;
@@ -73,7 +73,8 @@ Menu * GetTaskFolder(int n, bool popup)
 {
 	if (n < 0) return NULL;
 	DesktopInfo DI;
-	get_desktop_info(&DI, n);
+	//get_desktop_info(&DI, n);
+	GetDesktopInfo(&DI, n);
 	return build_task_folder(n, DI.name, popup);
 }
 

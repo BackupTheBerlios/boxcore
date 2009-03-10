@@ -1364,20 +1364,6 @@ bool SetTaskLocation(HWND hwnd, struct taskinfo *t, UINT flags)
 	return true;
 }
 
-//===========================================================================
-// API: EnumTasks
-
-void EnumTasks (TASKENUMPROC lpEnumFunc, LPARAM lParam)
-{
-	struct tasklist *tl;
-	dolist (tl, taskList)
-	{
-		tl->wkspc = vwm_get_desk(tl->hwnd);
-		if (FALSE == lpEnumFunc(tl, lParam))
-			break;
-	}
-}
-
 
 
 

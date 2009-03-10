@@ -41,7 +41,7 @@ typedef void (*fnTaskCallback)(HWND p_window, PVOID p_extra);
 enum eTaskCallbackType {TASK_ADDED, TASK_REMOVED, TASK_ACTIVATED, TASK_UPDATED, TASK_FLASHED, TASK_GETRECT};
 typedef std::map<eTaskCallbackType, fnTaskCallback> tTaskCallbackMap;
 
-enum eTaskInfo {TI_LEGACY};
+enum eTaskInfo {TI_ACTIVE, TI_LEGACY};
 
 class TaskManagerInterface
 {
@@ -55,6 +55,7 @@ public:
 	virtual UINT GetNumTasks() PURE;
 	virtual void CleanTasks() PURE;
 	virtual HWND GetTopTask() PURE;
+	virtual void FocusTopTask(HWND p_exclude) PURE;
 
 	virtual UINT GetTaskInfo(HWND p_window, PVOID p_info[], eTaskInfo p_infoType[], UINT p_numInfo) PURE;
 

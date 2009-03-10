@@ -211,7 +211,8 @@ ST void Desk_SetPosition()
 	SetWindowPos(
 		hDesktopWnd,
 		HWND_BOTTOM,
-		VScreenX, VScreenY, VScreenWidth, VScreenHeight,
+		g_pVirtualWindowManager->GetVirtualScreenX(), g_pVirtualWindowManager->GetVirtualScreenY(),
+		g_pVirtualWindowManager->GetVirtualScreenSizeX(), g_pVirtualWindowManager->GetVirtualScreenSizeY(),
 		SWP_NOACTIVATE
 	);
 }

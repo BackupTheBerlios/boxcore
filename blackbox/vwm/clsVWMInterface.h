@@ -47,8 +47,15 @@ public:
 	virtual LPCTSTR GetWorkspaceName(HMONITOR p_monitor, UINT p_workspace) PURE;
 	virtual UINT GetNumWorkspaces(HMONITOR p_monitor) PURE;
 
-	virtual void PrevWorkspace(HMONITOR _monitor) PURE;
-	virtual void NextWorkspace(HMONITOR _monitor) PURE;
+	virtual int GetVirtualScreenX() PURE;
+	virtual int GetVirtualScreenY() PURE;
+	virtual int GetVirtualScreenSizeX() PURE;
+	virtual int GetVirtualScreenSizeY() PURE;
+	virtual int GetPrimaryScreenSizeX() PURE;
+	virtual int GetPrimaryScreenSizeY() PURE;
+
+	virtual void PrevWorkspace(HMONITOR p_monitor) PURE;
+	virtual void NextWorkspace(HMONITOR p_monitor) PURE;
 };
 
 }

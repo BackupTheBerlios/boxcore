@@ -32,7 +32,7 @@
 #include "Settings.h"
 #include "clsMessageManager.h"
 #include "PluginManager.h"
-#include "Workspaces.h"
+//#include "Workspaces.h"
 #include "Desk.h"
 #include "Toolbar.h"
 #include "Menu/MenuMaker.h"
@@ -549,7 +549,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	MenuMaker_Init();
 	MenuMaker_Configure();
 	PRINT("VWM");
-	Workspaces_Init();
+	//Workspaces_Init();
 	g_pVirtualWindowManager = new TaskManagement::NullVWM();
 	PRINT("Creating TaskManager");
 	g_pTaskManager = new TaskManagement::TaskManager(TaskFactory, g_pVirtualWindowManager);
@@ -679,7 +679,7 @@ void shutdown_blackbox()
 	delete g_pShellServiceWindow;
 	g_pShellServiceWindow = NULL;
 	Desk_Exit();
-	Workspaces_Exit();
+	//Workspaces_Exit();
 	delete g_pTaskManager;
 	g_pTaskManager = NULL;
 	delete g_pVirtualWindowManager;
@@ -805,7 +805,8 @@ LRESULT CALLBACK MainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			break;
 bb_quit:
 		SendMessage(hwnd, BB_EXITTYPE, 0, 0);
-		Workspaces_GatherWindows();
+		//Workspaces_GatherWindows();
+		g_pVirtualWindowManager->GatherWindows();
 		shutdown_blackbox();
 		PostQuitMessage(0);
 		break;
@@ -924,7 +925,8 @@ case_bb_restart:
 		Settings_ReadStyleSettings();
 		Session_UpdateSession();
 		set_opaquemove();
-		Workspaces_Reconfigure();
+		//Workspaces_Reconfigure();
+		g_pVirtualWindowManager->Reload();
 		Desk_new_background();
 		MenuMaker_Configure();
 		Menu_All_Redraw(0);
@@ -965,6 +967,9 @@ case_bb_restart:
 			return g_pMessageManager->BroadcastMessage(uMsg, wParam, lParam);
 		}
 	case BB_SWITCHTON:
+		g_pVirtualWindowManager->SwitchToWorkspace(NULL, lParam);
+		DesktopUpdate();
+		break;
 	case BB_LISTDESKTOPS:
 
 	case BB_WINDOWMINIMIZE:
@@ -973,7 +978,8 @@ case_bb_restart:
 	case BB_WINDOWCLOSE:
 	case BB_WINDOWMOVE:
 	case BB_WINDOWSIZE:
-		Workspaces_Command(uMsg, wParam, lParam);
+		TRACE("Unhandled message, previously done by Workspaces_Command %u", uMsg);
+		//Workspaces_Command(uMsg, wParam, lParam);
 		goto dispatch_bb_message;
 
 		//====================
@@ -1072,7 +1078,8 @@ case_bb_restart:
 		break;
 
 	case WM_QUERYENDSESSION:
-		Workspaces_GatherWindows();
+		//Workspaces_GatherWindows();
+		g_pVirtualWindowManager->GatherWindows();
 		return TRUE;
 
 	case WM_CLOSE:
@@ -1121,11 +1128,11 @@ case_bb_restart:
 
 		//====================
 	case WM_TIMER:
-		if (BB_CHECKWINDOWS_TIMER == wParam)
-		{
-			Workspaces_handletimer();
-			break;
-		}
+		//if (BB_CHECKWINDOWS_TIMER == wParam)
+		//{
+		//	Workspaces_handletimer();
+		//	break;
+		//}
 		KillTimer(hwnd, wParam);
 		if (BB_WRITERC_TIMER == wParam)
 		{

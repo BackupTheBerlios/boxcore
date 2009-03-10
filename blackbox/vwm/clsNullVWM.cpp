@@ -12,8 +12,13 @@ namespace TaskManagement
 
 NullVWM::NullVWM()
 {
-	// TODO Auto-generated constructor stub
+	m_primaryScreenSizeX = GetSystemMetrics(SM_CXSCREEN);
+	m_primaryScreenSizeY = GetSystemMetrics(SM_CYSCREEN);
 
+	m_virtualScreenSizeX = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+	m_virtualScreenSizeY = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+	m_virtualScreenX = GetSystemMetrics(SM_XVIRTUALSCREEN);
+	m_virtualScreenY = GetSystemMetrics(SM_YVIRTUALSCREEN);
 }
 
 NullVWM::~NullVWM()
@@ -67,7 +72,37 @@ UINT NullVWM::GetNumWorkspaces(HMONITOR p_monitor)
 	return 1;
 }
 
-void NullVWM::PrevWorkspace(HMONITOR _monitor) {}
-void NullVWM::NextWorkspace(HMONITOR _monitor) {}
+void NullVWM::PrevWorkspace(HMONITOR p_monitor) {}
+void NullVWM::NextWorkspace(HMONITOR p_monitor) {}
+
+int NullVWM::GetVirtualScreenX()
+{
+	return m_virtualScreenX;
+}
+
+int NullVWM::GetVirtualScreenY()
+{
+	return m_virtualScreenY;
+}
+
+int NullVWM::GetVirtualScreenSizeX()
+{
+	return m_virtualScreenSizeX;
+}
+
+int NullVWM::GetVirtualScreenSizeY()
+{
+	return m_virtualScreenSizeY;
+}
+
+int NullVWM::GetPrimaryScreenSizeX()
+{
+	return m_primaryScreenSizeX;
+}
+
+int NullVWM::GetPrimaryScreenSizeY()
+{
+	return m_primaryScreenSizeY;
+}
 
 }

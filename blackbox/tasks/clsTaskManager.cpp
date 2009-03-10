@@ -101,7 +101,32 @@ LRESULT TaskManager::ProcessShellMessage(WPARAM p_wParam, HWND p_hWnd)
 
 HWND TaskManager::GetTopTask()
 {
-	return NULL;
+	return m_activeTask->getHWnd();
+}
+
+void TaskManager::FocusTopTask(HWND p_exclude)
+{
+	EnumWindows(FocusTopTaskEnumExternal, reinterpret_cast<LPARAM>(this));
+}
+
+BOOL CALLBACK TaskManager::FocusTopTaskEnumExternal(HWND p_hWnd, LPARAM p_lParam)
+{
+	TaskManager *caller = reinterpret_cast<TaskManager *>(p_lParam);
+	return caller->FocusTopTaskEnum(p_hWnd, p_lParam);
+}
+
+BOOL CALLBACK TaskManager::FocusTopTaskEnum(HWND p_hWnd, LPARAM p_lParam)
+{
+	if (IsTask(p_hWnd))
+	{
+		tTaskList::iterator task = FindTask(p_hWnd);
+		if (m_vwm->GetWindowWorkspace(p_hWnd) == m_vwm->GetCurrentWorkspace(MonitorFromWindow(p_hWnd, MONITOR_DEFAULTTOPRIMARY)))
+		{
+			ActivateTask(p_hWnd, false);
+			return FALSE;
+		}
+	}
+	return TRUE;
 }
 
 HWND TaskManager::GetTaskWindow(UINT p_taskNum)
@@ -126,6 +151,10 @@ UINT TaskManager::GetTaskInfo(HWND p_window, PVOID p_info[], eTaskInfo p_infoTyp
 		{
 			switch (p_infoType[i])
 			{
+			case TI_ACTIVE:
+				p_info[i] = reinterpret_cast<PVOID>(task->getActive());
+				numDone++;
+				break;
 			case TI_LEGACY:
 				p_info[i] = reinterpret_cast<PVOID>(task->getLegacy());
 				numDone++;
@@ -179,11 +208,9 @@ LRESULT TaskManager::CreateTask(HWND p_hWnd)
 
 LRESULT TaskManager::DestroyTask(HWND p_destroyed)
 {
-	OutputDebugStringA("Desire destruction");
 	tTaskList::iterator taskIt = FindTask(p_destroyed);
 	if (taskIt != m_taskList.end())
 	{
-		OutputDebugStringA("Destruction");
 		if (taskIt == m_taskList.begin())
 		{
 			tTaskList::iterator next = taskIt;
@@ -231,7 +258,6 @@ LRESULT TaskManager::ActivateTask(HWND p_activated, bool p_rudeApp)
 	{
 		m_activeTask->Activate(false);
 	}
-	m_activeTask = NULL;
 	tTaskList::iterator taskIt = FindTask(p_activated);
 	if (taskIt != m_taskList.end())
 	{
@@ -243,6 +269,7 @@ LRESULT TaskManager::ActivateTask(HWND p_activated, bool p_rudeApp)
 	}
 	else
 	{
+		m_activeTask = NULL;
 		return FALSE;
 	}
 }

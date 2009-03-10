@@ -881,7 +881,7 @@ void Toolbar_UpdatePosition()
 	int tbheight = imax(labelH, buttonH) +
 				   2 * (mStyle.Toolbar.borderWidth + mStyle.Toolbar.marginWidth);
 
-	int tbwidth = imax (300, ScreenWidth * Settings_toolbarWidthPercent / 100);
+	int tbwidth = imax (300, g_pVirtualWindowManager->GetPrimaryScreenSizeX() * Settings_toolbarWidthPercent / 100);
 
 	// ------------------------------------------
 	//int ScreenWidth = GetSystemMetrics(SM_CXSCREEN);
@@ -891,8 +891,8 @@ void Toolbar_UpdatePosition()
 	TBInfo.widthPercent     = Settings_toolbarWidthPercent;
 	TBInfo.height           = tbheight;
 	TBInfo.width            = tbwidth;
-	TBInfo.ypos             = (place<3) ? 0 : ScreenHeight - TBInfo.height;
-	TBInfo.xpos             = (place%3) * (ScreenWidth - TBInfo.width) / 2;
+	TBInfo.ypos             = (place<3) ? 0 : g_pVirtualWindowManager->GetPrimaryScreenSizeY() - TBInfo.height;
+	TBInfo.xpos             = (place%3) * (g_pVirtualWindowManager->GetPrimaryScreenSizeX() - TBInfo.width) / 2;
 
 	TBInfo.onTop            = Settings_toolbarOnTop;
 	TBInfo.autoHide         = Settings_toolbarAutoHide;

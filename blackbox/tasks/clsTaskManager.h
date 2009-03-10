@@ -31,6 +31,7 @@ public:
 	virtual void SwitchToWindow(HWND p_window, bool p_force);
 	virtual LRESULT ProcessShellMessage(WPARAM p_wParam, HWND p_hWnd);
 	virtual HWND GetTopTask();
+	virtual void FocusTopTask(HWND p_exclude);
 	virtual UINT GetTaskInfo(HWND p_window, PVOID p_info[], eTaskInfo p_infoType[], UINT p_numInfo);
 
 	virtual void CleanTasks();
@@ -41,8 +42,12 @@ private:
 	tTaskList m_taskList;
 	HWND m_replacingWindow;
 	Task *m_activeTask;
+	Task *m_topTask;
 
 	static BOOL CALLBACK EnumProc(HWND p_hWnd, LPARAM p_lParam);
+
+	static BOOL CALLBACK FocusTopTaskEnumExternal(HWND p_hWnd, LPARAM p_lParam);
+	BOOL CALLBACK FocusTopTaskEnum(HWND p_hWnd, LPARAM p_lParam);
 
 	static VOID CALLBACK TimerProc(HWND p_hWnd, UINT p_uMsg, UINT_PTR p_idEvent, DWORD p_dwTime);
 	static TaskManager *s_taskMan;

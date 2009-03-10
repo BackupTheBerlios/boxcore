@@ -2570,13 +2570,77 @@ void GetDesktopInfo(DesktopInfo *deskInfo)
 
 void EnumDesks (DESKENUMPROC lpEnumFunc, LPARAM lParam)
 {
-	for (int n = 0; n < g_pVirtualWindowManager->GetNumWorkspaces(NULL); n++)
+	for (UINT n = 0; n < g_pVirtualWindowManager->GetNumWorkspaces(NULL); n++)
 	{
 		DesktopInfo DI;
 		GetDesktopInfo(&DI, n);
 		if (FALSE == lpEnumFunc(&DI, lParam))
 			break;
 	}
+}
+
+//===========================================================================
+// API: EnumTasks
+
+void EnumTasks (TASKENUMPROC lpEnumFunc, LPARAM lParam)
+{
+	for(UINT i = 0; i < g_pTaskManager->GetNumTasks(); ++i)
+	{
+		PVOID data[1];
+		TaskManagement::eTaskInfo info[1] = {TaskManagement::TI_LEGACY};
+		g_pTaskManager->GetTaskInfo(g_pTaskManager->GetTaskWindow(i), data, info, 1);
+		if (FALSE == lpEnumFunc(reinterpret_cast<tasklist *>(data[0]), lParam))
+					break;
+	}
+}
+
+//===========================================================================
+// API: GetActiveTask - returns index of current active task or -1, if none or BB
+int GetActiveTask(void)
+{
+	PVOID data[1];
+	TaskManagement::eTaskInfo info[1] = {TaskManagement::TI_ACTIVE};
+	for (UINT i = 0; i< g_pTaskManager->GetNumTasks(); ++i)
+	{
+		g_pTaskManager->GetTaskInfo(g_pTaskManager->GetTaskWindow(i), data, info, 1);
+		if (data[0])
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+//===========================================================================
+// API: GetTaskWorkspace - returns the workspace of the task by HWND
+
+int GetTaskWorkspace(HWND hwnd)
+{
+	return g_pVirtualWindowManager->GetWindowWorkspace(hwnd);
+}
+
+//===========================================================================
+// API: SetTaskWorkspace - set the workspace of the task by HWND
+
+void SetTaskWorkspace(HWND hwnd, int wkspc)
+{
+	g_pVirtualWindowManager->SetWindowWorkspace(hwnd, MonitorFromWindow(hwnd, MONITOR_DEFAULTTOPRIMARY), wkspc, false);
+}
+
+//===========================================================================
+// API: GetTaskLocation - retrieve the desktop and the original coords for a window
+// STUB
+bool GetTaskLocation(HWND hwnd, struct taskinfo *t)
+{
+	return false;
+}
+
+//===========================================================================
+// API: SetTaskLocation - move a window and it's popups to another desktop and/or position
+// STUB
+bool SetTaskLocation(HWND hwnd, struct taskinfo *t, UINT flags)
+{
+	return false;
 }
 
 BOOL GetTrayInfoReal(ShellServices::NotificationIcon *p_icon, PVOID *p_trayInfo, ATOM *p_infoTypes, CONST UINT p_numInfo)

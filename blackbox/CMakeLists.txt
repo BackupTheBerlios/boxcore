@@ -13,7 +13,7 @@ Utils.cpp
 BImage.cpp
 Settings.cpp
 PluginManager.cpp
-Workspaces.cpp
+#Workspaces.cpp
 Desk.cpp
 Toolbar.cpp
 DesktopMenu.cpp
@@ -22,7 +22,7 @@ m_alloc.cpp
 Tinylist.cpp
 Install.cpp
 BBRoot.cpp
-BBVWM.cpp
+#BBVWM.cpp
 Pidl.cpp
 VolumeControl.cpp
 )
