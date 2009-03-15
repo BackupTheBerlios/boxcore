@@ -237,11 +237,11 @@ LRESULT TaskManager::DestroyTask(HWND p_destroyed)
 			}
 		}
 		if (m_activeTask == *taskIt)
-			{
-				m_activeTask = NULL;
-			}
-			delete (*taskIt);
-			m_taskList.erase(taskIt);
+		{
+			m_activeTask = NULL;
+		}
+		delete (*taskIt);
+		m_taskList.erase(taskIt);
 		DoCallback(TASK_REMOVED, p_destroyed, NULL);
 		return TRUE;
 

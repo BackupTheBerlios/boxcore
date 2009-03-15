@@ -99,7 +99,7 @@ BOOL save_opaquemove;
 #include "shellservices/clsNotifyIconHandler.h"
 #include "shellservices/clsAppbarHandler.h"
 #include "tasks/clsTaskManager.h"
-#include "vwm/clsNullVWM.h"
+#include "vwm/clsBBVWM.h"
 #include "clsSystemTrayIcon.h"
 #include "clsBBTask.h"
 
@@ -550,7 +550,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	MenuMaker_Configure();
 	PRINT("VWM");
 	//Workspaces_Init();
-	g_pVirtualWindowManager = new TaskManagement::NullVWM();
+	g_pVirtualWindowManager = new TaskManagement::BBVWM();
 	PRINT("Creating TaskManager");
 	g_pTaskManager = new TaskManagement::TaskManager(TaskFactory, g_pVirtualWindowManager);
 	g_pTaskManager->RegisterCallback(TaskManagement::TASK_ADDED, TaskAddedCallback);
