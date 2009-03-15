@@ -38,7 +38,6 @@
  */
 LRESULT MessageManager::BroadcastMessage(UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	OutputDebugString(TEXT("Broadcasting messages"));
 	tMessageMap::iterator mapEntry = m_messageMap.find(msg);
 	if (mapEntry != m_messageMap.end())
 	{
@@ -67,7 +66,6 @@ LRESULT MessageManager::BroadcastMessage(UINT msg, WPARAM wParam, LPARAM lParam)
   */
 void MessageManager::AddMessages(HWND p_window, UINT *p_messages)
 {
-	OutputDebugString(TEXT("Registering messages"));
 	while (*p_messages != 0)
 	{
 		m_messageMap[*p_messages].insert(p_window);
@@ -82,7 +80,6 @@ void MessageManager::AddMessages(HWND p_window, UINT *p_messages)
   */
 void MessageManager::RemoveMessages(HWND p_window, UINT *p_messages)
 {
-	OutputDebugString(TEXT("Deregistering messages"));
 	while (*p_messages != 0)
 	{
 		m_messageMap[*p_messages].erase(p_window);
