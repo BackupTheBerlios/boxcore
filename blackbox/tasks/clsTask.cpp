@@ -88,7 +88,6 @@ void Task::UpdateLegacy()
 
 VOID CALLBACK Task::SmallIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult)
 {
-	OutputDebugString("Trying SMALL");
 	if (IsTask(p_hWnd))
 	{
 		Task *task = reinterpret_cast<Task *>(p_dwData);;
@@ -106,7 +105,6 @@ VOID CALLBACK Task::SmallIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, 
 
 VOID CALLBACK Task::LargeIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult)
 {
-	OutputDebugString("Trying LARGE");
 	if (IsTask(p_hWnd))
 	{
 		Task *task = reinterpret_cast<Task *>(p_dwData);

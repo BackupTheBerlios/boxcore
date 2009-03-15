@@ -171,7 +171,6 @@ LRESULT TaskManager::CreateTask(HWND p_hWnd)
 {
 	if (IsTask(p_hWnd) && (FindTask(p_hWnd) == m_taskList.end()))
 	{
-		OutputDebugString(TEXT("A task!"));
 		LegacyTask *newLegacy = NULL;
 		if (m_legacyFactory)
 		{
