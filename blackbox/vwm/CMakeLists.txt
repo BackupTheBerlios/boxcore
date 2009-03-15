@@ -4,6 +4,7 @@ project (VirtualDesktops)
 
 set (VWM_SRCS
 clsNullVWM.cpp
+clsBBVWM.cpp
 )
 
 add_library (vwm STATIC ${VWM_SRCS})
