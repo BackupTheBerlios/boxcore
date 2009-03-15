@@ -279,8 +279,11 @@ LRESULT TaskManager::RedrawTask(HWND p_redraw, bool p_rudeApp)
 	if (taskIt != m_taskList.end())
 	{
 		Task *task = *taskIt;
-		task->Update();
 		task->Flash(p_rudeApp);
+		if (!p_rudeApp)
+		{
+			task->Update();
+		}
 		return TRUE;
 	}
 	else
