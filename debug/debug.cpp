@@ -7,7 +7,7 @@
 
 #include "debug.h"
 #include <windows.h>
-#include <string>
+#include <cstdio>
 
 void trace_printf(const char *pFileName, unsigned int pLine, const char *pFunction, const char *pFormat, ...)
 {

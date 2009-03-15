@@ -40,6 +40,8 @@
 
 #include "clsSystemTrayIcon.h"
 #include "../debug/debug.h"
+#include "../utility/stringcopy.h"
+#include "clsBBTask.h"
 
 #define ST static
 
@@ -1670,6 +1672,7 @@ BOOL BBExecute_command(const char *command, const char *arguments, bool no_error
 	replace_shellfolders(parsed_command, command, true);
 	char workdir[MAX_PATH];
 	get_directory(workdir, parsed_command);
+	PRINT("About to return from BBExecute_command");
 	return BBExecute(NULL, NULL, parsed_command, arguments, workdir, SW_SHOWNORMAL, no_errors);
 }
 
@@ -2501,6 +2504,143 @@ systemTray* GetTrayIcon(UINT idx)
 	ShellServices::eNotificationIconInfo info[1] = {ShellServices::NI_LEGACY};
 	g_pNotificationIconHandler->GetNotificationIconInfo(idx, data,info, 1);
 	return static_cast<SystemTrayIcon *>(data[0])->getSystemTray();
+}
+
+//===========================================================================
+// API: GetTask - returns the HWND of the task by index
+
+HWND GetTask(int index)
+{
+	if (index >= 0)
+	{
+		return g_pTaskManager->GetTaskWindow(index);
+	}
+	return NULL;
+}
+
+//===========================================================================
+// API: GetTaskListSize - returns the number of currently registered tasks
+
+int GetTaskListSize(void)
+{
+	return g_pTaskManager->GetNumTasks();
+}
+
+//===========================================================================
+// API: GetTaskListPtr - returns the raw task-list
+
+struct tasklist *GetTaskListPtr(void)
+{
+	HWND firstTask = g_pTaskManager->GetTaskWindow(0);
+	PVOID info[1];
+	TaskManagement::eTaskInfo infoType[1] = {TaskManagement::TI_LEGACY};
+	if (g_pTaskManager->GetTaskInfo(firstTask, info, infoType, 1))
+	{
+		return reinterpret_cast<BBTask *>(info[0])->GetTaskList();
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+void GetDesktopInfo(DesktopInfo *p_deskInfo, UINT p_workspace)
+{
+	p_deskInfo->number = p_workspace;
+	CopyString(p_deskInfo->name, g_pVirtualWindowManager->GetWorkspaceName(NULL, p_workspace), 32);
+	p_deskInfo->deskNames = NULL;
+	p_deskInfo->ScreensX = g_pVirtualWindowManager->GetNumWorkspaces(NULL);
+	p_deskInfo->isCurrent = p_workspace == g_pVirtualWindowManager->GetCurrentWorkspace(NULL);
+}
+
+//===========================================================================
+// API: GetDesktopInfo
+
+void GetDesktopInfo(DesktopInfo *deskInfo)
+{
+	deskInfo->number = g_pVirtualWindowManager->GetCurrentWorkspace(NULL);
+	CopyString(deskInfo->name, g_pVirtualWindowManager->GetWorkspaceName(NULL,deskInfo->number),32);
+	deskInfo->deskNames = NULL; //Not supported
+	deskInfo->ScreensX = g_pVirtualWindowManager->GetNumWorkspaces(NULL);
+	deskInfo->isCurrent = true;
+}
+
+//===========================================================================
+// API: EnumDesks
+
+void EnumDesks (DESKENUMPROC lpEnumFunc, LPARAM lParam)
+{
+	for (UINT n = 0; n < g_pVirtualWindowManager->GetNumWorkspaces(NULL); n++)
+	{
+		DesktopInfo DI;
+		GetDesktopInfo(&DI, n);
+		if (FALSE == lpEnumFunc(&DI, lParam))
+			break;
+	}
+}
+
+//===========================================================================
+// API: EnumTasks
+
+void EnumTasks (TASKENUMPROC lpEnumFunc, LPARAM lParam)
+{
+	for (UINT i = 0; i < g_pTaskManager->GetNumTasks(); ++i)
+	{
+		PVOID data[1];
+		TaskManagement::eTaskInfo info[1] = {TaskManagement::TI_LEGACY};
+		g_pTaskManager->GetTaskInfo(g_pTaskManager->GetTaskWindow(i), data, info, 1);
+		if (FALSE == lpEnumFunc(reinterpret_cast<tasklist *>(data[0]), lParam))
+			break;
+	}
+}
+
+//===========================================================================
+// API: GetActiveTask - returns index of current active task or -1, if none or BB
+int GetActiveTask(void)
+{
+	PVOID data[1];
+	TaskManagement::eTaskInfo info[1] = {TaskManagement::TI_ACTIVE};
+	for (UINT i = 0; i< g_pTaskManager->GetNumTasks(); ++i)
+	{
+		g_pTaskManager->GetTaskInfo(g_pTaskManager->GetTaskWindow(i), data, info, 1);
+		if (data[0])
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+//===========================================================================
+// API: GetTaskWorkspace - returns the workspace of the task by HWND
+
+int GetTaskWorkspace(HWND hwnd)
+{
+	return g_pVirtualWindowManager->GetWindowWorkspace(hwnd);
+}
+
+//===========================================================================
+// API: SetTaskWorkspace - set the workspace of the task by HWND
+
+void SetTaskWorkspace(HWND hwnd, int wkspc)
+{
+	g_pVirtualWindowManager->SetWindowWorkspace(hwnd, MonitorFromWindow(hwnd, MONITOR_DEFAULTTOPRIMARY), wkspc, false);
+}
+
+//===========================================================================
+// API: GetTaskLocation - retrieve the desktop and the original coords for a window
+// STUB
+bool GetTaskLocation(HWND hwnd, struct taskinfo *t)
+{
+	return false;
+}
+
+//===========================================================================
+// API: SetTaskLocation - move a window and it's popups to another desktop and/or position
+// STUB
+bool SetTaskLocation(HWND hwnd, struct taskinfo *t, UINT flags)
+{
+	return false;
 }
 
 BOOL GetTrayInfoReal(ShellServices::NotificationIcon *p_icon, PVOID *p_trayInfo, ATOM *p_infoTypes, CONST UINT p_numInfo)

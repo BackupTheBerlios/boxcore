@@ -50,7 +50,7 @@ ShellServiceWindow::ShellServiceWindow(HINSTANCE pInstance, bool pTopmost)
 	hUser32 = LoadLibrary(TEXT("user32.dll"));
 	if (hUser32)
 	{
-		ChangeWindowMessageFilter = (BOOL (*)(UINT, DWORD))GetProcAddress(hUser32, "ChangeWindowMessageFilter");
+		ChangeWindowMessageFilter = (BOOL (WINAPI *)(UINT, DWORD))GetProcAddress(hUser32, "ChangeWindowMessageFilter");
 		if (ChangeWindowMessageFilter)
 		{
 			ChangeWindowMessageFilter(TaskbarCreated, MSGFLT_ADD);

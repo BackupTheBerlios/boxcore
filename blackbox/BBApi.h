@@ -82,6 +82,7 @@
 /*------------------------------------------ */
 
 #define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
 #ifndef WINVER
 #define WINVER 0x0502
 #endif
@@ -411,14 +412,22 @@ enum eTrayUpdateLparam
   */
 #define BB_ACTIVETASK           10604
 
+#define BBMINRECT_DEFINED
+struct bbminrect
+{
+	SHORT left;
+	SHORT top;
+	SHORT right;
+	SHORT bottom;
+};
+
 /** @brief Window Message: A task is being minimised or maximised
   *
   * This message is sent by the core for this event. Plugins should never send this message
   * @par wParam:
-  * The HWND of the task that is being minised or maximised
+  * The HWND of the task that is being minimised or maximised
   * @par lParam:
-  * The lParam has no importance in this message
-  * @deprecated The taskupdate section of the core claims this message is never really generated
+  * A pointer to a bbminrect under boxCore, 0 otherwise
   * @ingroup bbapi_tasks
   */
 #define BB_MINMAXTASK           10605

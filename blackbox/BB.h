@@ -53,7 +53,7 @@
 /* compiler specifics */
 
 #define WINVER 0x0502
-#define _WIN32_WINNT 0x0500
+#define _WIN32_WINNT 0x0502
 #define _WIN32_IE 0x0501
 #define NO_INTSHCUT_GUIDS
 #define NO_SHDOCVW_GUIDS
@@ -132,9 +132,9 @@ extern clsSystemInfo SystemInfo;
 
 extern HINSTANCE    hMainInstance;
 extern HWND         BBhwnd;
-extern int          VScreenX, VScreenY;
-extern int          VScreenWidth, VScreenHeight;
-extern int          ScreenWidth, ScreenHeight;
+//extern int          VScreenX, VScreenY;
+//extern int          VScreenWidth, VScreenHeight;
+//extern int          ScreenWidth, ScreenHeight;
 extern bool         underExplorer;
 extern bool         multimon;
 extern bool         dont_hide_explorer;
@@ -256,8 +256,8 @@ Menu *GetContextMenu(const struct _ITEMIDLIST *pidl);
 
 // ==============================================================
 /* workspaces and tasks */
-bool focus_top_window(void);
-void ForceForegroundWindow(HWND theWin);
+//bool focus_top_window(void);
+//void ForceForegroundWindow(HWND theWin);
 struct hwnd_list
 {
 	struct hwnd_list *next;
@@ -307,6 +307,8 @@ void set_opaquemove(void);
 
 /* Menu */
 bool IsMenu(HWND hwnd);
+
+void GetDesktopInfo(DesktopInfo *p_deskInfo, UINT p_workspace);
 
 // ==============================================================
 /* Experimental Nationalized Language support */

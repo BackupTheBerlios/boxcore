@@ -1,37 +1,38 @@
-/*
- ============================================================================
-
-  This file is part of the bbLean source code
-  Copyright © 2001-2003 The Blackbox for Windows Development Team
-  Copyright © 2004 grischka
-
-  http://bb4win.sourceforge.net/bblean
-  http://sourceforge.net/projects/bb4win
-
- ============================================================================
-
-  bbLean and bb4win are free software, released under the GNU General
-  Public License (GPL version 2 or later), with an extension that allows
-  linking of proprietary modules under a controlled interface. This means
-  that plugins etc. are allowed to be released under any license the author
-  wishes. For details see:
-
-  http://www.fsf.org/licenses/gpl.html
-  http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
-
-  This program is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-  or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-  for more details.
-
- ============================================================================
-*/
+/** @internal
+  * @brief Main source file for blackbox
+  *
+  * This file is part of the boxCore source code @n
+  * <!-- Copyright (C) 2001-2003 The Blackbox for Windows Development Team -->
+  * <!-- Copyright (C) 2004-2007 grischka -->
+  * <!-- Copyright (C) 2008-2009 Carsomyr -->
+  * Copyright &copy; 2001-2003 The Blackbox for Windows Development Team @n
+  * Copyright &copy; 2004-2007 grischka @n
+  * Copyright &copy; 2008-2009 Carsomyr
+  * @par Links:
+  * http://developer.berlios.de/projects/boxcore @n
+  * http://bb4win.sourceforge.net/bblean @n
+  * http://sourceforge.net/projects/bb4win @n
+  * @par License:
+  * boxCore, bbLean and bb4win are free software, released under the GNU General
+  * Public License (GPL version 2 or later), with an extension that allows
+  * linking of proprietary modules under a controlled interface. This means
+  * that plugins etc. are allowed to be released under any license the author
+  * wishes. For details see:
+  * @par
+  * http://www.fsf.org/licenses/gpl.html @n
+  * http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
+  * @par
+  * This program is distributed in the hope that it will be useful, but
+  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+  * for more details.
+  */
 
 #include "BB.h"
 #include "Settings.h"
 #include "clsMessageManager.h"
 #include "PluginManager.h"
-#include "Workspaces.h"
+//#include "Workspaces.h"
 #include "Desk.h"
 #include "Toolbar.h"
 #include "Menu/MenuMaker.h"
@@ -51,6 +52,9 @@
 #include "shellserviceobjects/clsShellServiceObjects.h"
 #include "clsSystemInfo.h"
 #include "../debug/debug.h"
+#include "../utility/stringcopy.h"
+#include "callbacks.h"
+
 
 //====================
 
@@ -94,15 +98,25 @@ BOOL save_opaquemove;
 #include "shellservices/clsShellServiceWindow.h"
 #include "shellservices/clsNotifyIconHandler.h"
 #include "shellservices/clsAppbarHandler.h"
+#include "tasks/clsTaskManager.h"
+#include "vwm/clsBBVWM.h"
 #include "clsSystemTrayIcon.h"
+#include "clsBBTask.h"
 
 ShellServices::ShellServiceWindow *g_pShellServiceWindow;
 ShellServices::NotifyIconHandler *g_pNotificationIconHandler;
 ShellServices::AppbarHandler *g_pAppbarHandler;
+TaskManagement::TaskManagerInterface *g_pTaskManager;
+TaskManagement::VWMInterface *g_pVirtualWindowManager;
 
 ShellServices::LegacyNotificationIcon *SystemTrayIconFactory()
 {
 	return new SystemTrayIcon;
+}
+
+TaskManagement::LegacyTask *TaskFactory()
+{
+	return new BBTask;
 }
 
 std::map<ATOM,ShellServices::eNotificationIconInfo> g_trayInfoMapping;
@@ -263,30 +277,12 @@ void set_opaquemove(void)
 	SystemParametersInfo(SPI_SETDRAGFULLWINDOWS, Settings_opaqueMove, NULL, SPIF_SENDCHANGE);
 }
 
-void broadcastAdd(void *p_data)
-{
-	PRINT("BROADCAST: Icon Added");
-	PostMessage(BBhwnd, BB_TRAYUPDATE, reinterpret_cast<WPARAM>(p_data), TRAYICON_ADDED);
-}
-
-void broadcastRemove(void *p_data)
-{
-	PRINT("BROADCAST: Icon Deleted");
-	PostMessage(BBhwnd, BB_TRAYUPDATE, reinterpret_cast<WPARAM>(p_data), TRAYICON_REMOVED);
-}
-
-void broadcastMod(void *p_data)
-{
-	//PRINT("BROADCAST: Icon Modified");
-	PostMessage(BBhwnd, BB_TRAYUPDATE, reinterpret_cast<WPARAM>(p_data), TRAYICON_MODIFIED);
-}
-
 //===========================================================================
 
 void bb_about(void)
 {
 	BBMessageBox(MB_OK,
-				 "%s - © 2003-2005 grischka, © 2008 carsomyr"
+				 "%s - © 2003-2005 grischka, © 2008-2009 carsomyr"
 				 "\n%s",
 				 GetBBVersion(),
 				 NLS2("$BBAbout$",
@@ -552,18 +548,32 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	g_pMessageManager = new MessageManager;
 	MenuMaker_Init();
 	MenuMaker_Configure();
-	Workspaces_Init();
+	PRINT("VWM");
+	//Workspaces_Init();
+	g_pVirtualWindowManager = new TaskManagement::BBVWM();
+	PRINT("Creating TaskManager");
+	g_pTaskManager = new TaskManagement::TaskManager(TaskFactory, g_pVirtualWindowManager);
+	g_pTaskManager->RegisterCallback(TaskManagement::TASK_ADDED, TaskAddedCallback);
+	g_pTaskManager->RegisterCallback(TaskManagement::TASK_REMOVED, TaskRemovedCallback);
+	g_pTaskManager->RegisterCallback(TaskManagement::TASK_UPDATED, TaskUpdatedCallback);
+	g_pTaskManager->RegisterCallback(TaskManagement::TASK_FLASHED, TaskFlashedCallback);
+	g_pTaskManager->RegisterCallback(TaskManagement::TASK_ACTIVATED, TaskActivatedCallback);
+	g_pTaskManager->RegisterCallback(TaskManagement::TASK_GETRECT, TaskGetRectCallback);
+	PRINT("Starting desktop");
 	Desk_Init();
+	PRINT("Creating tray message mapping");
 	InitTrayMapping();
 	g_pShellServiceWindow = new ShellServices::ShellServiceWindow(hMainInstance, true);
+	PRINT("Starting NotifyIcon Handler");
 	g_pNotificationIconHandler = new ShellServices::NotifyIconHandler(SystemTrayIconFactory, true);
 	g_pNotificationIconHandler->RegisterCallback(ShellServices::TCALLBACK_ADD,broadcastAdd);
 	g_pNotificationIconHandler->RegisterCallback(ShellServices::TCALLBACK_MOD,broadcastMod);
 	g_pNotificationIconHandler->RegisterCallback(ShellServices::TCALLBACK_DEL,broadcastRemove);
 	g_pShellServiceWindow->RegisterHandler(ShellServices::HANDLER_NOTIFYICON, g_pNotificationIconHandler);
+	PRINT("Starting AppBar Handler");
 	g_pAppbarHandler = new ShellServices::AppbarHandler();
 	g_pShellServiceWindow->RegisterHandler(ShellServices::HANDLER_APPBAR, g_pAppbarHandler);
-
+	PRINT("Starting SSO's");
 	if (!underExplorer)
 	{
 		if (SystemInfo.isOsVista())
@@ -586,9 +596,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			ShellServiceObjectsManager.startServiceObjects(normalKey);
 		}
 	}
-
+	PRINT("Initialising API extensions");
 	InitApiExtensions();
-
+	PRINT("Starting Plugins");
 	start_plugins();
 
 	if (bRunStartup) SetTimer(BBhwnd, BB_RUNSTARTUP_TIMER, 500, NULL);
@@ -596,6 +606,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	Session_UpdateSession();
 
 	/* Message Loop */
+	PRINT("Entering Message Loop");
 	RetCode = message_loop();
 
 	// ------------------------------------------
@@ -668,7 +679,11 @@ void shutdown_blackbox()
 	delete g_pShellServiceWindow;
 	g_pShellServiceWindow = NULL;
 	Desk_Exit();
-	Workspaces_Exit();
+	//Workspaces_Exit();
+	delete g_pTaskManager;
+	g_pTaskManager = NULL;
+	delete g_pVirtualWindowManager;
+	g_pVirtualWindowManager = NULL;
 	MenuMaker_Exit();
 }
 
@@ -755,6 +770,18 @@ void adjust_style(void) // temporary fix for bbStyleMaker 1.2
 
 }
 
+void DesktopUpdate()
+{
+	static DesktopInfo deskInfo;
+	deskInfo.number = g_pVirtualWindowManager->GetCurrentWorkspace(NULL);
+	CopyString(deskInfo.name, g_pVirtualWindowManager->GetWorkspaceName(NULL, deskInfo.number), 32);
+	deskInfo.isCurrent = true;
+	deskInfo.ScreensX = g_pVirtualWindowManager->GetNumWorkspaces(NULL);
+	deskInfo.deskNames = NULL;
+	g_pMessageManager->BroadcastMessage(BB_DESKTOPINFO, 0, reinterpret_cast<LPARAM>(&deskInfo));
+	g_pMessageManager->BroadcastMessage(BB_REDRAWTASK, 0, 0); //Apparently for bbPager
+}
+
 //===========================================================================
 //#include "other/BBMessages.cpp"
 //===========================================================================
@@ -778,7 +805,8 @@ LRESULT CALLBACK MainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			break;
 bb_quit:
 		SendMessage(hwnd, BB_EXITTYPE, 0, 0);
-		Workspaces_GatherWindows();
+		//Workspaces_GatherWindows();
+		g_pVirtualWindowManager->GatherWindows();
 		shutdown_blackbox();
 		PostQuitMessage(0);
 		break;
@@ -897,7 +925,8 @@ case_bb_restart:
 		Settings_ReadStyleSettings();
 		Session_UpdateSession();
 		set_opaquemove();
-		Workspaces_Reconfigure();
+		//Workspaces_Reconfigure();
+		g_pVirtualWindowManager->Reload();
 		Desk_new_background();
 		MenuMaker_Configure();
 		Menu_All_Redraw(0);
@@ -914,6 +943,9 @@ case_bb_restart:
 		goto dispatch_bb_message;
 
 		//======================================================
+	case BB_BRINGTOFRONT:
+		g_pTaskManager->SwitchToWindow(reinterpret_cast<HWND>(lParam), false);
+		break;
 	case BB_WINDOWLOWER:
 	case BB_WINDOWRAISE:
 	case BB_WINDOWSHADE:
@@ -923,17 +955,31 @@ case_bb_restart:
 			lParam = wParam;
 
 	case BB_WORKSPACE:
+		switch (wParam)
+		{
+		case BBWS_DESKLEFT:
+			g_pVirtualWindowManager->PrevWorkspace(NULL);
+			DesktopUpdate();
+			return g_pMessageManager->BroadcastMessage(uMsg, wParam, lParam);
+		case BBWS_DESKRIGHT:
+			g_pVirtualWindowManager->NextWorkspace(NULL);
+			DesktopUpdate();
+			return g_pMessageManager->BroadcastMessage(uMsg, wParam, lParam);
+		}
 	case BB_SWITCHTON:
+		g_pVirtualWindowManager->SwitchToWorkspace(NULL, lParam);
+		DesktopUpdate();
+		break;
 	case BB_LISTDESKTOPS:
 
-	case BB_BRINGTOFRONT:
 	case BB_WINDOWMINIMIZE:
 	case BB_WINDOWMAXIMIZE:
 	case BB_WINDOWRESTORE:
 	case BB_WINDOWCLOSE:
 	case BB_WINDOWMOVE:
 	case BB_WINDOWSIZE:
-		Workspaces_Command(uMsg, wParam, lParam);
+		TRACE("Unhandled message, previously done by Workspaces_Command %u", uMsg);
+		//Workspaces_Command(uMsg, wParam, lParam);
 		goto dispatch_bb_message;
 
 		//====================
@@ -1032,7 +1078,8 @@ case_bb_restart:
 		break;
 
 	case WM_QUERYENDSESSION:
-		Workspaces_GatherWindows();
+		//Workspaces_GatherWindows();
+		g_pVirtualWindowManager->GatherWindows();
 		return TRUE;
 
 	case WM_CLOSE:
@@ -1081,11 +1128,11 @@ case_bb_restart:
 
 		//====================
 	case WM_TIMER:
-		if (BB_CHECKWINDOWS_TIMER == wParam)
-		{
-			Workspaces_handletimer();
-			break;
-		}
+		//if (BB_CHECKWINDOWS_TIMER == wParam)
+		//{
+		//	Workspaces_handletimer();
+		//	break;
+		//}
 		KillTimer(hwnd, wParam);
 		if (BB_WRITERC_TIMER == wParam)
 		{
@@ -1123,33 +1170,15 @@ case_bb_restart:
 			case HSHELL_TASKMAN:
 				uMsg = BB_WINKEY;
 				lParam = (GetAsyncKeyState(VK_RWIN) & 1) ? VK_RWIN : VK_LWIN;
-				goto p2;
+				PostMessage(hwnd, uMsg, lParam, extended);
+				break;
 
-			case HSHELL_WINDOWCREATED:
-				uMsg = BB_ADDTASK;
-				break;
-			case HSHELL_WINDOWDESTROYED:
-				uMsg = BB_REMOVETASK;
-				break;
 			case HSHELL_ACTIVATESHELLWINDOW:
-				uMsg = BB_ACTIVATESHELLWINDOW;
+				PRINT("ActivateShellWindow recieved");
 				break;
-			case HSHELL_WINDOWACTIVATED:
-				uMsg = BB_ACTIVETASK;
-				break;
-			case HSHELL_GETMINRECT:
-				uMsg = BB_MINMAXTASK;
-				break;
-			case HSHELL_REDRAW:
-				uMsg = BB_REDRAWTASK;
-				break;
-			default:
-				return 0;
 			}
-			TaskWndProc(wParam, (HWND)lParam);
-p2:
-			PostMessage(hwnd, uMsg, lParam, extended);
-			break;
+			//TaskWndProc(wParam, (HWND)lParam);
+			return g_pTaskManager->ProcessShellMessage(wParam, reinterpret_cast<HWND>(lParam));
 		}
 
 		if (uMsg >= BB_MSGFIRST && uMsg < BB_MSGLAST)

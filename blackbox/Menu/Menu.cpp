@@ -2,8 +2,8 @@
  ============================================================================
 
   This file is part of the bbLean source code
-  Copyright © 2001-2003 The Blackbox for Windows Development Team
-  Copyright © 2004 grischka
+  Copyright ï¿½ 2001-2003 The Blackbox for Windows Development Team
+  Copyright ï¿½ 2004 grischka
 
   http://bb4win.sourceforge.net/bblean
   http://sourceforge.net/projects/bb4win
@@ -32,6 +32,7 @@
 #include "../Pidl.h"
 #include "MenuMaker.h"
 #include "Menu.h"
+#include "../managers.h"
 #include <commctrl.h>
 #include <shellapi.h>
 
@@ -1591,7 +1592,8 @@ k_left:
 						//--------------------------------------
 					case VK_ESCAPE:
 						Menu_All_Hide();
-						focus_top_window();
+						g_pTaskManager->FocusTopTask(NULL);
+						//focus_top_window();
 						break;
 
 					case VK_DELETE:
@@ -2011,7 +2013,8 @@ void Menu_ShowFirst(Menu *p, bool from_kbd, bool with_xy, int x, int y)
 		}
 
 	p->decref();
-	ForceForegroundWindow(p->m_hwnd);   // force focus, if it was invoked by a keystroke
+	//ForceForegroundWindow(p->m_hwnd);   // force focus, if it was invoked by a keystroke
+	g_pTaskManager->SwitchToWindow(p->m_hwnd, true);
 	p->set_focus();
 	Menu::Hide_All_But(p);              // hide all other menus but this one
 }

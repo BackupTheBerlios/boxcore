@@ -77,7 +77,7 @@ private:
 	HINSTANCE hInstance;
 
 	HMODULE hUser32;
-	BOOL (*ChangeWindowMessageFilter)(UINT message, DWORD dwFlag);
+	BOOL (WINAPI *ChangeWindowMessageFilter)(UINT message, DWORD dwFlag);
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK childWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void announceWindow();

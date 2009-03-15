@@ -2,8 +2,8 @@
  ============================================================================
 
   This file is part of the bbLean source code
-  Copyright © 2001-2003 The Blackbox for Windows Development Team
-  Copyright © 2004 grischka
+  Copyright ï¿½ 2001-2003 The Blackbox for Windows Development Team
+  Copyright ï¿½ 2004 grischka
 
   http://bb4win.sourceforge.net/bblean
   http://sourceforge.net/projects/bb4win
@@ -31,10 +31,11 @@
 #include "Settings.h"
 #include "Desk.h"
 #include "PluginManager.h"
-#include "Workspaces.h"
+//#include "Workspaces.h"
 #include "Toolbar.h"
 #include "Menu/MenuMaker.h"
 #include "blackbox.h"
+#include "managers.h"
 
 #define SUB_PLUGIN_LOAD 1
 #define SUB_PLUGIN_SLIT 2
@@ -517,7 +518,8 @@ void exec_cfg_command(const char *argument)
 			else
 				if (cfg_sub_workspace == p_menu)
 				{
-					Workspaces_Reconfigure();
+					//Workspaces_Reconfigure();
+					g_pVirtualWindowManager->Reload();
 				}
 				else
 					if (v == Settings_focusModel)

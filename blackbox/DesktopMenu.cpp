@@ -2,8 +2,8 @@
  ============================================================================
 
   This file is part of the bbLean source code
-  Copyright © 2001-2003 The Blackbox for Windows Development Team
-  Copyright © 2004 grischka
+  Copyright ï¿½ 2001-2003 The Blackbox for Windows Development Team
+  Copyright ï¿½ 2004 grischka
 
   http://bb4win.sourceforge.net/bblean
   http://sourceforge.net/projects/bb4win
@@ -28,9 +28,10 @@
 */
 
 #include "BB.h"
-#include "Workspaces.h"
+//#include "Workspaces.h"
 #include "Menu/MenuMaker.h"
 #include "Menu/Menu.h"
+#include "managers.h"
 
 //===========================================================================
 struct en
@@ -62,7 +63,7 @@ static Menu * build_task_folder(int desk, const char *title, bool popup)
 	Menu *m = MakeNamedMenu(title, buf, popup);
 	if (m)
 	{
-		struct en en = { m, desk, GetTopTask(), 0 };
+		struct en en = { m, desk, g_pTaskManager->GetTopTask(), 0 };
 		EnumTasks(task_enum_func, (LPARAM)&en);
 	}
 	return m;
@@ -72,7 +73,8 @@ Menu * GetTaskFolder(int n, bool popup)
 {
 	if (n < 0) return NULL;
 	DesktopInfo DI;
-	get_desktop_info(&DI, n);
+	//get_desktop_info(&DI, n);
+	GetDesktopInfo(&DI, n);
 	return build_task_folder(n, DI.name, popup);
 }
 
@@ -117,7 +119,7 @@ Menu* MakeDesktopMenu(bool popup)
 	MakeSubmenu(m, s, CFG);
 
 	MakeMenuItem(s, NLS0("New Workspace"), "@BBCore.AddWorkspace", false);
-	if (Settings_workspaces>1) MakeMenuItem(s, NLS0("Remove Last"), "@BBCore.DelWorkspace", false);
+	if (g_pVirtualWindowManager->GetNumWorkspaces(NULL)>1) MakeMenuItem(s, NLS0("Remove Last"), "@BBCore.DelWorkspace", false);
 	MakeMenuItem(s, NLS0("Edit Workspace Names"), "@BBCore.EditWorkspaceNames", false);
 
 	return m;

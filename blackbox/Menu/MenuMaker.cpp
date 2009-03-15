@@ -2,8 +2,8 @@
  ============================================================================
 
   This file is part of the bbLean source code
-  Copyright © 2001-2003 The Blackbox for Windows Development Team
-  Copyright © 2004 grischka
+  Copyright ï¿½ 2001-2003 The Blackbox for Windows Development Team
+  Copyright ï¿½ 2004 grischka
 
   http://bb4win.sourceforge.net/bblean
   http://sourceforge.net/projects/bb4win
@@ -31,8 +31,9 @@
 #include "../Settings.h"
 #include "../Pidl.h"
 #include "../Desk.h"
-#include "../Workspaces.h"
+//#include "../Workspaces.h"
 #include "../Toolbar.h"
+#include "../managers.h"
 #include "MenuMaker.h"
 #include "Menu.h"
 
@@ -612,7 +613,7 @@ s_insert:
 			{
 				s = label;
 				DesktopInfo DI;
-				if (0 == *s) s = DI.name, get_desktop_info(&DI, f);
+				if (0 == *s) s = DI.name, GetDesktopInfo(&DI, f);
 				MakeSubmenu(pMenu, GetTaskFolder(f, popup), s, icon);
 				continue;
 			}
@@ -814,7 +815,7 @@ bool check_menu_toggle(const char *menu_id, bool kbd_invoked)
 	if (m->has_focus_in_chain()
 			&& (kbd_invoked || window_under_mouse() == m->m_hwnd))
 	{
-		focus_top_window();
+		g_pTaskManager->FocusTopTask(NULL);
 		Menu_All_Hide();
 		return true;
 	}
@@ -822,7 +823,7 @@ bool check_menu_toggle(const char *menu_id, bool kbd_invoked)
 	if (kbd_invoked && m->IsPinned())
 	{
 		m->set_keyboard_active_item();
-		ForceForegroundWindow(m->m_hwnd);
+		g_pTaskManager->SwitchToWindow(m->m_hwnd, true);
 		m->set_focus();
 		return true;
 	}

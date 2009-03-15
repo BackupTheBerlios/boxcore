@@ -30,12 +30,12 @@
 #include "BB.h"
 #include "Desk.h"
 #include "Settings.h"
-#include "Workspaces.h"
 #include "managers.h"
 #include <shlobj.h>
 #include <shellapi.h>
 #include <process.h>
 #include <winbase.h>
+#include "../debug/debug.h"
 
 #define ST static
 
@@ -181,7 +181,9 @@ void Desk_Init(void)
 			NULL
 		);
 	}
+	PRINT("Setting Background");
 	Desk_new_background();
+	PRINT("Desk_Init done");
 }
 
 // --------------------------------------------
@@ -208,7 +210,8 @@ ST void Desk_SetPosition()
 	SetWindowPos(
 		hDesktopWnd,
 		HWND_BOTTOM,
-		VScreenX, VScreenY, VScreenWidth, VScreenHeight,
+		g_pVirtualWindowManager->GetVirtualScreenX(), g_pVirtualWindowManager->GetVirtualScreenY(),
+		g_pVirtualWindowManager->GetVirtualScreenSizeX(), g_pVirtualWindowManager->GetVirtualScreenSizeY(),
 		SWP_NOACTIVATE
 	);
 }
@@ -221,6 +224,7 @@ ST void Desk_Clear(void)
 
 	if (hDesktopWnd)
 		InvalidateRect(hDesktopWnd, NULL, FALSE);
+	PRINT("Desktop cleared");
 }
 
 void Desk_reset_rootCommand(void)
@@ -269,18 +273,25 @@ void Desk_new_background(const char *p)
 		return;
 
 	strcpy(Root.command, p);
+	TRACE("Rootcommand : %s", Root.command);
 
+	PRINT("Setting background real");
 	if (NULL == hDesktopWnd || false == Settings_smartWallpaper)
 	{
+		PRINT("With windows wallpaper");
 		// use Windows Wallpaper?
 		Desk_Clear();
+		PRINT("Executing string");
 		if (Root.command[0]) BBExecute_string(Root.command, true);
+		PRINT("String executed");
 	}
 	else
 	{
+		PRINT("Internal");
 		if (hDTThread) WaitForSingleObject(hDTThread, INFINITE);
 		hDTThread = (HANDLE)_beginthread(load_root_thread, 0, NULL);
 	}
+	PRINT("Set background done");
 }
 
 //===========================================================================

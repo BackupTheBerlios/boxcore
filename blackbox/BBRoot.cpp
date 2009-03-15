@@ -2,8 +2,8 @@
  ============================================================================
 
   This file is part of the bbLean source code
-  Copyright © 2001-2003 The Blackbox for Windows Development Team
-  Copyright © 2004 grischka
+  Copyright ï¿½ 2001-2003 The Blackbox for Windows Development Team
+  Copyright ï¿½ 2004 grischka
 
   http://bb4win.sourceforge.net/bblean
   http://sourceforge.net/projects/bb4win
@@ -31,6 +31,7 @@
 // file into a HBITMAP, for Desk.cpp to paint the wallpaper.
 
 #include "BB.h"
+#include "managers.h"
 #include "Settings.h"
 
 //#define EXTERN_WALLPAPER
@@ -334,8 +335,8 @@ public:
 				else
 					return NULL;
 
-		int width = VScreenWidth;
-		int height = VScreenHeight;
+		int width = g_pVirtualWindowManager->GetVirtualScreenSizeX();
+		int height = g_pVirtualWindowManager->GetVirtualScreenSizeY();
 
 		HWND hwnd_desk = GetDesktopWindow();
 		HDC hdc_desk = GetDC(hwnd_desk);
@@ -403,10 +404,10 @@ static HBITMAP read_bitmap(LPCSTR path, bool delete_after)
 		HDC hdc_old = CreateCompatibleDC(hdc_desk);
 		HGDIOBJ old_bmp = SelectObject(hdc_old, bmp);
 		HDC hdc_new = CreateCompatibleDC(hdc_desk);
-		HBITMAP bmp_new = CreateCompatibleBitmap(hdc_desk, VScreenWidth, VScreenHeight);
+		HBITMAP bmp_new = CreateCompatibleBitmap(hdc_desk, g_pVirtualWindowManager->GetVirtualScreenSizeX(), g_pVirtualWindowManager->GetVirtualScreenSizeY());
 
 		SelectObject(hdc_new, bmp_new);
-		StretchBlt(hdc_new, 0, 0, VScreenWidth, VScreenHeight, hdc_old, 0, 0, bih.biWidth, bih.biHeight, SRCCOPY);
+		StretchBlt(hdc_new, 0, 0, g_pVirtualWindowManager->GetVirtualScreenSizeX(), g_pVirtualWindowManager->GetVirtualScreenSizeY(), hdc_old, 0, 0, bih.biWidth, bih.biHeight, SRCCOPY);
 		DeleteDC(hdc_new);
 
 		DeleteObject(SelectObject(hdc_old, old_bmp));
