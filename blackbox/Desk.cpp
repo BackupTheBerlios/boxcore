@@ -30,7 +30,6 @@
 #include "BB.h"
 #include "Desk.h"
 #include "Settings.h"
-#include "Workspaces.h"
 #include "managers.h"
 #include <shlobj.h>
 #include <shellapi.h>
