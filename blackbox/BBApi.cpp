@@ -2589,7 +2589,7 @@ void EnumTasks (TASKENUMPROC lpEnumFunc, LPARAM lParam)
 		PVOID data[1];
 		TaskManagement::eTaskInfo info[1] = {TaskManagement::TI_LEGACY};
 		g_pTaskManager->GetTaskInfo(g_pTaskManager->GetTaskWindow(i), data, info, 1);
-		if (FALSE == lpEnumFunc(reinterpret_cast<tasklist *>(data[0]), lParam))
+		if (FALSE == lpEnumFunc(reinterpret_cast<BBTask *>(data[0])->GetTaskList(), lParam))
 			break;
 	}
 }
