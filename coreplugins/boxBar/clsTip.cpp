@@ -74,11 +74,11 @@ LRESULT CALLBACK Tip::realWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 	{
 	case WM_CREATE:
 	case WM_NCCREATE:
-		realClass = (Tip *)(((CREATESTRUCT *)lParam)->lpCreateParams);
-		SetWindowLongPtr(hWnd, 0, (LONG_PTR)realClass);
+		realClass = reinterpret_cast<Tip *>(reinterpret_cast<CREATESTRUCT *>(lParam)->lpCreateParams);
+		SetWindowLongPtr(hWnd, 0, reinterpret_cast<LONG_PTR>(realClass));
 		break;
 	default:
-		realClass = (Tip *)GetWindowLongPtr(hWnd, 0);
+		realClass = reinterpret_cast<Tip *>(GetWindowLongPtr(hWnd, 0));
 		break;
 	}
 	if (realClass)

@@ -3,7 +3,7 @@
 clsWorkspaceLabel::clsWorkspaceLabel(bool pVertical): clsLabelItem(pVertical)
 {
 	static int msgs[] = {BB_DESKTOPINFO, 0};
-	PostMessage(hBlackboxWnd, BB_REGISTERMESSAGE, (WPARAM)barWnd, (LPARAM)msgs);
+	PostMessage(hBlackboxWnd, BB_REGISTERMESSAGE, reinterpret_cast<WPARAM>(barWnd), reinterpret_cast<LPARAM>(msgs));
 	DesktopInfo deskinfo;
 	GetDesktopInfo(&deskinfo);
 	CopyString(text, deskinfo.name, 256);
@@ -14,7 +14,7 @@ clsWorkspaceLabel::clsWorkspaceLabel(bool pVertical): clsLabelItem(pVertical)
 clsWorkspaceLabel::~clsWorkspaceLabel()
 {
 	static int msgs[] = {BB_DESKTOPINFO, 0};
-	SendMessage(hBlackboxWnd, BB_UNREGISTERMESSAGE, (WPARAM)barWnd, (LPARAM)msgs);
+	SendMessage(hBlackboxWnd, BB_UNREGISTERMESSAGE, reinterpret_cast<WPARAM>(barWnd), reinterpret_cast<LPARAM>(msgs));
 }
 
 
@@ -28,7 +28,7 @@ LRESULT clsWorkspaceLabel::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 	{
 	case BB_DESKTOPINFO:
 	{
-		DesktopInfo *deskinfo = (DesktopInfo *)lParam;
+		DesktopInfo *deskinfo = reinterpret_cast<DesktopInfo *>(lParam);
 		CopyString(text, deskinfo->name, 256);
 		PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 		return 0;

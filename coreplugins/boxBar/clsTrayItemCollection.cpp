@@ -52,7 +52,7 @@ LRESULT clsTrayItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 		break;
 	case BB_BROADCAST:
 	{
-		const char *msg_string = (LPCSTR)lParam;
+		const char *msg_string = reinterpret_cast<LPCSTR>(lParam);
 		LPCSTR element = NULL;
 		msg_string += 1;
 		if (!strnicmp(msg_string, m_pluginPrefix, strlen(m_pluginPrefix)))
@@ -176,14 +176,14 @@ void clsTrayItemCollection::populateTray()
 		{
 			if (m_reverseOrder && !vertical)
 			{
-				((clsItemCollection*)(*columnRev))->addItem(new clsTrayItem(trayItem, iconSize, vertical));
+				(dynamic_cast<clsItemCollection*>(*columnRev))->addItem(new clsTrayItem(trayItem, iconSize, vertical));
 				columnRev++;
 				if (columnRev == itemList.rend())
 					columnRev = itemList.rbegin();
 			}
 			else
 			{
-				((clsItemCollection*)(*column))->addItem(new clsTrayItem(trayItem, iconSize, vertical), m_reverseOrder);
+				(dynamic_cast<clsItemCollection*>(*column))->addItem(new clsTrayItem(trayItem, iconSize, vertical), m_reverseOrder);
 				column++;
 				if (column == itemList.end())
 					column = itemList.begin();
@@ -198,14 +198,14 @@ void clsTrayItemCollection::populateTray()
 		{
 			if (m_reverseOrder && !vertical)
 			{
-				((clsItemCollection*)(*columnRev))->addItem(new clsIconItem(NULL, iconSize, vertical));
+				(dynamic_cast<clsItemCollection*>(*columnRev))->addItem(new clsIconItem(NULL, iconSize, vertical));
 				columnRev++;
 				if (columnRev == itemList.rend())
 					columnRev = itemList.rbegin();
 			}
 			else
 			{
-				((clsItemCollection*)(*column))->addItem(new clsIconItem(NULL, iconSize, vertical), m_reverseOrder);
+				(dynamic_cast<clsItemCollection*>(*column))->addItem(new clsIconItem(NULL, iconSize, vertical), m_reverseOrder);
 				column++;
 				if (column == itemList.end())
 					column = itemList.begin();

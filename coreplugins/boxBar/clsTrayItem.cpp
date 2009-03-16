@@ -15,7 +15,7 @@ clsTrayItem::clsTrayItem(systemTray *trayItem, UINT pIconSize, bool pVertical): 
 	if (GetTrayInfo == NULL)
 	{
 		if (bbApiLoader.requestApiPresence(TEXT("boxCore::hasGetTrayInfo")))
-			GetTrayInfo = (fnGetTrayInfo)bbApiLoader.requestApiPointer("GetTrayInfo");
+			GetTrayInfo = reinterpret_cast<fnGetTrayInfo>(bbApiLoader.requestApiPointer("GetTrayInfo"));
 	}
 	iconWnd = trayItem->hWnd;
 	iconID = trayItem->uID;

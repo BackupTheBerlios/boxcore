@@ -289,10 +289,10 @@ LRESULT clsItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		break;
-		case WM_NOTIFY:
-		{
-			NMHDR &messageHeader = *reinterpret_cast<NMHDR*>(lParam);
-		switch(messageHeader.code)
+	case WM_NOTIFY:
+	{
+		NMHDR &messageHeader = *reinterpret_cast<NMHDR*>(lParam);
+		switch (messageHeader.code)
 		{
 		case TTN_NEEDTEXT:
 		{
@@ -306,8 +306,8 @@ LRESULT clsItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			return FALSE;
 		}
 		}
-		}
-		break;
+	}
+	break;
 	}
 
 	return DefWindowProc(hWnd, msg, wParam, lParam);
