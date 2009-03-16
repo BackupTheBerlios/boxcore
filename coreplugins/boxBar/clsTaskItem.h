@@ -40,6 +40,7 @@ protected:
 	static int inactiveAlpha;
 private:
 	static void activateTask(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
+	static void WindowMenu(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
 };
 
 #endif // CLSTASKITEM_H
