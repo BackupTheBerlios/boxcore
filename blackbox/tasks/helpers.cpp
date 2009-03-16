@@ -25,9 +25,9 @@ bool IsTask(HWND p_hWnd)
 
 	LONG_PTR exStyle = GetWindowLongPtr(p_hWnd, GWL_EXSTYLE);
 	if (exStyle & WS_EX_APPWINDOW)
-		{
-			return true;
-		}
+	{
+		return true;
+	}
 	HWND owner = GetWindow(p_hWnd, GW_OWNER);
 	if (owner)
 	{
