@@ -87,7 +87,7 @@ endif(MINGW)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resource.rc.in
 ${CMAKE_CURRENT_BINARY_DIR}/resource.rc)
 
-add_executable (blackbox ${BLACKBOX_CORE_SRCS} ${BLACKBOX_MENU_SRCS} ${BLACKBOX_NEW_SRCS} ${BLACKBOX_RESOURCES} )
+add_executable (blackbox WIN32 ${BLACKBOX_CORE_SRCS} ${BLACKBOX_MENU_SRCS} ${BLACKBOX_NEW_SRCS} ${BLACKBOX_RESOURCES} )
 include_directories(blackbox ${CMAKE_CURRENT_BINARY_DIR})
 #add_custom_command (TARGET blackbox POST_BUILD
 #	COMMAND ${DLLTOOL} -d ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def -l ${CMAKE_CURRENT_BINARY_DIR}/libblackbox.a -D blackbox.exe
@@ -95,7 +95,6 @@ include_directories(blackbox ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries (blackbox ${UNICOWSLIB}
 	debuglib shellserviceobjects shellservices taskmanager vwm shlwapi version ole32 uuid comctl32 comdlg32 shell32 advapi32 winmm gdi32)
 set_target_properties (blackbox PROPERTIES
-	WIN32_EXECUTABLE true
 	IMPORT_SUFFIX .a
 	ENABLE_EXPORTS true
 )
@@ -107,7 +106,7 @@ endif (BOXCORE_DEBUG)
 
 if (MINGW)
 set_target_properties (blackbox PROPERTIES
-	LINK_FLAGS "${BOXCORE_FLAGS_STRIP} ${BOXCORE_FLAGS_PROFILE} ${BOXCORE_FLAGS_DEBUG} ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def -mthreads"
+	LINK_FLAGS "${BOXCORE_FLAGS_STRIP} ${BOXCORE_FLAGS_PROFILE} ${BOXCORE_FLAGS_DEBUG} ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def"
 	COMPILE_FLAGS "${BOXCORE_FLAGS_OPTIMIZE} ${BOXCORE_FLAGS_PROFILE} ${BOXCORE_FLAGS_DEBUG} -Wall -fno-rtti -fno-exceptions -fmessage-length=0"
 )
 endif (MINGW)
