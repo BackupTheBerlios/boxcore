@@ -47,6 +47,7 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVe
 	addItem(iconItem);
 	addItem(captionItem);
 	leftClick = activateTask;
+	rightClick = WindowMenu;
 }
 
 /** @brief TaskItem destructer
@@ -78,6 +79,7 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case TASKITEM_MODIFIED:
 			if ((HWND)wParam == taskWnd)
 			{
+				PRINT(TEXT("Task modified"));
 				tasklist *task = GetTaskListPtr();
 				tipText = NULL;
 				for (int i = 0; i < GetTaskListSize(); ++i)
@@ -97,6 +99,17 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					}
 					task = task->next;
 				}
+				/*if (task->active)
+				{
+					style = activeStyle;
+					itemAlpha = activeAlpha;
+				}
+				else
+				{
+					style = inactiveStyle;
+					itemAlpha = inactiveAlpha;
+				}
+				captionItem->setStyle(style);*/
 			}
 			return 0;
 		case TASKITEM_ACTIVATED:
@@ -112,6 +125,23 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 			captionItem->setStyle(style);
 			return 0;
+		case TASKITEM_FLASHED:
+			if (taskWnd == (HWND)wParam)
+			{
+				PRINT(TEXT("Task flashed"));
+				if (style == activeStyle)
+				{
+					style = inactiveStyle;
+					itemAlpha = inactiveAlpha;
+				}
+				else
+				{
+					style = activeStyle;
+					itemAlpha = activeAlpha;
+				}
+				captionItem->setStyle(style);
+			}
+			return 0;
 		}
 		break;
 	case BOXBAR_NEEDTIP:
@@ -121,7 +151,7 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				tipText = m_caption;
 			if (!m_hasTooltip)
 			{
-			setTooltip();
+				setTooltip();
 			}
 		}
 		break;
@@ -139,6 +169,18 @@ void clsTaskItem::activateTask(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM l
 	if (realItem)
 	{
 		PostMessage(hBlackboxWnd, BB_BRINGTOFRONT, 0,  (LPARAM)realItem->taskWnd);
+	}
+}
+
+void clsTaskItem::WindowMenu(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	clsTaskItem *realItem = dynamic_cast<clsTaskItem *>(pItem);
+	if (realItem)
+	{
+		//HMENU sysMenu = GetSystemMenu(realItem->taskWnd, FALSE);
+		//SendMessage(realItem->taskWnd, WM_INITMENU, reinterpret_cast<WPARAM>(sysMenu), 0);
+		//TrackPopupMenu(sysMenu, 0, 100, 100, 0, realItem->barWnd, NULL);
+		SendMessage(realItem->taskWnd, WM_SYSCOMMAND, SC_MOUSEMENU, 0);
 	}
 }
 
