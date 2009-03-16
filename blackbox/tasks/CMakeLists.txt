@@ -14,14 +14,14 @@ helpers.cpp
 add_library (taskmanager STATIC ${TASKMAN_SRCS})
 target_link_libraries (taskmanager ${UNICOWSLIB} debuglib)
 
-if (DEBUG_CODE)
+if (BOXCORE_DEBUG)
 set_target_properties (taskmanager PROPERTIES COMPILE_DEFINITIONS "DEBUG")
-else (DEBUG_CODE)
+else (BOXCORE_DEBUG)
 set_target_properties (taskmanager PROPERTIES COMPILE_DEFINITIONS "NDEBUG")
-endif (DEBUG_CODE)
+endif (BOXCORE_DEBUG)
 
 if (MINGW)
 set_target_properties (taskmanager PROPERTIES
-	LINK_FLAGS "-s"
-	COMPILE_FLAGS "-Os -Wall -fno-rtti -fno-exceptions")
+	LINK_FLAGS "${BOXCORE_FLAGS_STRIP} ${BOXCORE_FLAGS_PROFILE} ${BOXCORE_FLAGS_DEBUG}"
+	COMPILE_FLAGS "${BOXCORE_FLAGS_OPTIMIZE} ${BOXCORE_FLAGS_PROFILE} ${BOXCORE_FLAGS_DEBUG} -Wall -fno-rtti -fno-exceptions")
 endif (MINGW)

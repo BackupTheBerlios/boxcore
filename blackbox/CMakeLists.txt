@@ -13,7 +13,6 @@ Utils.cpp
 BImage.cpp
 Settings.cpp
 PluginManager.cpp
-#Workspaces.cpp
 Desk.cpp
 Toolbar.cpp
 DesktopMenu.cpp
@@ -22,7 +21,6 @@ m_alloc.cpp
 Tinylist.cpp
 Install.cpp
 BBRoot.cpp
-#BBVWM.cpp
 Pidl.cpp
 VolumeControl.cpp
 )
@@ -82,7 +80,6 @@ if(MINGW)
                                          -o ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
   SET(BLACKBOX_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
   set (RC_MANIFEST_LINE "APP_MANIFEST RT_MANIFEST blackbox.exe.manifest")
-  message (STATUS "Mingw compiles detected")
 else(MINGW)
   SET(BLACKBOX_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/resource.rc)
 endif(MINGW)
@@ -102,16 +99,16 @@ set_target_properties (blackbox PROPERTIES
 	IMPORT_SUFFIX .a
 	ENABLE_EXPORTS true
 )
-if (DEBUG_CODE)
+if (BOXCORE_DEBUG)
 set_target_properties (blackbox PROPERTIES COMPILE_DEFINITIONS "DEBUG")
-else (DEBUG_CODE)
+else (BOXCORE_DEBUG)
 set_target_properties (blackbox PROPERTIES COMPILE_DEFINITIONS "NDEBUG")
-endif (DEBUG_CODE)
+endif (BOXCORE_DEBUG)
 
 if (MINGW)
 set_target_properties (blackbox PROPERTIES
-	LINK_FLAGS " -s ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def"
-	COMPILE_FLAGS "-Os -Wall -fno-rtti -fno-exceptions -fmessage-length=0"
+	LINK_FLAGS "${BOXCORE_FLAGS_STRIP} ${BOXCORE_FLAGS_PROFILE} ${BOXCORE_FLAGS_DEBUG} ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def -mthreads"
+	COMPILE_FLAGS "${BOXCORE_FLAGS_OPTIMIZE} ${BOXCORE_FLAGS_PROFILE} ${BOXCORE_FLAGS_DEBUG} -Wall -fno-rtti -fno-exceptions -fmessage-length=0"
 )
 endif (MINGW)
 
@@ -120,8 +117,8 @@ set_target_properties (TrayForwarder  PROPERTIES PREFIX "")
 
 if (MINGW)
 set_target_properties (TrayForwarder PROPERTIES
-	LINK_FLAGS " -s"
-	COMPILE_FLAGS "-Os -Wall -fno-rtti -fno-exceptions -fmessage-length=0"
+	LINK_FLAGS "${BOXCORE_FLAGS_STRIP}"
+	COMPILE_FLAGS "${BOXCORE_FLAGS_OPTIMIZE} -Wall -fno-rtti -fno-exceptions -fmessage-length=0"
 )
 endif (MINGW)
 

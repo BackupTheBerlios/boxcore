@@ -7,9 +7,9 @@ clsUser32::clsUser32()
 	hModule = LoadLibrary(TEXT("user32.dll"));
 	if (hModule)
 	{
-		AllowSetForegroundWindow = (fnAllowSetForegroundWindow)GetProcAddress(hModule, "AllowSetForegroundWindow");
-		TrackMouseEvent = (fnTrackMouseEvent)GetProcAddress(hModule, "TrackMouseEvent");
-		UpdateLayeredWindow = (fnUpdateLayeredWindow)GetProcAddress(hModule, "UpdateLayeredWindow");
+		AllowSetForegroundWindow = reinterpret_cast<fnAllowSetForegroundWindow>(GetProcAddress(hModule, "AllowSetForegroundWindow"));
+		TrackMouseEvent = reinterpret_cast<fnTrackMouseEvent>(GetProcAddress(hModule, "TrackMouseEvent"));
+		UpdateLayeredWindow = reinterpret_cast<fnUpdateLayeredWindow>(GetProcAddress(hModule, "UpdateLayeredWindow"));
 	}
 	else
 	{

@@ -11,6 +11,6 @@ add_library (shellserviceobjects STATIC ${SSO_SRCS})
 
 if (MINGW)
 set_target_properties (shellserviceobjects PROPERTIES
-	LINK_FLAGS "-s"
-	COMPILE_FLAGS "-Os -Wall -fno-rtti -fno-exceptions")
+	LINK_FLAGS "${BOXCORE_FLAGS_STRIP} ${BOXCORE_FLAGS_PROFILE}"
+	COMPILE_FLAGS "${BOXCORE_FLAGS_OPTIMIZE} ${BOXCORE_FLAGS_PROFILE} -Wall -fno-rtti -fno-exceptions")
 endif (MINGW)
