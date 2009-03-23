@@ -137,7 +137,7 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				systemTray *trayItem = GetTrayIcon(i);
 				if ((trayItem->hWnd == iconWnd) && (trayItem->uID == iconID))
 				{
-					icon = trayItem->hIcon;
+					setIcon(trayItem->hIcon);
 					delete tipText;
 					tipText = NULL;
 					if (GetTrayInfo)
