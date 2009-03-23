@@ -11,7 +11,7 @@
 class clsTaskItem : public clsItemCollection
 {
 public:
-	clsTaskItem(tasklist *pTask, bool pVertical);
+	clsTaskItem(HWND p_Task, bool pVertical);
 	~clsTaskItem();
 
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -31,6 +31,8 @@ protected:
 	clsTextItem *captionItem;
 	clsIconItem *iconItem;
 
+	bool m_fallback;
+
 	static bool s_activeBackground;
 	static bool s_inactiveBackground;
 
@@ -41,6 +43,9 @@ protected:
 private:
 	static void activateTask(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
 	static void WindowMenu(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
+
+	static VOID CALLBACK SmallIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult);
+	static VOID CALLBACK LargeIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult);
 };
 
 #endif // CLSTASKITEM_H

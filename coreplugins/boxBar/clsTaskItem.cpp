@@ -6,7 +6,7 @@
 #include "rcworker/clsRCBool.h"
 #include "rcworker/clsRCInt.h"
 
-clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVertical)
+clsTaskItem::clsTaskItem(HWND p_Task, bool pVertical): clsItemCollection(pVertical)
 {
 	CHAR buffer[256];
 	m_itemPrefix = new CHAR[strlen("Tasks")+1];
@@ -14,9 +14,10 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVe
 	m_knowsSize = DIM_VERTICAL;
 	m_wantsStretch = DIM_HORIZONTAL;
 	vertical = false;
+	m_fallback = false;
 
-	taskWnd = pTask->hwnd;
-	CopyString(m_caption, pTask->caption, 256);
+	taskWnd = p_Task;
+	GetWindowText(p_Task, m_caption, 256);
 	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"iconsize"), iconSize, 16));
 	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"task.spacingBorder"), spacingBorder, 2));
 	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"task.spacingItems"), spacingItems, 2));
@@ -26,7 +27,7 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVe
 	m_workers.push_back(new RCWorkers::RCBool(configFile, ItemRCKey(buffer, "active.background"), s_activeBackground, true));
 	m_workers.push_back(new RCWorkers::RCBool(configFile, ItemRCKey(buffer, "inactive.background"), s_inactiveBackground, true));
 	readSettings();
-	if (pTask->active)
+	if (GetTask(GetActiveTask()) == p_Task)
 	{
 		style = activeStyle;
 		itemAlpha = activeAlpha;
@@ -36,16 +37,14 @@ clsTaskItem::clsTaskItem(tasklist *pTask, bool pVertical): clsItemCollection(pVe
 		style = inactiveStyle;
 		itemAlpha = inactiveAlpha;
 	}
-	if (iconSize > 16)
-		if (GlobalFindAtom(TEXT("boxCore::running")))
-			iconItem = new clsIconItem(pTask->icon_big, iconSize, vertical);
-		else
-			iconItem = new clsIconItem(pTask->icon, iconSize, vertical);
-	else
-		iconItem = new clsIconItem(pTask->icon, iconSize, vertical);
+	iconItem = new clsIconItem(LoadIcon(NULL, IDI_APPLICATION), iconSize, vertical);
 	captionItem = new clsTextItem(m_caption, style, vertical);
 	addItem(iconItem);
 	addItem(captionItem);
+	if (iconSize > 16)
+		SendMessageCallback(taskWnd, WM_GETICON, ICON_BIG, 0, LargeIconProc, reinterpret_cast<ULONG_PTR>(this));
+	else
+		SendMessageCallback(taskWnd, WM_GETICON, ICON_SMALL, 0, SmallIconProc, reinterpret_cast<ULONG_PTR>(this));
 	leftClick = activateTask;
 	rightClick = WindowMenu;
 }
@@ -59,6 +58,7 @@ clsTaskItem::~clsTaskItem()
 {
 	delete iconItem;
 	delete captionItem;
+	iconItem = NULL;
 	itemList.clear();
 	tipText = NULL;
 }
@@ -80,36 +80,15 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			if ((HWND)wParam == taskWnd)
 			{
 				PRINT(TEXT("Task modified"));
-				tasklist *task = GetTaskListPtr();
-				tipText = NULL;
-				for (int i = 0; i < GetTaskListSize(); ++i)
-				{
-					if (task->hwnd == (HWND)wParam)
-					{
-						CopyString(m_caption, task->caption, 256);
-						captionItem->setText(m_caption);
-						if (iconSize > 16)
-							if (GlobalFindAtom(TEXT("boxCore::running")))
-								iconItem->setIcon(task->icon_big);
-							else
-								iconItem->setIcon(task->icon);
-						else
-							iconItem->setIcon(task->icon);
-						break;
-					}
-					task = task->next;
-				}
-				/*if (task->active)
-				{
-					style = activeStyle;
-					itemAlpha = activeAlpha;
-				}
+				GetWindowText(taskWnd, m_caption, 256);
+				captionItem->setText(m_caption);
+				m_fallback = false;
+				if (iconSize > 16)
+					SendMessageCallback(taskWnd, WM_GETICON, ICON_BIG, 0, LargeIconProc, reinterpret_cast<ULONG_PTR>(this));
 				else
-				{
-					style = inactiveStyle;
-					itemAlpha = inactiveAlpha;
-				}
-				captionItem->setStyle(style);*/
+					SendMessageCallback(taskWnd, WM_GETICON, ICON_SMALL, 0, SmallIconProc, reinterpret_cast<ULONG_PTR>(this));
+				break;
+
 			}
 			return 0;
 		case TASKITEM_ACTIVATED:
@@ -197,6 +176,64 @@ void clsTaskItem::readSettings()
 	}
 	activeStyle = s_activeBackground ? SN_TOOLBARWINDOWLABEL : 0;
 	inactiveStyle = s_inactiveBackground ? SN_TOOLBAR : 0;
+}
+
+VOID CALLBACK clsTaskItem::SmallIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult)
+{
+		clsTaskItem *task = reinterpret_cast<clsTaskItem *>(p_dwData);
+		if (task->taskWnd == p_hWnd)
+		{
+		if (p_lResult)
+		{
+			task->iconItem->setIcon(reinterpret_cast<HICON>(p_lResult));
+		}
+		else
+		{
+			if (!task->iconItem->setIcon(reinterpret_cast<HICON>(GetClassLongPtr(task->taskWnd, GCLP_HICONSM))))
+			{
+				if (task->m_fallback)
+				{
+					task->iconItem->setIcon(LoadIcon(NULL, IDI_APPLICATION));
+				}
+				else
+				{
+					task->m_fallback = true;
+					SendMessageCallback(task->taskWnd, WM_GETICON, ICON_BIG, 0, LargeIconProc, reinterpret_cast<ULONG_PTR>(task));
+					return;
+				}
+			}
+		}
+		RedrawWindow(task->barWnd, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
+		}
+}
+
+VOID CALLBACK clsTaskItem::LargeIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult)
+{
+		clsTaskItem *task = reinterpret_cast<clsTaskItem *>(p_dwData);
+		if (task->taskWnd == p_hWnd)
+		{
+		if (p_lResult)
+		{
+			task->iconItem->setIcon(reinterpret_cast<HICON>(p_lResult));
+		}
+		else
+		{
+			if (!task->iconItem->setIcon(reinterpret_cast<HICON>(GetClassLongPtr(task->taskWnd, GCLP_HICON))))
+			{
+				if (task->m_fallback)
+				{
+					task->iconItem->setIcon(LoadIcon(NULL, IDI_APPLICATION));
+				}
+				else
+				{
+					task->m_fallback = true;
+					SendMessageCallback(task->taskWnd, WM_GETICON, ICON_SMALL, 0, SmallIconProc, reinterpret_cast<ULONG_PTR>(task));
+					return;
+				}
+			}
+		}
+		RedrawWindow(task->barWnd, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
+		}
 }
 
 /** @brief configMenu
