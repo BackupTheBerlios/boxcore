@@ -12,37 +12,7 @@ set (VERSION_BUILD 0)
 
 set (VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
-option(USE_UNICOWS "Should we link against unicows.dll?" ON)
-option(UNICODE_ENABLE "Compile unicode versions of the core and plugins" ON)
-option(UPDATE_PACKAGE "Should we move configs to a sample folder" OFF)
-option(BOXCORE_PROFILE "Compile with profiling support" OFF)
-option(BOXCORE_STRIP "Strip executables and libraries" ON)
-option (BOXCORE_DEBUG "Activate code for generating debug messages and enable debug information" OFF)
-set(BOXCORE_FLAGS_OPTIMIZE "-Os" CACHE STRING "Optimization flags")
-
-if (BOXCORE_PROFILE)
-set (BOXCORE_FLAGS_PROFILE "-pg")
-else (BOXCORE_PROFILE)
-set (BOXCORE_FLAGS_PROFILE "")
-endif (BOXCORE_PROFILE)
-
-if (BOXCORE_DEBUG)
-set (BOXCORE_FLAGS_DEBUG "-gstabs")
-else (BOXCORE_DEBUG)
-set (BOXCORE_FLAGS_DEBUG "")
-endif (BOXCORE_DEBUG)
-
-if (BOXCORE_STRIP)
-set (BOXCORE_FLAGS_STRIP "-s")
-else (BOXCORE_STRIP)
-set (BOXCORE_FLAGS_STRIP "")
-endif (BOXCORE_STRIP)
-
-if (UNICODE_ENABLE)
-set (PACKAGE_CHARTYPE "unicode")
-else (UNICODE_ENABLE)
-set (PACKAGE_CHARTYPE "ansi")
-endif (UNICODE_ENABLE)
+include(boxCore_options)
 
 if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL AMD64)
 set (ARCH amd64)
