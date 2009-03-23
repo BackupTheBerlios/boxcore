@@ -9,6 +9,8 @@ public:
 	clsStyle();
 	virtual ~clsStyle();
 
+	void Update();
+
 	StyleItem *getStyle(int pStyle);
 	bool getStyleBorder(int pStyle);
 	HFONT getStyleFont(int pStyle);

@@ -2,6 +2,24 @@
 
 clsStyle::clsStyle()
 {
+	toolbarFont = NULL;
+	Update();
+}
+
+clsStyle::~clsStyle()
+{
+	if (toolbarFont)
+	{
+		DeleteObject(toolbarFont);
+	}
+}
+
+void clsStyle::Update()
+{
+	if (toolbarFont)
+	{
+		DeleteObject(toolbarFont);
+	}
 	toolbar = (StyleItem *)GetSettingPtr(SN_TOOLBAR);
 	toolbarClock = (StyleItem *)GetSettingPtr(SN_TOOLBARCLOCK);
 	toolbarLabel = (StyleItem *)GetSettingPtr(SN_TOOLBARLABEL);
@@ -9,11 +27,6 @@ clsStyle::clsStyle()
 	toolbarButtonPressed = (StyleItem *)GetSettingPtr(SN_TOOLBARBUTTONP);
 	toolbarWindowLabel = (StyleItem *)GetSettingPtr(SN_TOOLBARWINDOWLABEL);
 	toolbarFont = CreateStyleFont(toolbar);
-}
-
-clsStyle::~clsStyle()
-{
-	//dtor
 }
 
 /** @brief getStyleFont
