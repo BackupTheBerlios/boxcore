@@ -206,6 +206,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		// Blackbox sends a "BB_RECONFIGURE" message on style changes etc.
 
 	case BB_RECONFIGURE:
+		bbStyle.Update();
 		readSettings();
 		populateBar();
 		break;
