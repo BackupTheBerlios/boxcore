@@ -90,7 +90,6 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 		{
 		case TASKITEM_FLASHED:
 		case TASKITEM_ACTIVATED:
-		case TASKITEM_MODIFIED:
 			clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
 			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
 			return 0;
@@ -120,12 +119,13 @@ void clsTaskItemCollection::populateTasks()
 	itemList.clear();
 	itemMapping.clear();
 
-	tasklist *task = GetTaskListPtr();
-	while (task)
+	for (int i = 0; i < GetTaskListSize(); ++i)
 	{
-		clsTaskItem *newTask = new clsTaskItem(task, vertical);
-		addItem(newTask);
-		task = task->next;
+		if (GetTask(i))
+		{
+			clsTaskItem *newTask = new clsTaskItem(GetTask(i), vertical);
+			addItem(newTask);
+		}
 	}
 	if (vertical && stretchTaskarea)
 		addItem(new clsFlexiSpacer(vertical));
@@ -225,7 +225,3 @@ void clsTaskItemCollection::DragAction(clsItem * p_item, eDragDropState p_state,
 		}
 	}
 }
-
-
-
-
