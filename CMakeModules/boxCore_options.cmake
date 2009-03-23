@@ -1,6 +1,6 @@
 if (NOT BOXCORE_OPTIONS_INCLUDED)
 set (BOXCORE_OPTIONS_INCLUDED 1)
-message ("Processing boxCore options")
+message (STATUS "Processing boxCore options")
 option(USE_UNICOWS "Should we link against unicows.dll?" ON)
 option(BOXCORE_UNICODE "Compile unicode versions of the core and plugins" ON)
 option(UPDATE_PACKAGE "Should we move configs to a sample folder" OFF)
