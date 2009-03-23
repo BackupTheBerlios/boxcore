@@ -8,8 +8,9 @@ class clsIconItem : public clsItem
 {
 public:
 	clsIconItem(HICON pIcon, UINT pSize, bool pVertical);
+	~clsIconItem();
 
-	void setIcon(HICON pIcon);
+	bool setIcon(HICON pIcon);
 
 	virtual void draw(HDC pContext);
 	virtual void calculateSizes(bool pSizeGiven = false);

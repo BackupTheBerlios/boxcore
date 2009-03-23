@@ -2,10 +2,18 @@
 
 clsIconItem::clsIconItem(HICON pIcon, UINT pSize, bool pVertical):clsItem(pVertical)
 {
-	icon = pIcon;
+	icon = CopyIcon(pIcon);
 	iconSize = pSize;
 	m_knowsSize = DIM_BOTH;
 	m_wantsStretch = DIM_NONE;
+}
+
+clsIconItem::~clsIconItem()
+{
+	if (icon)
+	{
+		DestroyIcon(icon);
+	}
 }
 
 /** @brief calculateSizes
@@ -77,15 +85,21 @@ void clsIconItem::draw(HDC pContext)
   *
   * @todo: document this function
   */
-void clsIconItem::setIcon(HICON pIcon)
+bool clsIconItem::setIcon(HICON pIcon)
 {
-	icon = pIcon;
 	if (icon)
 	{
-		InvalidateRect(barWnd, &itemArea, TRUE);
-		PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
+		DestroyIcon(icon);
 	}
-
+	icon = CopyIcon(pIcon);
+	if (icon)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 
