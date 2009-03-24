@@ -107,7 +107,7 @@ BEGIN
 			//VALUE "InternalName", "Blackbox"
 			VALUE "LegalCopyright", "Copyright � 2003-2005 grischka, � 2008 carsomyr"
 			//VALUE "LegalTrademarks", "none"
-			VALUE "OriginalFilename", "blackbox.exe"
+			VALUE "OriginalFilename", "blackbox${BOXCORE_EXE_SUFFIX}.exe"
 			//VALUE "PrivateBuild", "none"
 			VALUE "ProductName", "Blackbox for Windows"
 			VALUE "ProductVersion", "bbLean ${VERSION}"
