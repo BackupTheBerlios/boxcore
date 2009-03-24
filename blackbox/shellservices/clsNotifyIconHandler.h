@@ -40,6 +40,7 @@ typedef void (*NotificationIconCallback)(void *);
 typedef LegacyNotificationIcon *(*LegacyNotficationIconFactory)();
 
 typedef std::pair<HWND, UINT> iconPair_t;
+typedef std::map<UINT, iconPair_t> iconMap_t;
 
 class NotifyIconHandler : public ShellServiceHandler
 {

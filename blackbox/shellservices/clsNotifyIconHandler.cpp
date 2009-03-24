@@ -592,15 +592,33 @@ UINT NotifyIconHandler::GetTraySize()
 void NotifyIconHandler::CleanTray()
 {
 	PRINT("Clean tray requested");
-	for (IconList::iterator i = m_IconList.begin(); i != m_IconList.end();++i)
+	if (m_proxyEnabled)
 	{
-		if (!IsWindow((*i)->m_hWnd))
+		for (iconMap_t::iterator i = m_iconLookup.begin(); i != m_iconLookup.end();++i)
 		{
-			DeleteIcon((*i)->m_hWnd, (*i)->m_uID);
-			if (deletedCallback)
-				deletedCallback(*i);
-			CleanTray();
-			break;
+
+			if (!IsWindow(i->second.first))
+			{
+				DeleteIcon(i->second.first, i->second.second);
+				if (deletedCallback)
+					deletedCallback(i->second.first);
+				CleanTray();
+				break;
+			}
+		}
+	}
+	else
+	{
+		for (IconList::iterator i = m_IconList.begin(); i != m_IconList.end();++i)
+		{
+			if (!IsWindow((*i)->m_hWnd))
+			{
+				DeleteIcon((*i)->m_hWnd, (*i)->m_uID);
+				if (deletedCallback)
+					deletedCallback(*i);
+				CleanTray();
+				break;
+			}
 		}
 	}
 }
