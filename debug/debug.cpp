@@ -13,10 +13,10 @@ void trace_printf(const char *pFileName, unsigned int pLine, const char *pFuncti
 {
 	char buffer[4096];
 	sprintf(buffer, "In file %s at line %u.\nFunction %s", pFileName, pLine, pFunction);
-	OutputDebugString(buffer);
+	OutputDebugStringA(buffer);
 	va_list arg;
 	va_start(arg, pFormat);
 	vsprintf (buffer, pFormat, arg);
 	strcat(buffer, "\n");
-	OutputDebugString(buffer);
+	OutputDebugStringA(buffer);
 }
