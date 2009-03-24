@@ -43,6 +43,7 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertica
 		strcpy(configFile, pluginpath);
 		strcat(configFile, rcname);
 	}
+	s_settingsManager.AttachFile(configFile);
 	readSettings();
 
 	margin = 0;
@@ -207,6 +208,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	case BB_RECONFIGURE:
 		bbStyle.Update();
+		s_settingsManager.ReadSettings();
 		readSettings();
 		populateBar();
 		break;
