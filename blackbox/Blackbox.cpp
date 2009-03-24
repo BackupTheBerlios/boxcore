@@ -57,8 +57,11 @@
 
 
 //====================
-
+#ifndef _WIN64
 const char bb_exename       [] = "Blackbox.exe";
+#else
+const char bb_exename       [] = "Blackbox64.exe";
+#endif
 const char szBlackboxName   [] = "Blackbox";
 const char szBlackboxClass  [] = "BlackboxClass";
 const char ShellTrayClass   [] = "Shell_TrayWnd";
