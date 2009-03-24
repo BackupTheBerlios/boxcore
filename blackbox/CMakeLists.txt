@@ -58,6 +58,8 @@ config/shellfolders.rc
 config/stickywindows.ini
 )
 
+set (BLACKBOX_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" PARENT_SCOPE)
+
 set (VERSION_MAJOR 0)
 set (VERSION_MINOR 2)
 set (VERSION_PATCH 1)
@@ -79,7 +81,7 @@ if(MINGW)
                                          -i${CMAKE_CURRENT_BINARY_DIR}/resource.rc
                                          -o ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
   SET(BLACKBOX_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
-  set (RC_MANIFEST_LINE "APP_MANIFEST RT_MANIFEST blackbox.exe.manifest")
+  set (RC_MANIFEST_LINE "APP_MANIFEST RT_MANIFEST blackbox${BOXCORE_EXE_SUFFIX}.exe.manifest")
 else(MINGW)
   SET(BLACKBOX_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/resource.rc)
 endif(MINGW)
@@ -97,12 +99,8 @@ target_link_libraries (blackbox ${UNICOWSLIB}
 set_target_properties (blackbox PROPERTIES
 	IMPORT_SUFFIX .a
 	ENABLE_EXPORTS true
+	OUTPUT_NAME "blackbox${BOXCORE_EXE_SUFFIX}"
 )
-if (BOXCORE_DEBUG)
-set_target_properties (blackbox PROPERTIES COMPILE_DEFINITIONS "DEBUG")
-else (BOXCORE_DEBUG)
-set_target_properties (blackbox PROPERTIES COMPILE_DEFINITIONS "NDEBUG")
-endif (BOXCORE_DEBUG)
 
 if (MINGW)
 set_target_properties (blackbox PROPERTIES
@@ -122,12 +120,12 @@ set_target_properties (TrayForwarder PROPERTIES
 endif (MINGW)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/manifest.in
-${CMAKE_CURRENT_BINARY_DIR}/blackbox.exe.manifest)
+${CMAKE_CURRENT_BINARY_DIR}/blackbox${BOXCORE_EXE_SUFFIX}.exe.manifest)
 
 if (MINGW)
 set (DEF_HEADER "")
 else (MINGW)
-set (DEF_HEADER "LIBRARY Blackbox.exe")
+set (DEF_HEADER "LIBRARY Blackbox${BOXCORE_EXE_SUFFIX}.exe")
 endif (MINGW)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libBlackbox.def.in
