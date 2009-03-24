@@ -26,6 +26,8 @@ private:
 	DropTarget *m_dropTarget;
 	clsTaskItem *m_dragTask;
 	UINT m_dragTimer;
+
+	UINT &m_iconSize;
 };
 
 #endif // CLSTASKITEMCOLLECTION_H

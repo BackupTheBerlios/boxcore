@@ -7,7 +7,8 @@
 #include "rcworker/clsRCInt.h"
 #include "rcworker/clsRCBool.h"
 
-clsTaskItemCollection::clsTaskItemCollection(bool pVertical): clsItemCollection(pVertical)
+clsTaskItemCollection::clsTaskItemCollection(bool pVertical): clsItemCollection(pVertical),
+	m_iconSize(s_settingsManager.AssociateUInt(m_pluginPrefix, "Tasks", "IconSize", 16))
 {
 	CHAR buffer[256];
 	m_dragTask = NULL;
@@ -65,11 +66,12 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			{
 				CHAR buffer[256];
 				msg_string += strlen(m_itemPrefix) + 1;
-				if ((element = "iconSize") && !strnicmp(msg_string, element, strlen(element)))
+				if ((element = "IconSize") && !strnicmp(msg_string, element, strlen(element)))
 				{
 					msg_string += strlen(element);
-					WriteInt(configFile, ItemRCKey(buffer, element),atoi(msg_string));
-					readSettings();
+					m_iconSize = atoi(msg_string);
+					s_settingsManager.WriteSetting(m_pluginPrefix, m_itemPrefix, element);
+					s_settingsManager.ReadSettings();
 					populateTasks();
 					PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
 				}
@@ -183,7 +185,7 @@ void clsTaskItemCollection::configMenu(Menu *pMenu, bool p_update)
 	{
 		MakeSubmenu(pMenu, subMenu, menuTitle);
 	}
-	MakeMenuItemInt(subMenu, "Icon size", ItemBroam(buffer, "iconSize"), ReadInt(configFile, ItemRCKey(buffer,"iconSize"), 16), 0, 256);
+	MakeMenuItemInt(subMenu, "Icon size", ItemBroam(buffer, "iconSize"), m_iconSize, 0, 256);
 	MakeMenuItemInt(subMenu, "Maximum TaskWidth", ItemBroam(buffer, "maxSize.X"), ReadInt(configFile, ItemRCKey(buffer,"maxSize.X"), 0), 0, 1000);
 	if (p_update)
 	{
