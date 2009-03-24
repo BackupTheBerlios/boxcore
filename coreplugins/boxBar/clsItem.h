@@ -15,6 +15,7 @@
 
 #include <vector>
 #include "rcworker/clsRCWorker.h"
+#include "clsSettingsManager.h"
 
 /** @enum dimType
   * @brief Dimensions for use in boxBar
@@ -201,6 +202,8 @@ protected:
 	const char* m_broamMid;
 
 	std::vector<RCWorkers::RCWorker *> m_workers;
+
+	static SettingsManager s_settingsManager;
 private:
 	BLENDFUNCTION itemBlend;
 	BITMAPINFO itemBitmapInfo;

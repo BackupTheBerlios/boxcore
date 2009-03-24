@@ -48,6 +48,8 @@ clsItButton.cpp
 
 clsDropTarget.cpp
 
+clsSettingsManager.cpp
+
 rcworker/clsRCWorker.cpp
 rcworker/clsRCInt.cpp
 rcworker/clsRCBool.cpp

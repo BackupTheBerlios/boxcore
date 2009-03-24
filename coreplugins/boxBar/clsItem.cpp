@@ -534,5 +534,6 @@ LPCSTR clsItem::ItemRCKey(LPSTR p_buffer, LPCSTR p_key)
 	return p_buffer;
 }
 
+SettingsManager clsItem::s_settingsManager;
 
 
