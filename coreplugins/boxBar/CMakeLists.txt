@@ -1,5 +1,16 @@
 cmake_minimum_required (VERSION 2.6)
 project (boxBar)
+if (NOT CMAKE_MODULE_PATH)
+set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../CMakeModules" CACHE STRING "Path to search for CMake modules")
+endif (NOT CMAKE_MODULE_PATH)
+include (boxCore_options OPTIONAL RESULT_VARIABLE BOXCORE_OPTIONS_FOUND)
+if (BOXCORE_OPTIONS_FOUND STREQUAL "NOTFOUND")
+message(FATAL_ERROR "Your CMAKE_MODULE_PATH is incorrect. Please set it to the location of boxCore_options.cmake and boxCore_plugins.cmake")
+endif (BOXCORE_OPTIONS_FOUND STREQUAL "NOTFOUND")
+if (NOT BOXCORE_FULL_TREE)
+include (boxCore_plugins)
+endif (NOT BOXCORE_FULL_TREE)
+AllowUnicode()
 
 set (BOXBAR_SRCS
 boxBar.cpp
@@ -67,33 +78,17 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/version.h.in ${CMAKE_CURRENT_BINARY_
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/CPackConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/CPackConfig.cmake)
 
 add_library(boxBar MODULE ${BOXBAR_SRCS})
-include_directories(boxBar ../../blackbox ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(boxBar ${UNICOWSLIB} debuglib blackbox comctl32 gdi32 ole32 uuid)
+include_directories(boxBar ${CMAKE_CURRENT_BINARY_DIR} ${BLACKBOX_INCLUDE_DIR})
+target_link_libraries(boxBar ${UNICOWSLIB} ${BOXCORE_LIBRARY_DEBUG} blackbox comctl32 gdi32 ole32 uuid)
 set_target_properties (boxBar PROPERTIES
 	PREFIX ""
 	VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
 )
-if (UNICODE_ENABLE)
-set_target_properties (boxBar PROPERTIES COMPILE_DEFINITIONS "UNICODE;_UNICODE;")
-endif (UNICODE_ENABLE)
 
-if (DEBUG_CODE)
-get_target_property(currentProperties boxBar COMPILE_DEFINITIONS)
-if (currentProperties STREQUAL currentProperties-NOTFOUND)
-set (currentProperties "")
-endif (currentProperties STREQUAL currentProperties-NOTFOUND)
-set_target_properties (boxBar PROPERTIES COMPILE_DEFINITIONS "${currentProperties}DEBUG")
-else (DEBUG_CODE)
-get_target_property(currentProperties boxBar COMPILE_DEFINITIONS)
-if (currentProperties STREQUAL currentProperties-NOTFOUND)
-set (currentProperties "")
-endif (currentProperties STREQUAL currentProperties-NOTFOUND)
-set_target_properties (boxBar PROPERTIES COMPILE_DEFINITIONS "${currentProperties}NDEBUG")
-endif (DEBUG_CODE)
 if (MINGW)
 set_target_properties (boxBar PROPERTIES
-	LINK_FLAGS "${BOXCORE_FLAGS_STRIP} ${BOXCORE_FLAGS_PROFILE} ${BOXCORE_FLAGS_DEBUG}"
-	COMPILE_FLAGS "-Wall ${BOXCORE_FLAGS_PROFILE} ${BOXCORE_FLAGS_OPTIMIZE} ${BOXCORE_FLAGS_DEBUG} -fno-exceptions -fmessage-length=0"
+	LINK_FLAGS "${BOXCORE_LINK_FLAGS}"
+	COMPILE_FLAGS "-Wall ${BOXCORE_COMPILE_FLAGS} -fno-exceptions -fmessage-length=0"
 )
 endif (MINGW)
 
