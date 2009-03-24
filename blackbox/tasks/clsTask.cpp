@@ -8,6 +8,7 @@
 #include "clsTask.h"
 #include "clsLegacyTask.h"
 #include "helpers.h"
+#include "../../debug/debug.h"
 
 namespace TaskManagement
 {
@@ -115,9 +116,17 @@ VOID CALLBACK Task::LargeIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, 
 		else
 		{
 			task->SetLargeIcon(reinterpret_cast<HICON>(GetClassLongPtr(task->m_hWnd, GCLP_HICON)));
-			if (!task->m_largeIcon && task->m_smallIcon)
+			if (!task->m_largeIcon)
 			{
-				task->SetLargeIcon(task->m_origSmallIcon);
+				if (task->m_smallIcon)
+				{
+					task->SetLargeIcon(task->m_origSmallIcon);
+				}
+				else
+				{
+					task->SetLargeIcon(LoadIcon(NULL, IDI_APPLICATION));
+					//DestroyIcon(defIcon);
+				}
 			}
 		}
 
