@@ -26,7 +26,7 @@ protected:
 	HWND taskWnd;
 	TCHAR m_caption[256];
 
-	UINT iconSize;
+	UINT &iconSize;
 
 	clsTextItem *captionItem;
 	clsIconItem *iconItem;
@@ -40,6 +40,9 @@ protected:
 	static int activeStyle;
 	static int activeAlpha;
 	static int inactiveAlpha;
+
+	bool &m_showIcon;
+	bool &m_showText;
 private:
 	static void activateTask(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
 	static void WindowMenu(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);

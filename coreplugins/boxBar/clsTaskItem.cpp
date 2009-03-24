@@ -6,7 +6,10 @@
 #include "rcworker/clsRCBool.h"
 #include "rcworker/clsRCInt.h"
 
-clsTaskItem::clsTaskItem(HWND p_Task, bool pVertical): clsItemCollection(pVertical)
+clsTaskItem::clsTaskItem(HWND p_Task, bool pVertical): clsItemCollection(pVertical),
+	iconSize(s_settingsManager.AssociateUInt(m_pluginPrefix, "Tasks", "IconSize", 16)),
+	m_showIcon(s_settingsManager.AssociateBool(m_pluginPrefix, "Tasks", "ShowIcon", true)),
+	m_showText(s_settingsManager.AssociateBool(m_pluginPrefix, "Tasks", "ShowText", true))
 {
 	CHAR buffer[256];
 	m_itemPrefix = new CHAR[strlen("Tasks")+1];
@@ -18,7 +21,6 @@ clsTaskItem::clsTaskItem(HWND p_Task, bool pVertical): clsItemCollection(pVertic
 
 	taskWnd = p_Task;
 	GetWindowText(p_Task, m_caption, 256);
-	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"iconsize"), iconSize, 16));
 	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"task.spacingBorder"), spacingBorder, 2));
 	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"task.spacingItems"), spacingItems, 2));
 	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"maxsize.x"), m_maxSizeX, 0));
@@ -37,14 +39,34 @@ clsTaskItem::clsTaskItem(HWND p_Task, bool pVertical): clsItemCollection(pVertic
 		style = inactiveStyle;
 		itemAlpha = inactiveAlpha;
 	}
-	iconItem = new clsIconItem(LoadIcon(NULL, IDI_APPLICATION), iconSize, vertical);
+	if (m_showIcon)
+	{
+		iconItem = new clsIconItem(LoadIcon(NULL, IDI_APPLICATION), iconSize, vertical);
+		addItem(iconItem);
+	}
+	else
+	{
+		iconItem = NULL;
+	}
+	if (m_showText || !m_showIcon)
+	{
 	captionItem = new clsTextItem(m_caption, style, vertical);
-	addItem(iconItem);
 	addItem(captionItem);
+	}
+	else
+	{
+		captionItem = NULL;
+		m_knowsSize = DIM_BOTH;
+			m_wantsStretch = DIM_NONE;
+		PostMessage(barWnd, BOXBAR_NEEDTIP, (WPARAM)m_caption, (LPARAM)iconItem);
+	}
+	if (m_showIcon)
+	{
 	if (iconSize > 16)
 		SendMessageCallback(taskWnd, WM_GETICON, ICON_BIG, 0, LargeIconProc, reinterpret_cast<ULONG_PTR>(this));
 	else
 		SendMessageCallback(taskWnd, WM_GETICON, ICON_SMALL, 0, SmallIconProc, reinterpret_cast<ULONG_PTR>(this));
+	}
 	leftClick = activateTask;
 	rightClick = WindowMenu;
 }
@@ -81,12 +103,23 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				PRINT(TEXT("Task modified"));
 				GetWindowText(taskWnd, m_caption, 256);
+				if (captionItem)
+				{
 				captionItem->setText(m_caption);
-				m_fallback = false;
+				}
+				else
+				{
+					PostMessage(barWnd, BOXBAR_NEEDTIP, (WPARAM)m_caption, (LPARAM)iconItem);
+				}
+
+				if (m_showIcon)
+				{
+					m_fallback = false;
 				if (iconSize > 16)
 					SendMessageCallback(taskWnd, WM_GETICON, ICON_BIG, 0, LargeIconProc, reinterpret_cast<ULONG_PTR>(this));
 				else
 					SendMessageCallback(taskWnd, WM_GETICON, ICON_SMALL, 0, SmallIconProc, reinterpret_cast<ULONG_PTR>(this));
+				}
 				break;
 
 			}
@@ -102,7 +135,10 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				style = inactiveStyle;
 				itemAlpha = inactiveAlpha;
 			}
+			if (captionItem)
+			{
 			captionItem->setStyle(style);
+			}
 			return 0;
 		case TASKITEM_FLASHED:
 			if (taskWnd == (HWND)wParam)
@@ -118,13 +154,16 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					style = activeStyle;
 					itemAlpha = activeAlpha;
 				}
+				if (captionItem)
+				{
 				captionItem->setStyle(style);
+				}
 			}
 			return 0;
 		}
 		break;
 	case BOXBAR_NEEDTIP:
-		if ((clsTextItem *)lParam == captionItem)
+		if ((clsItem *)lParam == captionItem || (clsItem *)lParam == iconItem)
 		{
 			if (wParam)
 				tipText = m_caption;
@@ -180,9 +219,9 @@ void clsTaskItem::readSettings()
 
 VOID CALLBACK clsTaskItem::SmallIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult)
 {
-		clsTaskItem *task = reinterpret_cast<clsTaskItem *>(p_dwData);
-		if (task->taskWnd == p_hWnd)
-		{
+	clsTaskItem *task = reinterpret_cast<clsTaskItem *>(p_dwData);
+	if (task->taskWnd == p_hWnd)
+	{
 		if (p_lResult)
 		{
 			task->iconItem->setIcon(reinterpret_cast<HICON>(p_lResult));
@@ -204,14 +243,14 @@ VOID CALLBACK clsTaskItem::SmallIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_d
 			}
 		}
 		RedrawWindow(task->barWnd, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
-		}
+	}
 }
 
 VOID CALLBACK clsTaskItem::LargeIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult)
 {
-		clsTaskItem *task = reinterpret_cast<clsTaskItem *>(p_dwData);
-		if (task->taskWnd == p_hWnd)
-		{
+	clsTaskItem *task = reinterpret_cast<clsTaskItem *>(p_dwData);
+	if (task->taskWnd == p_hWnd)
+	{
 		if (p_lResult)
 		{
 			task->iconItem->setIcon(reinterpret_cast<HICON>(p_lResult));
@@ -233,7 +272,7 @@ VOID CALLBACK clsTaskItem::LargeIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_d
 			}
 		}
 		RedrawWindow(task->barWnd, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
-		}
+	}
 }
 
 /** @brief configMenu
