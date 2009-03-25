@@ -7,8 +7,8 @@ using std::for_each;
 using std::mem_fun;
 using std::bind2nd;
 
-clsItemCollection::clsItemCollection(bool pVertical) :
-		clsItem(pVertical)
+clsItemCollection::clsItemCollection(bool pVertical, INT &p_maxSizeX) :
+		clsItem(pVertical, p_maxSizeX)
 {
 	m_knowsSize = DIM_BOTH;
 	m_wantsStretch = DIM_NONE;

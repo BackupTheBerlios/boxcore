@@ -1,12 +1,11 @@
 #include "clsTaskItem.h"
 #include "clsTextItem.h"
-#include "clsFlexiSpacer.h"
 #include <limits.h>
 
 #include "rcworker/clsRCBool.h"
 #include "rcworker/clsRCInt.h"
 
-clsTaskItem::clsTaskItem(HWND p_Task, bool pVertical): clsItemCollection(pVertical),
+clsTaskItem::clsTaskItem(HWND p_Task, bool pVertical): clsItemCollection(pVertical, s_settingsManager.AssociateInt(m_pluginPrefix, "Tasks", "MaxSize.X", 64)),
 	iconSize(s_settingsManager.AssociateUInt(m_pluginPrefix, "Tasks", "IconSize", 16)),
 	m_showIcon(s_settingsManager.AssociateBool(m_pluginPrefix, "Tasks", "ShowIcon", true)),
 	m_showText(s_settingsManager.AssociateBool(m_pluginPrefix, "Tasks", "ShowText", true))
@@ -23,7 +22,6 @@ clsTaskItem::clsTaskItem(HWND p_Task, bool pVertical): clsItemCollection(pVertic
 	GetWindowText(p_Task, m_caption, 256);
 	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"task.spacingBorder"), spacingBorder, 2));
 	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"task.spacingItems"), spacingItems, 2));
-	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"maxsize.x"), m_maxSizeX, 0));
 	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"active.alpha"), activeAlpha, 255));
 	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"inactive.alpha"), inactiveAlpha, 255));
 	m_workers.push_back(new RCWorkers::RCBool(configFile, ItemRCKey(buffer, "active.background"), s_activeBackground, true));

@@ -12,6 +12,7 @@
 #include "../../dynwinapi/clsMsimg32.h"
 #include "../../debug/debug.h"
 #include "../../utility/stringcopy.h"
+#include "limits.h"
 
 #include <vector>
 #include "rcworker/clsRCWorker.h"
@@ -44,6 +45,8 @@ class clsItem;
   */
 typedef void (*mouseFunction)(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
 
+static int dummyInt = INT_MAX;
+
 /** @internal
   * @brief Base class for boxBar
   *
@@ -54,7 +57,7 @@ typedef void (*mouseFunction)(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lP
 class clsItem
 {
 public:
-	clsItem(bool pVertical);
+	clsItem(bool pVertical, INT &p_maxSizeX = dummyInt);
 	virtual ~clsItem();
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -108,7 +111,7 @@ protected:
 
 	INT m_minSizeX;
 	INT m_minSizeY;
-	INT m_maxSizeX;
+	INT &m_maxSizeX;
 	INT m_maxSizeY;
 
 	/** @brief The styleitem to be used for drawing

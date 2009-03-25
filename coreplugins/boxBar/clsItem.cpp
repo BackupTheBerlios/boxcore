@@ -27,7 +27,7 @@ bool clsItem::AssignButton(LPCSTR p_data, mouseFunction & p_hook, LPCSTR & p_bro
   *
   * Initialises all members to safe values, and sets an items vertical state as requested
   */
-clsItem::clsItem(bool pVertical)
+clsItem::clsItem(bool pVertical, INT &p_maxSizeX) : m_maxSizeX(p_maxSizeX)
 {
 	vertical = pVertical;
 	style = 0;
@@ -41,7 +41,7 @@ clsItem::clsItem(bool pVertical)
 	minSizeY = 0;
 	m_minSizeX = 0;
 	m_minSizeY = 0;
-	m_maxSizeX = INT_MAX;
+	//m_maxSizeX = INT_MAX;
 	m_maxSizeY = INT_MAX;
 
 	m_broamLeft = NULL;

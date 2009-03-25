@@ -10,7 +10,7 @@ using std::list;
 class clsItemCollection : public clsItem
 {
 public:
-	clsItemCollection(bool pVertical);
+	clsItemCollection(bool pVertical, INT &p_maxSizeX = dummyInt);
 	virtual ~clsItemCollection();
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	virtual void draw(HDC pContext);
