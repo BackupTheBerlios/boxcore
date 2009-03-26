@@ -15,7 +15,7 @@
 #include "../../dynwinapi/clsUser32.h"
 #include "../../utility/stringcopy.h"
 
-clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertical): clsItemCollection(pVertical)
+clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertical): clsItemCollection(pVertical, NULL, 0, 2)
 {
 	trackMouse = false;
 	isBar = true;
@@ -210,7 +210,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		bbStyle.Update();
 		s_settingsManager.ReadSettings();
 		readSettings();
-		populateBar();
+		PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
 		break;
 
 		// ----------------------------------------------------------
