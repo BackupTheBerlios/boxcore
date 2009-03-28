@@ -4,6 +4,7 @@ SET(CMAKE_SYSTEM_PROCESSOR "AMD64")
 
 # specify the cross compiler
 SET(CMAKE_C_COMPILER   x86_64-pc-mingw32-gcc)
+SET(CMAKE_CXX_COMPILER   x86_64-pc-mingw32-g++)
 set (WINDRES x86_64-pc-mingw32-windres)
 set (DLLTOOL x86_64-pc-mingw32-dlltool)
 
