@@ -50,11 +50,6 @@ clsDropTarget.cpp
 
 clsSettingsManager.cpp
 
-rcworker/clsRCWorker.cpp
-rcworker/clsRCInt.cpp
-rcworker/clsRCBool.cpp
-rcworker/clsRCConditional.cpp
-
 ../utils/clsApiLoader.cpp
 ../../dynwinapi/clsUser32.cpp
 ../../dynwinapi/clsMsimg32.cpp
