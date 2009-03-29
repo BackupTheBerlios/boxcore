@@ -51,7 +51,7 @@ clsTrayItem::clsTrayItem(systemTray *trayItem, UINT pIconSize, bool pVertical): 
 	}
 	iconCallback = trayItem->uCallbackMessage;
 	popupVisible = false;
-	itemAlpha = 150;
+	itemAlpha = 255;
 }
 
 /** @brief wndProc
