@@ -11,7 +11,7 @@
 class clsTaskItem : public clsItemCollection
 {
 public:
-	clsTaskItem(HWND p_Task, bool pVertical);
+	clsTaskItem(HWND p_Task, bool pVertical, LPCSTR p_itemName = "Tasks");
 	~clsTaskItem();
 
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -34,7 +34,7 @@ protected:
 	bool m_fallback;
 
 	static bool s_activeBackground;
-	static bool s_inactiveBackground;
+	bool &m_inactiveBackground;
 
 	static int inactiveStyle;
 	static int activeStyle;
