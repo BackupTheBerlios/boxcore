@@ -27,7 +27,8 @@ bool clsItem::AssignButton(LPCSTR p_data, mouseFunction & p_hook, LPCSTR & p_bro
   *
   * Initialises all members to safe values, and sets an items vertical state as requested
   */
-clsItem::clsItem(bool pVertical, INT &p_maxSizeX) : m_maxSizeX(p_maxSizeX)
+clsItem::clsItem(bool pVertical, LPCSTR p_itemName, INT &p_maxSizeX) : m_maxSizeX(p_maxSizeX),
+	m_itemPrefix(strdup(p_itemName))
 {
 	vertical = pVertical;
 	style = 0;
@@ -41,7 +42,6 @@ clsItem::clsItem(bool pVertical, INT &p_maxSizeX) : m_maxSizeX(p_maxSizeX)
 	minSizeY = 0;
 	m_minSizeX = 0;
 	m_minSizeY = 0;
-	//m_maxSizeX = INT_MAX;
 	m_maxSizeY = INT_MAX;
 
 	m_broamLeft = NULL;
@@ -73,6 +73,7 @@ clsItem::clsItem(bool pVertical, INT &p_maxSizeX) : m_maxSizeX(p_maxSizeX)
 	itemBitmapInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
 	itemBitmapInfo.bmiHeader.biPlanes = 1;
 	itemBitmapInfo.bmiHeader.biBitCount = 32;
+	m_clipRegion = CreateRectRgnIndirect(&itemArea);
 }
 
 /** @brief Base destructor
@@ -81,17 +82,14 @@ clsItem::clsItem(bool pVertical, INT &p_maxSizeX) : m_maxSizeX(p_maxSizeX)
   */
 clsItem::~clsItem()
 {
-	for (UINT i = 0; i < m_workers.size(); ++i)
-	{
-		delete m_workers[i];
-	}
 	delete[] tipText;
 	delete[] m_broamLeft;
 	delete[] m_broamLeftDbl;
 	delete[] m_broamMid;
 	delete[] m_broamRight;
-	delete[] m_itemPrefix;
+	free(m_itemPrefix);
 	tipText = NULL;
+	DeleteObject(m_clipRegion);
 	ClearTooltip();
 }
 
@@ -101,10 +99,8 @@ clsItem::~clsItem()
   */
 bool clsItem::hitTest(int pX, int pY)
 {
-	if ((pX >= itemArea.left) && (pX <= itemArea.right) && (pY >= itemArea.top) && (pY <= itemArea.bottom))
-		return true;
-	else
-		return false;
+	POINT temp = {pX, pY};
+	return PtInRect(&itemArea, temp);
 }
 
 /** @brief Base moving function for items
@@ -114,12 +110,7 @@ bool clsItem::hitTest(int pX, int pY)
 void clsItem::move(int pX, int pY)
 {
 	ClearTooltip();
-	int sizeX = itemArea.right - itemArea.left;
-	int sizeY = itemArea.bottom - itemArea.top;
-	itemArea.left = pX;
-	itemArea.right = pX + sizeX;
-	itemArea.top = pY;
-	itemArea.bottom = pY + sizeY;
+	OffsetRect(&itemArea, pX - itemArea.left, pY - itemArea.top);
 	if (tipText)
 		setTooltip();
 }
@@ -153,6 +144,8 @@ dimType clsItem::resize(int pX, int pY)
 	itemBitmapInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
 	if (tipText)
 		setTooltip();
+	DeleteObject(m_clipRegion);
+	m_clipRegion = CreateRectRgnIndirect(&itemArea);
 	return done;
 }
 
@@ -442,10 +435,6 @@ void clsItem::draw(HDC pContext)
   */
 void clsItem::readSettings()
 {
-	for (std::vector<RCWorkers::RCWorker *>::iterator i = m_workers.begin(); i != m_workers.end(); ++i)
-	{
-		(*i)->ReadValue();
-	}
 }
 
 /** @brief Stub for config menu addition

@@ -15,7 +15,6 @@
 #include "limits.h"
 
 #include <vector>
-#include "rcworker/clsRCWorker.h"
 #include "clsSettingsManager.h"
 
 /** @enum dimType
@@ -57,7 +56,7 @@ static int dummyInt = INT_MAX;
 class clsItem
 {
 public:
-	clsItem(bool pVertical, INT &p_maxSizeX = dummyInt);
+	clsItem(bool pVertical, LPCSTR p_itemName = NULL, INT &p_maxSizeX = dummyInt);
 	virtual ~clsItem();
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -204,7 +203,7 @@ protected:
 	const char* m_broamRight;
 	const char* m_broamMid;
 
-	std::vector<RCWorkers::RCWorker *> m_workers;
+	HRGN m_clipRegion;
 
 	static SettingsManager s_settingsManager;
 private:
