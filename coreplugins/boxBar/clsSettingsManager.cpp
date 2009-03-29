@@ -8,10 +8,10 @@
 #include "clsSettingsManager.h"
 #include <cstring>
 #include "BBApi.h"
+#include "../../debug/debug.h"
 
 SettingsManager::SettingsManager()
 {
-	m_fileName = "";
 }
 
 SettingsManager::~SettingsManager()
@@ -25,7 +25,11 @@ void SettingsManager::AttachFile(const char *p_file)
 
 INT & SettingsManager::AssociateInt(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key, INT p_default)
 {
-	std::string entry = p_plugin;
+	std::string entry;
+	if (p_plugin)
+	{
+	entry = p_plugin;
+	}
 	if (p_component)
 	{
 		entry += ".";
