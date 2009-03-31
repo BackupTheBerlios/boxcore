@@ -1,6 +1,7 @@
 #include "clsTaskItem.h"
 #include "clsTextItem.h"
 #include <limits.h>
+#include <cstdlib>
 
 clsTaskItem::clsTaskItem(HWND p_Task, bool pVertical, LPCSTR p_itemName): clsItemCollection(pVertical, "Tasks", 2, 2, s_settingsManager.AssociateInt(m_pluginPrefix, p_itemName, "MaxSize.X", 0)),
 	iconSize(s_settingsManager.AssociateUInt(m_pluginPrefix, p_itemName, "IconSize", 16)),
@@ -86,6 +87,42 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
+	case BB_BROADCAST:
+	{
+			LPCSTR msg_string = (LPCSTR)lParam;
+			LPCSTR element = NULL;
+			msg_string += 1;
+			if (!strnicmp(msg_string, m_pluginPrefix, strlen(m_pluginPrefix)))
+			{
+				msg_string += strlen(m_pluginPrefix) + 1;
+				if (!strnicmp(msg_string, m_itemPrefix, strlen(m_itemPrefix)))
+				{
+					msg_string += strlen(m_itemPrefix) + 1;
+					if ((element = "IconSize") && !strnicmp(msg_string, element, strlen(element)))
+					{
+						msg_string += strlen(element);
+						iconSize = atoi(msg_string);
+						s_settingsManager.WriteSetting(m_pluginPrefix, m_itemPrefix, element);
+					}
+					else if ((element = "MaxSize.X") && !strnicmp(msg_string, element, strlen(element)))
+					{
+						msg_string += strlen(element);
+						m_maxSizeX = atoi(msg_string);
+						s_settingsManager.WriteSetting(m_pluginPrefix, m_itemPrefix, element);
+					}
+					else if ((element = "ShowIcon") && !strnicmp(msg_string, element, strlen(element)))
+					{
+						m_showIcon = !m_showIcon;
+						s_settingsManager.WriteSetting(m_pluginPrefix, m_itemPrefix, element);
+					}
+					else if ((element = "ShowText") && !strnicmp(msg_string, element, strlen(element)))
+										{
+											m_showText = !m_showText;
+											s_settingsManager.WriteSetting(m_pluginPrefix, m_itemPrefix, element);
+										}
+				}
+			}
+		}
 	case BB_TASKSUPDATE:
 		switch (lParam)
 		{
