@@ -2,7 +2,7 @@
 #include "clsLabelItem.h"
 #include <tchar.h>
 
-clsLabelItem::clsLabelItem(bool pVertical) : clsTextItem(NULL, SN_TOOLBARCLOCK, pVertical)
+clsLabelItem::clsLabelItem(bool pVertical) : clsTextItem(TEXT(""), SN_TOOLBARCLOCK, pVertical)
 {
 	m_knowsSize = DIM_BOTH;
 	m_wantsStretch = DIM_NONE;
