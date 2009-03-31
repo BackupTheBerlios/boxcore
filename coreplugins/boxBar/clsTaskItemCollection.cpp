@@ -3,21 +3,17 @@
 #include "clsTaskItem.h"
 #include "clsFlexiSpacer.h"
 #include <cstdlib>
+#include <functional>
+#include <algorithm>
 
-#include "rcworker/clsRCInt.h"
-#include "rcworker/clsRCBool.h"
-
-clsTaskItemCollection::clsTaskItemCollection(bool pVertical): clsItemCollection(pVertical),
+clsTaskItemCollection::clsTaskItemCollection(bool pVertical, LPCSTR p_itemName): clsItemCollection(pVertical, p_itemName, 0, 2),
+	stretchTaskarea(s_settingsManager.AssociateBool(m_pluginPrefix, m_itemPrefix, "Stretch", true)),
+	m_basePrefix(p_itemName),
 	m_iconSize(s_settingsManager.AssociateUInt(m_pluginPrefix, "Tasks", "IconSize", 16))
 {
-	CHAR buffer[256];
+	m_basePrefix.resize(m_basePrefix.find_first_of("."));
 	m_dragTask = NULL;
 	m_dragTimer = getTimerID();
-	m_itemPrefix = new CHAR[strlen("Tasks")+1];
-	strcpy(m_itemPrefix, "Tasks");
-	m_workers.push_back(new RCWorkers::RCBool(configFile, ItemRCKey(buffer, "stretcharea"), stretchTaskarea, true));
-	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"SpacingBorder"), spacingBorder, 0));
-	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"SpacingItems"), spacingItems, 2));
 	readSettings();
 	populateTasks();
 	m_dropTarget = new DropTarget(this, DragAction);
@@ -30,6 +26,22 @@ clsTaskItemCollection::~clsTaskItemCollection()
 	RevokeDragDrop(barWnd);
 	m_dropTarget->Release();
 }
+
+class TaskIsHWnd : public std::binary_function<clsItem *, HWND, bool>{
+public:
+	result_type operator() (first_argument_type p_task, second_argument_type p_hWnd) const
+	{
+		clsTaskItem *task = dynamic_cast<clsTaskItem *>(p_task);
+		if (task)
+		{
+		return (task->GetTaskWnd() == p_hWnd);
+		}
+		else
+		{
+			return false;
+		}
+	}
+};
 
 /** @brief wndProc
   *
@@ -64,25 +76,19 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			msg_string += strlen(m_pluginPrefix) + 1;
 			if (!strnicmp(msg_string, m_itemPrefix, strlen(m_itemPrefix)))
 			{
-				CHAR buffer[256];
 				msg_string += strlen(m_itemPrefix) + 1;
-				if ((element = "IconSize") && !strnicmp(msg_string, element, strlen(element)))
+				if ((element = "Stretch") && !strnicmp(msg_string, element, strlen(element)))
 				{
-					msg_string += strlen(element);
-					m_iconSize = atoi(msg_string);
-					s_settingsManager.WriteSetting(m_pluginPrefix, m_itemPrefix, element);
-					s_settingsManager.ReadSettings();
-					populateTasks();
-					PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
+					//msg_string += strlen(element);
+					//m_iconSize = atoi(msg_string);
+					//s_settingsManager.WriteSetting(m_pluginPrefix, "Tasks", element);
+					//populateTasks();
+					//PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
 				}
-				else if ((element = "MaxSize.X") && !strnicmp(msg_string, element, strlen(element)))
-				{
-					msg_string += strlen(element);
-					WriteInt(configFile, ItemRCKey(buffer, element),atoi(msg_string));
-					readSettings();
-					populateTasks();
-					PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
-				}
+			}
+			else if (!strnicmp(msg_string, m_basePrefix.c_str(), m_basePrefix.size()))
+			{
+				PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
 			}
 		}
 	}
@@ -96,11 +102,43 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
 			return 0;
 		case TASKITEM_ADDED:
-			populateTasks();
+
+			if (std::find_if(itemList.begin(), itemList.end(), bind2nd(TaskIsHWnd(), reinterpret_cast<HWND>(wParam))) == itemList.end())
+			{
+			clsTaskItem *newTask = new clsTaskItem(reinterpret_cast<HWND>(wParam), vertical);
+			itemList_t::iterator insertLoc = itemList.end();
+			if (vertical && stretchTaskarea)
+			{
+				insertLoc--;
+			}
+			itemList.insert(insertLoc, newTask);
+			if (stretchTaskarea)
+			{
+				calculateSizes(true);
+				RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
+			}
+			else
+			{
+			PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
+			}
+			}
 			break;
+
 		case TASKITEM_REMOVED:
-			populateTasks();
+		{
+			itemList.remove_if(bind2nd(TaskIsHWnd(), reinterpret_cast<HWND>(wParam)));
+			if (stretchTaskarea)
+						{
+							calculateSizes(true);
+							RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
+						}
+						else
+						{
+						PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
+						}
 			break;
+		}
+			//populateTasks();
 		}
 		break;
 	}
@@ -146,8 +184,6 @@ void clsTaskItemCollection::populateTasks()
   */
 void clsTaskItemCollection::readSettings()
 {
-	clsItem::readSettings();
-
 	if (stretchTaskarea)
 	{
 		m_wantsStretch = DIM_BOTH;
@@ -181,12 +217,19 @@ void clsTaskItemCollection::configMenu(Menu *pMenu, bool p_update)
 	LPCSTR menuTitle = "Tasks Configuration";
 	sprintf(buffer, "%s.%s", m_pluginPrefix, m_itemPrefix);
 	Menu *subMenu = MakeNamedMenu(menuTitle, buffer, !p_update);
+	TRACE(buffer);
 	if (!p_update)
 	{
 		MakeSubmenu(pMenu, subMenu, menuTitle);
 	}
-	MakeMenuItemInt(subMenu, "Icon size", ItemBroam(buffer, "iconSize"), m_iconSize, 0, 256);
-	MakeMenuItemInt(subMenu, "Maximum TaskWidth", ItemBroam(buffer, "maxSize.X"), ReadInt(configFile, ItemRCKey(buffer,"maxSize.X"), 0), 0, 1000);
+	sprintf(buffer, "@%s.%s.%s", m_pluginPrefix, m_basePrefix.c_str(), "ShowIcon");
+	MakeMenuItem(subMenu, "Display Icon", buffer, s_settingsManager.AssociateBool(m_pluginPrefix, m_basePrefix.c_str(), "ShowIcon", true));
+	sprintf(buffer, "@%s.%s.%s", m_pluginPrefix, m_basePrefix.c_str(), "ShowText");
+	MakeMenuItem(subMenu, "Display Title", buffer, s_settingsManager.AssociateBool(m_pluginPrefix, m_basePrefix.c_str(), "ShowText", true));
+	sprintf(buffer, "@%s.%s.%s", m_pluginPrefix, m_basePrefix.c_str(), "IconSize");
+	MakeMenuItemInt(subMenu, "Icon size", buffer, m_iconSize, 0, 256);
+	sprintf(buffer, "@%s.%s.%s", m_pluginPrefix, m_basePrefix.c_str(), "Maxsize.X");
+	MakeMenuItemInt(subMenu, "Maximum TaskWidth", buffer, s_settingsManager.AssociateInt(m_pluginPrefix, m_basePrefix.c_str(), "MaxSize.x", 0), 0, 1000);
 	if (p_update)
 	{
 		ShowMenu(subMenu);
