@@ -44,7 +44,8 @@ class clsItem;
   */
 typedef void (*mouseFunction)(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
 
-static int dummyInt = INT_MAX;
+static int dummyMaxInt = INT_MAX;
+static int dummyZeroInt = 0;
 
 /** @internal
   * @brief Base class for boxBar
@@ -56,7 +57,7 @@ static int dummyInt = INT_MAX;
 class clsItem
 {
 public:
-	clsItem(bool pVertical, LPCSTR p_itemName = NULL, INT &p_maxSizeX = dummyInt);
+	clsItem(bool pVertical, LPCSTR p_itemName = NULL, INT &p_maxSizeX = dummyMaxInt);
 	virtual ~clsItem();
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 

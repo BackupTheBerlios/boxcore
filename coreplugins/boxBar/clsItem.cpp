@@ -411,6 +411,8 @@ void clsItem::draw(HDC pContext)
 			tempArea.left = tempArea.top = 0;
 			tempArea.right = itemArea.right - itemArea.left;
 			tempArea.bottom = itemArea.bottom - itemArea.top;
+			BitBlt(internalDC, tempArea.left, tempArea.top, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top,
+			       pContext, itemArea.left, itemArea.top, SRCCOPY);
 			MakeStyleGradient(internalDC, &tempArea, bbStyle.getStyle(style), bbStyle.getStyleBorder(style));
 			msimg32.AlphaBlend(pContext, itemArea.left, itemArea.top,
 							   itemArea.right - itemArea.left, itemArea.bottom - itemArea.top,
