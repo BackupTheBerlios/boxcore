@@ -7,11 +7,12 @@
 class clsTextItem : public clsItem
 {
 public:
-	clsTextItem(CONST TCHAR *pText, UINT pStyle, bool pVertical, dimType p_knowsSize = DIM_VERTICAL);
+	clsTextItem(LPCSTR pText, UINT pStyle, bool pVertical, dimType p_knowsSize = DIM_VERTICAL);
+	clsTextItem(LPCWSTR pText, UINT pStyle, bool pVertical, dimType p_knowsSize = DIM_VERTICAL);
 	virtual ~clsTextItem();
 
-	void setText(CONST CHAR *pText);
-	void setText(CONST WCHAR *pText);
+	void setText(LPCSTR pText);
+	void setText(LPCWSTR pText);
 	void setStyle(UINT pStyle);
 
 	virtual void draw(HDC pContext);

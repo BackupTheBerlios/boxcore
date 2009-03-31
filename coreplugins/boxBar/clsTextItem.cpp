@@ -2,14 +2,29 @@
 #include "clsTextItem.h"
 #include <tchar.h>
 
-clsTextItem::clsTextItem(CONST TCHAR *pText, UINT pStyle, bool pVertical, dimType p_knowsSize): clsItem(pVertical)
+clsTextItem::clsTextItem(LPCSTR pText, UINT pStyle, bool pVertical, dimType p_knowsSize): clsItem(pVertical)
 {
 	m_knowsSize = p_knowsSize;
 	m_wantsStretch = ((m_knowsSize & DIM_HORIZONTAL) ? DIM_NONE : DIM_HORIZONTAL);
 	fontStyle = pStyle;
 	if (pText)
 	{
-		_tcscpy(text, pText);
+		CopyString(text, pText, 256);
+	}
+	else
+	{
+		text[0] = TEXT('\0');
+	}
+}
+
+clsTextItem::clsTextItem(LPCWSTR pText, UINT pStyle, bool pVertical, dimType p_knowsSize): clsItem(pVertical)
+{
+	m_knowsSize = p_knowsSize;
+	m_wantsStretch = ((m_knowsSize & DIM_HORIZONTAL) ? DIM_NONE : DIM_HORIZONTAL);
+	fontStyle = pStyle;
+	if (pText)
+	{
+		CopyString(text, pText, 256);
 	}
 	else
 	{
