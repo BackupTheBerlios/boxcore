@@ -7,9 +7,13 @@
 
 #include "clsItButton.h"
 #include "clsTextItem.h"
+#include "clsIconItem.h"
 #include "clsFlexiSpacer.h"
 
-ItButton::ItButton() : clsItemCollection(false)
+ItButton::ItButton(LPCSTR p_itemName) : clsItemCollection(false, p_itemName, 3),
+	m_hasIcon(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "ShowIcon", true)),
+	m_hasText(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "ShowText", true)),
+	m_buttonText(s_settingsManager.AssociateString(m_pluginPrefix, p_itemName, "Text", "boxButton"))
 {
 	m_knowsSize = DIM_BOTH;
 	m_wantsStretch = DIM_NONE;
@@ -17,8 +21,24 @@ ItButton::ItButton() : clsItemCollection(false)
 	PRINT(TEXT("Button"));
 	spacingBorder = 3;
 	addItem(new clsFlexiSpacer(false));
-	m_buttonText = new clsTextItem(NULL,SN_TOOLBARBUTTON,false,DIM_BOTH);
-	addItem(m_buttonText);
+	if (m_hasIcon)
+	{
+		m_iconItem = new clsIconItem(LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(101)), 32, true);
+		addItem(m_iconItem);
+	}
+	else
+	{
+		m_iconItem = NULL;
+	}
+	if (m_hasText)
+	{
+	m_textItem = new clsTextItem(m_buttonText.c_str(),SN_TOOLBARBUTTON,false,DIM_BOTH);
+	addItem(m_textItem);
+	}
+	else
+	{
+		m_textItem = NULL;
+	}
 	addItem(new clsFlexiSpacer(false));
 	//m_minSizeX = 100;
 	readSettings();
@@ -48,8 +68,7 @@ LRESULT ItButton::wndProc(HWND p_hWnd, UINT p_msg, WPARAM p_wParam, LPARAM p_lPa
 	case WM_MBUTTONUP:
 	case WM_LBUTTONUP:
 		style = SN_TOOLBARBUTTON;
-		RedrawWindow(barWnd, &itemArea,NULL,RDW_INVALIDATE);
-		PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
+		RedrawWindow(barWnd, NULL, NULL,RDW_INVALIDATE|RDW_INTERNALPAINT);
 		return clsItem::wndProc(p_hWnd, p_msg, p_wParam, p_lParam);
 	}
 	return clsItemCollection::wndProc(p_hWnd, p_msg, p_wParam, p_lParam);
@@ -57,11 +76,13 @@ LRESULT ItButton::wndProc(HWND p_hWnd, UINT p_msg, WPARAM p_wParam, LPARAM p_lPa
 
 void ItButton::readSettings()
 {
+	if (m_textItem)
+	{
+		m_textItem->setText(m_buttonText.c_str());
+	}
 	m_minSizeX = ReadInt(configFile, "boxBar.button.minSize.x:",0);
 	m_minSizeY = ReadInt(configFile, "boxBar.button.minSize.y:",0);
-	const char *textBuffer = ReadString(configFile, "boxBar.button.text:","BB");
-	m_buttonText->setText(textBuffer);
-	textBuffer = ReadString(configFile, "boxBar.button.leftClick:","@bbCore.ShowMenu");
+	const char *textBuffer = ReadString(configFile, "boxBar.button.leftClick:","@bbCore.ShowMenu");
 	AssignButton(textBuffer, leftClick, m_broamLeft);
 	textBuffer = ReadString(configFile, "boxBar.button.rightClick:","");
 	AssignButton(textBuffer, rightClick, m_broamRight);

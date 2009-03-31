@@ -11,17 +11,23 @@
 #include "clsItemCollection.h"
 
 class clsTextItem;
+class clsIconItem;
 
 class ItButton: public clsItemCollection
 {
 public:
-	ItButton();
+	ItButton(LPCSTR p_itemName = "Button");
 	virtual ~ItButton();
 
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	virtual void readSettings();
 protected:
-	clsTextItem *m_buttonText;
+	bool &m_hasIcon;
+	bool &m_hasText;
+	std::string &m_buttonText;
+
+	clsIconItem *m_iconItem;
+	clsTextItem *m_textItem;
 };
 
 #endif /* CLSITBUTTON_H_ */
