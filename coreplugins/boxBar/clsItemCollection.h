@@ -7,10 +7,12 @@
 
 using std::list;
 
+typedef std::list<clsItem *> itemList_t;
+
 class clsItemCollection : public clsItem
 {
 public:
-	clsItemCollection(bool pVertical, INT &p_maxSizeX = dummyInt);
+	clsItemCollection(bool pVertical, LPCSTR p_itemName = NULL, INT p_defaultBorder = 0, INT p_defaultSpacing = 2, INT &p_maxSizeX = dummyMaxInt);
 	virtual ~clsItemCollection();
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	virtual void draw(HDC pContext);
@@ -20,11 +22,11 @@ public:
 	virtual void configMenu(Menu *pMenu, bool p_update = false);
 protected:
 	void sortItems();
-	list<clsItem *> itemList;
+	itemList_t itemList;
 	clsItem *lastMouse;
 
-	INT spacingBorder;
-	INT spacingItems;
+	INT &spacingBorder;
+	INT &spacingItems;
 
 	int flexibleItemCount;
 	int fixedItemUsed;
