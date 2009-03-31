@@ -88,7 +88,7 @@ protected:
 	  *
 	  * May affect drawing, sizing or calculating functions
 	  */
-	bool vertical;
+	bool &vertical;
 
 	/** @brief Directions in which the item can calculate its size
 	  *
