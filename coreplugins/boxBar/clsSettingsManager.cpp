@@ -25,11 +25,7 @@ void SettingsManager::AttachFile(const char *p_file)
 
 INT & SettingsManager::AssociateInt(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key, INT p_default)
 {
-	std::string entry;
-	if (p_plugin)
-	{
-	entry = p_plugin;
-	}
+	std::string entry(p_plugin ? p_plugin : "");
 	if (p_component)
 	{
 		entry += ".";
@@ -63,7 +59,7 @@ INT & SettingsManager::AssociateInt(LPCSTR p_plugin, LPCSTR p_component, LPCSTR 
 
 UINT & SettingsManager::AssociateUInt(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key, UINT p_default)
 {
-	std::string entry = p_plugin;
+	std::string entry(p_plugin ? p_plugin : "");
 	if (p_component)
 	{
 		entry += ".";
@@ -97,7 +93,7 @@ UINT & SettingsManager::AssociateUInt(LPCSTR p_plugin, LPCSTR p_component, LPCST
 
 bool & SettingsManager::AssociateBool(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key, bool p_default)
 {
-	std::string entry = p_plugin;
+	std::string entry(p_plugin ? p_plugin : "");
 	if (p_component)
 	{
 		entry += ".";
@@ -131,7 +127,7 @@ bool & SettingsManager::AssociateBool(LPCSTR p_plugin, LPCSTR p_component, LPCST
 
 std::string & SettingsManager::AssociateString(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key, LPCSTR p_default)
 {
-	std::string entry = p_plugin;
+	std::string entry(p_plugin ? p_plugin : "");
 	if (p_component)
 	{
 		entry += ".";
