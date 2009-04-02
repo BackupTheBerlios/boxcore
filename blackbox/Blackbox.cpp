@@ -285,12 +285,12 @@ void set_opaquemove(void)
 void bb_about(void)
 {
 	BBMessageBox(MB_OK,
-				 "%s - Â© 2003-2005 grischka, Â© 2008-2009 carsomyr"
+				 "%s - © 2003-2005 grischka, © 2008-2009 carsomyr"
 				 "\n%s",
 				 GetBBVersion(),
 				 NLS2("$BBAbout$",
 					  "Based stylistically on the Blackbox window manager for Linux by Brad Hughes\n\n"
-					  "Built at " __DATE__ " " __TIME__ "\n"
+					  "Built at " __DATE__ " " __TIME__ " with GCC " __VERSION__ "\n"
 					  "\n"
 					  "\nSwitches:"
 					  "\n-help  \t\tShow this text"
