@@ -138,7 +138,7 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				if ((trayItem->hWnd == iconWnd) && (trayItem->uID == iconID))
 				{
 					setIcon(trayItem->hIcon);
-					delete tipText;
+					delete [] tipText;
 					tipText = NULL;
 					if (GetTrayInfo)
 					{
