@@ -5,7 +5,7 @@
  *      Author: shaun
  */
 
-#include "clsItButton.h"
+#include "clsButton.h"
 #include "clsTextItem.h"
 #include "clsIconItem.h"
 #include "clsFlexiSpacer.h"
@@ -31,9 +31,9 @@ namespace boxBar
  */
 
 Button::Button(LPCSTR p_itemName) : clsItemCollection(false, p_itemName, 3),
-	m_hasIcon(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "ShowIcon", true)),
-	m_hasText(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "ShowText", true)),
-	m_buttonText(s_settingsManager.AssociateString(m_pluginPrefix, p_itemName, "Text", "boxButton"))
+		m_hasIcon(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "ShowIcon", true)),
+		m_hasText(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "ShowText", true)),
+		m_buttonText(s_settingsManager.AssociateString(m_pluginPrefix, p_itemName, "Text", "boxButton"))
 {
 	m_knowsSize = DIM_BOTH;
 	m_wantsStretch = DIM_NONE;
