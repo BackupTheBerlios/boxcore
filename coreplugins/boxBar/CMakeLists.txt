@@ -44,7 +44,7 @@ clsBar.cpp
 
 clsTip.cpp
 
-clsItButton.cpp
+clsButton.cpp
 
 clsDropTarget.cpp
 
