@@ -21,8 +21,8 @@ clsItemCollection.cpp
 clsIconItem.cpp
 clsTextItem.cpp
 
-clsTaskItem.cpp
-clsTaskItemCollection.cpp
+clsTask.cpp
+clsTaskArea.cpp
 
 clsLabelItem.cpp
 

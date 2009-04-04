@@ -2,7 +2,7 @@
 #include "clsBar.h"
 #include "clsClockItem.h"
 #include "clsTrayItemCollection.h"
-#include "clsTaskItemCollection.h"
+#include "clsTaskArea.h"
 #include "clsFlexiSpacer.h"
 #include "clsWorkspaceLabel.h"
 #include "clsButton.h"

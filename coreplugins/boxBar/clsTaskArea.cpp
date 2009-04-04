@@ -1,6 +1,6 @@
 #include "BBApi.h"
-#include "clsTaskItemCollection.h"
-#include "clsTaskItem.h"
+#include "clsTaskArea.h"
+#include "clsTask.h"
 #include "clsFlexiSpacer.h"
 #include <cstdlib>
 #include <functional>

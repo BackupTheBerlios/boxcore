@@ -1,4 +1,4 @@
-#include "clsTaskItem.h"
+#include "clsTask.h"
 #include "clsTextItem.h"
 #include <limits.h>
 #include <cstdlib>
