@@ -38,7 +38,7 @@
 
 #include "clsBoxBar.h"
 
-clsBoxBar boxBar;
+clsBoxBar boxBarPlug;
 
 // ----------------------------------
 // plugin info
@@ -53,22 +53,22 @@ LPCSTR szInfoEmail      = PLUGININFO_EMAIL;
 
 int beginSlitPlugin(HINSTANCE hPluginInstance, HWND hSlit)
 {
-	return boxBar.beginPluginEx(hPluginInstance, hSlit);
+	return boxBarPlug.beginPluginEx(hPluginInstance, hSlit);
 }
 
 int beginPluginEx(HINSTANCE hPluginInstance, HWND hSlit)
 {
-	return boxBar.beginPluginEx(hPluginInstance, hSlit);
+	return boxBarPlug.beginPluginEx(hPluginInstance, hSlit);
 }
 
 int beginPlugin(HINSTANCE hPluginInstance)
 {
-	return boxBar.beginPluginEx(hPluginInstance, NULL);
+	return boxBarPlug.beginPluginEx(hPluginInstance, NULL);
 }
 
 void endPlugin(HINSTANCE hPluginInstance)
 {
-	boxBar.endPlugin(hPluginInstance);
+	boxBarPlug.endPlugin(hPluginInstance);
 }
 
 LPCSTR pluginInfo(int field)

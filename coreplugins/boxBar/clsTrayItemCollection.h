@@ -2,7 +2,9 @@
 #define CLSTRAYITEMCOLLECTION_H
 
 #include "clsItemCollection.h"
-#include <vector>
+
+namespace boxBar
+{
 
 /** @internal
  * @brief Implements the containter for the system tray
@@ -25,5 +27,7 @@ private:
 	bool m_newFirst; ///< @brief Sets whether icons are added at the beginning or end of the tray
 	bool m_reverseOrder; ///< @brief Swaps the beginning and end of the tray
 };
+
+}
 
 #endif // CLSTRAYITEMCOLLECTION_H

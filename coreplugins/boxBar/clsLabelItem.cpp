@@ -2,6 +2,9 @@
 #include "clsLabelItem.h"
 #include <tchar.h>
 
+namespace boxBar
+{
+
 clsLabelItem::clsLabelItem(bool pVertical) : clsTextItem(TEXT(""), SN_TOOLBARCLOCK, pVertical)
 {
 	m_knowsSize = DIM_BOTH;
@@ -41,9 +44,4 @@ void clsLabelItem::calculateSizes(bool pSizeGiven)
 	}
 }
 
-
-
-
-
-
-
+}

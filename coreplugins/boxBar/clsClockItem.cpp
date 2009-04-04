@@ -3,6 +3,9 @@
 #include <tchar.h>
 #include <locale.h>
 
+namespace boxBar
+{
+
 clsClockItem::clsClockItem(bool pVertical): clsLabelItem(pVertical)
 {
 	style = SN_TOOLBARCLOCK;
@@ -110,6 +113,4 @@ bool clsClockItem::AssignButton(LPCSTR p_data, mouseFunction &p_hook, LPCSTR &p_
 	return false;
 }
 
-
-
-
+}

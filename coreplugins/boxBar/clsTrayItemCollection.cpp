@@ -4,6 +4,9 @@
 #include <cstdlib>
 #include <tchar.h>
 
+namespace boxBar
+{
+
 /**
  * @page boxBarRC RC settings for boxBar
  * @section boxBarTray Settings which control the system tray
@@ -164,7 +167,7 @@ void clsTrayItemCollection::configMenu(Menu *pMenu, bool p_update)
 void clsTrayItemCollection::populateTray()
 {
 	lastMouse = NULL;
-	for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+	for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
 	{
 		delete (*i);
 	}
@@ -174,8 +177,8 @@ void clsTrayItemCollection::populateTray()
 		for (int i=0;i<numRowCols;++i)
 			addItem(new clsItemCollection(!vertical, "TrayInternal", 0, 1));
 	}
-	list<clsItem*>::iterator column = itemList.begin();
-	list<clsItem*>::reverse_iterator columnRev = itemList.rbegin();
+	itemList_t::iterator column = itemList.begin();
+	itemList_t::reverse_iterator columnRev = itemList.rbegin();
 	for (int i = (m_newFirst?GetTraySize()-1:0); (m_newFirst?(i>=0):(i < GetTraySize())); (m_newFirst?--i:++i))
 	{
 		systemTray *trayItem = GetTrayIcon(i);
@@ -235,5 +238,4 @@ void clsTrayItemCollection::readSettings()
 	populateTray();
 }
 
-
-
+}

@@ -8,6 +8,9 @@
 #define TTS_USEVISUALSTYLE 0x100
 #endif
 
+namespace boxBar
+{
+
 bool clsItem::AssignButton(LPCSTR p_data, mouseFunction & p_hook, LPCSTR & p_broamSlot)
 {
 	if (p_data[0] == '@')
@@ -20,6 +23,15 @@ bool clsItem::AssignButton(LPCSTR p_data, mouseFunction & p_hook, LPCSTR & p_bro
 	}
 	return false;
 }
+
+/**
+ * @page boxBarRCAdvanced
+ * @section boxBarItem Settings which can be applied to any item
+ * @code boxBar.<item>.Vertical: <bar vertical setting> @endcode
+ * Sets whether an item is drawn horizontally or vertically. There are very
+ * few cases where you should change this setting, and most are listed in
+ * @ref boxBarRC.
+ */
 
 /** @brief Base constructor
   *
@@ -526,4 +538,4 @@ LPCSTR clsItem::ItemRCKey(LPSTR p_buffer, LPCSTR p_key)
 
 SettingsManager clsItem::s_settingsManager;
 
-
+}

@@ -3,6 +3,8 @@
 
 #include "clsLabelItem.h"
 
+namespace boxBar
+{
 
 class clsClockItem : public clsLabelItem
 {
@@ -21,5 +23,7 @@ private:
 	static void showMenu(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
 	static void TimeControlPanel(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
 };
+
+}
 
 #endif // CLSCLOCKITEM_H

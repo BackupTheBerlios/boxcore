@@ -10,11 +10,11 @@
 
 #include "clsItemCollection.h"
 
-class clsTextItem;
-class clsIconItem;
-
 namespace boxBar
 {
+
+class clsTextItem;
+class clsIconItem;
 
 class Button: public clsItemCollection
 {

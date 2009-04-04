@@ -3,6 +3,8 @@
 
 #include "clsItem.h"
 
+namespace boxBar
+{
 
 class clsFlexiSpacer : public clsItem
 {
@@ -18,5 +20,7 @@ public:
 protected:
 private:
 };
+
+}
 
 #endif // CLSFLEXISPACER_H

@@ -3,6 +3,9 @@
 
 #include "clsTextItem.h"
 
+namespace boxBar
+{
+
 class clsLabelItem : public clsTextItem
 {
 public:
@@ -13,5 +16,7 @@ protected:
 private:
 
 };
+
+}
 
 #endif // CLSLABELITEM_H

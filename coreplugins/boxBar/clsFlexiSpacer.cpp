@@ -1,5 +1,8 @@
 #include "clsFlexiSpacer.h"
 
+namespace boxBar
+{
+
 clsFlexiSpacer::clsFlexiSpacer(bool pVertical): clsItem(pVertical)
 {
 	if (vertical)
@@ -17,4 +20,6 @@ clsFlexiSpacer::clsFlexiSpacer(bool pVertical): clsItem(pVertical)
 clsFlexiSpacer::~clsFlexiSpacer()
 {
 	//dtor
+}
+
 }

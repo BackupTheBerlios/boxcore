@@ -37,6 +37,9 @@ enum dimType {DIM_NONE = 0, DIM_HORIZONTAL = 1, DIM_VERTICAL = 2, DIM_BOTH = 3};
 
 #define BOXBAR_BALLOONDONE WM_USER+100
 
+namespace boxBar
+{
+
 class clsItem;
 
 /** @typedef mouseFunction
@@ -211,5 +214,7 @@ private:
 	BLENDFUNCTION itemBlend;
 	BITMAPINFO itemBitmapInfo;
 };
+
+}
 
 #endif // CLSITEM_H

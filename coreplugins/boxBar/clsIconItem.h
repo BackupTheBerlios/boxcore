@@ -3,6 +3,8 @@
 
 #include "clsItem.h"
 
+namespace boxBar
+{
 
 class clsIconItem : public clsItem
 {
@@ -19,5 +21,7 @@ protected:
 	UINT iconSize;
 private:
 };
+
+}
 
 #endif // CLSICONITEM_H

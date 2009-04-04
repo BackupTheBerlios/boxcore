@@ -3,6 +3,8 @@
 
 #include "clsItem.h"
 
+namespace boxBar
+{
 
 class clsTextItem : public clsItem
 {
@@ -21,5 +23,7 @@ protected:
 	TCHAR text[256];
 	UINT fontStyle;
 };
+
+}
 
 #endif // CLSTEXTITEM_H

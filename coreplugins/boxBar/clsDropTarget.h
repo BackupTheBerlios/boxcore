@@ -9,6 +9,9 @@
 #define CLSDROPTARGET_H_
 #include <shlobj.h>
 
+namespace boxBar
+{
+
 enum eDragDropState {DRAG_ENTER, DRAG_OVER, DRAG_LEAVE, DRAG_DROP};
 
 class clsItem;
@@ -33,5 +36,7 @@ private:
 	DragAction m_dragAction;
 	clsItem *m_item;
 };
+
+}
 
 #endif /* CLSDROPTARGET_H_ */

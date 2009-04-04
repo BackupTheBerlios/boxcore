@@ -7,6 +7,9 @@
 
 #include "clsDropTarget.h"
 
+namespace boxBar
+{
+
 DropTarget::DropTarget(clsItem *p_item, DragAction p_drag)
 {
 	m_item = p_item;
@@ -75,3 +78,6 @@ HRESULT DropTarget::Drop(LPDATAOBJECT pDataObject, DWORD grfKeyState, POINTL pt,
 	Release();
 	return S_OK;
 }
+
+}
+

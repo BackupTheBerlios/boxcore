@@ -7,6 +7,9 @@ using std::for_each;
 using std::mem_fun;
 using std::bind2nd;
 
+namespace boxBar
+{
+
 /**
  * @page boxBarRCAdvanced
  * @section boxBarCollection Settings which apply to any collection item
@@ -33,7 +36,7 @@ clsItemCollection::clsItemCollection(bool pVertical, LPCSTR p_itemName, INT p_de
 
 clsItemCollection::~clsItemCollection()
 {
-	for (list<clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+	for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
 		delete (*i);
 	itemList.clear();
 }
@@ -47,7 +50,7 @@ clsItemCollection::~clsItemCollection()
 void clsItemCollection::draw(HDC pContext)
 {
 	clsItem::draw(pContext);
-	for (list<clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+	for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
 	{
 		(*i)->draw(pContext);
 	}
@@ -76,7 +79,7 @@ LRESULT clsItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam,
 	case WM_XBUTTONDOWN:
 	case WM_XBUTTONUP:
 	case WM_XBUTTONDBLCLK:
-		for (list<clsItem *>::iterator i = itemList.begin(); i
+		for (itemList_t::iterator i = itemList.begin(); i
 				!= itemList.end(); ++i)
 		{
 			if ((*i)->hitTest(LOWORD(lParam), HIWORD(lParam)))
@@ -97,7 +100,7 @@ LRESULT clsItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam,
 	case BOXBAR_NEEDTIP:
 	case WM_TIMER:
 	case WM_NOTIFY:
-		for (list<clsItem *>::iterator i = itemList.begin(); i
+		for (itemList_t::iterator i = itemList.begin(); i
 				!= itemList.end(); ++i)
 		{
 			(*i)->wndProc(hWnd, msg, wParam, lParam);
@@ -107,7 +110,7 @@ LRESULT clsItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam,
 
 	if ((msg >= BB_MSGFIRST) && (msg <= BB_MSGLAST))
 	{
-		for (list<clsItem *>::iterator i = itemList.begin(); i
+		for (itemList_t::iterator i = itemList.begin(); i
 				!= itemList.end(); ++i)
 		{
 			(*i)->wndProc(hWnd, msg, wParam, lParam);
@@ -138,7 +141,7 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 		maxDim = DIM_VERTICAL;
 	}
 
-	for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+	for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
 	{
 		(*i)->calculateSizes();
 		dimType itemFixed = (*i)->getKnowsSize();
@@ -204,7 +207,7 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 		else
 			flexibleItemSize = (minSizeX - fixedItemUsed) / flexibleItemCount;
 		flexibleItemSize = std::max(flexibleItemSize, 0);
-		for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+		for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
 		{
 			(*i)->calculateSizes();
 			dimType itemStretch = (*i)->getWantsStretch();
@@ -219,7 +222,7 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
 	}
 
 	resize(minSizeX, minSizeY);
-	for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+	for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
 	{
 		if (vertical)
 			(*i)->resize(maxSize, -1);
@@ -275,7 +278,7 @@ void clsItemCollection::sortItems()
 		pos = itemArea.left + spacingBorder;
 		available = itemArea.bottom - itemArea.top;
 	}
-	for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+	for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
 	{
 		if (vertical)
 		{
@@ -300,11 +303,13 @@ void clsItemCollection::sortItems()
  */
 void clsItemCollection::configMenu(Menu *pMenu, bool p_update)
 {
-	for (list<clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+	for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
 	{
 		(*i)->configMenu(pMenu, p_update);
 	}
 	//for_each(itemList.begin(), itemList.end(),
 	//		 bind2nd(mem_fun((void(clsItem::*)(Menu*)) &clsItem::configMenu),
 	//				 pMenu));
+}
+
 }

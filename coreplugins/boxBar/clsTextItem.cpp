@@ -2,6 +2,9 @@
 #include "clsTextItem.h"
 #include <tchar.h>
 
+namespace boxBar
+{
+
 clsTextItem::clsTextItem(LPCSTR pText, UINT pStyle, bool pVertical, dimType p_knowsSize): clsItem(pVertical)
 {
 	m_knowsSize = p_knowsSize;
@@ -169,8 +172,4 @@ void clsTextItem::setStyle(UINT pStyle)
 	fontStyle = pStyle;
 }
 
-
-
-
-
-
+}

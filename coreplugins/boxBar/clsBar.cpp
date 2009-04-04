@@ -146,7 +146,7 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertica
 
 clsBar::~clsBar()
 {
-	for (list<clsItem *>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+	for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
 		delete (*i);
 	itemList.clear();
 	bbApiLoader.freeLibrary();
@@ -686,7 +686,7 @@ void clsBar::populateBar()
 {
 	hasTray = false;
 	lastMouse = NULL;
-	for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+	for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
 	{
 		delete (*i);
 	}

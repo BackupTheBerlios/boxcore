@@ -4,6 +4,9 @@
 #include "BBApi.h"
 #include "clsIconItem.h"
 
+namespace boxBar
+{
+
 typedef BOOL(*fnGetTrayInfo)(HWND, UINT, PVOID*, ATOM*, UINT);
 
 /** @class clsTrayItem
@@ -25,5 +28,7 @@ protected:
 	static fnGetTrayInfo GetTrayInfo;
 private:
 };
+
+}
 
 #endif // CLSTRAYITEM_H

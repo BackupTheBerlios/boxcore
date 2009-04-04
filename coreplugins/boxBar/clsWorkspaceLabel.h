@@ -3,6 +3,8 @@
 
 #include "clsLabelItem.h"
 
+namespace boxBar
+{
 
 class clsWorkspaceLabel : public clsLabelItem
 {
@@ -16,5 +18,7 @@ protected:
 	static void prevWorkspace(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
 private:
 };
+
+}
 
 #endif // CLSWORKSPACELABEL_H

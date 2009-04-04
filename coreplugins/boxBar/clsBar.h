@@ -7,6 +7,9 @@
 
 class Tip;
 
+namespace boxBar
+{
+
 using std::deque;
 
 enum ePosition {POS_TOP = 1, POS_VCENTER = 2, POS_BOTTOM = 4, POS_LEFT = 8, POS_CENTER = 16, POS_RIGHT = 32};
@@ -70,5 +73,7 @@ private:
 	UINT m_tipTimer;
 	bool m_replaceTip;
 };
+
+}
 
 #endif // CLSBAR_H

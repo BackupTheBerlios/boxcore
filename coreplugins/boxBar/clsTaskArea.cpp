@@ -162,7 +162,7 @@ LRESULT TaskArea::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 void TaskArea::populateTasks()
 {
 	lastMouse = NULL;
-	for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end(); ++i)
+	for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
 	{
 		delete (*i);
 	}
@@ -256,7 +256,7 @@ void TaskArea::DragAction(clsItem * p_item, eDragDropState p_state, INT p_x, INT
 		{
 			POINT point = {p_x, p_y};
 			ScreenToClient(barWnd, &point);
-			for (list<clsItem *>::iterator i = taskCollection->itemList.begin(); i
+			for (itemList_t::iterator i = taskCollection->itemList.begin(); i
 					!= taskCollection->itemList.end(); ++i)
 			{
 				if ((*i)->hitTest(point.x, point.y))

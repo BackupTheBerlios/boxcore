@@ -5,7 +5,8 @@
 
 #include <list>
 
-using std::list;
+namespace boxBar
+{
 
 typedef std::list<clsItem *> itemList_t;
 
@@ -35,5 +36,7 @@ protected:
 	bool isBar;
 private:
 };
+
+}
 
 #endif // CLSITEMCOLLECTION_H

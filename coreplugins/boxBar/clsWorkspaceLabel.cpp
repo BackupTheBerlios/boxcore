@@ -1,5 +1,8 @@
 #include "clsWorkspaceLabel.h"
 
+namespace boxBar
+{
+
 clsWorkspaceLabel::clsWorkspaceLabel(bool pVertical): clsLabelItem(pVertical)
 {
 	static int msgs[] = {BB_DESKTOPINFO, 0};
@@ -55,5 +58,4 @@ void clsWorkspaceLabel::prevWorkspace(clsItem *pItem, UINT msg, WPARAM wParam, L
 	PostMessage(hBlackboxWnd, BB_WORKSPACE, BBWS_DESKLEFT, 0);
 }
 
-
-
+}

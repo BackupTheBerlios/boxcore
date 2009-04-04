@@ -1,5 +1,8 @@
 #include "clsIconItem.h"
 
+namespace boxBar
+{
+
 clsIconItem::clsIconItem(HICON pIcon, UINT pSize, bool pVertical):clsItem(pVertical)
 {
 	icon = CopyIcon(pIcon);
@@ -102,4 +105,4 @@ bool clsIconItem::setIcon(HICON pIcon)
 	}
 }
 
-
+}

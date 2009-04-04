@@ -23,7 +23,7 @@ private:
 
 	bool started;
 
-	clsBar *bar;
+	boxBar::clsBar *bar;
 };
 
 #endif // CLSBOXBAR_H
