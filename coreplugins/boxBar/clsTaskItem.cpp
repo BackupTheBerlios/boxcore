@@ -3,11 +3,14 @@
 #include <limits.h>
 #include <cstdlib>
 
-clsTaskItem::clsTaskItem(HWND p_Task, bool pVertical, LPCSTR p_itemName): clsItemCollection(pVertical, "Tasks", 2, 2, s_settingsManager.AssociateInt(m_pluginPrefix, p_itemName, "MaxSize.X", 0)),
-	iconSize(s_settingsManager.AssociateUInt(m_pluginPrefix, p_itemName, "IconSize", 16)),
-	m_inactiveBackground(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "Inactive.Background", true)),
-	m_showIcon(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "ShowIcon", true)),
-	m_showText(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "ShowText", true))
+namespace boxBar
+{
+
+Task::Task(HWND p_Task, bool pVertical, LPCSTR p_itemName): clsItemCollection(pVertical, "Tasks", 2, 2, s_settingsManager.AssociateInt(m_pluginPrefix, p_itemName, "MaxSize.X", 0)),
+		iconSize(s_settingsManager.AssociateUInt(m_pluginPrefix, p_itemName, "IconSize", 16)),
+		m_inactiveBackground(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "Inactive.Background", true)),
+		m_showIcon(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "ShowIcon", true)),
+		m_showText(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "ShowText", true))
 {
 	m_knowsSize = DIM_VERTICAL;
 	m_wantsStretch = DIM_HORIZONTAL;
@@ -42,22 +45,22 @@ clsTaskItem::clsTaskItem(HWND p_Task, bool pVertical, LPCSTR p_itemName): clsIte
 	}
 	if (m_showText || !m_showIcon)
 	{
-	captionItem = new clsTextItem(m_caption, style, vertical);
-	addItem(captionItem);
+		captionItem = new clsTextItem(m_caption, style, vertical);
+		addItem(captionItem);
 	}
 	else
 	{
 		captionItem = NULL;
 		m_knowsSize = DIM_BOTH;
-			m_wantsStretch = DIM_NONE;
+		m_wantsStretch = DIM_NONE;
 		PostMessage(barWnd, BOXBAR_NEEDTIP, (WPARAM)m_caption, (LPARAM)iconItem);
 	}
 	if (m_showIcon)
 	{
-	if (iconSize > 16)
-		SendMessageCallback(taskWnd, WM_GETICON, ICON_BIG, 0, LargeIconProc, reinterpret_cast<ULONG_PTR>(this));
-	else
-		SendMessageCallback(taskWnd, WM_GETICON, ICON_SMALL, 0, SmallIconProc, reinterpret_cast<ULONG_PTR>(this));
+		if (iconSize > 16)
+			SendMessageCallback(taskWnd, WM_GETICON, ICON_BIG, 0, LargeIconProc, reinterpret_cast<ULONG_PTR>(this));
+		else
+			SendMessageCallback(taskWnd, WM_GETICON, ICON_SMALL, 0, SmallIconProc, reinterpret_cast<ULONG_PTR>(this));
 	}
 	leftClick = activateTask;
 	rightClick = WindowMenu;
@@ -68,7 +71,7 @@ clsTaskItem::clsTaskItem(HWND p_Task, bool pVertical, LPCSTR p_itemName): clsIte
   * Cleans up the tooltip, instead of letting it get handled by the base destructor. This
   * is needed because out tipText is not dynamically allocated.
   */
-clsTaskItem::~clsTaskItem()
+Task::~Task()
 {
 	delete iconItem;
 	delete captionItem;
@@ -83,46 +86,46 @@ clsTaskItem::~clsTaskItem()
   *
   * @todo: document this function
   */
-LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT Task::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
 	case BB_BROADCAST:
 	{
-			LPCSTR msg_string = (LPCSTR)lParam;
-			LPCSTR element = NULL;
-			msg_string += 1;
-			if (!strnicmp(msg_string, m_pluginPrefix, strlen(m_pluginPrefix)))
+		LPCSTR msg_string = (LPCSTR)lParam;
+		LPCSTR element = NULL;
+		msg_string += 1;
+		if (!strnicmp(msg_string, m_pluginPrefix, strlen(m_pluginPrefix)))
+		{
+			msg_string += strlen(m_pluginPrefix) + 1;
+			if (!strnicmp(msg_string, m_itemPrefix, strlen(m_itemPrefix)))
 			{
-				msg_string += strlen(m_pluginPrefix) + 1;
-				if (!strnicmp(msg_string, m_itemPrefix, strlen(m_itemPrefix)))
+				msg_string += strlen(m_itemPrefix) + 1;
+				if ((element = "IconSize") && !strnicmp(msg_string, element, strlen(element)))
 				{
-					msg_string += strlen(m_itemPrefix) + 1;
-					if ((element = "IconSize") && !strnicmp(msg_string, element, strlen(element)))
-					{
-						msg_string += strlen(element);
-						iconSize = atoi(msg_string);
-						s_settingsManager.WriteSetting(m_pluginPrefix, m_itemPrefix, element);
-					}
-					else if ((element = "MaxSize.X") && !strnicmp(msg_string, element, strlen(element)))
-					{
-						msg_string += strlen(element);
-						m_maxSizeX = atoi(msg_string);
-						s_settingsManager.WriteSetting(m_pluginPrefix, m_itemPrefix, element);
-					}
-					else if ((element = "ShowIcon") && !strnicmp(msg_string, element, strlen(element)))
-					{
-						m_showIcon = !m_showIcon;
-						s_settingsManager.WriteSetting(m_pluginPrefix, m_itemPrefix, element);
-					}
-					else if ((element = "ShowText") && !strnicmp(msg_string, element, strlen(element)))
-										{
-											m_showText = !m_showText;
-											s_settingsManager.WriteSetting(m_pluginPrefix, m_itemPrefix, element);
-										}
+					msg_string += strlen(element);
+					iconSize = atoi(msg_string);
+					s_settingsManager.WriteSetting(m_pluginPrefix, m_itemPrefix, element);
+				}
+				else if ((element = "MaxSize.X") && !strnicmp(msg_string, element, strlen(element)))
+				{
+					msg_string += strlen(element);
+					m_maxSizeX = atoi(msg_string);
+					s_settingsManager.WriteSetting(m_pluginPrefix, m_itemPrefix, element);
+				}
+				else if ((element = "ShowIcon") && !strnicmp(msg_string, element, strlen(element)))
+				{
+					m_showIcon = !m_showIcon;
+					s_settingsManager.WriteSetting(m_pluginPrefix, m_itemPrefix, element);
+				}
+				else if ((element = "ShowText") && !strnicmp(msg_string, element, strlen(element)))
+				{
+					m_showText = !m_showText;
+					s_settingsManager.WriteSetting(m_pluginPrefix, m_itemPrefix, element);
 				}
 			}
 		}
+	}
 	case BB_TASKSUPDATE:
 		switch (lParam)
 		{
@@ -133,7 +136,7 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				GetWindowText(taskWnd, m_caption, 256);
 				if (captionItem)
 				{
-				captionItem->setText(m_caption);
+					captionItem->setText(m_caption);
 				}
 				else
 				{
@@ -143,10 +146,10 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				if (m_showIcon)
 				{
 					m_fallback = false;
-				if (iconSize > 16)
-					SendMessageCallback(taskWnd, WM_GETICON, ICON_BIG, 0, LargeIconProc, reinterpret_cast<ULONG_PTR>(this));
-				else
-					SendMessageCallback(taskWnd, WM_GETICON, ICON_SMALL, 0, SmallIconProc, reinterpret_cast<ULONG_PTR>(this));
+					if (iconSize > 16)
+						SendMessageCallback(taskWnd, WM_GETICON, ICON_BIG, 0, LargeIconProc, reinterpret_cast<ULONG_PTR>(this));
+					else
+						SendMessageCallback(taskWnd, WM_GETICON, ICON_SMALL, 0, SmallIconProc, reinterpret_cast<ULONG_PTR>(this));
 				}
 				break;
 
@@ -165,7 +168,7 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 			if (captionItem)
 			{
-			captionItem->setStyle(style);
+				captionItem->setStyle(style);
 			}
 			return 0;
 		case TASKITEM_FLASHED:
@@ -184,7 +187,7 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				}
 				if (captionItem)
 				{
-				captionItem->setStyle(style);
+					captionItem->setStyle(style);
 				}
 			}
 			return 0;
@@ -209,18 +212,18 @@ LRESULT clsTaskItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
   *
   * @todo: document this function
   */
-void clsTaskItem::activateTask(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
+void Task::activateTask(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	clsTaskItem *realItem = dynamic_cast<clsTaskItem *>(pItem);
+	Task *realItem = dynamic_cast<Task *>(pItem);
 	if (realItem)
 	{
 		PostMessage(hBlackboxWnd, BB_BRINGTOFRONT, 0,  (LPARAM)realItem->taskWnd);
 	}
 }
 
-void clsTaskItem::WindowMenu(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
+void Task::WindowMenu(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	clsTaskItem *realItem = dynamic_cast<clsTaskItem *>(pItem);
+	Task *realItem = dynamic_cast<Task *>(pItem);
 	if (realItem)
 	{
 		//HMENU sysMenu = GetSystemMenu(realItem->taskWnd, FALSE);
@@ -234,7 +237,7 @@ void clsTaskItem::WindowMenu(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lPa
   *
   * @todo: document this function
   */
-void clsTaskItem::readSettings()
+void Task::readSettings()
 {
 	clsItem::readSettings();
 	if (m_maxSizeX <= 0)
@@ -245,9 +248,9 @@ void clsTaskItem::readSettings()
 	inactiveStyle = m_inactiveBackground ? SN_TOOLBAR : 0;
 }
 
-VOID CALLBACK clsTaskItem::SmallIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult)
+VOID CALLBACK Task::SmallIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult)
 {
-	clsTaskItem *task = reinterpret_cast<clsTaskItem *>(p_dwData);
+	Task *task = reinterpret_cast<Task *>(p_dwData);
 	if (task->taskWnd == p_hWnd)
 	{
 		if (p_lResult)
@@ -274,9 +277,9 @@ VOID CALLBACK clsTaskItem::SmallIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_d
 	}
 }
 
-VOID CALLBACK clsTaskItem::LargeIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult)
+VOID CALLBACK Task::LargeIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult)
 {
-	clsTaskItem *task = reinterpret_cast<clsTaskItem *>(p_dwData);
+	Task *task = reinterpret_cast<Task *>(p_dwData);
 	if (task->taskWnd == p_hWnd)
 	{
 		if (p_lResult)
@@ -307,7 +310,7 @@ VOID CALLBACK clsTaskItem::LargeIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_d
   *
   * @todo: document this function
   */
-void clsTaskItem::configMenu(Menu *pMenu, bool p_update)
+void Task::configMenu(Menu *pMenu, bool p_update)
 {
 	char ansiCaption[256];
 	char command[256];
@@ -326,8 +329,11 @@ void clsTaskItem::configMenu(Menu *pMenu, bool p_update)
 	MakeMenuItem(subMenu, "Move to end", command, false);
 }
 
-bool clsTaskItem::s_activeBackground = true;
-int clsTaskItem::inactiveStyle = SN_TOOLBAR;
-int clsTaskItem::activeStyle = SN_TOOLBARWINDOWLABEL;
-int clsTaskItem::inactiveAlpha = 255;
-int clsTaskItem::activeAlpha = 255;
+bool Task::s_activeBackground = true;
+int Task::inactiveStyle = SN_TOOLBAR;
+int Task::activeStyle = SN_TOOLBARWINDOWLABEL;
+int Task::inactiveAlpha = 255;
+int Task::activeAlpha = 255;
+
+}
+

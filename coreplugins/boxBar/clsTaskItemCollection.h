@@ -5,13 +5,16 @@
 #include "clsDropTarget.h"
 #include <map>
 
-class clsTaskItem;
+namespace boxBar
+{
 
-class clsTaskItemCollection : public clsItemCollection
+class Task;
+
+class TaskArea : public clsItemCollection
 {
 public:
-	clsTaskItemCollection(bool pVertical, LPCSTR p_itemName = "Tasks.Area");
-	virtual ~clsTaskItemCollection();
+	TaskArea(bool pVertical, LPCSTR p_itemName = "Tasks.Area");
+	virtual ~TaskArea();
 
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	virtual void readSettings();
@@ -25,10 +28,12 @@ private:
 	std::string m_basePrefix;
 	static void DragAction(clsItem *p_item, eDragDropState p_state, INT p_x, INT p_y);
 	DropTarget *m_dropTarget;
-	clsTaskItem *m_dragTask;
+	Task *m_dragTask;
 	UINT m_dragTimer;
 
 	UINT &m_iconSize;
 };
+
+}
 
 #endif // CLSTASKITEMCOLLECTION_H

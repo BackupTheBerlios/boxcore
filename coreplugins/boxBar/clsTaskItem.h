@@ -7,12 +7,14 @@
 #include "BBApi.h"
 #include <tchar.h>
 
+namespace boxBar
+{
 
-class clsTaskItem : public clsItemCollection
+class Task : public clsItemCollection
 {
 public:
-	clsTaskItem(HWND p_Task, bool pVertical, LPCSTR p_itemName = "Tasks");
-	~clsTaskItem();
+	Task(HWND p_Task, bool pVertical, LPCSTR p_itemName = "Tasks");
+	~Task();
 
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	virtual void readSettings();
@@ -50,5 +52,7 @@ private:
 	static VOID CALLBACK SmallIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult);
 	static VOID CALLBACK LargeIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult);
 };
+
+}
 
 #endif // CLSTASKITEM_H

@@ -6,7 +6,10 @@
 #include <functional>
 #include <algorithm>
 
-clsTaskItemCollection::clsTaskItemCollection(bool pVertical, LPCSTR p_itemName): clsItemCollection(pVertical, p_itemName, 0, 2),
+namespace boxBar
+{
+
+TaskArea::TaskArea(bool pVertical, LPCSTR p_itemName): clsItemCollection(pVertical, p_itemName, 0, 2),
 		stretchTaskarea(s_settingsManager.AssociateBool(m_pluginPrefix, m_itemPrefix, "Stretch", true)),
 		m_basePrefix(p_itemName),
 		m_iconSize(s_settingsManager.AssociateUInt(m_pluginPrefix, "Tasks", "IconSize", 16))
@@ -21,7 +24,7 @@ clsTaskItemCollection::clsTaskItemCollection(bool pVertical, LPCSTR p_itemName):
 
 }
 
-clsTaskItemCollection::~clsTaskItemCollection()
+TaskArea::~TaskArea()
 {
 	RevokeDragDrop(barWnd);
 	m_dropTarget->Release();
@@ -32,7 +35,7 @@ class TaskIsHWnd : public std::binary_function<clsItem *, HWND, bool>
 public:
 	result_type operator() (first_argument_type p_task, second_argument_type p_hWnd) const
 	{
-		clsTaskItem *task = dynamic_cast<clsTaskItem *>(p_task);
+		Task *task = dynamic_cast<Task *>(p_task);
 		if (task)
 		{
 			return (task->GetTaskWnd() == p_hWnd);
@@ -48,7 +51,7 @@ public:
   *
   * @TODO: document this function
   */
-LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT TaskArea::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -112,7 +115,7 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 
 			if (std::find_if(itemList.begin(), itemList.end(), bind2nd(TaskIsHWnd(), reinterpret_cast<HWND>(wParam))) == itemList.end())
 			{
-				clsTaskItem *newTask = new clsTaskItem(reinterpret_cast<HWND>(wParam), vertical);
+				Task *newTask = new Task(reinterpret_cast<HWND>(wParam), vertical);
 				itemList_t::iterator insertLoc = itemList.end();
 				if (vertical && stretchTaskarea)
 				{
@@ -156,7 +159,7 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
   *
   * @TODO: document this function
   */
-void clsTaskItemCollection::populateTasks()
+void TaskArea::populateTasks()
 {
 	lastMouse = NULL;
 	for (list<clsItem*>::iterator i = itemList.begin(); i != itemList.end(); ++i)
@@ -170,7 +173,7 @@ void clsTaskItemCollection::populateTasks()
 	{
 		if (GetTask(i))
 		{
-			clsTaskItem *newTask = new clsTaskItem(GetTask(i), vertical);
+			Task *newTask = new Task(GetTask(i), vertical);
 			addItem(newTask);
 		}
 	}
@@ -187,9 +190,9 @@ void clsTaskItemCollection::populateTasks()
 /** @brief Reads task area settings from RC file
   *
   * This function reads settings related to the general task area, such as whether
-  * it should stretch vertically or not. Detailed setting are read by clsTaskItem itself
+  * it should stretch vertically or not. Detailed setting are read by Task itself
   */
-void clsTaskItemCollection::readSettings()
+void TaskArea::readSettings()
 {
 	if (stretchTaskarea)
 	{
@@ -214,11 +217,11 @@ void clsTaskItemCollection::readSettings()
   *
   * @param[in,out] pMenu Menu pointer to which items can be added
   *
-  * This adds the submenu for general task properties (as read from the RC file by clsTaskItemCollection)
-  * as well as specific task properties (as read by clsTaskItem). The messages generated will be
+  * This adds the submenu for general task properties (as read from the RC file by TaskArea)
+  * as well as specific task properties (as read by Task). The messages generated will be
   * handled separately by these two classes
   */
-void clsTaskItemCollection::configMenu(Menu *pMenu, bool p_update)
+void TaskArea::configMenu(Menu *pMenu, bool p_update)
 {
 	CHAR buffer[256];
 	LPCSTR menuTitle = "Tasks Configuration";
@@ -242,9 +245,9 @@ void clsTaskItemCollection::configMenu(Menu *pMenu, bool p_update)
 	}
 }
 
-void clsTaskItemCollection::DragAction(clsItem * p_item, eDragDropState p_state, INT p_x, INT p_y)
+void TaskArea::DragAction(clsItem * p_item, eDragDropState p_state, INT p_x, INT p_y)
 {
-	clsTaskItemCollection *taskCollection = dynamic_cast<clsTaskItemCollection *>(p_item);
+	TaskArea *taskCollection = dynamic_cast<TaskArea *>(p_item);
 	if (taskCollection)
 	{
 		switch (p_state)
@@ -261,7 +264,7 @@ void clsTaskItemCollection::DragAction(clsItem * p_item, eDragDropState p_state,
 					if (taskCollection->m_dragTask != (*i))
 					{
 						SetTimer(taskCollection->barWnd, taskCollection->m_dragTimer, 500, NULL);
-						taskCollection->m_dragTask = dynamic_cast<clsTaskItem *>(*i);
+						taskCollection->m_dragTask = dynamic_cast<Task *>(*i);
 					}
 				}
 			}
@@ -275,4 +278,6 @@ void clsTaskItemCollection::DragAction(clsItem * p_item, eDragDropState p_state,
 			break;
 		}
 	}
+}
+
 }
