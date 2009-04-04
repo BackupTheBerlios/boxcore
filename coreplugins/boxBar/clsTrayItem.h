@@ -4,18 +4,18 @@
 #include "BBApi.h"
 #include "clsIconItem.h"
 
-namespace boxBar
+namespace Plugin_boxBar
 {
 
 typedef BOOL(*fnGetTrayInfo)(HWND, UINT, PVOID*, ATOM*, UINT);
 
-/** @class clsTrayItem
+/** @class TrayIcon
   * @brief Represents a single tray item in the bar
   */
-class clsTrayItem : public clsIconItem
+class TrayIcon : public clsIconItem
 {
 public:
-	clsTrayItem(systemTray *trayItem, UINT pIconSize, bool pVertical);
+	TrayIcon(systemTray *trayItem, UINT pIconSize, bool pVertical);
 
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 protected:

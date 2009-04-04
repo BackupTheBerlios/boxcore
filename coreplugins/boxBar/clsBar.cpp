@@ -15,7 +15,7 @@
 #include "../../dynwinapi/clsUser32.h"
 #include "../../utility/stringcopy.h"
 
-using namespace boxBar;
+using namespace Plugin_boxBar;
 
 /**
  * @page boxBarRC RC settings for boxBar
@@ -699,7 +699,7 @@ void clsBar::populateBar()
 		barItems = Tokenize(barItems, barItem, ",");
 		if (!stricmp(barItem, "tray"))
 		{
-			addItem(new clsTrayItemCollection(vertical));
+			addItem(new TrayArea(vertical));
 			hasTray = true;
 		}
 		else if (!stricmp(barItem, "clock"))

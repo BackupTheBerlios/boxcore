@@ -3,7 +3,7 @@
 
 #include "clsTextItem.h"
 
-namespace boxBar
+namespace Plugin_boxBar
 {
 
 class clsLabelItem : public clsTextItem

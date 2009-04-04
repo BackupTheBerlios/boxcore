@@ -3,16 +3,16 @@
 
 #include "clsItemCollection.h"
 
-namespace boxBar
+namespace Plugin_boxBar
 {
 
 /** @internal
  * @brief Implements the containter for the system tray
  */
-class clsTrayItemCollection : public clsItemCollection
+class TrayArea : public clsItemCollection
 {
 public:
-	clsTrayItemCollection(bool pVertical, LPCSTR p_itemName = "Tray");
+	TrayArea(bool pVertical, LPCSTR p_itemName = "Tray");
 
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	virtual void readSettings();

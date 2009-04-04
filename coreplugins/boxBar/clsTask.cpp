@@ -3,7 +3,7 @@
 #include <limits.h>
 #include <cstdlib>
 
-namespace boxBar
+namespace Plugin_boxBar
 {
 
 Task::Task(HWND p_Task, bool pVertical, LPCSTR p_itemName): clsItemCollection(pVertical, "Tasks", 2, 2, s_settingsManager.AssociateInt(m_pluginPrefix, p_itemName, "MaxSize.X", 0)),

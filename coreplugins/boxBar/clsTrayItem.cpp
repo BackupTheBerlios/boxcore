@@ -10,10 +10,10 @@
 #define NIN_POPUPCLOSE 0x00000407
 #endif
 
-namespace boxBar
+namespace Plugin_boxBar
 {
 
-clsTrayItem::clsTrayItem(systemTray *trayItem, UINT pIconSize, bool pVertical): clsIconItem(trayItem->hIcon, pIconSize, pVertical)
+TrayIcon::TrayIcon(systemTray *trayItem, UINT pIconSize, bool pVertical): clsIconItem(trayItem->hIcon, pIconSize, pVertical)
 {
 	if (GetTrayInfo == NULL)
 	{
@@ -61,7 +61,7 @@ clsTrayItem::clsTrayItem(systemTray *trayItem, UINT pIconSize, bool pVertical): 
   *
   * @TODO: document this function
   */
-LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT TrayIcon::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -206,6 +206,6 @@ LRESULT clsTrayItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return clsItem::wndProc(hWnd, msg, wParam, lParam);
 }
 
-fnGetTrayInfo clsTrayItem::GetTrayInfo = NULL;
+fnGetTrayInfo TrayIcon::GetTrayInfo = NULL;
 
 }

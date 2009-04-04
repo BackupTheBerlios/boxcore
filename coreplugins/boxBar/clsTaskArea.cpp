@@ -6,7 +6,7 @@
 #include <functional>
 #include <algorithm>
 
-namespace boxBar
+namespace Plugin_boxBar
 {
 
 TaskArea::TaskArea(bool pVertical, LPCSTR p_itemName): clsItemCollection(pVertical, p_itemName, 0, 2),

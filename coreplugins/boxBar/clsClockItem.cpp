@@ -3,7 +3,7 @@
 #include <tchar.h>
 #include <locale.h>
 
-namespace boxBar
+namespace Plugin_boxBar
 {
 
 clsClockItem::clsClockItem(bool pVertical): clsLabelItem(pVertical)

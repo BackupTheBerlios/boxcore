@@ -3,7 +3,7 @@
 
 #include "clsItem.h"
 
-namespace boxBar
+namespace Plugin_boxBar
 {
 
 class clsIconItem : public clsItem

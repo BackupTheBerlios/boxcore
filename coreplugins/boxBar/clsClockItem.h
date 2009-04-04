@@ -3,7 +3,7 @@
 
 #include "clsLabelItem.h"
 
-namespace boxBar
+namespace Plugin_boxBar
 {
 
 class clsClockItem : public clsLabelItem

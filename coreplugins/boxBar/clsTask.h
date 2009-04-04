@@ -7,7 +7,7 @@
 #include "BBApi.h"
 #include <tchar.h>
 
-namespace boxBar
+namespace Plugin_boxBar
 {
 
 class Task : public clsItemCollection

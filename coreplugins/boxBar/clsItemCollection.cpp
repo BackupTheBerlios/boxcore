@@ -7,7 +7,7 @@ using std::for_each;
 using std::mem_fun;
 using std::bind2nd;
 
-namespace boxBar
+namespace Plugin_boxBar
 {
 
 /**

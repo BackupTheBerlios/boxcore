@@ -2,7 +2,7 @@
 #include "clsTextItem.h"
 #include <tchar.h>
 
-namespace boxBar
+namespace Plugin_boxBar
 {
 
 clsTextItem::clsTextItem(LPCSTR pText, UINT pStyle, bool pVertical, dimType p_knowsSize): clsItem(pVertical)

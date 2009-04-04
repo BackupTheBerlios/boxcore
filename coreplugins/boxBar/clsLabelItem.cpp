@@ -2,7 +2,7 @@
 #include "clsLabelItem.h"
 #include <tchar.h>
 
-namespace boxBar
+namespace Plugin_boxBar
 {
 
 clsLabelItem::clsLabelItem(bool pVertical) : clsTextItem(TEXT(""), SN_TOOLBARCLOCK, pVertical)

@@ -1,6 +1,6 @@
 #include "clsWorkspaceLabel.h"
 
-namespace boxBar
+namespace Plugin_boxBar
 {
 
 clsWorkspaceLabel::clsWorkspaceLabel(bool pVertical): clsLabelItem(pVertical)

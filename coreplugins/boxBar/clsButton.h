@@ -10,7 +10,7 @@
 
 #include "clsItemCollection.h"
 
-namespace boxBar
+namespace Plugin_boxBar
 {
 
 class clsTextItem;

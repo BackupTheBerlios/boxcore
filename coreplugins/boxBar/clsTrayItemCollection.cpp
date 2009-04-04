@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <tchar.h>
 
-namespace boxBar
+namespace Plugin_boxBar
 {
 
 /**
@@ -26,7 +26,7 @@ namespace boxBar
  * or set this to true for a vertical bar when you want to restrict the number of columns.
  */
 
-clsTrayItemCollection::clsTrayItemCollection(bool pVertical, LPCSTR p_itemName):clsItemCollection(pVertical, p_itemName, 0, 1),
+TrayArea::TrayArea(bool pVertical, LPCSTR p_itemName):clsItemCollection(pVertical, p_itemName, 0, 1),
 		iconSize(s_settingsManager.AssociateInt(m_pluginPrefix, m_itemPrefix, "IconSize", 16)),
 		numRowCols(s_settingsManager.AssociateInt(m_pluginPrefix, m_itemPrefix, (vertical ? "maxRows" : "maxCols"), 0)),
 		m_newFirst(s_settingsManager.AssociateBool(m_pluginPrefix, m_itemPrefix, "NewIconsFirst", false)),
@@ -42,7 +42,7 @@ clsTrayItemCollection::clsTrayItemCollection(bool pVertical, LPCSTR p_itemName):
   *
   * @todo: document this function
   */
-LRESULT clsTrayItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT TrayArea::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -136,7 +136,7 @@ LRESULT clsTrayItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
   *
   * @todo: document this function
   */
-void clsTrayItemCollection::configMenu(Menu *pMenu, bool p_update)
+void TrayArea::configMenu(Menu *pMenu, bool p_update)
 {
 	CHAR buffer[256];
 	LPCSTR menuTitle = "Tray Configuration";
@@ -164,7 +164,7 @@ void clsTrayItemCollection::configMenu(Menu *pMenu, bool p_update)
 	}
 }
 
-void clsTrayItemCollection::populateTray()
+void TrayArea::populateTray()
 {
 	lastMouse = NULL;
 	for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
@@ -186,21 +186,21 @@ void clsTrayItemCollection::populateTray()
 		{
 			if (m_reverseOrder && !vertical)
 			{
-				(dynamic_cast<clsItemCollection*>(*columnRev))->addItem(new clsTrayItem(trayItem, iconSize, vertical));
+				(dynamic_cast<clsItemCollection*>(*columnRev))->addItem(new TrayIcon(trayItem, iconSize, vertical));
 				columnRev++;
 				if (columnRev == itemList.rend())
 					columnRev = itemList.rbegin();
 			}
 			else
 			{
-				(dynamic_cast<clsItemCollection*>(*column))->addItem(new clsTrayItem(trayItem, iconSize, vertical), m_reverseOrder);
+				(dynamic_cast<clsItemCollection*>(*column))->addItem(new TrayIcon(trayItem, iconSize, vertical), m_reverseOrder);
 				column++;
 				if (column == itemList.end())
 					column = itemList.begin();
 			}
 		}
 		else
-			addItem(new clsTrayItem(trayItem, iconSize, vertical), m_reverseOrder);
+			addItem(new TrayIcon(trayItem, iconSize, vertical), m_reverseOrder);
 	}
 	if (numRowCols > 0)
 	{
@@ -224,7 +224,7 @@ void clsTrayItemCollection::populateTray()
 	}
 }
 
-void clsTrayItemCollection::writeSettings()
+void TrayArea::writeSettings()
 {
 }
 
@@ -232,7 +232,7 @@ void clsTrayItemCollection::writeSettings()
   *
   * Reads the tray icon size, tray orientation, max number of rows and max number of columns
   */
-void clsTrayItemCollection::readSettings()
+void TrayArea::readSettings()
 {
 	clsItem::readSettings();
 	populateTray();
