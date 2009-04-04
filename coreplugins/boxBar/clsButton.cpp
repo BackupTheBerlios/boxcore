@@ -15,7 +15,7 @@ namespace Plugin_boxBar
 
 /**
  * @page boxBarRC
- * @section boxBarButton Settings that apply to button items
+ * @section boxBarButton Button
  * The button item is a nameable item. See @ref boxBarNameable for what this means.
  * The button is also a collection item, so settings for @ref boxBarCollection "Collection Items" apply.
  * The following properties can be set for buttons

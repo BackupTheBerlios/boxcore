@@ -9,10 +9,18 @@
 namespace Plugin_boxBar
 {
 
+/**
+ * @page boxBarRCAdvanced
+ * @section boxBarTaskArea TaskArea
+ * The TaskArea is created as part of the tasks item, and serves to contain the tasks.
+ * The TaskArea is a @ref boxBarCollection, so those settings can be applied.
+ * @code boxBar.TaskArea.Stretch: true @endcode
+ * Sets whether the task area is stretched or not. Should only be set to false when using icons only
+ */
+
 TaskArea::TaskArea(bool pVertical, LPCSTR p_itemName): clsItemCollection(pVertical, p_itemName, 0, 2),
 		stretchTaskarea(s_settingsManager.AssociateBool(m_pluginPrefix, m_itemPrefix, "Stretch", true)),
-		m_basePrefix(p_itemName),
-		m_iconSize(s_settingsManager.AssociateUInt(m_pluginPrefix, "Tasks", "IconSize", 16))
+		m_basePrefix(p_itemName)
 {
 	m_basePrefix.resize(m_basePrefix.find_first_of("."));
 	m_dragTask = NULL;
@@ -236,7 +244,7 @@ void TaskArea::configMenu(Menu *pMenu, bool p_update)
 	sprintf(buffer, "@%s.%s.%s", m_pluginPrefix, m_basePrefix.c_str(), "ShowText");
 	MakeMenuItem(subMenu, "Display Title", buffer, s_settingsManager.AssociateBool(m_pluginPrefix, m_basePrefix.c_str(), "ShowText", true));
 	sprintf(buffer, "@%s.%s.%s", m_pluginPrefix, m_basePrefix.c_str(), "IconSize");
-	MakeMenuItemInt(subMenu, "Icon size", buffer, m_iconSize, 0, 256);
+	MakeMenuItemInt(subMenu, "Icon size", buffer, s_settingsManager.AssociateUInt(m_pluginPrefix, "Tasks", "IconSize", 16), 0, 256);
 	sprintf(buffer, "@%s.%s.%s", m_pluginPrefix, m_basePrefix.c_str(), "Maxsize.X");
 	MakeMenuItemInt(subMenu, "Maximum TaskWidth", buffer, s_settingsManager.AssociateInt(m_pluginPrefix, m_basePrefix.c_str(), "MaxSize.x", 0), 0, 1000);
 	if (p_update)

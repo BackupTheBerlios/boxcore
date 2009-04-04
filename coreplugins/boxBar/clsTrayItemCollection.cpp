@@ -8,9 +8,19 @@ namespace Plugin_boxBar
 {
 
 /**
- * @page boxBarRC RC settings for boxBar
- * @section boxBarTray Settings which control the system tray
- * The system tray is a collection item, so settings for @ref boxBarCollection "Collection Items" also apply.
+ * @page boxBarRC
+ * @section boxBarTray Tray
+ * The Tray item implements a system tray. The tray is a @ref boxBarCollection,
+ * so those settings can be applied if desired.
+ *
+ * @code boxBar.Tray.IconSize: 16 @endcode
+ * The size of tray icons, in pixels.
+ *
+ * @code boxBar.Tray.NewIconsFirst: false @endcode
+ * Sets whether the newest icons are added at the beginning or at the end of the tray.
+ * This changes the order of the icons without affecting inserted spacers
+ * (in multi-line or multi-column modes). Can be combined with ReverseOrder to only move spacers
+ * without changing the icon order
  *
  * @code boxBar.Tray.NumRows: 0 @endcode
  * Number of rows in the tray
@@ -19,6 +29,9 @@ namespace Plugin_boxBar
  * @code boxBar.Tray.NumCols: 0 @endcode
  * Number of columns in the tray
  * @note Only used when the tray is not in vertical mode
+ *
+ * @code boxBar.Tray.ReverseOrder: true @endcode
+ * This setting reverse the order of icons and spacers.
  *
  * @code boxBar.Tray.Vertical: <bar vertical setting> @endcode
  * Sets whether the tray is drawn vertically or horizontally. Matches the bar setting if not set.
@@ -30,7 +43,7 @@ TrayArea::TrayArea(bool pVertical, LPCSTR p_itemName):clsItemCollection(pVertica
 		iconSize(s_settingsManager.AssociateInt(m_pluginPrefix, m_itemPrefix, "IconSize", 16)),
 		numRowCols(s_settingsManager.AssociateInt(m_pluginPrefix, m_itemPrefix, (vertical ? "maxRows" : "maxCols"), 0)),
 		m_newFirst(s_settingsManager.AssociateBool(m_pluginPrefix, m_itemPrefix, "NewIconsFirst", false)),
-		m_reverseOrder(s_settingsManager.AssociateBool(m_pluginPrefix, m_itemPrefix, "ReverseOrder", false))
+		m_reverseOrder(s_settingsManager.AssociateBool(m_pluginPrefix, m_itemPrefix, "ReverseOrder", true))
 {
 	m_knowsSize = DIM_BOTH;
 	m_wantsStretch = DIM_NONE;
@@ -83,34 +96,32 @@ LRESULT TrayArea::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				else if ((element = "ReverseOrder") && !stricmp(msg_string, element))
 				{
 					m_reverseOrder = !m_reverseOrder;
-					writeSettings();
-					readSettings();
+					s_settingsManager.WriteSetting(m_pluginPrefix, m_itemPrefix, element);
+					populateTray();
 					configMenu(NULL, true);
 					PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 				}
 				else if ((element = "NewIconsFirst") && !stricmp(msg_string, element))
 				{
 					m_newFirst = !m_newFirst;
-					writeSettings();
-					readSettings();
+					s_settingsManager.WriteSetting(m_pluginPrefix, m_itemPrefix, element);
+					populateTray();
 					configMenu(NULL, true);
 					PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 				}
-				else if (!strnicmp(msg_string, "maxRows", strlen("maxRows")))
+				else if ((element = "MaxRows") && !strnicmp(msg_string, element, strlen(element)))
 				{
-					msg_string += strlen("maxRows");
+					msg_string += strlen(element);
 					numRowCols = atoi(msg_string);
-					writeSettings();
-					readSettings();
+					s_settingsManager.WriteSetting(m_pluginPrefix, m_itemPrefix, element);
 					configMenu(NULL, true);
 					PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
 				}
-				else if (!strnicmp(msg_string, "maxCols", strlen("maxCols")))
+				else if ((element = "Maxcols") && !strnicmp(msg_string, element, strlen(element)))
 				{
-					msg_string += strlen("maxCols");
+					msg_string += strlen(element);
 					numRowCols = atoi(msg_string);
-					writeSettings();
-					readSettings();
+					s_settingsManager.WriteSetting(m_pluginPrefix, m_itemPrefix, element);
 					configMenu(NULL, true);
 					PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
 				}
@@ -222,20 +233,6 @@ void TrayArea::populateTray()
 			}
 		}
 	}
-}
-
-void TrayArea::writeSettings()
-{
-}
-
-/** @brief Reads settings from the RC file
-  *
-  * Reads the tray icon size, tray orientation, max number of rows and max number of columns
-  */
-void TrayArea::readSettings()
-{
-	clsItem::readSettings();
-	populateTray();
 }
 
 }

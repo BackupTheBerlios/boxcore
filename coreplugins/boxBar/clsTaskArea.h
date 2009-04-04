@@ -30,8 +30,6 @@ private:
 	DropTarget *m_dropTarget;
 	Task *m_dragTask;
 	UINT m_dragTimer;
-
-	UINT &m_iconSize;
 };
 
 }

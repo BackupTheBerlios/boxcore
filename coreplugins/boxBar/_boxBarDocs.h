@@ -1,5 +1,15 @@
 /** @page boxBar Documentation for the boxBar plugin
- * boxBar is a system tray plugin for Blackbox for Windows.
+ * boxBar is a <A HREF="http://bb4win.sourceforge.net/">Blackbox for Windows</A> plugin that provides
+ * a system bar. It is designed to be easily extensible, and is becoming more configurable. Its current
+ * major feature is that allows a vertical bar.
+ *
+ * boxBar has been tested with boxCore on Windows Vista x64 by the author, and on Windows XP by users.
+ * It should also work under other branches (except xoblite at this point, due to task support), and
+ * has had some testing under vanilla bbLean.
+ *
+ * @sectionboxBarToc Table of Contents
+ * - @ref boxBarChangelog
+ * - @ref boxBarSettings
  *
  * @section boxBarChangelog Changelog
  * @subsection boxBar_0_2_0 boxBar 0.2.0 (2008-04-??)

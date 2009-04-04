@@ -6,6 +6,21 @@
 namespace Plugin_boxBar
 {
 
+/**
+ * @page boxBarRC
+ * @section boxBarTasks Tasks
+ * The tasks item displays the list of currently running tasks, similar to the taskbar in
+ * windows explorer. Each task is a @ref boxBarCollection, so those settings can be applied to the Tasks item.
+ * @code boxBar.Tasks.IconSize: 32 @endcode
+ * The size of the icon for a task, if enabled
+ *
+ * @code boxBar.Tasks.ShowIcon: true @endcode
+ * Determines whether tasks display their icon, or not.
+ *
+ * @code boxBar.Tasks.ShowText: true @endcode
+ * Determines whether tasks display the window title, or not.
+ */
+
 Task::Task(HWND p_Task, bool pVertical, LPCSTR p_itemName): clsItemCollection(pVertical, "Tasks", 2, 2, s_settingsManager.AssociateInt(m_pluginPrefix, p_itemName, "MaxSize.X", 0)),
 		iconSize(s_settingsManager.AssociateUInt(m_pluginPrefix, p_itemName, "IconSize", 16)),
 		m_inactiveBackground(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "Inactive.Background", true)),

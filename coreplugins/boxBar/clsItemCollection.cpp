@@ -12,9 +12,9 @@ namespace Plugin_boxBar
 
 /**
  * @page boxBarRCAdvanced
- * @section boxBarCollection Settings which apply to any collection item
+ * @section boxBarCollection Collection Item
  * These settings can be applied to several items.
- * These items include @ref boxBarTray "Tray", @ref boxBarTasksArea "TasksArea", @ref boxBarTasks "Tasks".
+ * These items include @ref boxBarTray "Tray", @ref boxBarTaskArea, @ref boxBarTask.
  * These settings can also be applied to the bar itself by removing "<item>." from the settings below. Otherwise replace "<item>"
  * with the item that you want to affect.
  * @code boxBar.<item>.Spacing.Border: <varies> @endcode
