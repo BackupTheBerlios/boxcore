@@ -5,7 +5,7 @@
 #include "clsTaskItemCollection.h"
 #include "clsFlexiSpacer.h"
 #include "clsWorkspaceLabel.h"
-#include "clsItButton.h"
+#include "clsButton.h"
 
 #include "clsTip.h"
 
@@ -14,6 +14,18 @@
 
 #include "../../dynwinapi/clsUser32.h"
 #include "../../utility/stringcopy.h"
+
+using namespace boxBar;
+
+/**
+ * @page boxBarRC RC settings for boxBar
+ * @section Bar General settings
+ * @code boxBar.Vertical: false @endcode
+ * Determines whether the bar is drawn vertically or horizontally
+ * @code boxBar.Items: Button,Tasks,Tray,Clock @endcode
+ * Select the items to show on the bar. Available items are @ref boxBarTray "Tray", @ref boxBarButton "Button"
+ * and each name links to its appropriate settings in this file.
+ */
 
 clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertical): clsItemCollection(pVertical, NULL, 0, 2)
 {
@@ -680,7 +692,7 @@ void clsBar::populateBar()
 	}
 	itemList.clear();
 
-	const CHAR * barItems = ReadString(configFile, "boxBar.items:", "tasks,tray,clock");
+	const CHAR * barItems = ReadString(configFile, "boxBar.items:", "button,tasks,tray,clock");
 	CHAR barItem[MAX_PATH];
 	do
 	{
@@ -700,7 +712,7 @@ void clsBar::populateBar()
 		}
 		else if (!stricmp(barItem, "tasks"))
 		{
-			addItem(new clsTaskItemCollection(vertical));
+			addItem(new TaskArea(vertical));
 		}
 		else if (!stricmp(barItem, "wslabel"))
 		{
@@ -708,7 +720,7 @@ void clsBar::populateBar()
 		}
 		else if (!stricmp(barItem, "button"))
 		{
-			addItem(new ItButton());
+			addItem(new Button());
 		}
 	}
 	while (strlen(barItems));
