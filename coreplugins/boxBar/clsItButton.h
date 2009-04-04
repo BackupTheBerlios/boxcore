@@ -13,11 +13,14 @@
 class clsTextItem;
 class clsIconItem;
 
-class ItButton: public clsItemCollection
+namespace boxBar
+{
+
+class Button: public clsItemCollection
 {
 public:
-	ItButton(LPCSTR p_itemName = "Button");
-	virtual ~ItButton();
+	Button(LPCSTR p_itemName = "Button");
+	virtual ~Button();
 
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	virtual void readSettings();
@@ -29,5 +32,7 @@ protected:
 	clsIconItem *m_iconItem;
 	clsTextItem *m_textItem;
 };
+
+}
 
 #endif /* CLSITBUTTON_H_ */
