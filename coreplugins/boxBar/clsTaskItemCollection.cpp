@@ -7,9 +7,9 @@
 #include <algorithm>
 
 clsTaskItemCollection::clsTaskItemCollection(bool pVertical, LPCSTR p_itemName): clsItemCollection(pVertical, p_itemName, 0, 2),
-	stretchTaskarea(s_settingsManager.AssociateBool(m_pluginPrefix, m_itemPrefix, "Stretch", true)),
-	m_basePrefix(p_itemName),
-	m_iconSize(s_settingsManager.AssociateUInt(m_pluginPrefix, "Tasks", "IconSize", 16))
+		stretchTaskarea(s_settingsManager.AssociateBool(m_pluginPrefix, m_itemPrefix, "Stretch", true)),
+		m_basePrefix(p_itemName),
+		m_iconSize(s_settingsManager.AssociateUInt(m_pluginPrefix, "Tasks", "IconSize", 16))
 {
 	m_basePrefix.resize(m_basePrefix.find_first_of("."));
 	m_dragTask = NULL;
@@ -27,14 +27,15 @@ clsTaskItemCollection::~clsTaskItemCollection()
 	m_dropTarget->Release();
 }
 
-class TaskIsHWnd : public std::binary_function<clsItem *, HWND, bool>{
+class TaskIsHWnd : public std::binary_function<clsItem *, HWND, bool>
+{
 public:
 	result_type operator() (first_argument_type p_task, second_argument_type p_hWnd) const
 	{
 		clsTaskItem *task = dynamic_cast<clsTaskItem *>(p_task);
 		if (task)
 		{
-		return (task->GetTaskWnd() == p_hWnd);
+			return (task->GetTaskWnd() == p_hWnd);
 		}
 		else
 		{
@@ -88,7 +89,13 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			}
 			else if (!strnicmp(msg_string, m_basePrefix.c_str(), m_basePrefix.size()))
 			{
+				if (itemList.size())
+				{
+					itemList.front()->wndProc(hWnd, msg, wParam, lParam);
+				}
 				PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
+				configMenu(NULL, true);
+				return 0;
 			}
 		}
 	}
@@ -105,22 +112,22 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 
 			if (std::find_if(itemList.begin(), itemList.end(), bind2nd(TaskIsHWnd(), reinterpret_cast<HWND>(wParam))) == itemList.end())
 			{
-			clsTaskItem *newTask = new clsTaskItem(reinterpret_cast<HWND>(wParam), vertical);
-			itemList_t::iterator insertLoc = itemList.end();
-			if (vertical && stretchTaskarea)
-			{
-				insertLoc--;
-			}
-			itemList.insert(insertLoc, newTask);
-			if (stretchTaskarea)
-			{
-				calculateSizes(true);
-				RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
-			}
-			else
-			{
-			PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
-			}
+				clsTaskItem *newTask = new clsTaskItem(reinterpret_cast<HWND>(wParam), vertical);
+				itemList_t::iterator insertLoc = itemList.end();
+				if (vertical && stretchTaskarea)
+				{
+					insertLoc--;
+				}
+				itemList.insert(insertLoc, newTask);
+				if (stretchTaskarea)
+				{
+					calculateSizes(true);
+					RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
+				}
+				else
+				{
+					PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
+				}
 			}
 			break;
 
@@ -128,17 +135,17 @@ LRESULT clsTaskItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 		{
 			itemList.remove_if(bind2nd(TaskIsHWnd(), reinterpret_cast<HWND>(wParam)));
 			if (stretchTaskarea)
-						{
-							calculateSizes(true);
-							RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
-						}
-						else
-						{
-						PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
-						}
+			{
+				calculateSizes(true);
+				RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
+			}
+			else
+			{
+				PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
+			}
 			break;
 		}
-			//populateTasks();
+		//populateTasks();
 		}
 		break;
 	}
@@ -217,7 +224,6 @@ void clsTaskItemCollection::configMenu(Menu *pMenu, bool p_update)
 	LPCSTR menuTitle = "Tasks Configuration";
 	sprintf(buffer, "%s.%s", m_pluginPrefix, m_itemPrefix);
 	Menu *subMenu = MakeNamedMenu(menuTitle, buffer, !p_update);
-	TRACE(buffer);
 	if (!p_update)
 	{
 		MakeSubmenu(pMenu, subMenu, menuTitle);
