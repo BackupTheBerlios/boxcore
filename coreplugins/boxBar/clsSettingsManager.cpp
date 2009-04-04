@@ -38,7 +38,7 @@ INT & SettingsManager::AssociateInt(LPCSTR p_plugin, LPCSTR p_component, LPCSTR 
 	}
 	entry += ":";
 	intKeys_t::iterator it = m_intKeys.find(entry);
-	if (it != m_intKeys.end())
+	if (it != m_intKeys.end() && (it->second.first == p_default))
 	{
 		return it->second.second;
 	}
@@ -72,7 +72,7 @@ UINT & SettingsManager::AssociateUInt(LPCSTR p_plugin, LPCSTR p_component, LPCST
 	}
 	entry += ":";
 	uIntKeys_t::iterator it = m_uIntKeys.find(entry);
-	if (it != m_uIntKeys.end())
+	if (it != m_uIntKeys.end() && (it->second.first == p_default))
 	{
 		return it->second.second;
 	}
@@ -106,7 +106,7 @@ bool & SettingsManager::AssociateBool(LPCSTR p_plugin, LPCSTR p_component, LPCST
 	}
 	entry += ":";
 	boolKeys_t::iterator it = m_boolKeys.find(entry);
-	if (it != m_boolKeys.end())
+	if (it != m_boolKeys.end() && (it->second.first == p_default))
 	{
 		return it->second.second;
 	}
@@ -140,7 +140,7 @@ std::string & SettingsManager::AssociateString(LPCSTR p_plugin, LPCSTR p_compone
 	}
 	entry += ":";
 	strKeys_t::iterator it = m_strKeys.find(entry);
-	if (it != m_strKeys.end())
+	if (it != m_strKeys.end() && (it->second.first == p_default))
 	{
 		return it->second.second;
 	}
@@ -161,22 +161,22 @@ std::string & SettingsManager::AssociateString(LPCSTR p_plugin, LPCSTR p_compone
 
 void SettingsManager::ReadSettings()
 {
-	for(intKeys_t::iterator i = m_intKeys.begin(); i != m_intKeys.end(); ++i)
+	for (intKeys_t::iterator i = m_intKeys.begin(); i != m_intKeys.end(); ++i)
 	{
 		i->second.second = ReadInt(m_fileName.c_str(), i->first.c_str(), i->second.first);
 	}
-	for(uIntKeys_t::iterator i = m_uIntKeys.begin(); i != m_uIntKeys.end(); ++i)
-		{
-			i->second.second = ReadInt(m_fileName.c_str(), i->first.c_str(), i->second.first);
-		}
-	for(boolKeys_t::iterator i = m_boolKeys.begin(); i != m_boolKeys.end(); ++i)
-		{
-			i->second.second = ReadBool(m_fileName.c_str(), i->first.c_str(), i->second.first);
-		}
-	for(strKeys_t::iterator i = m_strKeys.begin(); i != m_strKeys.end(); ++i)
-		{
-			i->second.second = ReadString(m_fileName.c_str(), i->first.c_str(), i->second.first.c_str());
-		}
+	for (uIntKeys_t::iterator i = m_uIntKeys.begin(); i != m_uIntKeys.end(); ++i)
+	{
+		i->second.second = ReadInt(m_fileName.c_str(), i->first.c_str(), i->second.first);
+	}
+	for (boolKeys_t::iterator i = m_boolKeys.begin(); i != m_boolKeys.end(); ++i)
+	{
+		i->second.second = ReadBool(m_fileName.c_str(), i->first.c_str(), i->second.first);
+	}
+	for (strKeys_t::iterator i = m_strKeys.begin(); i != m_strKeys.end(); ++i)
+	{
+		i->second.second = ReadString(m_fileName.c_str(), i->first.c_str(), i->second.first.c_str());
+	}
 }
 
 void SettingsManager::WriteSetting(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key)
