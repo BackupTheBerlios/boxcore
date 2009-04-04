@@ -2,7 +2,11 @@
  * boxBar is a system tray plugin for Blackbox for Windows.
  * @author Shaun Barlow "Carsomyr" <carsomyr@users.berlios.de>
  *
- * You can also see
+ * @section boxBarChangelog Changelog
+ * @subsection boxBar_0_1_0 boxBar 0.1.0
+ *
+ * @section boxBarSettings Settings
+ * For settings that you can change in the RC file you can see
  * - @subpage boxBarRC
  * - @subpage boxBarRCAdvanced
  */
