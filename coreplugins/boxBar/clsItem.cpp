@@ -28,9 +28,9 @@ bool clsItem::AssignButton(LPCSTR p_data, mouseFunction & p_hook, LPCSTR & p_bro
   * Initialises all members to safe values, and sets an items vertical state as requested
   */
 clsItem::clsItem(bool pVertical, LPCSTR p_itemName, INT &p_maxSizeX) :
-	vertical(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "Vertical", pVertical)),
-	m_maxSizeX(p_maxSizeX),
-	m_itemPrefix(strdup(p_itemName))
+		vertical(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "Vertical", pVertical)),
+		m_maxSizeX(p_maxSizeX),
+		m_itemPrefix(strdup(p_itemName))
 {
 	style = 0;
 	itemArea.left = itemArea.right = itemArea.top = itemArea.bottom = 0;
@@ -411,7 +411,7 @@ void clsItem::draw(HDC pContext)
 			tempArea.right = itemArea.right - itemArea.left;
 			tempArea.bottom = itemArea.bottom - itemArea.top;
 			BitBlt(internalDC, tempArea.left, tempArea.top, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top,
-			       pContext, itemArea.left, itemArea.top, SRCCOPY);
+				   pContext, itemArea.left, itemArea.top, SRCCOPY);
 			MakeStyleGradient(internalDC, &tempArea, bbStyle.getStyle(style), bbStyle.getStyleBorder(style));
 			msimg32.AlphaBlend(pContext, itemArea.left, itemArea.top,
 							   itemArea.right - itemArea.left, itemArea.bottom - itemArea.top,
