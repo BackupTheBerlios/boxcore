@@ -3,25 +3,34 @@
 #include "clsTrayItem.h"
 #include <cstdlib>
 #include <tchar.h>
-#include "rcworker/clsRCInt.h"
-#include "rcworker/clsRCConditional.h"
-#include "rcworker/clsRCBool.h"
 
-clsTrayItemCollection::clsTrayItemCollection(bool pVertical):clsItemCollection(pVertical)
+/**
+ * @page boxBarRC RC settings for boxBar
+ * @section boxBarTray Settings which control the system tray
+ * The system tray is a collection item, so settings for @ref boxBarCollection "Collection Items" also apply.
+ *
+ * @code boxBar.Tray.NumRows: 0 @endcode
+ * Number of rows in the tray
+ * @note Only used when the tray is in vertical mode
+ *
+ * @code boxBar.Tray.NumCols: 0 @endcode
+ * Number of columns in the tray
+ * @note Only used when the tray is not in vertical mode
+ *
+ * @code boxBar.Tray.Vertical: <bar vertical setting> @endcode
+ * Sets whether the tray is drawn vertically or horizontally. Matches the bar setting if not set.
+ * You generally want to set this to false when you want multiple rows if icons on a horizontal bar,
+ * or set this to true for a vertical bar when you want to restrict the number of columns.
+ */
+
+clsTrayItemCollection::clsTrayItemCollection(bool pVertical, LPCSTR p_itemName):clsItemCollection(pVertical, p_itemName, 0, 1),
+		iconSize(s_settingsManager.AssociateInt(m_pluginPrefix, m_itemPrefix, "IconSize", 16)),
+		numRowCols(s_settingsManager.AssociateInt(m_pluginPrefix, m_itemPrefix, (vertical ? "maxRows" : "maxCols"), 0)),
+		m_newFirst(s_settingsManager.AssociateBool(m_pluginPrefix, m_itemPrefix, "NewIconsFirst", false)),
+		m_reverseOrder(s_settingsManager.AssociateBool(m_pluginPrefix, m_itemPrefix, "ReverseOrder", false))
 {
 	m_knowsSize = DIM_BOTH;
 	m_wantsStretch = DIM_NONE;
-	m_itemPrefix = new CHAR[strlen("Tray")+1];
-	strcpy(m_itemPrefix, "Tray");
-	CHAR buffer[256];
-	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"IconSize"), iconSize, 16));
-	m_workers.push_back(new RCWorkers::RCBool(configFile, ItemRCKey(buffer, "Vertical"), vertical, vertical));
-	m_workers.push_back(new RCWorkers::RCConditional(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"maxRows"), numRowCols, 0), vertical, true));
-	m_workers.push_back(new RCWorkers::RCConditional(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"maxCols"), numRowCols, 0), vertical, false));
-	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"SpacingBorder"), spacingBorder, 0));
-	m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"SpacingItems"), spacingItems, 2));
-	m_workers.push_back(new RCWorkers::RCBool(configFile, ItemRCKey(buffer, "NewIconsFirst"), m_newFirst, false));
-	m_workers.push_back(new RCWorkers::RCBool(configFile, ItemRCKey(buffer, "ReverseOrder"), m_reverseOrder, false));
 	readSettings();
 	populateTray();
 }
@@ -61,13 +70,12 @@ LRESULT clsTrayItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			if (!strnicmp(msg_string, m_itemPrefix, strlen(m_itemPrefix)))
 			{
 				msg_string += strlen(m_itemPrefix) + 1;
-				if ((element = "vertical") && !stricmp(msg_string, element))
+				if ((element = "Vertical") && !stricmp(msg_string, element))
 				{
 					vertical = !vertical;
-					writeSettings();
-					readSettings();
+					s_settingsManager.WriteSetting(m_pluginPrefix, m_itemPrefix, element);
 					configMenu(NULL, true);
-					PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
+					PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
 				}
 				else if ((element = "ReverseOrder") && !stricmp(msg_string, element))
 				{
@@ -103,12 +111,11 @@ LRESULT clsTrayItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 					configMenu(NULL, true);
 					PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
 				}
-				else if (!strnicmp(msg_string, "iconSize", strlen("iconSize")))
+				else if ((element = "IconSize") && !strnicmp(msg_string, element, strlen(element)))
 				{
-					msg_string += strlen("iconSize");
+					msg_string += strlen(element);
 					iconSize = atoi(msg_string);
-					writeSettings();
-					readSettings();
+					s_settingsManager.WriteSetting(m_pluginPrefix, m_itemPrefix, element);
 					configMenu(NULL, true);
 					PostMessage(barWnd, BOXBAR_UPDATESIZE, 1, 0);
 				}
@@ -165,7 +172,7 @@ void clsTrayItemCollection::populateTray()
 	if (numRowCols > 0)
 	{
 		for (int i=0;i<numRowCols;++i)
-			addItem(new clsItemCollection(!vertical));
+			addItem(new clsItemCollection(!vertical, "TrayInternal", 0, 1));
 	}
 	list<clsItem*>::iterator column = itemList.begin();
 	list<clsItem*>::reverse_iterator columnRev = itemList.rbegin();
@@ -216,10 +223,6 @@ void clsTrayItemCollection::populateTray()
 
 void clsTrayItemCollection::writeSettings()
 {
-	for (std::vector<RCWorkers::RCWorker *>::iterator i = m_workers.begin(); i != m_workers.end(); ++i)
-	{
-		(*i)->WriteValue();
-	}
 }
 
 /** @brief Reads settings from the RC file
