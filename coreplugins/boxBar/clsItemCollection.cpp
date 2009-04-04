@@ -7,6 +7,19 @@ using std::for_each;
 using std::mem_fun;
 using std::bind2nd;
 
+/**
+ * @page boxBarRCAdvanced
+ * @section boxBarCollection Settings which apply to any collection item
+ * These settings can be applied to several items.
+ * These items include @ref boxBarTray "Tray", @ref boxBarTasksArea "TasksArea", @ref boxBarTasks "Tasks".
+ * These settings can also be applied to the bar itself by removing "<item>." from the settings below. Otherwise replace "<item>"
+ * with the item that you want to affect.
+ * @code boxBar.<item>.Spacing.Border: <varies> @endcode
+ * Space left unused around the border of this item, in pixels.
+ * @code boxBar.<item>.Spacing.Items: <varies> @endcode
+ * Space left between items, in pixels.
+ */
+
 clsItemCollection::clsItemCollection(bool pVertical, LPCSTR p_itemName, INT p_defaultBorder, INT p_defaultSpacing, INT &p_maxSizeX) :
 		clsItem(pVertical, p_itemName, p_maxSizeX),
 		spacingBorder(s_settingsManager.AssociateInt(m_pluginPrefix, p_itemName, "Spacing.Border", p_defaultBorder)),
