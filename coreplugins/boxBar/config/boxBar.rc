@@ -10,7 +10,9 @@ boxBar.toggleWithPlugins: true
 
 boxBar.tasks.iconsize: 32
 boxBar.tasks.stretchArea: true
-boxBar.tasks.maxsize.x: 200
+boxBar.tasks.MaxSize.X: 200
+boxBar.Tasks.ShowText: true
+boxBar.Tasks.ShowIcon: true
 
 boxBar.tray.vertical: true
 boxBar.tray.iconsize: 16
@@ -22,11 +24,6 @@ boxBar.tray.newIconsFirst: false
 boxBar.clock.format: %H:%M
 boxBar.clock.tipFormat: %A %d %B %Y
 
-boxBar.button.text: boxButton
-boxBar.button.minsize.x: 80
+boxBar.button.ShowText: false
+boxBar.button.ShowIcon: true
 boxBar.button.leftClick: @bbCore.ShowMenu
-boxBar.button.midclick: @bbCore.MinimizeAll
-boxBar.button.rightclick: @bbCore.RestoreAll
-
-boxBar.drawBackground: true
-boxBar.useAlphaBlend: false
