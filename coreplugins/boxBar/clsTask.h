@@ -35,13 +35,13 @@ protected:
 
 	bool m_fallback;
 
-	static bool s_activeBackground;
+	bool &m_activeBackground;
 	bool &m_inactiveBackground;
 
-	static int inactiveStyle;
-	static int activeStyle;
-	static int activeAlpha;
-	static int inactiveAlpha;
+	static UINT inactiveStyle;
+	static UINT activeStyle;
+	static UINT activeAlpha;
+	static UINT inactiveAlpha;
 
 	bool &m_showIcon;
 	bool &m_showText;

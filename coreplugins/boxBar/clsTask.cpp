@@ -19,10 +19,22 @@ namespace Plugin_boxBar
  *
  * @code boxBar.Tasks.ShowText: true @endcode
  * Determines whether tasks display the window title, or not.
+ *
+ * @page boxBarRCAdvanced
+ * @section boxBarTasksAdv Tasks
+ * Advanced settings for @ref boxBarTasks.
+ *
+ * @code boxBar.Tasks.Active.Background: true @endcode
+ * Sets whether active tasks draw a background for the task.
+ *
+ * @code boxBar.Tasks.Inactive.Background: true @endcode
+ * Sets whether inactive tasks draw a background for the task.
  */
 
-Task::Task(HWND p_Task, bool pVertical, LPCSTR p_itemName): clsItemCollection(pVertical, "Tasks", 2, 2, s_settingsManager.AssociateInt(m_pluginPrefix, p_itemName, "MaxSize.X", 0)),
-		iconSize(s_settingsManager.AssociateUInt(m_pluginPrefix, p_itemName, "IconSize", 16)),
+Task::Task(HWND p_Task, bool pVertical, LPCSTR p_itemName):
+		clsItemCollection(pVertical, "Tasks", 2, 2, minMaxStruct(dummyZeroInt, s_settingsManager.AssociateInt(m_pluginPrefix, p_itemName, "MaxSize.X", 0))),
+		iconSize(s_settingsManager.AssociateUInt(m_pluginPrefix, p_itemName, "IconSize", 32)),
+		m_activeBackground(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "Active.Background", true)),
 		m_inactiveBackground(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "Inactive.Background", true)),
 		m_showIcon(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "ShowIcon", true)),
 		m_showText(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "ShowText", true))
@@ -37,7 +49,6 @@ Task::Task(HWND p_Task, bool pVertical, LPCSTR p_itemName): clsItemCollection(pV
 	//m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"active.alpha"), activeAlpha, 255));
 	//m_workers.push_back(new RCWorkers::RCInt(configFile, ItemRCKey(buffer,"inactive.alpha"), inactiveAlpha, 255));
 	//m_workers.push_back(new RCWorkers::RCBool(configFile, ItemRCKey(buffer, "active.background"), s_activeBackground, true));
-	//m_workers.push_back(new RCWorkers::RCBool(configFile, ItemRCKey(buffer, "inactive.background"), s_inactiveBackground, true));
 	readSettings();
 	if (GetTask(GetActiveTask()) == p_Task)
 	{
@@ -259,7 +270,7 @@ void Task::readSettings()
 	{
 		m_maxSizeX = INT_MAX;
 	}
-	activeStyle = s_activeBackground ? SN_TOOLBARWINDOWLABEL : 0;
+	activeStyle = m_activeBackground ? SN_TOOLBARWINDOWLABEL : 0;
 	inactiveStyle = m_inactiveBackground ? SN_TOOLBAR : 0;
 }
 
@@ -330,25 +341,24 @@ void Task::configMenu(Menu *pMenu, bool p_update)
 	char ansiCaption[256];
 	char command[256];
 	CopyString(ansiCaption, m_caption, 256);
-	sprintf(command, "%s (%llu)", ansiCaption, (UINT64)taskWnd);
+	sprintf(command, "%s (%Iu)", ansiCaption, (UINT_PTR)taskWnd);
 	Menu *subMenu = MakeNamedMenu(command, command, !p_update);
 	MakeSubmenu(pMenu, subMenu, command);
 
-	sprintf(command, "@boxbar.task.front.%llu", (UINT64)taskWnd);
+	sprintf(command, "@boxbar.task.front.%Iu", (UINT_PTR)taskWnd);
 	MakeMenuItem(subMenu, "Move to start", command, false);
-	sprintf(command, "@boxbar.task.left.%llu", (UINT64)taskWnd);
+	sprintf(command, "@boxbar.task.left.%Iu", (UINT_PTR)taskWnd);
 	MakeMenuItem(subMenu, "Move left/up", command, false);
-	sprintf(command, "@boxbar.task.right.%llu", (UINT64)taskWnd);
+	sprintf(command, "@boxbar.task.right.%Iu", (UINT_PTR)taskWnd);
 	MakeMenuItem(subMenu, "Move right/down", command, false);
-	sprintf(command, "@boxbar.task.end.%llu", (UINT64)taskWnd);
+	sprintf(command, "@boxbar.task.end.%Iu", (UINT_PTR)taskWnd);
 	MakeMenuItem(subMenu, "Move to end", command, false);
 }
 
-bool Task::s_activeBackground = true;
-int Task::inactiveStyle = SN_TOOLBAR;
-int Task::activeStyle = SN_TOOLBARWINDOWLABEL;
-int Task::inactiveAlpha = 255;
-int Task::activeAlpha = 255;
+UINT Task::inactiveStyle = SN_TOOLBAR;
+UINT Task::activeStyle = SN_TOOLBARWINDOWLABEL;
+UINT Task::inactiveAlpha = 255;
+UINT Task::activeAlpha = 255;
 
 }
 
