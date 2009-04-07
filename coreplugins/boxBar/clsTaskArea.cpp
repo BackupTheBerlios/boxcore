@@ -38,7 +38,7 @@ TaskArea::~TaskArea()
 	m_dropTarget->Release();
 }
 
-class TaskIsHWnd : public std::binary_function<clsItem *, HWND, bool>
+class TaskIsHWnd : public std::binary_function<Item *, HWND, bool>
 {
 public:
 	result_type operator() (first_argument_type p_task, second_argument_type p_hWnd) const
@@ -253,7 +253,7 @@ void TaskArea::configMenu(Menu *pMenu, bool p_update)
 	}
 }
 
-void TaskArea::DragAction(clsItem * p_item, eDragDropState p_state, INT p_x, INT p_y)
+void TaskArea::DragAction(Item * p_item, eDragDropState p_state, INT p_x, INT p_y)
 {
 	TaskArea *taskCollection = dynamic_cast<TaskArea *>(p_item);
 	if (taskCollection)

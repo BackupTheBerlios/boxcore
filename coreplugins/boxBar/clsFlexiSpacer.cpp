@@ -3,7 +3,7 @@
 namespace Plugin_boxBar
 {
 
-clsFlexiSpacer::clsFlexiSpacer(bool pVertical): clsItem(pVertical)
+clsFlexiSpacer::clsFlexiSpacer(bool pVertical): Item(pVertical)
 {
 	if (vertical)
 	{

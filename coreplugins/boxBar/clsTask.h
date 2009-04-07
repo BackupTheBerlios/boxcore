@@ -30,7 +30,7 @@ protected:
 
 	UINT &iconSize;
 
-	clsTextItem *captionItem;
+	Text *captionItem;
 	clsIconItem *iconItem;
 
 	bool m_fallback;
@@ -46,8 +46,8 @@ protected:
 	bool &m_showIcon;
 	bool &m_showText;
 private:
-	static void activateTask(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
-	static void WindowMenu(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
+	static void activateTask(Item *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
+	static void WindowMenu(Item *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	static VOID CALLBACK SmallIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult);
 	static VOID CALLBACK LargeIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, LRESULT p_lResult);

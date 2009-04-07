@@ -6,7 +6,7 @@
 namespace Plugin_boxBar
 {
 
-class clsFlexiSpacer : public clsItem
+class clsFlexiSpacer : public Item
 {
 public:
 	clsFlexiSpacer(bool pVertical);

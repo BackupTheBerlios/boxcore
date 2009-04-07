@@ -3,7 +3,7 @@
 namespace Plugin_boxBar
 {
 
-clsIconItem::clsIconItem(HICON pIcon, UINT pSize, bool pVertical):clsItem(pVertical)
+clsIconItem::clsIconItem(HICON pIcon, UINT pSize, bool pVertical):Item(pVertical)
 {
 	icon = CopyIcon(pIcon);
 	iconSize = pSize;

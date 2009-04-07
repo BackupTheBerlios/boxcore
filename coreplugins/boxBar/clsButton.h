@@ -13,7 +13,7 @@
 namespace Plugin_boxBar
 {
 
-class clsTextItem;
+class Text;
 class clsIconItem;
 
 class Button: public clsItemCollection
@@ -30,7 +30,7 @@ protected:
 	std::string &m_buttonText;
 
 	clsIconItem *m_iconItem;
-	clsTextItem *m_textItem;
+	Text *m_textItem;
 };
 
 }

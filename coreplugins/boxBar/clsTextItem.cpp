@@ -5,7 +5,7 @@
 namespace Plugin_boxBar
 {
 
-clsTextItem::clsTextItem(LPCSTR pText, UINT pStyle, bool pVertical, dimType p_knowsSize): clsItem(pVertical)
+Text::Text(LPCSTR pText, UINT pStyle, bool pVertical, dimType p_knowsSize): Item(pVertical)
 {
 	m_knowsSize = p_knowsSize;
 	m_wantsStretch = ((m_knowsSize & DIM_HORIZONTAL) ? DIM_NONE : DIM_HORIZONTAL);
@@ -20,7 +20,7 @@ clsTextItem::clsTextItem(LPCSTR pText, UINT pStyle, bool pVertical, dimType p_kn
 	}
 }
 
-clsTextItem::clsTextItem(LPCWSTR pText, UINT pStyle, bool pVertical, dimType p_knowsSize): clsItem(pVertical)
+Text::Text(LPCWSTR pText, UINT pStyle, bool pVertical, dimType p_knowsSize): Item(pVertical)
 {
 	m_knowsSize = p_knowsSize;
 	m_wantsStretch = ((m_knowsSize & DIM_HORIZONTAL) ? DIM_NONE : DIM_HORIZONTAL);
@@ -35,7 +35,7 @@ clsTextItem::clsTextItem(LPCWSTR pText, UINT pStyle, bool pVertical, dimType p_k
 	}
 }
 
-clsTextItem::~clsTextItem()
+Text::~Text()
 {
 	//dtor
 }
@@ -44,9 +44,9 @@ clsTextItem::~clsTextItem()
   *
   * @todo: document this function
   */
-void clsTextItem::draw(HDC pContext)
+void Text::draw(HDC pContext)
 {
-	clsItem::draw(pContext);
+	Item::draw(pContext);
 	HDC internalDC;
 	HBITMAP alphaBitmap = NULL, oldBitmap = NULL;
 	COLORREF oldColor;
@@ -124,7 +124,7 @@ void clsTextItem::draw(HDC pContext)
   *
   * @todo: document this function
   */
-void clsTextItem::calculateSizes(bool pSizeGiven)
+void Text::calculateSizes(bool pSizeGiven)
 {
 	if (!pSizeGiven)
 	{
@@ -144,7 +144,7 @@ void clsTextItem::calculateSizes(bool pSizeGiven)
   *
   * @todo: document this function
   */
-void clsTextItem::setText(CONST CHAR *pText)
+void Text::setText(CONST CHAR *pText)
 {
 	CopyString(text, pText, 256);
 	InvalidateRect(barWnd, &itemArea, TRUE);
@@ -155,7 +155,7 @@ void clsTextItem::setText(CONST CHAR *pText)
   *
   * @todo: document this function
   */
-void clsTextItem::setText(CONST WCHAR *pText)
+void Text::setText(CONST WCHAR *pText)
 {
 	CopyString(text, pText, 256);
 	InvalidateRect(barWnd, &itemArea, TRUE);
@@ -167,7 +167,7 @@ void clsTextItem::setText(CONST WCHAR *pText)
   *
   * @todo: document this function
   */
-void clsTextItem::setStyle(UINT pStyle)
+void Text::setStyle(UINT pStyle)
 {
 	fontStyle = pStyle;
 }

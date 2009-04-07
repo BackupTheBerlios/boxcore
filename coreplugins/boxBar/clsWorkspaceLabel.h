@@ -14,8 +14,8 @@ public:
 
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 protected:
-	static void nextWorkspace(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
-	static void prevWorkspace(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
+	static void nextWorkspace(Item *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
+	static void prevWorkspace(Item *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
 private:
 };
 

@@ -71,7 +71,7 @@ Task::Task(HWND p_Task, bool pVertical, LPCSTR p_itemName):
 	}
 	if (m_showText || !m_showIcon)
 	{
-		captionItem = new clsTextItem(m_caption, style, vertical);
+		captionItem = new Text(m_caption, style, vertical);
 		addItem(captionItem);
 	}
 	else
@@ -220,7 +220,7 @@ LRESULT Task::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case BOXBAR_NEEDTIP:
-		if ((clsItem *)lParam == captionItem || (clsItem *)lParam == iconItem)
+		if ((Item *)lParam == captionItem || (Item *)lParam == iconItem)
 		{
 			if (wParam)
 				tipText = m_caption;
@@ -231,14 +231,14 @@ LRESULT Task::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	}
-	return clsItem::wndProc(hWnd, msg, wParam, lParam);
+	return Item::wndProc(hWnd, msg, wParam, lParam);
 }
 
 /** @brief activateTask
   *
   * @todo: document this function
   */
-void Task::activateTask(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
+void Task::activateTask(Item *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	Task *realItem = dynamic_cast<Task *>(pItem);
 	if (realItem)
@@ -247,7 +247,7 @@ void Task::activateTask(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 }
 
-void Task::WindowMenu(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
+void Task::WindowMenu(Item *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	Task *realItem = dynamic_cast<Task *>(pItem);
 	if (realItem)
@@ -265,7 +265,7 @@ void Task::WindowMenu(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
   */
 void Task::readSettings()
 {
-	clsItem::readSettings();
+	Item::readSettings();
 	if (m_maxSizeX <= 0)
 	{
 		m_maxSizeX = INT_MAX;

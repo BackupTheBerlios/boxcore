@@ -24,7 +24,7 @@ namespace Plugin_boxBar
  */
 
 clsItemCollection::clsItemCollection(bool pVertical, LPCSTR p_itemName, INT p_defaultBorder, INT p_defaultSpacing, minMaxStruct p_minMax) :
-		clsItem(pVertical, p_itemName, p_minMax),
+		Item(pVertical, p_itemName, p_minMax),
 		spacingBorder(s_settingsManager.AssociateInt(m_pluginPrefix, p_itemName, "Spacing.Border", p_defaultBorder)),
 		spacingItems(s_settingsManager.AssociateInt(m_pluginPrefix, p_itemName, "Spacing.Items", p_defaultSpacing))
 {
@@ -49,7 +49,7 @@ clsItemCollection::~clsItemCollection()
  */
 void clsItemCollection::draw(HDC pContext)
 {
-	clsItem::draw(pContext);
+	Item::draw(pContext);
 	for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
 	{
 		(*i)->draw(pContext);
@@ -117,7 +117,7 @@ LRESULT clsItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam,
 		}
 		return 0;
 	}
-	return clsItem::wndProc(hWnd, msg, wParam, lParam);
+	return Item::wndProc(hWnd, msg, wParam, lParam);
 }
 
 /** @brief calculateSizes
@@ -237,7 +237,7 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
   *
   * @todo: document this function
   */
-void clsItemCollection::addItem(clsItem *p_item, bool p_front)
+void clsItemCollection::addItem(Item *p_item, bool p_front)
 {
 	if (p_front)
 	{
@@ -256,7 +256,7 @@ void clsItemCollection::addItem(clsItem *p_item, bool p_front)
   */
 void clsItemCollection::move(int pX, int pY)
 {
-	clsItem::move(pX, pY);
+	Item::move(pX, pY);
 	sortItems();
 }
 

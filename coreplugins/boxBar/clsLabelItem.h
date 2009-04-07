@@ -6,7 +6,7 @@
 namespace Plugin_boxBar
 {
 
-class clsLabelItem : public clsTextItem
+class clsLabelItem : public Text
 {
 public:
 	clsLabelItem(bool pVertical);

@@ -203,7 +203,7 @@ LRESULT TrayIcon::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 		}
 	}
-	return clsItem::wndProc(hWnd, msg, wParam, lParam);
+	return Item::wndProc(hWnd, msg, wParam, lParam);
 }
 
 fnGetTrayInfo TrayIcon::GetTrayInfo = NULL;

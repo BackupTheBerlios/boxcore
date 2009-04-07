@@ -6,12 +6,12 @@
 namespace Plugin_boxBar
 {
 
-class clsTextItem : public clsItem
+class Text : public Item
 {
 public:
-	clsTextItem(LPCSTR pText, UINT pStyle, bool pVertical, dimType p_knowsSize = DIM_VERTICAL);
-	clsTextItem(LPCWSTR pText, UINT pStyle, bool pVertical, dimType p_knowsSize = DIM_VERTICAL);
-	virtual ~clsTextItem();
+	Text(LPCSTR pText, UINT pStyle, bool pVertical, dimType p_knowsSize = DIM_VERTICAL);
+	Text(LPCWSTR pText, UINT pStyle, bool pVertical, dimType p_knowsSize = DIM_VERTICAL);
+	virtual ~Text();
 
 	void setText(LPCSTR pText);
 	void setText(LPCWSTR pText);

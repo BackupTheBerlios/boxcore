@@ -23,10 +23,10 @@ protected:
 	bool &stretchTaskarea;
 	void populateTasks();
 
-	std::map<HWND, clsItem *> itemMapping;
+	std::map<HWND, Item *> itemMapping;
 private:
 	std::string m_basePrefix;
-	static void DragAction(clsItem *p_item, eDragDropState p_state, INT p_x, INT p_y);
+	static void DragAction(Item *p_item, eDragDropState p_state, INT p_x, INT p_y);
 	DropTarget *m_dropTarget;
 	Task *m_dragTask;
 	UINT m_dragTimer;

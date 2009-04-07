@@ -11,7 +11,7 @@
 namespace Plugin_boxBar
 {
 
-bool clsItem::AssignButton(LPCSTR p_data, mouseFunction & p_hook, LPCSTR & p_broamSlot)
+bool Item::AssignButton(LPCSTR p_data, mouseFunction & p_hook, LPCSTR & p_broamSlot)
 {
 	if (p_data[0] == '@')
 	{
@@ -39,7 +39,7 @@ bool clsItem::AssignButton(LPCSTR p_data, mouseFunction & p_hook, LPCSTR & p_bro
   *
   * Initialises all members to safe values, and sets an items vertical state as requested
   */
-clsItem::clsItem(bool pVertical, LPCSTR p_itemName, minMaxStruct p_minMax) :
+Item::Item(bool pVertical, LPCSTR p_itemName, minMaxStruct p_minMax) :
 		vertical(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "Vertical", pVertical)),
 		m_maxSizeX(p_minMax.m_maxX),
 		m_itemPrefix(strdup(p_itemName))
@@ -91,7 +91,7 @@ clsItem::clsItem(bool pVertical, LPCSTR p_itemName, minMaxStruct p_minMax) :
   *
   * Removes the tooltip, if it was set.
   */
-clsItem::~clsItem()
+Item::~Item()
 {
 	delete[] tipText;
 	delete[] m_broamLeft;
@@ -108,7 +108,7 @@ clsItem::~clsItem()
   *
   * For use on mouse events, when it is necessary to determine if an item was clicked
   */
-bool clsItem::hitTest(int pX, int pY)
+bool Item::hitTest(int pX, int pY)
 {
 	POINT temp = {pX, pY};
 	return PtInRect(&itemArea, temp);
@@ -118,7 +118,7 @@ bool clsItem::hitTest(int pX, int pY)
   *
   * Moves the item without any checks. Also moves the tootip location if one is set.
   */
-void clsItem::move(int pX, int pY)
+void Item::move(int pX, int pY)
 {
 	ClearTooltip();
 	OffsetRect(&itemArea, pX - itemArea.left, pY - itemArea.top);
@@ -135,7 +135,7 @@ void clsItem::move(int pX, int pY)
   * Resizes the item if the requested size is not negative.This allows a negative size
   * to be used to indicate that the old  size should be kept for that dimension.
   */
-dimType clsItem::resize(int pX, int pY)
+dimType Item::resize(int pX, int pY)
 {
 	ClearTooltip();
 	dimType done = DIM_NONE;
@@ -166,7 +166,7 @@ dimType clsItem::resize(int pX, int pY)
   *
   * Returns the vertical or horizontal size of the item, as requested.
   */
-int clsItem::getSize(dimType pDim)
+int Item::getSize(dimType pDim)
 {
 	switch (pDim)
 	{
@@ -187,7 +187,7 @@ int clsItem::getSize(dimType pDim)
   * the item to that size. Calculations and sizing are only performed when the size
   * was not set externally.
   */
-void clsItem::calculateSizes(bool pSizeGiven)
+void Item::calculateSizes(bool pSizeGiven)
 {
 	if (!pSizeGiven)
 	{
@@ -209,7 +209,7 @@ void clsItem::calculateSizes(bool pSizeGiven)
  * @param lParam The second parameter of the message
  * @return Message dependant value
  */
-LRESULT clsItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT Item::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -330,7 +330,7 @@ LRESULT clsItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
   * as id, so we don't need extra storage to know which tooltip is ours. When called for the first time
   * in a plugin we call initTooltips to create a tooltip window to handle requests.
   */
-void clsItem::setTooltip()
+void Item::setTooltip()
 {
 	if (!tooltipWnd)
 		initTooltips();
@@ -376,7 +376,7 @@ void clsItem::setTooltip()
   * window to values that are suitable for our use.
   * @note This is copied verbatim from bbLeanBars tooltip initalisation
   */
-void clsItem::initTooltips()
+void Item::initTooltips()
 {
 	INITCOMMONCONTROLSEX ic;
 	ic.dwSize = sizeof(INITCOMMONCONTROLSEX);
@@ -413,7 +413,7 @@ void clsItem::initTooltips()
   *
   * If the item has a style set, draws the stylegradient in the item area.
   */
-void clsItem::draw(HDC pContext)
+void Item::draw(HDC pContext)
 {
 	//bool alphaDraw = false;
 	if (style)
@@ -453,7 +453,7 @@ void clsItem::draw(HDC pContext)
   * Items should implement this if they need to perform additional processing besides just having
   * their RCWorkers driven.
   */
-void clsItem::readSettings()
+void Item::readSettings()
 {
 }
 
@@ -465,7 +465,7 @@ void clsItem::readSettings()
   * Each item should handle message which these items will generate itself. This stub does nothing,
   * and is present so that items can ignore this function if they do not need it.
   */
-void clsItem::configMenu(Menu *pMenu, bool p_update)
+void Item::configMenu(Menu *pMenu, bool p_update)
 {
 }
 
@@ -474,7 +474,7 @@ void clsItem::configMenu(Menu *pMenu, bool p_update)
   * Retrieves a DC for the bar window and then draws the item to it. Use this
   * when an item updates, but does not move or change size.
   */
-void clsItem::drawNow()
+void Item::drawNow()
 {
 	HDC barDC = GetDC(barWnd);
 	draw(barDC);
@@ -483,17 +483,17 @@ void clsItem::drawNow()
 
 
 
-clsApiLoader clsItem::bbApiLoader;
-HWND clsItem::barWnd = NULL;
-HWND clsItem::tooltipWnd = NULL;
-CHAR clsItem::configFile[MAX_PATH] = {'\0'};
-clsStyle clsItem::bbStyle;
-HWND clsItem::hBlackboxWnd = NULL;
-HINSTANCE clsItem::hInstance = NULL;
-bool clsItem::alphaDraw = true;
-LPSTR clsItem::m_pluginPrefix = NULL;
+clsApiLoader Item::bbApiLoader;
+HWND Item::barWnd = NULL;
+HWND Item::tooltipWnd = NULL;
+CHAR Item::configFile[MAX_PATH] = {'\0'};
+clsStyle Item::bbStyle;
+HWND Item::hBlackboxWnd = NULL;
+HINSTANCE Item::hInstance = NULL;
+bool Item::alphaDraw = true;
+LPSTR Item::m_pluginPrefix = NULL;
 
-void clsItem::ClearTooltip()
+void Item::ClearTooltip()
 {
 	if (!tooltipWnd)
 		initTooltips();
@@ -509,7 +509,7 @@ void clsItem::ClearTooltip()
 	m_hasTooltip = false;
 }
 
-void clsItem::broam(clsItem *p_item, UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)
+void Item::broam(Item *p_item, UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)
 {
 	switch (p_msg)
 	{
@@ -525,24 +525,24 @@ void clsItem::broam(clsItem *p_item, UINT p_msg, WPARAM p_wParam, LPARAM p_lPara
 	}
 }
 
-LPCSTR clsItem::PluginBroam(LPSTR p_buffer, LPCSTR p_broam)
+LPCSTR Item::PluginBroam(LPSTR p_buffer, LPCSTR p_broam)
 {
 	sprintf(p_buffer, "@%s.%s", m_pluginPrefix, p_broam);
 	return p_buffer;
 }
 
-LPCSTR clsItem::ItemBroam(LPSTR p_buffer, LPCSTR p_broam)
+LPCSTR Item::ItemBroam(LPSTR p_buffer, LPCSTR p_broam)
 {
 	sprintf(p_buffer, "@%s.%s.%s", m_pluginPrefix, m_itemPrefix, p_broam);
 	return p_buffer;
 }
 
-LPCSTR clsItem::ItemRCKey(LPSTR p_buffer, LPCSTR p_key)
+LPCSTR Item::ItemRCKey(LPSTR p_buffer, LPCSTR p_key)
 {
 	sprintf(p_buffer, "%s.%s.%s:", m_pluginPrefix, m_itemPrefix, p_key);
 	return p_buffer;
 }
 
-SettingsManager clsItem::s_settingsManager;
+SettingsManager Item::s_settingsManager;
 
 }

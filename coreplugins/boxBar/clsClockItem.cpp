@@ -67,14 +67,14 @@ LRESULT clsClockItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
   *
   * @todo: document this function
   */
-void clsClockItem::showMenu(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
+void clsClockItem::showMenu(Item *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	PostMessage(hBlackboxWnd, BB_BROADCAST, 0, (LPARAM)"@bbCore.ShowMenu");
 }
 
 #include <string>
 
-void clsClockItem::TimeControlPanel(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
+void clsClockItem::TimeControlPanel(Item *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	BBExecute(NULL, "open", "control.exe","timedate.cpl",NULL,SW_SHOWNORMAL, true);
 }
@@ -101,7 +101,7 @@ void clsClockItem::readSettings()
 
 bool clsClockItem::AssignButton(LPCSTR p_data, mouseFunction &p_hook, LPCSTR &p_broamSlot)
 {
-	if (clsItem::AssignButton(p_data, p_hook, p_broamSlot))
+	if (Item::AssignButton(p_data, p_hook, p_broamSlot))
 	{
 		return true;
 	}

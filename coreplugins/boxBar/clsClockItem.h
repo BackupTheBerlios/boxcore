@@ -20,8 +20,8 @@ protected:
 	TCHAR clockFormat[256];
 	TCHAR clockTipFormat[256];
 private:
-	static void showMenu(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
-	static void TimeControlPanel(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
+	static void showMenu(Item *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
+	static void TimeControlPanel(Item *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
 };
 
 }

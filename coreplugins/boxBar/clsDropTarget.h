@@ -14,14 +14,14 @@ namespace Plugin_boxBar
 
 enum eDragDropState {DRAG_ENTER, DRAG_OVER, DRAG_LEAVE, DRAG_DROP};
 
-class clsItem;
+class Item;
 
-typedef void (*DragAction)(clsItem *item, eDragDropState p_state, INT p_x, INT p_y);
+typedef void (*DragAction)(Item *item, eDragDropState p_state, INT p_x, INT p_y);
 
 class DropTarget : public IDropTarget
 {
 public:
-	DropTarget(clsItem *p_item, DragAction p_drag);
+	DropTarget(Item *p_item, DragAction p_drag);
 	virtual ~DropTarget();
 
 	STDMETHOD(QueryInterface)(REFIID iid, void** ppvObject);
@@ -34,7 +34,7 @@ public:
 private:
 	DWORD m_refCount;
 	DragAction m_dragAction;
-	clsItem *m_item;
+	Item *m_item;
 };
 
 }

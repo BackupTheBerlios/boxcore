@@ -44,7 +44,7 @@ LRESULT clsWorkspaceLabel::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
   *
   * @todo: document this function
   */
-void clsWorkspaceLabel::nextWorkspace(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
+void clsWorkspaceLabel::nextWorkspace(Item *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	PostMessage(hBlackboxWnd, BB_WORKSPACE, BBWS_DESKRIGHT, 0);
 }
@@ -53,7 +53,7 @@ void clsWorkspaceLabel::nextWorkspace(clsItem *pItem, UINT msg, WPARAM wParam, L
   *
   * @todo: document this function
   */
-void clsWorkspaceLabel::prevWorkspace(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
+void clsWorkspaceLabel::prevWorkspace(Item *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	PostMessage(hBlackboxWnd, BB_WORKSPACE, BBWS_DESKLEFT, 0);
 }

@@ -43,12 +43,12 @@ enum dimType {DIM_NONE = 0, DIM_HORIZONTAL = 1, DIM_VERTICAL = 2, DIM_BOTH = 3};
 namespace Plugin_boxBar
 {
 
-class clsItem;
+class Item;
 
 /** @typedef mouseFunction
   * @brief Mouseclick callback signature
   */
-typedef void (*mouseFunction)(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
+typedef void (*mouseFunction)(Item *pItem, UINT msg, WPARAM wParam, LPARAM lParam);
 
 static int dummyMaxInt = INT_MAX;
 static int dummyZeroInt = 0;
@@ -69,11 +69,11 @@ struct minMaxStruct
   * implemented include mouse-click detection with handlers, a basic drawing function,
   * basic resize and move support as well as tooltip support.
   */
-class clsItem
+class Item
 {
 public:
-	clsItem(bool pVertical, LPCSTR p_itemName = NULL, minMaxStruct p_minMax = minMaxStruct());
-	virtual ~clsItem();
+	Item(bool pVertical, LPCSTR p_itemName = NULL, minMaxStruct p_minMax = minMaxStruct());
+	virtual ~Item();
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	virtual void draw(HDC pContext);
@@ -212,7 +212,7 @@ protected:
 	TCHAR *tipText;
 	bool m_hasTooltip;
 
-	static void broam(clsItem *p_item, UINT p_msg, WPARAM p_wParam, LPARAM p_lParam);
+	static void broam(Item *p_item, UINT p_msg, WPARAM p_wParam, LPARAM p_lParam);
 
 	const char* m_broamLeft;
 	const char* m_broamLeftDbl;

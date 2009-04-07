@@ -52,7 +52,7 @@ Button::Button(LPCSTR p_itemName) : clsItemCollection(false, p_itemName, 3),
 	}
 	if (m_hasText)
 	{
-		m_textItem = new clsTextItem(m_buttonText.c_str(),SN_TOOLBARBUTTON,false,DIM_BOTH);
+		m_textItem = new Text(m_buttonText.c_str(),SN_TOOLBARBUTTON,false,DIM_BOTH);
 		addItem(m_textItem);
 	}
 	else
@@ -82,14 +82,14 @@ LRESULT Button::wndProc(HWND p_hWnd, UINT p_msg, WPARAM p_wParam, LPARAM p_lPara
 		style = SN_TOOLBARBUTTONP;
 		RedrawWindow(barWnd, &itemArea,NULL,RDW_INVALIDATE);
 		PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
-		return clsItem::wndProc(p_hWnd, p_msg, p_wParam, p_lParam);
+		return Item::wndProc(p_hWnd, p_msg, p_wParam, p_lParam);
 	case WM_MOUSELEAVE:
 	case WM_RBUTTONUP:
 	case WM_MBUTTONUP:
 	case WM_LBUTTONUP:
 		style = SN_TOOLBARBUTTON;
 		RedrawWindow(barWnd, NULL, NULL,RDW_INVALIDATE|RDW_INTERNALPAINT);
-		return clsItem::wndProc(p_hWnd, p_msg, p_wParam, p_lParam);
+		return Item::wndProc(p_hWnd, p_msg, p_wParam, p_lParam);
 	}
 	return clsItemCollection::wndProc(p_hWnd, p_msg, p_wParam, p_lParam);
 }

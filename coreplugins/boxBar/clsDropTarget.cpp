@@ -10,7 +10,7 @@
 namespace Plugin_boxBar
 {
 
-DropTarget::DropTarget(clsItem *p_item, DragAction p_drag)
+DropTarget::DropTarget(Item *p_item, DragAction p_drag)
 {
 	m_item = p_item;
 	m_dragAction = p_drag;

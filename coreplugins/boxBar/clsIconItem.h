@@ -6,7 +6,7 @@
 namespace Plugin_boxBar
 {
 
-class clsIconItem : public clsItem
+class clsIconItem : public Item
 {
 public:
 	clsIconItem(HICON pIcon, UINT pSize, bool pVertical);
