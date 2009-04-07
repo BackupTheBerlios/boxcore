@@ -39,9 +39,9 @@ bool clsItem::AssignButton(LPCSTR p_data, mouseFunction & p_hook, LPCSTR & p_bro
   *
   * Initialises all members to safe values, and sets an items vertical state as requested
   */
-clsItem::clsItem(bool pVertical, LPCSTR p_itemName, INT &p_maxSizeX) :
+clsItem::clsItem(bool pVertical, LPCSTR p_itemName, minMaxStruct p_minMax) :
 		vertical(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "Vertical", pVertical)),
-		m_maxSizeX(p_maxSizeX),
+		m_maxSizeX(p_minMax.m_maxX),
 		m_itemPrefix(strdup(p_itemName))
 {
 	style = 0;
@@ -197,11 +197,18 @@ void clsItem::calculateSizes(bool pSizeGiven)
 	}
 }
 
-/** @brief Base window procedure for items
-  *
-  * Handles mouse button messages and runs handlers if installed when
-  * a click is detected. Passes all other message to DefWindowProc
-  */
+/**
+ * @brief Base window procedure for items
+ *
+ * Handles mouse button messages and runs handlers if installed when
+ * a click is detected. Passes all other message to DefWindowProc
+ *
+ * @param hWnd The window that the message was sent to
+ * @param msg The message to be processed
+ * @param wParam The first parameter of the message
+ * @param lParam The second parameter of the message
+ * @return Message dependant value
+ */
 LRESULT clsItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)

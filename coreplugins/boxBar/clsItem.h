@@ -53,6 +53,15 @@ typedef void (*mouseFunction)(clsItem *pItem, UINT msg, WPARAM wParam, LPARAM lP
 static int dummyMaxInt = INT_MAX;
 static int dummyZeroInt = 0;
 
+struct minMaxStruct
+{
+	minMaxStruct(INT &p_minX = dummyZeroInt, INT &p_maxX = dummyMaxInt, INT &p_minY = dummyZeroInt, INT &p_maxY = dummyMaxInt):m_minX(p_minX), m_maxX(p_maxX), m_minY(p_minY), m_maxY(p_maxY) {}
+	INT &m_minX;
+	INT &m_maxX;
+	INT &m_minY;
+	INT &m_maxY;
+};
+
 /** @internal
   * @brief Base class for boxBar
   *
@@ -63,7 +72,7 @@ static int dummyZeroInt = 0;
 class clsItem
 {
 public:
-	clsItem(bool pVertical, LPCSTR p_itemName = NULL, INT &p_maxSizeX = dummyMaxInt);
+	clsItem(bool pVertical, LPCSTR p_itemName = NULL, minMaxStruct p_minMax = minMaxStruct());
 	virtual ~clsItem();
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
