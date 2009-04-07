@@ -23,8 +23,8 @@ namespace Plugin_boxBar
  * Space left between items, in pixels.
  */
 
-clsItemCollection::clsItemCollection(bool pVertical, LPCSTR p_itemName, INT p_defaultBorder, INT p_defaultSpacing, INT &p_maxSizeX) :
-		clsItem(pVertical, p_itemName, p_maxSizeX),
+clsItemCollection::clsItemCollection(bool pVertical, LPCSTR p_itemName, INT p_defaultBorder, INT p_defaultSpacing, minMaxStruct p_minMax) :
+		clsItem(pVertical, p_itemName, p_minMax),
 		spacingBorder(s_settingsManager.AssociateInt(m_pluginPrefix, p_itemName, "Spacing.Border", p_defaultBorder)),
 		spacingItems(s_settingsManager.AssociateInt(m_pluginPrefix, p_itemName, "Spacing.Items", p_defaultSpacing))
 {

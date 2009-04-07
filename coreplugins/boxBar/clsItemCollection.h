@@ -13,7 +13,7 @@ typedef std::list<clsItem *> itemList_t;
 class clsItemCollection : public clsItem
 {
 public:
-	clsItemCollection(bool pVertical, LPCSTR p_itemName = NULL, INT p_defaultBorder = 0, INT p_defaultSpacing = 2, INT &p_maxSizeX = dummyMaxInt);
+	clsItemCollection(bool pVertical, LPCSTR p_itemName = NULL, INT p_defaultBorder = 0, INT p_defaultSpacing = 2, minMaxStruct p_minMax = minMaxStruct());
 	virtual ~clsItemCollection();
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	virtual void draw(HDC pContext);
