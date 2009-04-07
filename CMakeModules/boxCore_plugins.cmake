@@ -1,7 +1,13 @@
 find_path(BLACKBOX_INCLUDE_DIR "BBApi.h" PATHS "." "../../blackbox" DOC "Location of BBApi.h")
 message (STATUS "Found BBApi.h in ${BLACKBOX_INCLUDE_DIR}")
 
-find_library(BLACKBOX_LIBRARY "blackbox${BOXCORE_EXE_SUFFIX}" PATHS "." "${CMAKE_CURRENT_BINARY_DIR}" "../../blackbox" "../../build/blackbox" DOC "Location of import library for blackbox.exe")
+if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL AMD64)
+set(EXTRA_BUILD_PATH "../build64/blackbox")
+else (${CMAKE_SYSTEM_PROCESSOR} STREQUAL AMD64)
+set(EXTRA_BUILD_PATH "../../build32/blackbox")
+endif (${CMAKE_SYSTEM_PROCESSOR} STREQUAL AMD64)
+
+find_library(BLACKBOX_LIBRARY "blackbox${BOXCORE_EXE_SUFFIX}" PATHS "." "${CMAKE_CURRENT_BINARY_DIR}" "../../blackbox" "../../build/blackbox" "${EXTRA_BUILD_PATH}" DOC "Location of import library for blackbox.exe")
 add_library(blackbox SHARED IMPORTED)
 set_target_properties(blackbox PROPERTIES
     IMPORTED_IMPLIB "${BLACKBOX_LIBRARY}"
