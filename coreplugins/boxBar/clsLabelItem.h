@@ -1,20 +1,21 @@
 #ifndef CLSLABELITEM_H
 #define CLSLABELITEM_H
 
+#include "clsItemCollection.h"
 #include "clsTextItem.h"
 
 namespace Plugin_boxBar
 {
 
-class clsLabelItem : public Text
+class clsLabelItem : public clsItemCollection
 {
 public:
-	clsLabelItem(bool pVertical);
+	clsLabelItem(bool pVertical, LPCSTR p_itemName = "Label");
 
-	virtual void calculateSizes(bool pSizeGiven = false);
+	//virtual void calculateSizes(bool pSizeGiven = false);
 protected:
+	Text *m_textItem;
 private:
-
 };
 
 }

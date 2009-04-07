@@ -34,8 +34,10 @@ LRESULT clsClockItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			time_t systemTime;
 			time(&systemTime);
+			TCHAR buffer[256];
 			struct tm *ltp = localtime(&systemTime);
-			_tcsftime(text, 256, clockFormat, ltp);
+			_tcsftime(buffer, 256, clockFormat, ltp);
+			m_textItem->setText(buffer);
 			drawNow();
 			if (tipText)
 				delete[] tipText;
@@ -48,7 +50,7 @@ LRESULT clsClockItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			SetTimer(barWnd, ClockTimer, seconds ? 1100 - lt.wMilliseconds : 61000 - lt.wSecond * 1000, NULL);
 			calculateSizes();
 			InvalidateRect(barWnd, &itemArea, TRUE);
-			PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
+			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 			return 0;
 		}
 		break;
