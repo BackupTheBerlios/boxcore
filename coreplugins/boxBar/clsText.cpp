@@ -1,5 +1,5 @@
 #include "BBApi.h"
-#include "clsTextItem.h"
+#include "clsText.h"
 #include <tchar.h>
 
 namespace Plugin_boxBar

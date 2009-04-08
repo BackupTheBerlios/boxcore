@@ -2,8 +2,6 @@
 #include "clsLabelItem.h"
 #include <tchar.h>
 
-#include "clsTextItem.h"
-
 namespace Plugin_boxBar
 {
 

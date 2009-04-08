@@ -2,7 +2,7 @@
 #define CLSLABELITEM_H
 
 #include "clsItemCollection.h"
-#include "clsTextItem.h"
+#include "clsText.h"
 
 namespace Plugin_boxBar
 {

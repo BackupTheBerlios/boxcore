@@ -13,13 +13,14 @@ endif (NOT BOXCORE_FULL_TREE)
 AllowUnicode()
 
 set (BOXBAR_SRCS
-boxBar.cpp
-clsBoxBar.cpp
 clsItem.cpp
 clsItemCollection.cpp
 
 clsIconItem.cpp
-clsTextItem.cpp
+clsText.cpp
+
+boxBar.cpp
+clsBoxBar.cpp
 
 clsTask.cpp
 clsTaskArea.cpp
