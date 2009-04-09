@@ -8,7 +8,7 @@
 #ifndef CLSITBUTTON_H_
 #define CLSITBUTTON_H_
 
-#include "clsItemCollection.h"
+#include "clsCollection.h"
 
 namespace Plugin_boxBar
 {

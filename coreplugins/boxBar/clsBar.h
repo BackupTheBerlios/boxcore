@@ -1,7 +1,7 @@
 #ifndef CLSBAR_H
 #define CLSBAR_H
 
-#include "clsItemCollection.h"
+#include "clsCollection.h"
 #include <tchar.h>
 #include <deque>
 

@@ -1,7 +1,7 @@
 #ifndef CLSTASKITEMCOLLECTION_H
 #define CLSTASKITEMCOLLECTION_H
 
-#include "clsItemCollection.h"
+#include "clsCollection.h"
 #include "clsDropTarget.h"
 #include <map>
 

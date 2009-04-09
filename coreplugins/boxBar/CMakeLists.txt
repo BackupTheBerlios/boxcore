@@ -14,8 +14,7 @@ AllowUnicode()
 
 set (BOXBAR_SRCS
 clsItem.cpp
-clsItemCollection.cpp
-
+clsCollection.cpp
 clsIconItem.cpp
 clsText.cpp
 

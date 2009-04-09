@@ -1,7 +1,7 @@
 #ifndef CLSTRAYITEMCOLLECTION_H
 #define CLSTRAYITEMCOLLECTION_H
 
-#include "clsItemCollection.h"
+#include "clsCollection.h"
 
 namespace Plugin_boxBar
 {

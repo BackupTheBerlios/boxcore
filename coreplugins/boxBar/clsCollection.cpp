@@ -1,5 +1,5 @@
 #include "BBApi.h"
-#include "clsItemCollection.h"
+#include "clsCollection.h"
 #include <algorithm>
 #include <functional>
 

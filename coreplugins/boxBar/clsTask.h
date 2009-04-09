@@ -1,7 +1,7 @@
 #ifndef CLSTASKITEM_H
 #define CLSTASKITEM_H
 
-#include "clsItemCollection.h"
+#include "clsCollection.h"
 #include "clsIconItem.h"
 #include "BBApi.h"
 #include <tchar.h>
