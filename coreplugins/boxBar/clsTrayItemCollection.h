@@ -9,7 +9,7 @@ namespace Plugin_boxBar
 /** @internal
  * @brief Implements display of the system tray
  */
-class TrayArea : public clsItemCollection
+class TrayArea : public Collection
 {
 public:
 	TrayArea(bool pVertical, LPCSTR p_itemName = "Tray");

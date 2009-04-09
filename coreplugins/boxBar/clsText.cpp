@@ -79,17 +79,12 @@ void Text::draw(HDC pContext)
 		PostMessage(barWnd, BOXBAR_NEEDTIP, (WPARAM)text, (LPARAM)this);
 	else
 		PostMessage(barWnd, BOXBAR_NEEDTIP, NULL, (LPARAM)this);
+	testRect = itemArea;
 	if (alphaDraw)
 	{
-		testRect.left = testRect.top = 0;
-		testRect.right = itemArea.right - itemArea.left;
-		testRect.bottom = itemArea.bottom - itemArea.top;
-		DrawTextEx(internalDC, text, -1, &testRect, bbStyle.getStyleTextJustify(fontStyle) | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS | DT_NOPREFIX, NULL);
+		OffsetRect(&testRect, -itemArea.left, -itemArea.top);
 	}
-	else
-	{
-		DrawTextEx(internalDC, text, -1, &itemArea, bbStyle.getStyleTextJustify(fontStyle) | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS | DT_NOPREFIX, NULL);
-	}
+	DrawTextEx(internalDC, text, -1, &testRect, bbStyle.getStyleTextJustify(fontStyle) | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS | DT_NOPREFIX, NULL);
 	SetTextColor(internalDC, oldColor);
 	SelectObject(internalDC, oldFont);
 	if (alphaDraw)

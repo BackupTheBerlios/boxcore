@@ -15,7 +15,7 @@ using std::deque;
 enum ePosition {POS_TOP = 1, POS_VCENTER = 2, POS_BOTTOM = 4, POS_LEFT = 8, POS_CENTER = 16, POS_RIGHT = 32};
 
 
-class clsBar : public clsItemCollection
+class clsBar : public Collection
 {
 public:
 	clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertical = false);
@@ -30,6 +30,8 @@ public:
 
 	void QueueTip(Tip *p_tip);
 	void KillTips(HWND p_hWnd, UINT p_uID);
+
+	static void SetPluginName(TCHAR *p_pluginName);
 protected:
 	void populateBar();
 private:
@@ -66,7 +68,7 @@ private:
 	UINT barLocation;
 	UINT m_barHGrowth;
 	UINT m_barVGrowth;
-	int sizePercentage;
+	INT &sizePercentage;
 
 	deque<Tip *> m_tipQueue;
 	Tip * m_activeTip;

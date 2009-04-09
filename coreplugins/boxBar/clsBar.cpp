@@ -18,16 +18,26 @@
 using namespace Plugin_boxBar;
 
 /**
- * @page boxBarRC RC settings for boxBar
+ * @page boxBarRC
  * @section Bar General settings
+ * @code boxBar.Percentage: 80 @endcode
+ * Sets the percentage of screen width (vertical: false) or height (vertical: true) that the bar will occupy.
+ * Ignored if no items on the bar are allow stretching.
+ *
  * @code boxBar.Vertical: false @endcode
  * Determines whether the bar is drawn vertically or horizontally
+ *
  * @code boxBar.Items: Button,Tasks,Tray,Clock @endcode
- * Select the items to show on the bar. Available items are @ref boxBarTray "Tray", @ref boxBarButton "Button"
- * and each name links to its appropriate settings in this file.
+ * Select the items to show on the bar. Available items are @ref boxBarTray, @ref boxBarButton,
+ * @ref boxBarTasks and each name links to its appropriate settings in this file.
+ *
+ * @page boxBarRCAdvanced
+ * @section boxBarAdv General Settings
  */
 
-clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertical): clsItemCollection(pVertical, NULL, 0, 2)
+clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertical):
+		Collection(pVertical, NULL, 3, 2),
+		sizePercentage(s_settingsManager.AssociateInt(m_pluginPrefix, NULL, "Percentage", 80))
 {
 	trackMouse = false;
 	isBar = true;
@@ -41,9 +51,7 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertica
 	hBlackboxWnd = GetBBWnd();
 	char rcname[100];
 	char pluginpath[MAX_PATH];
-	CopyString(rcname, pClassName, 95);
-	m_pluginPrefix = new CHAR[_tcslen(className)+1];
-	CopyString(m_pluginPrefix, className, _tcslen(className)+1);
+	CopyString(rcname, className, 95);
 	strcat(rcname, ".rc");
 	GetModuleFileNameA(hInstance, pluginpath, MAX_PATH);
 	if (strrchr(pluginpath, '\\'))
@@ -56,6 +64,7 @@ clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertica
 		strcat(configFile, rcname);
 	}
 	s_settingsManager.AttachFile(configFile);
+	s_settingsManager.ReadSettings();
 	readSettings();
 
 	margin = 0;
@@ -311,6 +320,12 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		// ----------------------------------------------------------
 		// Blackbox sends Broams to all windows...
 
+		/**
+		 * @page boxBarBroams
+		 * @section boxBarBar
+		 * @code @boxBar.Percentage XX @endcode
+		 * Changes the boxBar.Percentage setting
+		 */
 	case BB_BROADCAST:
 	{
 		const char *msg_string = (LPCSTR)lParam + 1;
@@ -318,23 +333,28 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if (!strnicmp(msg_string, m_pluginPrefix, strlen(m_pluginPrefix)))
 		{
 			msg_string += strlen(m_pluginPrefix) + 1;
+
 			if ((element = "percentage") && !strnicmp(msg_string, element, strlen(element)))
 			{
 				msg_string += strlen(element);
 				sizePercentage = atoi(msg_string);
-				WriteInt(configFile, "boxBar.percentage:", sizePercentage);
+				s_settingsManager.WriteSetting(m_pluginPrefix, NULL, element);
 				readSettings();
 				calculateSizes();
 				RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
 			}
-			else if ((element = "vertical") && !strnicmp(msg_string, element, strlen(element)))
+			else if ((element = "Vertical") && !strnicmp(msg_string, element, strlen(element)))
 			{
 				vertical = !vertical;
-				WriteBool(configFile, "boxBar.vertical:", vertical);
+				s_settingsManager.WriteSetting(m_pluginPrefix, NULL, element);
 				resize(1, 1);
 				populateBar();
 				RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 				PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
+			}
+			else if ((element = "DumpSettings") && !strnicmp(msg_string, element, strlen(element)))
+			{
+				s_settingsManager.WriteSettings();
 			}
 			else if ((element = "align") && !strnicmp(msg_string, element, strlen(element)))
 			{
@@ -528,7 +548,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_MOUSELEAVE:
 		trackMouse = false;
-		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
+		return Collection::wndProc(hWnd, msg, wParam, lParam);
 	case WM_MOUSEMOVE:
 		if (user32.TrackMouseEvent && !trackMouse)
 		{
@@ -540,7 +560,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			user32.TrackMouseEvent(&mouseTrack);
 			trackMouse = true;
 		}
-		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
+		return Collection::wndProc(hWnd, msg, wParam, lParam);
 	case WM_TIMER:
 		if (wParam == m_tipTimer)
 		{
@@ -550,12 +570,12 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				m_activeTip->Timeout();
 			}
 		}
-		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
+		return Collection::wndProc(hWnd, msg, wParam, lParam);
 	default:
-		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
+		return Collection::wndProc(hWnd, msg, wParam, lParam);
 	}
 
-	return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
+	return Collection::wndProc(hWnd, msg, wParam, lParam);
 }
 
 /** @brief Resizes the item and the window
@@ -605,7 +625,7 @@ dimType clsBar::resize(int pX, int pY)
 			newY = barRect.top + dY;
 	}
 	SetWindowPos(barWnd, NULL, newX, newY, pX, pY, SWP_NOACTIVATE | SWP_NOZORDER);
-	dimType tempReturn = clsItemCollection::resize(pX, pY);
+	dimType tempReturn = Collection::resize(pX, pY);
 	bufferInfo.bmiHeader.biWidth = itemArea.right - itemArea.left;
 	bufferInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
 	SelectObject(buffer, origBitmap);
@@ -627,7 +647,7 @@ dimType clsBar::resize(int pX, int pY)
   */
 void clsBar::calculateSizes(bool pSizeGiven)
 {
-	clsItemCollection::calculateSizes(true);
+	Collection::calculateSizes(true);
 	if (margin)
 		SetDesktopMargin(barWnd, marginEdge, margin);
 }
@@ -760,7 +780,7 @@ void clsBar::configMenu(Menu *pMenu, bool p_update)
 	MakeMenuItem(subSubMenu, "Center", PluginBroam(buffer, "align.horizontal.center"), m_barHGrowth & POS_CENTER);
 	MakeMenuItem(subSubMenu, "Right", PluginBroam(buffer, "align.horizontal.right"), m_barHGrowth & POS_RIGHT);
 	MakeMenuItem(subSubMenu, "Auto", PluginBroam(buffer, "align.horizontal.auto"), !m_barHGrowth);
-	clsItemCollection::configMenu(pMenu, p_update);
+	Collection::configMenu(pMenu, p_update);
 }
 
 /** @brief readSettings
@@ -769,7 +789,6 @@ void clsBar::configMenu(Menu *pMenu, bool p_update)
   */
 void clsBar::readSettings()
 {
-	sizePercentage = ReadInt(configFile, "boxBar.percentage:", 80);
 	if (!inSlit)
 	{
 		setMargin = ReadBool(configFile, "boxBar.setMargin:", true);
@@ -807,11 +826,10 @@ void clsBar::readSettings()
 		m_barHGrowth |= POS_RIGHT;
 	}
 
-	vertical = ReadBool(configFile, "boxBar.vertical:", false);
 	toggleWithPlugins = ReadBool(configFile, "boxBar.TogglewithPlugins:", true);
 	useSlit = ReadBool(configFile, "boxBar.useSlit:", false);
-	spacingBorder = ReadInt(configFile, "boxBar.spacingBorder:", 3);
-	spacingItems = ReadInt(configFile, "boxBar.spacingItems:", 2);
+	//spacingBorder = ReadInt(configFile, "boxBar.spacingBorder:", 3);
+	//spacingItems = ReadInt(configFile, "boxBar.spacingItems:", 2);
 	itemAlpha = ReadInt(configFile, "boxBar.alpha:", 255);
 	if (itemAlpha > 255)
 		itemAlpha = 255;
@@ -904,5 +922,10 @@ void clsBar::ShowTip(Tip *p_tip)
 	SetTimer(barWnd, m_tipTimer, 10000, NULL);
 }
 
-
+void clsBar::SetPluginName(TCHAR *p_pluginName)
+{
+	delete [] m_pluginPrefix;
+	m_pluginPrefix = new CHAR[_tcslen(p_pluginName)+1];
+	CopyString(m_pluginPrefix, p_pluginName, _tcslen(p_pluginName)+1);
+}
 

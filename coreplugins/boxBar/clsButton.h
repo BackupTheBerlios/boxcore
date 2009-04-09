@@ -16,7 +16,7 @@ namespace Plugin_boxBar
 class Text;
 class clsIconItem;
 
-class Button: public clsItemCollection
+class Button: public Collection
 {
 public:
 	Button(LPCSTR p_itemName = "Button");

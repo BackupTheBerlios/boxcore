@@ -13,25 +13,11 @@ namespace Plugin_boxBar
  * The Tray item implements a system tray. The tray is a @ref boxBarCollection,
  * so those settings can be applied if desired.
  *
- * @code boxBar.Tray.IconSize: 16 @endcode
- * The size of tray icons, in pixels.
- *
  * @code boxBar.Tray.NewIconsFirst: false @endcode
  * Sets whether the newest icons are added at the beginning or at the end of the tray.
  * This changes the order of the icons without affecting inserted spacers
  * (in multi-line or multi-column modes). Can be combined with ReverseOrder to only move spacers
  * without changing the icon order
- *
- * @code boxBar.Tray.NumRows: 0 @endcode
- * Number of rows in the tray
- * @note Only used when the tray is in vertical mode
- *
- * @code boxBar.Tray.NumCols: 0 @endcode
- * Number of columns in the tray
- * @note Only used when the tray is not in vertical mode
- *
- * @code boxBar.Tray.ReverseOrder: true @endcode
- * This setting reverse the order of icons and spacers.
  *
  * @code boxBar.Tray.Vertical: <bar vertical setting> @endcode
  * Sets whether the tray is drawn vertically or horizontally. Matches the bar setting if not set.
@@ -39,10 +25,34 @@ namespace Plugin_boxBar
  * or set this to true for a vertical bar when you want to restrict the number of columns.
  */
 
-TrayArea::TrayArea(bool pVertical, LPCSTR p_itemName):clsItemCollection(pVertical, p_itemName, 0, 1),
+TrayArea::TrayArea(bool pVertical, LPCSTR p_itemName):Collection(pVertical, p_itemName, 0, 1),
+		/** @page boxBarRC
+		 * @code boxBar.Tray.IconSize: 16 @endcode
+		 * The size of tray icons, in pixels.
+		 */
 		iconSize(s_settingsManager.AssociateInt(m_pluginPrefix, m_itemPrefix, "IconSize", 16)),
+		/** @page boxBarRC
+		 * @code boxBar.Tray.NumRows: 0 @endcode
+		 * Number of rows in the tray
+		 * @note Only used when the tray is in vertical mode
+		 *
+		 * @code boxBar.Tray.NumCols: 0 @endcode
+		 * Number of columns in the tray
+		 * @note Only used when the tray is not in vertical mode
+		 */
 		numRowCols(s_settingsManager.AssociateInt(m_pluginPrefix, m_itemPrefix, (vertical ? "maxRows" : "maxCols"), 0)),
+		/**
+		 * @code boxBar.Tray.NewIconsFirst: false @endcode
+		 * Sets whether the newest icons are added at the beginning or at the end of the tray.
+		 * This changes the order of the icons without affecting inserted spacers
+		 * (in multi-line or multi-column modes). Can be combined with ReverseOrder to only move spacers
+		 * without changing the icon order
+		 */
 		m_newFirst(s_settingsManager.AssociateBool(m_pluginPrefix, m_itemPrefix, "NewIconsFirst", false)),
+		/**
+		 * @code boxBar.Tray.ReverseOrder: true @endcode
+		 * This setting reverse the order of icons and spacers.
+		 */
 		m_reverseOrder(s_settingsManager.AssociateBool(m_pluginPrefix, m_itemPrefix, "ReverseOrder", true))
 {
 	m_knowsSize = DIM_BOTH;
@@ -72,7 +82,7 @@ LRESULT TrayArea::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			SendMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 			return 0;
 		case TRAYICON_MODIFIED:
-			return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
+			return Collection::wndProc(hWnd, msg, wParam, lParam);
 		}
 		break;
 	case BB_BROADCAST:
@@ -138,7 +148,7 @@ LRESULT TrayArea::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 	default:
-		return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
+		return Collection::wndProc(hWnd, msg, wParam, lParam);
 	}
 
 	return 0;
@@ -186,7 +196,7 @@ void TrayArea::populateTray()
 	if (numRowCols > 0)
 	{
 		for (int i=0;i<numRowCols;++i)
-			addItem(new clsItemCollection(!vertical, "TrayInternal", 0, 1));
+			addItem(new Collection(!vertical, "TrayInternal", 0, 1));
 	}
 	itemList_t::iterator column = itemList.begin();
 	itemList_t::reverse_iterator columnRev = itemList.rbegin();
@@ -197,14 +207,14 @@ void TrayArea::populateTray()
 		{
 			if (m_reverseOrder && !vertical)
 			{
-				(dynamic_cast<clsItemCollection*>(*columnRev))->addItem(new TrayIcon(trayItem, iconSize, vertical));
+				(dynamic_cast<Collection*>(*columnRev))->addItem(new TrayIcon(trayItem, iconSize, vertical));
 				columnRev++;
 				if (columnRev == itemList.rend())
 					columnRev = itemList.rbegin();
 			}
 			else
 			{
-				(dynamic_cast<clsItemCollection*>(*column))->addItem(new TrayIcon(trayItem, iconSize, vertical), m_reverseOrder);
+				(dynamic_cast<Collection*>(*column))->addItem(new TrayIcon(trayItem, iconSize, vertical), m_reverseOrder);
 				column++;
 				if (column == itemList.end())
 					column = itemList.begin();
@@ -219,14 +229,14 @@ void TrayArea::populateTray()
 		{
 			if (m_reverseOrder && !vertical)
 			{
-				(dynamic_cast<clsItemCollection*>(*columnRev))->addItem(new clsIconItem(NULL, iconSize, vertical));
+				(dynamic_cast<Collection*>(*columnRev))->addItem(new clsIconItem(NULL, iconSize, vertical));
 				columnRev++;
 				if (columnRev == itemList.rend())
 					columnRev = itemList.rbegin();
 			}
 			else
 			{
-				(dynamic_cast<clsItemCollection*>(*column))->addItem(new clsIconItem(NULL, iconSize, vertical), m_reverseOrder);
+				(dynamic_cast<Collection*>(*column))->addItem(new clsIconItem(NULL, iconSize, vertical), m_reverseOrder);
 				column++;
 				if (column == itemList.end())
 					column = itemList.begin();

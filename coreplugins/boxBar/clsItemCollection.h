@@ -10,11 +10,11 @@ namespace Plugin_boxBar
 
 typedef std::list<Item *> itemList_t;
 
-class clsItemCollection : public Item
+class Collection : public Item
 {
 public:
-	clsItemCollection(bool pVertical, LPCSTR p_itemName = NULL, INT p_defaultBorder = 0, INT p_defaultSpacing = 2, minMaxStruct p_minMax = minMaxStruct());
-	virtual ~clsItemCollection();
+	Collection(bool pVertical, LPCSTR p_itemName = NULL, INT p_defaultBorder = 0, INT p_defaultSpacing = 2, minMaxStruct p_minMax = minMaxStruct());
+	virtual ~Collection();
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	virtual void draw(HDC pContext);
 	virtual void addItem(Item *p_item, bool p_front = false);

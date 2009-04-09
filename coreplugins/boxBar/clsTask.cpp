@@ -1,5 +1,5 @@
 #include "clsTask.h"
-#include "clsTextItem.h"
+#include "clsText.h"
 #include <limits.h>
 #include <cstdlib>
 
@@ -32,7 +32,7 @@ namespace Plugin_boxBar
  */
 
 Task::Task(HWND p_Task, bool pVertical, LPCSTR p_itemName):
-		clsItemCollection(pVertical, "Tasks", 2, 2, minMaxStruct(dummyZeroInt, s_settingsManager.AssociateInt(m_pluginPrefix, p_itemName, "MaxSize.X", 0))),
+		Collection(pVertical, "Tasks", 2, 2, minMaxStruct(dummyZeroInt, s_settingsManager.AssociateInt(m_pluginPrefix, p_itemName, "MaxSize.X", 0))),
 		iconSize(s_settingsManager.AssociateUInt(m_pluginPrefix, p_itemName, "IconSize", 32)),
 		m_activeBackground(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "Active.Background", true)),
 		m_inactiveBackground(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "Inactive.Background", true)),

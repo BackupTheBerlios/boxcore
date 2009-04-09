@@ -7,7 +7,7 @@
 namespace Plugin_boxBar
 {
 
-class clsLabelItem : public clsItemCollection
+class clsLabelItem : public Collection
 {
 public:
 	clsLabelItem(bool pVertical, LPCSTR p_itemName = "Label");

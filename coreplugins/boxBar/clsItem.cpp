@@ -425,11 +425,9 @@ void Item::draw(HDC pContext)
 			internalDC = CreateCompatibleDC(pContext);
 			internalBitmap = CreateDIBSection(internalDC, &itemBitmapInfo, DIB_RGB_COLORS, NULL, NULL, 0);
 			origBitmap = (HBITMAP) SelectObject(internalDC, internalBitmap);
-			RECT tempArea;
-			tempArea.left = tempArea.top = 0;
-			tempArea.right = itemArea.right - itemArea.left;
-			tempArea.bottom = itemArea.bottom - itemArea.top;
-			BitBlt(internalDC, tempArea.left, tempArea.top, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top,
+			RECT tempArea = itemArea;
+			OffsetRect(&tempArea, -itemArea.left, -itemArea.top);
+			BitBlt(internalDC, tempArea.left, tempArea.top, tempArea.right, tempArea.bottom,
 				   pContext, itemArea.left, itemArea.top, SRCCOPY);
 			MakeStyleGradient(internalDC, &tempArea, bbStyle.getStyle(style), bbStyle.getStyleBorder(style));
 			msimg32.AlphaBlend(pContext, itemArea.left, itemArea.top,

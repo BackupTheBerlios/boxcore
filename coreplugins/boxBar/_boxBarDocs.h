@@ -7,7 +7,7 @@
  * It should also work under other branches (except xoblite at this point, due to task support), and
  * has had some testing under vanilla bbLean.
  *
- * @sectionboxBarToc Table of Contents
+ * @section boxBarToc Table of Contents
  * - @ref boxBarChangelog
  * - @ref boxBarSettings
  *

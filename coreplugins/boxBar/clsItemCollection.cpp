@@ -23,7 +23,7 @@ namespace Plugin_boxBar
  * Space left between items, in pixels.
  */
 
-clsItemCollection::clsItemCollection(bool pVertical, LPCSTR p_itemName, INT p_defaultBorder, INT p_defaultSpacing, minMaxStruct p_minMax) :
+Collection::Collection(bool pVertical, LPCSTR p_itemName, INT p_defaultBorder, INT p_defaultSpacing, minMaxStruct p_minMax) :
 		Item(pVertical, p_itemName, p_minMax),
 		spacingBorder(s_settingsManager.AssociateInt(m_pluginPrefix, p_itemName, "Spacing.Border", p_defaultBorder)),
 		spacingItems(s_settingsManager.AssociateInt(m_pluginPrefix, p_itemName, "Spacing.Items", p_defaultSpacing))
@@ -34,7 +34,7 @@ clsItemCollection::clsItemCollection(bool pVertical, LPCSTR p_itemName, INT p_de
 	isBar = false;
 }
 
-clsItemCollection::~clsItemCollection()
+Collection::~Collection()
 {
 	for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
 		delete (*i);
@@ -47,7 +47,7 @@ clsItemCollection::~clsItemCollection()
  *
  * Calls the clsItem::draw in case a style was set, then calls draw for each item in the list, passing on the DC.
  */
-void clsItemCollection::draw(HDC pContext)
+void Collection::draw(HDC pContext)
 {
 	Item::draw(pContext);
 	for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
@@ -60,7 +60,7 @@ void clsItemCollection::draw(HDC pContext)
  *
  * @todo: document this function
  */
-LRESULT clsItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam,
+LRESULT Collection::wndProc(HWND hWnd, UINT msg, WPARAM wParam,
 								   LPARAM lParam)
 {
 	switch (msg)
@@ -124,7 +124,7 @@ LRESULT clsItemCollection::wndProc(HWND hWnd, UINT msg, WPARAM wParam,
   *
   * @todo: document this function
   */
-void clsItemCollection::calculateSizes(bool pSizeGiven)
+void Collection::calculateSizes(bool pSizeGiven)
 {
 	dimType additiveDim, maxDim;
 	fixedItemUsed = spacingBorder;
@@ -237,7 +237,7 @@ void clsItemCollection::calculateSizes(bool pSizeGiven)
   *
   * @todo: document this function
   */
-void clsItemCollection::addItem(Item *p_item, bool p_front)
+void Collection::addItem(Item *p_item, bool p_front)
 {
 	if (p_front)
 	{
@@ -254,7 +254,7 @@ void clsItemCollection::addItem(Item *p_item, bool p_front)
   * This function calls clsItem::move() to move the collection itself and then
   * uses sortItems() to reposition the contents of the collection.
   */
-void clsItemCollection::move(int pX, int pY)
+void Collection::move(int pX, int pY)
 {
 	Item::move(pX, pY);
 	sortItems();
@@ -264,7 +264,7 @@ void clsItemCollection::move(int pX, int pY)
  *
  * @todo: document this function
  */
-void clsItemCollection::sortItems()
+void Collection::sortItems()
 {
 	int pos;
 	int available;
@@ -301,7 +301,7 @@ void clsItemCollection::sortItems()
  *
  * This calls configMenu on each contained item
  */
-void clsItemCollection::configMenu(Menu *pMenu, bool p_update)
+void Collection::configMenu(Menu *pMenu, bool p_update)
 {
 	for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
 	{

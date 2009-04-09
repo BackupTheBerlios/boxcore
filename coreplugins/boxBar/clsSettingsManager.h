@@ -12,10 +12,18 @@
 #include <utility>
 #include <windows.h>
 
-typedef std::map<std::string, std::pair<INT, INT> > intKeys_t;
-typedef std::map<std::string, std::pair<UINT, UINT> > uIntKeys_t;
-typedef std::map<std::string, std::pair<bool, bool> > boolKeys_t;
-typedef std::map<std::string, std::pair<std::string, std::string> > strKeys_t;
+struct NoCaseCmp
+{
+	bool operator()(std::string p_a, std::string p_b)
+	{
+		return (stricmp(p_a.c_str(), p_b.c_str()) < 0);
+	}
+};
+
+typedef std::map<std::string, std::pair<INT, INT>, NoCaseCmp> intKeys_t;
+typedef std::map<std::string, std::pair<UINT, UINT>, NoCaseCmp > uIntKeys_t;
+typedef std::map<std::string, std::pair<bool, bool>, NoCaseCmp > boolKeys_t;
+typedef std::map<std::string, std::pair<std::string, std::string>, NoCaseCmp > strKeys_t;
 
 class SettingsManager
 {
@@ -31,6 +39,7 @@ public:
 
 	void ReadSettings();
 	void WriteSetting(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key);
+	void WriteSettings();
 private:
 	std::string m_fileName;
 

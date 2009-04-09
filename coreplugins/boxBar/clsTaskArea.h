@@ -10,7 +10,7 @@ namespace Plugin_boxBar
 
 class Task;
 
-class TaskArea : public clsItemCollection
+class TaskArea : public Collection
 {
 public:
 	TaskArea(bool pVertical, LPCSTR p_itemName = "Tasks.Area");

@@ -14,11 +14,11 @@ namespace Plugin_boxBar
  * @section boxBarTaskArea TaskArea
  * The TaskArea is created as part of the tasks item, and serves to contain the tasks.
  * The TaskArea is a @ref boxBarCollection, so those settings can be applied.
- * @code boxBar.TaskArea.Stretch: true @endcode
+ * @code boxBar.Tasks.Area.Stretch: true @endcode
  * Sets whether the task area is stretched or not. Should only be set to false when using icons only
  */
 
-TaskArea::TaskArea(bool pVertical, LPCSTR p_itemName): clsItemCollection(pVertical, p_itemName, 0, 2),
+TaskArea::TaskArea(bool pVertical, LPCSTR p_itemName): Collection(pVertical, p_itemName, 0, 2),
 		stretchTaskarea(s_settingsManager.AssociateBool(m_pluginPrefix, m_itemPrefix, "Stretch", true)),
 		m_basePrefix(p_itemName)
 {
@@ -116,7 +116,7 @@ LRESULT TaskArea::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 		case TASKITEM_FLASHED:
 		case TASKITEM_ACTIVATED:
-			clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
+			Collection::wndProc(hWnd, msg, wParam, lParam);
 			RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
 			return 0;
 		case TASKITEM_ADDED:
@@ -160,7 +160,7 @@ LRESULT TaskArea::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	}
-	return clsItemCollection::wndProc(hWnd, msg, wParam, lParam);
+	return Collection::wndProc(hWnd, msg, wParam, lParam);
 }
 
 /** @brief populateTasks

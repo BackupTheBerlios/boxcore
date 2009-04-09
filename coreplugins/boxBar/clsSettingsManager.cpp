@@ -227,16 +227,22 @@ void SettingsManager::WriteSetting(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p
 	}
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+void SettingsManager::WriteSettings()
+{
+	for (intKeys_t::iterator i = m_intKeys.begin(); i != m_intKeys.end(); ++i)
+	{
+		WriteInt(m_fileName.c_str(), i->first.c_str(), i->second.second);
+	}
+	for (uIntKeys_t::iterator i = m_uIntKeys.begin(); i != m_uIntKeys.end(); ++i)
+	{
+		WriteInt(m_fileName.c_str(), i->first.c_str(), i->second.second);
+	}
+	for (boolKeys_t::iterator i = m_boolKeys.begin(); i != m_boolKeys.end(); ++i)
+	{
+		WriteBool(m_fileName.c_str(), i->first.c_str(), i->second.second);
+	}
+	for (strKeys_t::iterator i = m_strKeys.begin(); i != m_strKeys.end(); ++i)
+	{
+		WriteString(m_fileName.c_str(), i->first.c_str(), i->second.second.c_str());
+	}
+}

@@ -6,7 +6,7 @@
  */
 
 #include "clsButton.h"
-#include "clsTextItem.h"
+#include "clsText.h"
 #include "clsIconItem.h"
 #include "clsFlexiSpacer.h"
 
@@ -30,7 +30,7 @@ namespace Plugin_boxBar
  * Sets the text that the button displays. Ignored if ShowText is false
  */
 
-Button::Button(LPCSTR p_itemName) : clsItemCollection(false, p_itemName, 3),
+Button::Button(LPCSTR p_itemName) : Collection(false, p_itemName, 3),
 		m_hasIcon(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "ShowIcon", true)),
 		m_hasText(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "ShowText", true)),
 		m_buttonText(s_settingsManager.AssociateString(m_pluginPrefix, p_itemName, "Text", "boxButton"))
@@ -91,7 +91,7 @@ LRESULT Button::wndProc(HWND p_hWnd, UINT p_msg, WPARAM p_wParam, LPARAM p_lPara
 		RedrawWindow(barWnd, NULL, NULL,RDW_INVALIDATE|RDW_INTERNALPAINT);
 		return Item::wndProc(p_hWnd, p_msg, p_wParam, p_lParam);
 	}
-	return clsItemCollection::wndProc(p_hWnd, p_msg, p_wParam, p_lParam);
+	return Collection::wndProc(p_hWnd, p_msg, p_wParam, p_lParam);
 }
 
 void Button::readSettings()

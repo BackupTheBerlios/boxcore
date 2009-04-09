@@ -2,7 +2,6 @@
 #define CLSTASKITEM_H
 
 #include "clsItemCollection.h"
-#include "clsTextItem.h"
 #include "clsIconItem.h"
 #include "BBApi.h"
 #include <tchar.h>
@@ -10,7 +9,9 @@
 namespace Plugin_boxBar
 {
 
-class Task : public clsItemCollection
+class Text;
+
+class Task : public Collection
 {
 public:
 	Task(HWND p_Task, bool pVertical, LPCSTR p_itemName = "Tasks");
