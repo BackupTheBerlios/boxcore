@@ -407,45 +407,6 @@ void Item::initTooltips()
 	SendMessage(tooltipWnd, TTM_SETDELAYTIME, TTDT_RESHOW,    60);
 }
 
-/** @brief Base drawing function for items
-  *
-  * @param[in,out] pContext The drawing context to use, passed on from the WM_PAINT message
-  *
-  * If the item has a style set, draws the stylegradient in the item area.
-  */
-void Item::draw(HDC pContext)
-{
-	//bool alphaDraw = false;
-	if (style)
-	{
-		HDC internalDC;
-		HBITMAP internalBitmap, origBitmap;
-		if (alphaDraw)
-		{
-			internalDC = CreateCompatibleDC(pContext);
-			internalBitmap = CreateDIBSection(internalDC, &itemBitmapInfo, DIB_RGB_COLORS, NULL, NULL, 0);
-			origBitmap = (HBITMAP) SelectObject(internalDC, internalBitmap);
-			RECT tempArea = itemArea;
-			OffsetRect(&tempArea, -itemArea.left, -itemArea.top);
-			BitBlt(internalDC, tempArea.left, tempArea.top, tempArea.right, tempArea.bottom,
-				   pContext, itemArea.left, itemArea.top, SRCCOPY);
-			MakeStyleGradient(internalDC, &tempArea, bbStyle.getStyle(style), bbStyle.getStyleBorder(style));
-			msimg32.AlphaBlend(pContext, itemArea.left, itemArea.top,
-							   itemArea.right - itemArea.left, itemArea.bottom - itemArea.top,
-							   internalDC, 0, 0, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top, itemBlend);
-			SelectObject(internalDC, origBitmap);
-			DeleteObject(internalBitmap);
-			DeleteDC(internalDC);
-		}
-		else
-		{
-			MakeStyleGradient(pContext, &itemArea, bbStyle.getStyle(style), bbStyle.getStyleBorder(style));
-		}
-
-	}
-}
-
-
 /** @brief Base for reading settings from the RC file
   *
   * Items should implement this if they need to perform additional processing besides just having

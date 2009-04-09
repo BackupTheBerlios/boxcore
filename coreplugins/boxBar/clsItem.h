@@ -76,7 +76,7 @@ public:
 	virtual ~Item();
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	virtual void draw(HDC pContext);
+	virtual void draw(HDC pContext) = 0;
 	void drawNow();
 	virtual dimType resize(int pX, int pY);
 	virtual void move(int pX, int pY);
@@ -222,9 +222,10 @@ protected:
 	HRGN m_clipRegion;
 
 	static SettingsManager s_settingsManager;
-private:
+
 	BLENDFUNCTION itemBlend;
-	BITMAPINFO itemBitmapInfo;
+		BITMAPINFO itemBitmapInfo;
+private:
 };
 
 }

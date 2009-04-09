@@ -46,7 +46,6 @@ Text::~Text()
   */
 void Text::draw(HDC pContext)
 {
-	Item::draw(pContext);
 	HDC internalDC;
 	HBITMAP alphaBitmap = NULL, oldBitmap = NULL;
 	COLORREF oldColor;
