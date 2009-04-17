@@ -50,25 +50,6 @@ Bar::Bar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertical): Pl
 
 Bar::~Bar()
 {
-	for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
-		delete (*i);
-	itemList.clear();
-	bbApiLoader.freeLibrary();
-	delete[] m_pluginPrefix;
-	if (eraseBrush)
-		DeleteObject(eraseBrush);
-	if (brushBitmap)
-		DeleteObject(brushBitmap);
-	SelectObject(buffer, origBitmap);
-	DeleteObject(bufferBitmap);
-	DeleteObject(eraseBrush);
-	DeleteObject(brushBitmap);
-	DeleteDC(buffer);
-	if (inSlit)
-		PostMessage(slitWnd, SLIT_REMOVE, 0, (LPARAM)barWnd);
-	DestroyWindow(barWnd);
-	UnregisterClass(className, hInstance);
-	UnregisterClass(TEXT("boxBarTip"), hInstance);
 }
 
 /** @brief realWndProc
@@ -923,7 +904,24 @@ INT Bar::BeginPlugin()
 
 void Bar::EndPlugin()
 {
-
+	for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
+			delete (*i);
+		itemList.clear();
+		bbApiLoader.freeLibrary();
+		if (eraseBrush)
+			DeleteObject(eraseBrush);
+		if (brushBitmap)
+			DeleteObject(brushBitmap);
+		SelectObject(buffer, origBitmap);
+		DeleteObject(bufferBitmap);
+		DeleteObject(eraseBrush);
+		DeleteObject(brushBitmap);
+		DeleteDC(buffer);
+		if (inSlit)
+			PostMessage(slitWnd, SLIT_REMOVE, 0, (LPARAM)barWnd);
+		DestroyWindow(barWnd);
+		UnregisterClass(className, hInstance);
+		UnregisterClass(TEXT("boxBarTip"), hInstance);
 }
 
 }
