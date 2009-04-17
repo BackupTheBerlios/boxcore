@@ -7,6 +7,7 @@ clsShellServiceWindow.cpp
 clsNotifyIconHandler.cpp
 clsNotificationIcon.cpp
 clsAppbarHandler.cpp
+clsNotifyIconRectHandler.cpp
 
 hash.cpp
 
@@ -17,14 +18,8 @@ hash.cpp
 add_library (shellservices STATIC ${SYSTEMTRAY_SRCS})
 target_link_libraries (shellservices ${UNICOWSLIB} debuglib shlwapi)
 
-if (DEBUG_CODE)
-set_target_properties (shellservices PROPERTIES COMPILE_DEFINITIONS "DEBUG")
-else (DEBUG_CODE)
-set_target_properties (shellservices PROPERTIES COMPILE_DEFINITIONS "NDEBUG")
-endif (DEBUG_CODE)
-
 if (MINGW)
 set_target_properties (shellservices PROPERTIES
-	LINK_FLAGS "${BOXCORE_FLAGS_STRIP} ${BOXCORE_FLAGS_PROFILE}"
-	COMPILE_FLAGS "${BOXCORE_FLAGS_OPTIMIZE} ${BOXCORE_FLAGS_PROFILE} -Wall -fno-rtti -fno-exceptions")
+	LINK_FLAGS "${BOXCORE_LINK_FLAGS}"
+	COMPILE_FLAGS "${BOXCORE_COMPILE_FLAGS} -Wall -fno-rtti -fno-exceptions")
 endif (MINGW)

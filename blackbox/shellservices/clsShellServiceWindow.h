@@ -51,7 +51,9 @@ namespace ShellServices
 enum eShellHandlers
 {
 	HANDLER_APPBAR, ///< @brief Indicates a handler for messages from SHAppbarMessage()
-	HANDLER_NOTIFYICON ///< @brief Indicates a handler for messages from Shell_Notifyicon()
+	HANDLER_NOTIFYICON, ///< @brief Indicates a handler for messages from Shell_Notifyicon()
+	HANDLER_RESERVED, ///< @brief Indicates a handler for messages from Shell_Notifyicon()
+	HANDLER_NOTIFYICONRECT ///< @brief Indicates a handler for messages from Shell_Notifyicon()
 };
 
 /** @internal
