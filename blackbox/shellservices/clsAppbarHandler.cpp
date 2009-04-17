@@ -76,6 +76,18 @@ struct INTERNAL_APPBARMSG
 	DWORD dwSourceProcessID;
 };
 
+struct APPBARMSG_V7
+{
+	APPBARDATA_64 abd;
+
+	DWORD dwMessage;
+	DWORD dwPadding1;
+	///Really a handle, but needed for correct spacing on 32 bit hosts
+	UINT64 hSharedMemory;
+	DWORD dwSourceProcessID;
+	DWORD dwPadding3;
+};
+
 namespace ShellServices
 {
 
@@ -106,6 +118,11 @@ HRESULT AppbarHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 		appbarMsg.dwMessage = ((APPBARMSG_32 *)(p_lpData))->dwMessage;
 		appbarMsg.hSharedMemory = (HANDLE)((APPBARMSG_32 *)(p_lpData))->hSharedMemory;
 		appbarMsg.dwSourceProcessID = ((APPBARMSG_32 *)(p_lpData))->dwSourceProcessID;
+		break;
+	case sizeof(APPBARMSG_V7):
+		appbarMsg.dwMessage = ((APPBARMSG_V7 *)(p_lpData))->dwMessage;
+		appbarMsg.hSharedMemory = (HANDLE)((APPBARMSG_V7 *)(p_lpData))->hSharedMemory;
+		appbarMsg.dwSourceProcessID = ((APPBARMSG_V7 *)(p_lpData))->dwSourceProcessID;
 		break;
 	default:
 		return FALSE;
