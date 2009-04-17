@@ -100,6 +100,7 @@ BOOL save_opaquemove;
 
 #include "shellservices/clsShellServiceWindow.h"
 #include "shellservices/clsNotifyIconHandler.h"
+#include "shellservices/clsNotifyIconRectHandler.h"
 #include "shellservices/clsAppbarHandler.h"
 #include "tasks/clsTaskManager.h"
 #include "vwm/clsBBVWM.h"
@@ -108,6 +109,7 @@ BOOL save_opaquemove;
 
 ShellServices::ShellServiceWindow *g_pShellServiceWindow;
 ShellServices::NotifyIconHandler *g_pNotificationIconHandler;
+ShellServices::NotifyIconRectHandler *g_pNotificationIconRectHandler;
 ShellServices::AppbarHandler *g_pAppbarHandler;
 TaskManagement::TaskManagerInterface *g_pTaskManager;
 TaskManagement::VWMInterface *g_pVirtualWindowManager;
@@ -281,6 +283,10 @@ void set_opaquemove(void)
 }
 
 //===========================================================================
+
+#ifndef __VERSION__
+#define __VERSION__ "(not compiled with GCC)"
+#endif
 
 void bb_about(void)
 {
@@ -573,6 +579,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	g_pNotificationIconHandler->RegisterCallback(ShellServices::TCALLBACK_MOD,broadcastMod);
 	g_pNotificationIconHandler->RegisterCallback(ShellServices::TCALLBACK_DEL,broadcastRemove);
 	g_pShellServiceWindow->RegisterHandler(ShellServices::HANDLER_NOTIFYICON, g_pNotificationIconHandler);
+	g_pNotificationIconRectHandler = new ShellServices::NotifyIconRectHandler();
+	g_pShellServiceWindow->RegisterHandler(ShellServices::HANDLER_NOTIFYICONRECT, g_pNotificationIconRectHandler);
 	PRINT("Starting AppBar Handler");
 	g_pAppbarHandler = new ShellServices::AppbarHandler();
 	g_pShellServiceWindow->RegisterHandler(ShellServices::HANDLER_APPBAR, g_pAppbarHandler);
