@@ -15,7 +15,8 @@
 #include "../../dynwinapi/clsUser32.h"
 #include "../../utility/stringcopy.h"
 
-using namespace Plugin_boxBar;
+namespace Plugin_boxBar
+{
 
 /**
  * @page boxBarRC
@@ -35,125 +36,19 @@ using namespace Plugin_boxBar;
  * @section boxBarAdv General Settings
  */
 
-clsBar::clsBar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertical):
-		Collection(pVertical, NULL, 3, 2),
-		sizePercentage(s_settingsManager.AssociateInt(m_pluginPrefix, NULL, "Percentage", 80))
+Bar::Bar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertical): Plugin(pInstance),
+		Collection(pVertical, m_pluginName.c_str(), 3, 2),
+		sizePercentage(s_settingsManager.AssociateInt(m_pluginName.c_str(), NULL, "Percentage", 80))
 {
-	trackMouse = false;
-	isBar = true;
-	slitWnd = pSlit;
-	ZeroMemory(&barBlend, sizeof(barBlend));
-	barBlend.BlendOp = AC_SRC_OVER;
-	brushBitmap = NULL;
-	eraseBrush = NULL;
 	hInstance = pInstance;
-	CopyString(className, pClassName, 100);
-	hBlackboxWnd = GetBBWnd();
-	char rcname[100];
-	char pluginpath[MAX_PATH];
-	CopyString(rcname, className, 95);
-	strcat(rcname, ".rc");
-	GetModuleFileNameA(hInstance, pluginpath, MAX_PATH);
-	if (strrchr(pluginpath, '\\'))
-		(*(strrchr(pluginpath, '\\') + 1)) = '\0';
-	const CHAR *configFileName = ConfigFileExists(rcname, pluginpath);
-	strcpy(configFile, configFileName);
-	if (strlen(configFile) == 0)
-	{
-		strcpy(configFile, pluginpath);
-		strcat(configFile, rcname);
-	}
-	s_settingsManager.AttachFile(configFile);
-	s_settingsManager.ReadSettings();
-	readSettings();
-
-	margin = 0;
-
-	WNDCLASSEX wc;
-	ZeroMemory(&wc, sizeof wc);
-	wc.cbSize = sizeof(wc);
-	wc.lpfnWndProc      = realWndProc;
-	wc.cbClsExtra = sizeof(this);
-	wc.hInstance        = pInstance;
-	wc.lpszClassName    = pClassName;
-	wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
-	wc.style            = CS_DBLCLKS;
-
-	if (!RegisterClassEx(&wc))
-	{
-		MessageBox(NULL ,
-				   TEXT("Error registering window class"), pClassName,
-				   MB_OK | MB_ICONERROR | MB_TOPMOST);
-		return;
-	}
-
-	ZeroMemory(&wc, sizeof(wc));
-	wc.cbSize = sizeof(wc);
-	wc.cbWndExtra = sizeof(this);
-	wc.hInstance        = hInstance;
-	wc.lpszClassName    = TEXT("boxBarTip");
-	wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
-	wc.style            = CS_DBLCLKS;
-	wc.lpfnWndProc      = Tip::realWndProc;
-	RegisterClassEx(&wc);
-
-	int x = ReadInt(configFile, "boxBar.x:", 0);
-	int y = ReadInt(configFile, "boxBar.y:", 0);
-	itemArea.right = 1;
-	itemArea.bottom = 1;
-	barWnd = CreateWindowEx(
-				 WS_EX_TOOLWINDOW | WS_EX_TOPMOST | (enableTransparency ? WS_EX_LAYERED : 0),   // window ex-style
-				 pClassName,          // window class name
-				 NULL,               // window caption text
-				 WS_POPUP | WS_OVERLAPPED, // window style
-				 x,            // x position
-				 y,            // y position
-				 1,           // window width
-				 1,          // window height
-				 NULL,               // parent window
-				 NULL,               // window menu
-				 pInstance,          // hInstance of .dll
-				 this                // creation data
-			 );
-	ShowWindow(barWnd, SW_SHOWNA);
-	if (useSlit && slitWnd)
-	{
-		SendMessage(slitWnd, SLIT_ADD, 0, reinterpret_cast<LPARAM>(barWnd));
-		SendMessage(slitWnd, SLIT_UPDATE, 0, reinterpret_cast<LPARAM>(barWnd));
-		SetWindowPos(barWnd, NULL, x, y, 0, 0, SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOSIZE);
-		inSlit = true;
-		setMargin = false;
-	}
-	else
-	{
-		inSlit = false;
-	}
-
-	buffer = CreateCompatibleDC(NULL);
-	ZeroMemory(&bufferInfo, sizeof(bufferInfo));
-	bufferInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	bufferInfo.bmiHeader.biWidth = 1;
-	bufferInfo.bmiHeader.biHeight = 1;
-	bufferInfo.bmiHeader.biPlanes = 1;
-	bufferInfo.bmiHeader.biBitCount = 32;
-	brushBitmap = CreateDIBSection(buffer, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
-	eraseBrush = CreatePatternBrush(brushBitmap);
-
-	bufferInfo.bmiHeader.biWidth = itemArea.right - itemArea.left;
-	bufferInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
-	bufferBitmap = CreateDIBSection(buffer, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
-	origBitmap = (HBITMAP)SelectObject(buffer, bufferBitmap);
-
+	m_pluginPrefix = m_pluginName.c_str();
 
 	m_activeTip = NULL;
 	m_tipTimer = getTimerID();
 	m_replaceTip = true;
-
-	populateBar();
-
 }
 
-clsBar::~clsBar()
+Bar::~Bar()
 {
 	for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
 		delete (*i);
@@ -180,18 +75,18 @@ clsBar::~clsBar()
   *
   * @todo: document this function
   */
-LRESULT CALLBACK clsBar::realWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Bar::realWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	clsBar *realClass = NULL;
+	Bar *realClass = NULL;
 	switch (msg)
 	{
 	case WM_CREATE:
 	case WM_NCCREATE:
-		realClass = (clsBar *)(((CREATESTRUCT *)lParam)->lpCreateParams);
+		realClass = (Bar *)(((CREATESTRUCT *)lParam)->lpCreateParams);
 		SetClassLongPtr(hWnd, 0, (LONG_PTR)realClass);
 		break;
 	default:
-		realClass = (clsBar *)GetClassLongPtr(hWnd, 0);
+		realClass = (Bar *)GetClassLongPtr(hWnd, 0);
 		break;
 	}
 	if (realClass)
@@ -205,7 +100,7 @@ LRESULT CALLBACK clsBar::realWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
   *
   * @todo: document this function
   */
-LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT Bar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	static int messages[] = { BB_RECONFIGURE, BB_BROADCAST, BB_TRAYUPDATE, BB_TASKSUPDATE, 0};
 
@@ -588,7 +483,7 @@ LRESULT clsBar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
   * The bar window adjustment is dependent on the current alignment of the bar so that right aligned bars
   * grow to the left, left aligned bars grow to the right etc.
   */
-dimType clsBar::resize(int pX, int pY)
+dimType Bar::resize(int pX, int pY)
 {
 	RECT barRect;
 	GetWindowRect(barWnd, &barRect);
@@ -645,7 +540,7 @@ dimType clsBar::resize(int pX, int pY)
   *
   * @todo: document this function
   */
-void clsBar::calculateSizes(bool pSizeGiven)
+void Bar::calculateSizes(bool pSizeGiven)
 {
 	Collection::calculateSizes(true);
 	if (margin)
@@ -656,7 +551,7 @@ void clsBar::calculateSizes(bool pSizeGiven)
   *
   * @todo: document this function
   */
-void clsBar::QueueTip(Tip *p_tip)
+void Bar::QueueTip(Tip *p_tip)
 {
 	if (m_activeTip)
 	{
@@ -673,7 +568,7 @@ void clsBar::QueueTip(Tip *p_tip)
 	}
 }
 
-void clsBar::KillTips(HWND p_hWnd, UINT p_uID)
+void Bar::KillTips(HWND p_hWnd, UINT p_uID)
 {
 	for (deque<Tip *>::iterator i = m_tipQueue.begin(); i != m_tipQueue.end(); ++i)
 	{
@@ -702,7 +597,7 @@ void clsBar::KillTips(HWND p_hWnd, UINT p_uID)
 	}
 }
 
-void clsBar::populateBar()
+void Bar::populateBar()
 {
 	hasTray = false;
 	lastMouse = NULL;
@@ -757,7 +652,7 @@ void clsBar::populateBar()
   *
   * This function adds a submenu for configuration of the main bar.
   */
-void clsBar::configMenu(Menu *pMenu, bool p_update)
+void Bar::configMenu(Menu *pMenu, bool p_update)
 {
 	CHAR buffer[256];
 	LPCSTR menuTitle;
@@ -787,7 +682,7 @@ void clsBar::configMenu(Menu *pMenu, bool p_update)
   *
   * @todo: document this function
   */
-void clsBar::readSettings()
+void Bar::readSettings()
 {
 	if (!inSlit)
 	{
@@ -880,7 +775,7 @@ void clsBar::readSettings()
 	calculateSizes();
 }
 
-void clsBar::ShowTip(Tip *p_tip)
+void Bar::ShowTip(Tip *p_tip)
 {
 	RECT tipRect;
 	RECT barRect;
@@ -922,10 +817,113 @@ void clsBar::ShowTip(Tip *p_tip)
 	SetTimer(barWnd, m_tipTimer, 10000, NULL);
 }
 
-void clsBar::SetPluginName(TCHAR *p_pluginName)
+void Bar::SetPluginName(TCHAR *p_pluginName)
 {
 	delete [] m_pluginPrefix;
 	m_pluginPrefix = new CHAR[_tcslen(p_pluginName)+1];
-	CopyString(m_pluginPrefix, p_pluginName, _tcslen(p_pluginName)+1);
+	//CopyString(m_pluginPrefix, p_pluginName, _tcslen(p_pluginName)+1);
 }
 
+INT Bar::BeginPlugin()
+{
+	trackMouse = false;
+		isBar = true;
+		slitWnd = m_hSlit;
+		ZeroMemory(&barBlend, sizeof(barBlend));
+		barBlend.BlendOp = AC_SRC_OVER;
+		brushBitmap = NULL;
+		eraseBrush = NULL;
+		CopyString(className, m_pluginName.c_str(), 100);
+		hBlackboxWnd = GetBBWnd();
+		configFile = m_rcPath.c_str();
+		s_settingsManager.AttachFile(m_rcPath.c_str());
+		s_settingsManager.ReadSettings();
+		readSettings();
+
+		margin = 0;
+
+		WNDCLASSEX wc;
+		ZeroMemory(&wc, sizeof wc);
+		wc.cbSize = sizeof(wc);
+		wc.lpfnWndProc      = realWndProc;
+		wc.cbClsExtra = sizeof(this);
+		wc.hInstance        = hInstance;
+		wc.lpszClassName    = className;
+		wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
+		wc.style            = CS_DBLCLKS;
+
+		if (!RegisterClassEx(&wc))
+		{
+			MessageBox(NULL ,
+					   TEXT("Error registering window class"), className,
+					   MB_OK | MB_ICONERROR | MB_TOPMOST);
+			return 1;
+		}
+
+		ZeroMemory(&wc, sizeof(wc));
+		wc.cbSize = sizeof(wc);
+		wc.cbWndExtra = sizeof(this);
+		wc.hInstance        = hInstance;
+		wc.lpszClassName    = TEXT("boxBarTip");
+		wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
+		wc.style            = CS_DBLCLKS;
+		wc.lpfnWndProc      = Tip::realWndProc;
+		RegisterClassEx(&wc);
+
+		int x = ReadInt(configFile, "boxBar.x:", 0);
+		int y = ReadInt(configFile, "boxBar.y:", 0);
+		itemArea.right = 1;
+		itemArea.bottom = 1;
+		barWnd = CreateWindowEx(
+					 WS_EX_TOOLWINDOW | WS_EX_TOPMOST | (enableTransparency ? WS_EX_LAYERED : 0),   // window ex-style
+					 className,          // window class name
+					 NULL,               // window caption text
+					 WS_POPUP | WS_OVERLAPPED, // window style
+					 x,            // x position
+					 y,            // y position
+					 1,           // window width
+					 1,          // window height
+					 NULL,               // parent window
+					 NULL,               // window menu
+					 hInstance,          // hInstance of .dll
+					 this                // creation data
+				 );
+		ShowWindow(barWnd, SW_SHOWNA);
+		if (useSlit && slitWnd)
+		{
+			SendMessage(slitWnd, SLIT_ADD, 0, reinterpret_cast<LPARAM>(barWnd));
+			SendMessage(slitWnd, SLIT_UPDATE, 0, reinterpret_cast<LPARAM>(barWnd));
+			SetWindowPos(barWnd, NULL, x, y, 0, 0, SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOSIZE);
+			inSlit = true;
+			setMargin = false;
+		}
+		else
+		{
+			inSlit = false;
+		}
+
+		buffer = CreateCompatibleDC(NULL);
+		ZeroMemory(&bufferInfo, sizeof(bufferInfo));
+		bufferInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+		bufferInfo.bmiHeader.biWidth = 1;
+		bufferInfo.bmiHeader.biHeight = 1;
+		bufferInfo.bmiHeader.biPlanes = 1;
+		bufferInfo.bmiHeader.biBitCount = 32;
+		brushBitmap = CreateDIBSection(buffer, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
+		eraseBrush = CreatePatternBrush(brushBitmap);
+
+		bufferInfo.bmiHeader.biWidth = itemArea.right - itemArea.left;
+		bufferInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
+		bufferBitmap = CreateDIBSection(buffer, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
+		origBitmap = (HBITMAP)SelectObject(buffer, bufferBitmap);
+
+		populateBar();
+		return 0;
+}
+
+void Bar::EndPlugin()
+{
+
+}
+
+}

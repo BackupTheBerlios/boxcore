@@ -23,7 +23,7 @@ private:
 
 	bool started;
 
-	Plugin_boxBar::clsBar *bar;
+	Plugin_boxBar::Bar *bar;
 };
 
 #endif // CLSBOXBAR_H

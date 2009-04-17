@@ -186,14 +186,14 @@ protected:
 
 
 	static HWND barWnd;
-	static CHAR configFile[MAX_PATH];
+	static LPCSTR configFile;
 	static clsStyle bbStyle;
 
 	static clsApiLoader bbApiLoader;
 	static HWND hBlackboxWnd;
 	static HINSTANCE hInstance;
 
-	static LPSTR m_pluginPrefix;
+	static LPCSTR m_pluginPrefix;
 	LPSTR m_itemPrefix;
 
 	LPCSTR PluginBroam(LPSTR p_buffer, LPCSTR p_broam);
@@ -224,7 +224,7 @@ protected:
 	static SettingsManager s_settingsManager;
 
 	BLENDFUNCTION itemBlend;
-		BITMAPINFO itemBitmapInfo;
+	BITMAPINFO itemBitmapInfo;
 private:
 };
 

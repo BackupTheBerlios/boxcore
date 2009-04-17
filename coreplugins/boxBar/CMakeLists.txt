@@ -19,7 +19,6 @@ clsIconItem.cpp
 clsText.cpp
 
 boxBar.cpp
-clsBoxBar.cpp
 
 clsTask.cpp
 clsTaskArea.cpp
@@ -55,6 +54,8 @@ clsSettingsManager.cpp
 ../../dynwinapi/clsMsimg32.cpp
 
 ../../utility/stringcopy.cpp
+
+../utils/clsPlugin.cpp
 )
 
 set (VERSION_MAJOR 0)

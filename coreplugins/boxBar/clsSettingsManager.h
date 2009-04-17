@@ -41,6 +41,8 @@ public:
 	void WriteSetting(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key);
 	void WriteSettings();
 private:
+	std::string BuildEntry(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key);
+
 	std::string m_fileName;
 
 	intKeys_t m_intKeys;

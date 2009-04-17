@@ -445,12 +445,12 @@ void Item::drawNow()
 clsApiLoader Item::bbApiLoader;
 HWND Item::barWnd = NULL;
 HWND Item::tooltipWnd = NULL;
-CHAR Item::configFile[MAX_PATH] = {'\0'};
+LPCSTR Item::configFile = NULL;
 clsStyle Item::bbStyle;
 HWND Item::hBlackboxWnd = NULL;
 HINSTANCE Item::hInstance = NULL;
 bool Item::alphaDraw = true;
-LPSTR Item::m_pluginPrefix = NULL;
+LPCSTR Item::m_pluginPrefix = NULL;
 
 void Item::ClearTooltip()
 {

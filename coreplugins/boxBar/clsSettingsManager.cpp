@@ -25,18 +25,7 @@ void SettingsManager::AttachFile(const char *p_file)
 
 INT & SettingsManager::AssociateInt(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key, INT p_default)
 {
-	std::string entry(p_plugin ? p_plugin : "");
-	if (p_component)
-	{
-		entry += ".";
-		entry += p_component;
-	}
-	if (p_key)
-	{
-		entry += ".";
-		entry += p_key;
-	}
-	entry += ":";
+	std::string entry(BuildEntry(p_plugin, p_component, p_key));
 	intKeys_t::iterator it = m_intKeys.find(entry);
 	if (it != m_intKeys.end() && (it->second.first == p_default))
 	{
@@ -59,18 +48,7 @@ INT & SettingsManager::AssociateInt(LPCSTR p_plugin, LPCSTR p_component, LPCSTR 
 
 UINT & SettingsManager::AssociateUInt(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key, UINT p_default)
 {
-	std::string entry(p_plugin ? p_plugin : "");
-	if (p_component)
-	{
-		entry += ".";
-		entry += p_component;
-	}
-	if (p_key)
-	{
-		entry += ".";
-		entry += p_key;
-	}
-	entry += ":";
+	std::string entry(BuildEntry(p_plugin, p_component, p_key));
 	uIntKeys_t::iterator it = m_uIntKeys.find(entry);
 	if (it != m_uIntKeys.end() && (it->second.first == p_default))
 	{
@@ -93,18 +71,7 @@ UINT & SettingsManager::AssociateUInt(LPCSTR p_plugin, LPCSTR p_component, LPCST
 
 bool & SettingsManager::AssociateBool(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key, bool p_default)
 {
-	std::string entry(p_plugin ? p_plugin : "");
-	if (p_component)
-	{
-		entry += ".";
-		entry += p_component;
-	}
-	if (p_key)
-	{
-		entry += ".";
-		entry += p_key;
-	}
-	entry += ":";
+	std::string entry(BuildEntry(p_plugin, p_component, p_key));
 	boolKeys_t::iterator it = m_boolKeys.find(entry);
 	if (it != m_boolKeys.end() && (it->second.first == p_default))
 	{
@@ -127,18 +94,7 @@ bool & SettingsManager::AssociateBool(LPCSTR p_plugin, LPCSTR p_component, LPCST
 
 std::string & SettingsManager::AssociateString(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key, LPCSTR p_default)
 {
-	std::string entry(p_plugin ? p_plugin : "");
-	if (p_component)
-	{
-		entry += ".";
-		entry += p_component;
-	}
-	if (p_key)
-	{
-		entry += ".";
-		entry += p_key;
-	}
-	entry += ":";
+	std::string entry(BuildEntry(p_plugin, p_component, p_key));
 	strKeys_t::iterator it = m_strKeys.find(entry);
 	if (it != m_strKeys.end() && (it->second.first == p_default))
 	{
@@ -183,18 +139,7 @@ void SettingsManager::WriteSetting(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p
 {
 	if (m_fileName.size())
 	{
-		std::string entry = p_plugin;
-		if (p_component)
-		{
-			entry += ".";
-			entry += p_component;
-		}
-		if (p_key)
-		{
-			entry += ".";
-			entry += p_key;
-		}
-		entry += ":";
+		std::string entry(BuildEntry(p_plugin, p_component, p_key));
 		intKeys_t::iterator intIt = m_intKeys.find(entry);
 		if (intIt != m_intKeys.end())
 		{
@@ -229,6 +174,8 @@ void SettingsManager::WriteSetting(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p
 
 void SettingsManager::WriteSettings()
 {
+	if (m_fileName.size())
+	{
 	for (intKeys_t::iterator i = m_intKeys.begin(); i != m_intKeys.end(); ++i)
 	{
 		WriteInt(m_fileName.c_str(), i->first.c_str(), i->second.second);
@@ -245,4 +192,30 @@ void SettingsManager::WriteSettings()
 	{
 		WriteString(m_fileName.c_str(), i->first.c_str(), i->second.second.c_str());
 	}
+	}
 }
+
+std::string SettingsManager::BuildEntry(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key)
+{
+	std::string entry(p_plugin ? p_plugin : "");
+		if (p_component)
+		{
+			if (entry.size())
+			{
+			entry += ".";
+			}
+			entry += p_component;
+		}
+		if (p_key)
+		{
+			if (entry.size())
+						{
+						entry += ".";
+						}
+			entry += p_key;
+		}
+		entry += ":";
+		return entry;
+}
+
+
