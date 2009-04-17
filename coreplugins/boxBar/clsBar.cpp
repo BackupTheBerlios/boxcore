@@ -511,7 +511,7 @@ dimType Bar::resize(int pX, int pY)
 	RedrawWindow(barWnd, NULL, NULL, RDW_INVALIDATE);
 	PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 	if (inSlit)
-		SendMessage(slitWnd, SLIT_UPDATE, 0, reinterpret_cast<LPARAM>(barWnd));
+		SendMessage(m_hSlit, SLIT_UPDATE, 0, reinterpret_cast<LPARAM>(barWnd));
 	if (margin)
 		SetDesktopMargin(barWnd, marginEdge, margin);
 	return tempReturn;
@@ -809,7 +809,6 @@ INT Bar::BeginPlugin()
 {
 	trackMouse = false;
 		isBar = true;
-		slitWnd = m_hSlit;
 		ZeroMemory(&barBlend, sizeof(barBlend));
 		barBlend.BlendOp = AC_SRC_OVER;
 		brushBitmap = NULL;
@@ -870,10 +869,10 @@ INT Bar::BeginPlugin()
 					 this                // creation data
 				 );
 		ShowWindow(barWnd, SW_SHOWNA);
-		if (useSlit && slitWnd)
+		if (useSlit && m_hSlit)
 		{
-			SendMessage(slitWnd, SLIT_ADD, 0, reinterpret_cast<LPARAM>(barWnd));
-			SendMessage(slitWnd, SLIT_UPDATE, 0, reinterpret_cast<LPARAM>(barWnd));
+			SendMessage(m_hSlit, SLIT_ADD, 0, reinterpret_cast<LPARAM>(barWnd));
+			SendMessage(m_hSlit, SLIT_UPDATE, 0, reinterpret_cast<LPARAM>(barWnd));
 			SetWindowPos(barWnd, NULL, x, y, 0, 0, SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOSIZE);
 			inSlit = true;
 			setMargin = false;
@@ -918,7 +917,7 @@ void Bar::EndPlugin()
 		DeleteObject(brushBitmap);
 		DeleteDC(buffer);
 		if (inSlit)
-			PostMessage(slitWnd, SLIT_REMOVE, 0, (LPARAM)barWnd);
+			PostMessage(m_hSlit, SLIT_REMOVE, 0, (LPARAM)barWnd);
 		DestroyWindow(barWnd);
 		UnregisterClass(className, hInstance);
 		UnregisterClass(TEXT("boxBarTip"), hInstance);

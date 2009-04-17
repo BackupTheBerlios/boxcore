@@ -54,7 +54,6 @@ private:
 	bool toggleWithPlugins;
 
 	bool useSlit;
-	HWND slitWnd;
 	bool inSlit;
 
 	bool enableTransparency;
