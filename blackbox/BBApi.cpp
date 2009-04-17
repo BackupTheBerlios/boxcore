@@ -2237,16 +2237,13 @@ void SnapWindowToEdge(WINDOWPOS* wp, LPARAM nDist_or_pContent, UINT Flags)
 
 	// well, why is this here? Because some plugins call this even if
 	// they reposition themselves rather than being moved by the user.
-	static DWORD snap_tick;
-	DWORD ticknow = GetTickCount();
-	if (GetCapture() != self)
-	{
-		if (snap_tick < ticknow) return;
-	}
-	else
-	{
-		snap_tick = ticknow + 100;
-	}
+	static bool capture;
+	        if (GetCapture() == self)
+	            capture = true;
+	        else if (capture)
+	            capture = false;
+	        else
+	             return;
 
 	HWND parent = (WS_CHILD & GetWindowLongPtr(self, GWL_STYLE)) ? GetParent(self) : NULL;
 
