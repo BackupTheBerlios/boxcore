@@ -6,7 +6,7 @@
 namespace Plugin_boxBar
 {
 
-clsClockItem::clsClockItem(bool pVertical): clsLabelItem(pVertical)
+clsClockItem::clsClockItem(bool pVertical): clsLabelItem(false)
 {
 	style = SN_TOOLBARCLOCK;
 
@@ -38,7 +38,6 @@ LRESULT clsClockItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			struct tm *ltp = localtime(&systemTime);
 			_tcsftime(buffer, 256, clockFormat, ltp);
 			m_textItem->setText(buffer);
-			drawNow();
 			if (tipText)
 				delete[] tipText;
 			tipText = new TCHAR[256];
@@ -48,7 +47,6 @@ LRESULT clsClockItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			GetLocalTime(&lt);
 			bool seconds = _tcsstr(clockFormat, TEXT("%S")) || _tcsstr(clockFormat, TEXT("%#S"));
 			SetTimer(barWnd, ClockTimer, seconds ? 1100 - lt.wMilliseconds : 61000 - lt.wSecond * 1000, NULL);
-			calculateSizes();
 			InvalidateRect(barWnd, &itemArea, TRUE);
 			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 			return 0;
