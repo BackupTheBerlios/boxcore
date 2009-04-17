@@ -19,7 +19,7 @@ enum ePosition {POS_TOP = 1, POS_VCENTER = 2, POS_BOTTOM = 4, POS_LEFT = 8, POS_
 class Bar : public Plugin, public Collection
 {
 public:
-	Bar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertical = false);
+	Bar(HINSTANCE p_hInstance);
 	virtual ~Bar();
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK realWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

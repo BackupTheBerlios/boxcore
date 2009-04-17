@@ -36,11 +36,11 @@ namespace Plugin_boxBar
  * @section boxBarAdv General Settings
  */
 
-Bar::Bar(TCHAR *pClassName, HINSTANCE pInstance, HWND pSlit, bool pVertical): Plugin(pInstance),
-		Collection(pVertical, m_pluginName.c_str(), 3, 2),
+Bar::Bar(HINSTANCE p_hInstance): Plugin(p_hInstance),
+		Collection(false, m_pluginName.c_str(), 3, 2),
 		sizePercentage(s_settingsManager.AssociateInt(m_pluginName.c_str(), NULL, "Percentage", 80))
 {
-	hInstance = pInstance;
+	hInstance = p_hInstance;
 	m_pluginPrefix = m_pluginName.c_str();
 
 	m_activeTip = NULL;

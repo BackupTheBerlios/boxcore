@@ -59,7 +59,7 @@ int beginSlitPlugin(HINSTANCE hPluginInstance, HWND hSlit)
 
 int beginPluginEx(HINSTANCE hPluginInstance, HWND hSlit)
 {
-	pPlugin = new Plugin_boxBar::Bar(NULL, hPluginInstance, hSlit, false);
+	pPlugin = new Plugin_boxBar::Bar(hPluginInstance);
 	return pPlugin->BeginPlugin(hPluginInstance, hSlit);
 }
 
