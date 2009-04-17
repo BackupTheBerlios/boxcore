@@ -36,7 +36,6 @@
 #include "BBApi.h"
 #include <tchar.h>
 
-#include "clsBoxBar.h"
 #include "clsBar.h"
 
 //clsBoxBar boxBarPlug;
@@ -71,14 +70,9 @@ int beginPlugin(HINSTANCE hPluginInstance)
 
 void endPlugin(HINSTANCE hPluginInstance)
 {
-	PRINT("EndPlugin");
 	pPlugin->EndPlugin(hPluginInstance);
-	PRINT("Ended");
-	//delete pPlugin;
-	PRINT("Deleted");
+	delete pPlugin;
 	pPlugin = NULL;
-	PRINT("Nulled");
-	//boxBarPlug.endPlugin(hPluginInstance);
 }
 
 LPCSTR pluginInfo(int field)
