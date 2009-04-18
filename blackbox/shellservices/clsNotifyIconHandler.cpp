@@ -680,7 +680,6 @@ LRESULT CALLBACK NotifyIconHandler::ProxyWndProc(HWND hWnd, UINT uMsg, WPARAM wP
 
 	if (uMsg == WM_TIMER)
 	{
-		OutputDebugString(TEXT("Timer message"));
 		if (m_lastPopup)
 		{
 			SendNotifyMessage(m_lastTarget.first, m_lastMessage, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(NIN_POPUPCLOSE, m_lastTarget.second));
@@ -691,7 +690,6 @@ LRESULT CALLBACK NotifyIconHandler::ProxyWndProc(HWND hWnd, UINT uMsg, WPARAM wP
 	}
 	else if (uMsg >= WM_USER)
 	{
-		OutputDebugString(TEXT("Proxying a message"));
 		UINT uID = wParam;
 		std::map<UINT, iconPair_t>::iterator target = m_iconLookup.find(uID);
 		UINT targetMsg;
@@ -725,10 +723,24 @@ LRESULT CALLBACK NotifyIconHandler::ProxyWndProc(HWND hWnd, UINT uMsg, WPARAM wP
 			{
 				switch (targetMsg)
 				{
+				case WM_LBUTTONDOWN:
+				case WM_RBUTTONDOWN:
+				case WM_MBUTTONDOWN:
+					SendNotifyMessage(targetWnd, uMsg, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(targetMsg, targetID));
+					SendNotifyMessage(targetWnd, uMsg, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(NIN_POPUPCLOSE, targetID));
+					m_lastPopup = 0;
+					KillTimer(hWnd, 1);
+					break;
+				case WM_LBUTTONUP:
+					SendNotifyMessage(targetWnd, uMsg, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(targetMsg, targetID));
+					SendNotifyMessage(targetWnd, uMsg, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(WM_USER, targetID));
+					break;
 				case WM_RBUTTONUP:
+					SendNotifyMessage(targetWnd, uMsg, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(targetMsg, targetID));
 					SendNotifyMessage(targetWnd, uMsg, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(WM_CONTEXTMENU, targetID));
 					break;
 				case WM_MOUSEMOVE:
+					SendNotifyMessage(targetWnd, uMsg, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(targetMsg, targetID));
 					if (m_lastPopup != uID)
 					{
 						SendNotifyMessage(targetWnd, uMsg, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(NIN_POPUPOPEN, targetID));
