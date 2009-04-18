@@ -11,15 +11,25 @@
 namespace ShellServices
 {
 
+#pragma pack(push, 1)
 struct IconRectStruct_v1
 {
 	DWORD dwMagic;
 	DWORD dwMessage;
 	DWORD cbSize;
-	HWND hWnd;
+	union
+	{
+		HWND hWnd;
+	struct
+	{
+		DWORD hWndL;
+		DWORD hWndH;
+	};
+	};
 	UINT uID;
 	GUID guidItem;
 };
+#pragma pack(pop)
 
 NotifyIconRectHandler::NotifyIconRectHandler()
 {
@@ -36,14 +46,18 @@ HRESULT NotifyIconRectHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 {
 	PRINT("Rect handler");
 	IconRectStruct_v1 &data = *reinterpret_cast<IconRectStruct_v1 *>(p_lpData);
-	if (data.dwMessage != 0x34753423)
+	if (data.dwMagic != 0x34753423)
 		return 0;
 	PRINT("Magic Success");
 	switch (data.dwMessage)
 	{
 	case 1:
+	{
 		PRINT("Position case");
-		return MAKELONG(1300, 800);
+		POINT mousePos;
+			GetCursorPos(&mousePos);
+		return MAKELONG(mousePos.x - 5, mousePos.y - 5);
+	}
 	case 2:
 		PRINT("Orientation case");
 		return 0x00180018;
