@@ -20,11 +20,11 @@ struct IconRectStruct_v1
 	union
 	{
 		HWND hWnd;
-	struct
-	{
-		DWORD hWndL;
-		DWORD hWndH;
-	};
+		struct
+		{
+			DWORD hWndL;
+			DWORD hWndH;
+		};
 	};
 	UINT uID;
 	GUID guidItem;
@@ -55,7 +55,7 @@ HRESULT NotifyIconRectHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 	{
 		PRINT("Position case");
 		POINT mousePos;
-			GetCursorPos(&mousePos);
+		GetCursorPos(&mousePos);
 		return MAKELONG(mousePos.x - 5, mousePos.y - 5);
 	}
 	case 2:
