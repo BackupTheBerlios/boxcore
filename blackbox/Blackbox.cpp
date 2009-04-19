@@ -1982,7 +1982,7 @@ DWORD WINAPI RunStartupThread (void *pv)
 
 	char szPath[MAX_PATH];
 	int i;
-	for (i = 0; i < 4; ++i)
+	for (i = 0; i < 4; SystemInfo.isOsVista()?i+=2:++i)
 		if (sh_getfolderpath(szPath, startuptable[i]))
 			RunFolderContents(szPath);
 
