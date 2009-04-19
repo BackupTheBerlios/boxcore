@@ -21,7 +21,7 @@ Plugin::Plugin(HINSTANCE p_hInstance):m_hInstance(p_hInstance)
 	LPCSTR configFile = ConfigFileExists(rcFile.c_str(), pluginPath);
 	if (strlen(configFile))
 	{
-	m_rcPath = configFile;
+		m_rcPath = configFile;
 	}
 	else
 	{
