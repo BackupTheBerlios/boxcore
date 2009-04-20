@@ -151,49 +151,52 @@ bool installBlackbox(bool forceInstall)
 	GetModuleFileName(NULL, szBlackbox, MAX_PATH);
 	bool result = false;
 
-	if (GetShortPathName(szBlackbox, szBlackbox, MAX_PATH))
+
+
+	//strcat(szBlackbox, " -startup");
+	if (SystemInfo.isOsNT())
 	{
-		//strcat(szBlackbox, " -startup");
-		if (SystemInfo.isOsNT())
+		int answer;
+		if (forceInstall)
 		{
-			int answer;
-			if (forceInstall)
-			{
-				answer = IDNO;
-			}
-			else
-			{
-				answer = BBMessageBox(MB_YESNOCANCEL, NLS2("$BBInstall_QueryAllOrCurrent$",
-									  "Do you want to install Blackbox as the default shell for All Users?"
-									  "\n(Selecting \"No\" will install for the Current User only)."
-														  ));
-			}
-
-			if (IDCANCEL==answer)
-				return false;
-
-			if (IDYES==answer)
-			{
-				// If installing for all users the HKLM shell setting should point to Blackbox...
-				result = install_nt(sys_bootOption, szBlackbox, NULL, false);
-			}
-
-			if (IDNO==answer)
-			{
-				// If installing only for the current user the HKLM shell setting should point to Explorer...
-				// If installing for the current user only, we also need to set the HKCU shell registry key...
-
-				// ...as well as the DesktopProcess registry key that allows Explorer
-				// to be used as file manager while using an alternative shell...
-
-				result = install_nt(usr_bootOption, szExplorer, szBlackbox, true);
-			}
+			answer = IDNO;
 		}
-		else // Windows9x/ME
+		else
+		{
+			answer = BBMessageBox(MB_YESNOCANCEL, NLS2("$BBInstall_QueryAllOrCurrent$",
+								  "Do you want to install Blackbox as the default shell for All Users?"
+								  "\n(Selecting \"No\" will install for the Current User only)."
+													  ));
+		}
+
+		if (IDCANCEL==answer)
+			return false;
+
+		if (IDYES==answer)
+		{
+			// If installing for all users the HKLM shell setting should point to Blackbox...
+			result = install_nt(sys_bootOption, szBlackbox, NULL, false);
+		}
+
+		if (IDNO==answer)
+		{
+			// If installing only for the current user the HKLM shell setting should point to Explorer...
+			// If installing for the current user only, we also need to set the HKCU shell registry key...
+
+			// ...as well as the DesktopProcess registry key that allows Explorer
+			// to be used as file manager while using an alternative shell...
+
+			result = install_nt(usr_bootOption, szExplorer, szBlackbox, true);
+		}
+	}
+	else // Windows9x/ME
+	{
+		if (GetShortPathName(szBlackbox, szBlackbox, MAX_PATH))
 		{
 			result = write_ini(szBlackbox);
 		}
 	}
+
 
 	return install_message("Blackbox", result);
 }
