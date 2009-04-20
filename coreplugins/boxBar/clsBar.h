@@ -76,7 +76,7 @@ private:
 	bool m_replaceTip;
 
 	INT BeginPlugin();
-		void EndPlugin();
+	void EndPlugin();
 };
 
 }

@@ -176,46 +176,46 @@ void SettingsManager::WriteSettings()
 {
 	if (m_fileName.size())
 	{
-	for (intKeys_t::iterator i = m_intKeys.begin(); i != m_intKeys.end(); ++i)
-	{
-		WriteInt(m_fileName.c_str(), i->first.c_str(), i->second.second);
-	}
-	for (uIntKeys_t::iterator i = m_uIntKeys.begin(); i != m_uIntKeys.end(); ++i)
-	{
-		WriteInt(m_fileName.c_str(), i->first.c_str(), i->second.second);
-	}
-	for (boolKeys_t::iterator i = m_boolKeys.begin(); i != m_boolKeys.end(); ++i)
-	{
-		WriteBool(m_fileName.c_str(), i->first.c_str(), i->second.second);
-	}
-	for (strKeys_t::iterator i = m_strKeys.begin(); i != m_strKeys.end(); ++i)
-	{
-		WriteString(m_fileName.c_str(), i->first.c_str(), i->second.second.c_str());
-	}
+		for (intKeys_t::iterator i = m_intKeys.begin(); i != m_intKeys.end(); ++i)
+		{
+			WriteInt(m_fileName.c_str(), i->first.c_str(), i->second.second);
+		}
+		for (uIntKeys_t::iterator i = m_uIntKeys.begin(); i != m_uIntKeys.end(); ++i)
+		{
+			WriteInt(m_fileName.c_str(), i->first.c_str(), i->second.second);
+		}
+		for (boolKeys_t::iterator i = m_boolKeys.begin(); i != m_boolKeys.end(); ++i)
+		{
+			WriteBool(m_fileName.c_str(), i->first.c_str(), i->second.second);
+		}
+		for (strKeys_t::iterator i = m_strKeys.begin(); i != m_strKeys.end(); ++i)
+		{
+			WriteString(m_fileName.c_str(), i->first.c_str(), i->second.second.c_str());
+		}
 	}
 }
 
 std::string SettingsManager::BuildEntry(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key)
 {
 	std::string entry(p_plugin ? p_plugin : "");
-		if (p_component)
+	if (p_component)
+	{
+		if (entry.size())
 		{
-			if (entry.size())
-			{
 			entry += ".";
-			}
-			entry += p_component;
 		}
-		if (p_key)
+		entry += p_component;
+	}
+	if (p_key)
+	{
+		if (entry.size())
 		{
-			if (entry.size())
-						{
-						entry += ".";
-						}
-			entry += p_key;
+			entry += ".";
 		}
-		entry += ":";
-		return entry;
+		entry += p_key;
+	}
+	entry += ":";
+	return entry;
 }
 
 

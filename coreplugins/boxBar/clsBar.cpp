@@ -808,119 +808,119 @@ void Bar::SetPluginName(TCHAR *p_pluginName)
 INT Bar::BeginPlugin()
 {
 	trackMouse = false;
-		isBar = true;
-		ZeroMemory(&barBlend, sizeof(barBlend));
-		barBlend.BlendOp = AC_SRC_OVER;
-		brushBitmap = NULL;
-		eraseBrush = NULL;
-		CopyString(className, m_pluginName.c_str(), 100);
-		hBlackboxWnd = GetBBWnd();
-		configFile = m_rcPath.c_str();
-		s_settingsManager.AttachFile(m_rcPath.c_str());
-		s_settingsManager.ReadSettings();
-		readSettings();
+	isBar = true;
+	ZeroMemory(&barBlend, sizeof(barBlend));
+	barBlend.BlendOp = AC_SRC_OVER;
+	brushBitmap = NULL;
+	eraseBrush = NULL;
+	CopyString(className, m_pluginName.c_str(), 100);
+	hBlackboxWnd = GetBBWnd();
+	configFile = m_rcPath.c_str();
+	s_settingsManager.AttachFile(m_rcPath.c_str());
+	s_settingsManager.ReadSettings();
+	readSettings();
 
-		margin = 0;
+	margin = 0;
 
-		WNDCLASSEX wc;
-		ZeroMemory(&wc, sizeof wc);
-		wc.cbSize = sizeof(wc);
-		wc.lpfnWndProc      = realWndProc;
-		wc.cbClsExtra = sizeof(this);
-		wc.hInstance        = hInstance;
-		wc.lpszClassName    = className;
-		wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
-		wc.style            = CS_DBLCLKS;
+	WNDCLASSEX wc;
+	ZeroMemory(&wc, sizeof wc);
+	wc.cbSize = sizeof(wc);
+	wc.lpfnWndProc      = realWndProc;
+	wc.cbClsExtra = sizeof(this);
+	wc.hInstance        = hInstance;
+	wc.lpszClassName    = className;
+	wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
+	wc.style            = CS_DBLCLKS;
 
-		if (!RegisterClassEx(&wc))
-		{
-			MessageBox(NULL ,
-					   TEXT("Error registering window class"), className,
-					   MB_OK | MB_ICONERROR | MB_TOPMOST);
-			return 1;
-		}
+	if (!RegisterClassEx(&wc))
+	{
+		MessageBox(NULL ,
+				   TEXT("Error registering window class"), className,
+				   MB_OK | MB_ICONERROR | MB_TOPMOST);
+		return 1;
+	}
 
-		ZeroMemory(&wc, sizeof(wc));
-		wc.cbSize = sizeof(wc);
-		wc.cbWndExtra = sizeof(this);
-		wc.hInstance        = hInstance;
-		wc.lpszClassName    = TEXT("boxBarTip");
-		wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
-		wc.style            = CS_DBLCLKS;
-		wc.lpfnWndProc      = Tip::realWndProc;
-		RegisterClassEx(&wc);
+	ZeroMemory(&wc, sizeof(wc));
+	wc.cbSize = sizeof(wc);
+	wc.cbWndExtra = sizeof(this);
+	wc.hInstance        = hInstance;
+	wc.lpszClassName    = TEXT("boxBarTip");
+	wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
+	wc.style            = CS_DBLCLKS;
+	wc.lpfnWndProc      = Tip::realWndProc;
+	RegisterClassEx(&wc);
 
-		int x = ReadInt(configFile, "boxBar.x:", 0);
-		int y = ReadInt(configFile, "boxBar.y:", 0);
-		itemArea.right = 1;
-		itemArea.bottom = 1;
-		barWnd = CreateWindowEx(
-					 WS_EX_TOOLWINDOW | WS_EX_TOPMOST | (enableTransparency ? WS_EX_LAYERED : 0),   // window ex-style
-					 className,          // window class name
-					 NULL,               // window caption text
-					 WS_POPUP | WS_OVERLAPPED, // window style
-					 x,            // x position
-					 y,            // y position
-					 1,           // window width
-					 1,          // window height
-					 NULL,               // parent window
-					 NULL,               // window menu
-					 hInstance,          // hInstance of .dll
-					 this                // creation data
-				 );
-		ShowWindow(barWnd, SW_SHOWNA);
-		if (useSlit && m_hSlit)
-		{
-			SendMessage(m_hSlit, SLIT_ADD, 0, reinterpret_cast<LPARAM>(barWnd));
-			SendMessage(m_hSlit, SLIT_UPDATE, 0, reinterpret_cast<LPARAM>(barWnd));
-			SetWindowPos(barWnd, NULL, x, y, 0, 0, SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOSIZE);
-			inSlit = true;
-			setMargin = false;
-		}
-		else
-		{
-			inSlit = false;
-		}
+	int x = ReadInt(configFile, "boxBar.x:", 0);
+	int y = ReadInt(configFile, "boxBar.y:", 0);
+	itemArea.right = 1;
+	itemArea.bottom = 1;
+	barWnd = CreateWindowEx(
+				 WS_EX_TOOLWINDOW | WS_EX_TOPMOST | (enableTransparency ? WS_EX_LAYERED : 0),   // window ex-style
+				 className,          // window class name
+				 NULL,               // window caption text
+				 WS_POPUP | WS_OVERLAPPED, // window style
+				 x,            // x position
+				 y,            // y position
+				 1,           // window width
+				 1,          // window height
+				 NULL,               // parent window
+				 NULL,               // window menu
+				 hInstance,          // hInstance of .dll
+				 this                // creation data
+			 );
+	ShowWindow(barWnd, SW_SHOWNA);
+	if (useSlit && m_hSlit)
+	{
+		SendMessage(m_hSlit, SLIT_ADD, 0, reinterpret_cast<LPARAM>(barWnd));
+		SendMessage(m_hSlit, SLIT_UPDATE, 0, reinterpret_cast<LPARAM>(barWnd));
+		SetWindowPos(barWnd, NULL, x, y, 0, 0, SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOSIZE);
+		inSlit = true;
+		setMargin = false;
+	}
+	else
+	{
+		inSlit = false;
+	}
 
-		buffer = CreateCompatibleDC(NULL);
-		ZeroMemory(&bufferInfo, sizeof(bufferInfo));
-		bufferInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-		bufferInfo.bmiHeader.biWidth = 1;
-		bufferInfo.bmiHeader.biHeight = 1;
-		bufferInfo.bmiHeader.biPlanes = 1;
-		bufferInfo.bmiHeader.biBitCount = 32;
-		brushBitmap = CreateDIBSection(buffer, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
-		eraseBrush = CreatePatternBrush(brushBitmap);
+	buffer = CreateCompatibleDC(NULL);
+	ZeroMemory(&bufferInfo, sizeof(bufferInfo));
+	bufferInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bufferInfo.bmiHeader.biWidth = 1;
+	bufferInfo.bmiHeader.biHeight = 1;
+	bufferInfo.bmiHeader.biPlanes = 1;
+	bufferInfo.bmiHeader.biBitCount = 32;
+	brushBitmap = CreateDIBSection(buffer, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
+	eraseBrush = CreatePatternBrush(brushBitmap);
 
-		bufferInfo.bmiHeader.biWidth = itemArea.right - itemArea.left;
-		bufferInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
-		bufferBitmap = CreateDIBSection(buffer, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
-		origBitmap = (HBITMAP)SelectObject(buffer, bufferBitmap);
+	bufferInfo.bmiHeader.biWidth = itemArea.right - itemArea.left;
+	bufferInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
+	bufferBitmap = CreateDIBSection(buffer, &bufferInfo, DIB_RGB_COLORS, NULL, NULL, 0);
+	origBitmap = (HBITMAP)SelectObject(buffer, bufferBitmap);
 
-		populateBar();
-		return 0;
+	populateBar();
+	return 0;
 }
 
 void Bar::EndPlugin()
 {
 	for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
-			delete (*i);
-		itemList.clear();
-		bbApiLoader.freeLibrary();
-		if (eraseBrush)
-			DeleteObject(eraseBrush);
-		if (brushBitmap)
-			DeleteObject(brushBitmap);
-		SelectObject(buffer, origBitmap);
-		DeleteObject(bufferBitmap);
+		delete (*i);
+	itemList.clear();
+	bbApiLoader.freeLibrary();
+	if (eraseBrush)
 		DeleteObject(eraseBrush);
+	if (brushBitmap)
 		DeleteObject(brushBitmap);
-		DeleteDC(buffer);
-		if (inSlit)
-			PostMessage(m_hSlit, SLIT_REMOVE, 0, (LPARAM)barWnd);
-		DestroyWindow(barWnd);
-		UnregisterClass(className, hInstance);
-		UnregisterClass(TEXT("boxBarTip"), hInstance);
+	SelectObject(buffer, origBitmap);
+	DeleteObject(bufferBitmap);
+	DeleteObject(eraseBrush);
+	DeleteObject(brushBitmap);
+	DeleteDC(buffer);
+	if (inSlit)
+		PostMessage(m_hSlit, SLIT_REMOVE, 0, (LPARAM)barWnd);
+	DestroyWindow(barWnd);
+	UnregisterClass(className, hInstance);
+	UnregisterClass(TEXT("boxBarTip"), hInstance);
 }
 
 }
