@@ -104,10 +104,22 @@ LRESULT TrayIcon::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			case 4:
 				switch (msg)
 				{
+				case WM_LBUTTONDOWN:
+				case WM_RBUTTONDOWN:
+				case WM_MBUTTONDOWN:
+					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(NIN_POPUPCLOSE, iconID));
+					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(msg, iconID));
+					break;
+				case WM_LBUTTONUP:
+					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(msg, iconID));
+					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(WM_USER, iconID));
+					break;
 				case WM_RBUTTONUP:
+					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(msg, iconID));
 					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(WM_CONTEXTMENU, iconID));
 					break;
 				case WM_MOUSEMOVE:
+					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(msg, iconID));
 					if (popupVisible)
 						break;
 					popupVisible = true;
@@ -116,6 +128,21 @@ LRESULT TrayIcon::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				case WM_MOUSELEAVE:
 					popupVisible = false;
 					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(NIN_POPUPCLOSE, iconID));
+					break;
+				default:
+					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(msg, iconID));
+				}
+				break;
+			case 3:
+				switch (msg)
+				{
+				case WM_LBUTTONUP:
+					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(msg, iconID));
+					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(WM_USER, iconID));
+					break;
+				case WM_RBUTTONUP:
+					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(msg, iconID));
+					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(WM_CONTEXTMENU, iconID));
 					break;
 				default:
 					SendNotifyMessage(iconWnd, iconCallback, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(msg, iconID));
