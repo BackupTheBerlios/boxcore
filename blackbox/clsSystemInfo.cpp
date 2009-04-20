@@ -7,6 +7,7 @@ clsSystemInfo::clsSystemInfo()
 	GetVersionEx(&osInfo);
 	typeNT = osInfo.dwPlatformId == VER_PLATFORM_WIN32_NT;
 	osVista = typeNT && osInfo.dwMajorVersion >= 6;
+	osWin7 = osVista && osInfo.dwMinorVersion == 1;
 	os2kXP    = typeNT && osInfo.dwMajorVersion == 5;
 
 	BOOL bIs64BitOS= FALSE;

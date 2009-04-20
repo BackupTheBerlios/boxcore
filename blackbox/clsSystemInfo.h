@@ -19,6 +19,11 @@ public:
 		return typeNT;
 	}
 
+	bool isOsWin7()
+	{
+		return osWin7;
+	}
+
 	bool isOsVista()
 	{
 		return osVista;
@@ -41,6 +46,7 @@ private:
 	OSVERSIONINFO osInfo;
 
 	bool typeNT;
+	bool osWin7;
 	bool osVista;
 	bool os2kXP;
 
