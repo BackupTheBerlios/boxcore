@@ -2,7 +2,6 @@
 #define CLSTASKITEM_H
 
 #include "clsCollection.h"
-#include "clsIconItem.h"
 #include "BBApi.h"
 #include <tchar.h>
 
@@ -10,6 +9,7 @@ namespace boxBar
 {
 
 class Text;
+class Icon;
 
 class Task : public Collection
 {

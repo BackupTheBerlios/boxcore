@@ -7,7 +7,7 @@
 
 #include "clsButton.h"
 #include "clsText.h"
-#include "clsIconItem.h"
+#include "clsIcon.h"
 #include "clsFlexiSpacer.h"
 
 namespace boxBar

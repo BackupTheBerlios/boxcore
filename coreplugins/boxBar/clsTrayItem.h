@@ -2,7 +2,7 @@
 #define CLSTRAYITEM_H
 
 #include "BBApi.h"
-#include "clsIconItem.h"
+#include "clsIcon.h"
 
 namespace boxBar
 {

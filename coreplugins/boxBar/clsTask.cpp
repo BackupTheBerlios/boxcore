@@ -1,6 +1,6 @@
 #include "clsTask.h"
 #include "clsText.h"
-#include <limits.h>
+#include "clsIcon.h"
 #include <cstdlib>
 
 namespace boxBar

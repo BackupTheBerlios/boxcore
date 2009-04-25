@@ -1,4 +1,4 @@
-#include "clsIconItem.h"
+#include "clsIcon.h"
 
 namespace boxBar
 {
