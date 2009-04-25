@@ -27,7 +27,7 @@ public:
 protected:
 	bool &m_hasIcon;
 	bool &m_hasText;
-	std::string &m_buttonText;
+	tstring &m_buttonText;
 
 	clsIconItem *m_iconItem;
 	Text *m_textItem;
