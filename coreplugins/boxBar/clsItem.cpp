@@ -8,7 +8,7 @@
 #define TTS_USEVISUALSTYLE 0x100
 #endif
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 bool Item::AssignButton(LPCSTR p_data, mouseFunction & p_hook, LPCSTR & p_broamSlot)

@@ -1,6 +1,6 @@
 #include "clsFlexiSpacer.h"
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 clsFlexiSpacer::clsFlexiSpacer(): Item()

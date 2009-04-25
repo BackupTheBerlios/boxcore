@@ -40,7 +40,7 @@ enum dimType {DIM_NONE = 0, DIM_HORIZONTAL = 1, DIM_VERTICAL = 2, DIM_BOTH = 3};
 /** @internal
  * @brief Contains all classes, functions, etc. for the @ref boxBar "boxBar" plugin
  */
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 class Item;

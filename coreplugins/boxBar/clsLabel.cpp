@@ -2,7 +2,7 @@
 #include "clsLabel.h"
 #include <tchar.h>
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 Label::Label(bool pVertical, LPCSTR p_itemName) : Collection(pVertical, p_itemName, 2, 0)

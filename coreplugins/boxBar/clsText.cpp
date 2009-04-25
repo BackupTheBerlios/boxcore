@@ -2,7 +2,7 @@
 #include "clsText.h"
 #include <tchar.h>
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 Text::Text(LPCSTR pText, UINT pStyle, dimType p_knowsSize): Item()

@@ -15,7 +15,7 @@
 #include "../../dynwinapi/clsUser32.h"
 #include "../../utility/stringcopy.h"
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 /**

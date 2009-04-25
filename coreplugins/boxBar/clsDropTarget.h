@@ -9,7 +9,7 @@
 #define CLSDROPTARGET_H_
 #include <shlobj.h>
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 enum eDragDropState {DRAG_ENTER, DRAG_OVER, DRAG_LEAVE, DRAG_DROP};

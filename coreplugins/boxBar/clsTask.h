@@ -6,7 +6,7 @@
 #include "BBApi.h"
 #include <tchar.h>
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 class Text;

@@ -10,7 +10,7 @@
 #define NIN_POPUPCLOSE 0x00000407
 #endif
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 TrayIcon::TrayIcon(systemTray *trayItem, UINT pIconSize): clsIconItem(trayItem->hIcon, pIconSize)

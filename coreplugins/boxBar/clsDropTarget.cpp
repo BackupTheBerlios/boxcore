@@ -7,7 +7,7 @@
 
 #include "clsDropTarget.h"
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 DropTarget::DropTarget(Item *p_item, DragAction p_drag)

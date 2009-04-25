@@ -3,7 +3,7 @@
 #include <tchar.h>
 #include <locale.h>
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 /**

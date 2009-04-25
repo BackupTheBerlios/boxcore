@@ -5,7 +5,7 @@
 
 #include <list>
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 typedef std::list<Item *> itemList_t;

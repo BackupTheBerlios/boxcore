@@ -8,7 +8,7 @@
 
 class Tip;
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 using std::deque;

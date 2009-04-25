@@ -1,6 +1,6 @@
 #include "clsIconItem.h"
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 clsIconItem::clsIconItem(HICON pIcon, UINT pSize):Item()

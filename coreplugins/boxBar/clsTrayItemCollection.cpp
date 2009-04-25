@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <tchar.h>
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 /**

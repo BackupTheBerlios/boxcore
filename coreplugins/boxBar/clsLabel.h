@@ -4,7 +4,7 @@
 #include "clsCollection.h"
 #include "clsText.h"
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 class Label : public Collection

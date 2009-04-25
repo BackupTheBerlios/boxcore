@@ -6,7 +6,7 @@
 #include <functional>
 #include <algorithm>
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 /**

@@ -3,7 +3,7 @@
 #include <limits.h>
 #include <cstdlib>
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 /**

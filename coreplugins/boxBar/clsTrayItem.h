@@ -4,7 +4,7 @@
 #include "BBApi.h"
 #include "clsIconItem.h"
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 typedef BOOL(*fnGetTrayInfo)(HWND, UINT, PVOID*, ATOM*, UINT);

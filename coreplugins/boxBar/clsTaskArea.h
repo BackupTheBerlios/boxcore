@@ -5,7 +5,7 @@
 #include "clsDropTarget.h"
 #include <map>
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 class Task;

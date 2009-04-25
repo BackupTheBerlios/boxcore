@@ -3,7 +3,7 @@
 
 #include "clsLabel.h"
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 class clsWorkspaceLabel : public Label

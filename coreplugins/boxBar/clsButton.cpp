@@ -10,7 +10,7 @@
 #include "clsIconItem.h"
 #include "clsFlexiSpacer.h"
 
-namespace Plugin_boxBar
+namespace boxBar
 {
 
 /**
