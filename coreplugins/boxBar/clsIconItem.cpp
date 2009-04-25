@@ -3,7 +3,7 @@
 namespace boxBar
 {
 
-clsIconItem::clsIconItem(HICON pIcon, UINT pSize):Item()
+Icon::Icon(HICON pIcon, UINT pSize):Item()
 {
 	icon = CopyIcon(pIcon);
 	iconSize = pSize;
@@ -11,7 +11,7 @@ clsIconItem::clsIconItem(HICON pIcon, UINT pSize):Item()
 	m_wantsStretch = DIM_NONE;
 }
 
-clsIconItem::~clsIconItem()
+Icon::~Icon()
 {
 	if (icon)
 	{
@@ -23,7 +23,7 @@ clsIconItem::~clsIconItem()
   *
   * @todo: document this function
   */
-void clsIconItem::calculateSizes(bool pSizeGiven)
+void Icon::calculateSizes(bool pSizeGiven)
 {
 	minSizeX = iconSize;
 	minSizeY = iconSize;
@@ -34,7 +34,7 @@ void clsIconItem::calculateSizes(bool pSizeGiven)
   *
   * @todo: document this function
   */
-void clsIconItem::draw(HDC pContext)
+void Icon::draw(HDC pContext)
 {
 	if (icon)
 	{
@@ -88,7 +88,7 @@ void clsIconItem::draw(HDC pContext)
   *
   * @todo: document this function
   */
-bool clsIconItem::setIcon(HICON pIcon)
+bool Icon::setIcon(HICON pIcon)
 {
 	if (icon)
 	{

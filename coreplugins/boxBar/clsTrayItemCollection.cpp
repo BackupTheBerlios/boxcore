@@ -229,14 +229,14 @@ void TrayArea::populateTray()
 		{
 			if (m_reverseOrder && !vertical)
 			{
-				(dynamic_cast<Collection*>(*columnRev))->addItem(new clsIconItem(NULL, iconSize));
+				(dynamic_cast<Collection*>(*columnRev))->addItem(new Icon(NULL, iconSize));
 				columnRev++;
 				if (columnRev == itemList.rend())
 					columnRev = itemList.rbegin();
 			}
 			else
 			{
-				(dynamic_cast<Collection*>(*column))->addItem(new clsIconItem(NULL, iconSize), m_reverseOrder);
+				(dynamic_cast<Collection*>(*column))->addItem(new Icon(NULL, iconSize), m_reverseOrder);
 				column++;
 				if (column == itemList.end())
 					column = itemList.begin();

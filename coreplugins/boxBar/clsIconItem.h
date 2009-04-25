@@ -6,11 +6,11 @@
 namespace boxBar
 {
 
-class clsIconItem : public Item
+class Icon : public Item
 {
 public:
-	clsIconItem(HICON pIcon, UINT pSize);
-	~clsIconItem();
+	Icon(HICON pIcon, UINT pSize);
+	~Icon();
 
 	bool setIcon(HICON pIcon);
 

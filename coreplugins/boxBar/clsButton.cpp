@@ -43,7 +43,7 @@ Button::Button(LPCSTR p_itemName) : Collection(false, p_itemName, 3),
 	addItem(new clsFlexiSpacer());
 	if (m_hasIcon)
 	{
-		m_iconItem = new clsIconItem(LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(101)), 32);
+		m_iconItem = new Icon(LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(101)), 32);
 		addItem(m_iconItem);
 	}
 	else

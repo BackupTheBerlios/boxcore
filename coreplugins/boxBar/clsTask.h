@@ -32,7 +32,7 @@ protected:
 	UINT &iconSize;
 
 	Text *captionItem;
-	clsIconItem *iconItem;
+	Icon *iconItem;
 
 	bool m_fallback;
 

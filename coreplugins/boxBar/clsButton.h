@@ -14,7 +14,7 @@ namespace boxBar
 {
 
 class Text;
-class clsIconItem;
+class Icon;
 
 class Button: public Collection
 {
@@ -29,7 +29,7 @@ protected:
 	bool &m_hasText;
 	tstring &m_buttonText;
 
-	clsIconItem *m_iconItem;
+	Icon *m_iconItem;
 	Text *m_textItem;
 };
 

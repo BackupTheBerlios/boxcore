@@ -12,7 +12,7 @@ typedef BOOL(*fnGetTrayInfo)(HWND, UINT, PVOID*, ATOM*, UINT);
 /** @class TrayIcon
   * @brief Represents a single tray item in the bar
   */
-class TrayIcon : public clsIconItem
+class TrayIcon : public Icon
 {
 public:
 	TrayIcon(systemTray *trayItem, UINT pIconSize);

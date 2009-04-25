@@ -62,7 +62,7 @@ Task::Task(HWND p_Task, bool pVertical, LPCSTR p_itemName):
 	}
 	if (m_showIcon)
 	{
-		iconItem = new clsIconItem(LoadIcon(NULL, IDI_APPLICATION), iconSize);
+		iconItem = new Icon(LoadIcon(NULL, IDI_APPLICATION), iconSize);
 		addItem(iconItem);
 	}
 	else

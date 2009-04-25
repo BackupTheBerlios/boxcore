@@ -13,7 +13,7 @@
 namespace boxBar
 {
 
-TrayIcon::TrayIcon(systemTray *trayItem, UINT pIconSize): clsIconItem(trayItem->hIcon, pIconSize)
+TrayIcon::TrayIcon(systemTray *trayItem, UINT pIconSize): Icon(trayItem->hIcon, pIconSize)
 {
 	if (GetTrayInfo == NULL)
 	{
