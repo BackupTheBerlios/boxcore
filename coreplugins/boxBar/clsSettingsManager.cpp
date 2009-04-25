@@ -9,6 +9,7 @@
 #include <cstring>
 #include "BBApi.h"
 #include "../../debug/debug.h"
+#include "../../utility/stringcopy.h"
 
 SettingsManager::SettingsManager()
 {
@@ -92,7 +93,7 @@ bool & SettingsManager::AssociateBool(LPCSTR p_plugin, LPCSTR p_component, LPCST
 	}
 }
 
-std::string & SettingsManager::AssociateString(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key, LPCSTR p_default)
+tstring & SettingsManager::AssociateString(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key, LPCSTR p_default)
 {
 	std::string entry(BuildEntry(p_plugin, p_component, p_key));
 	strKeys_t::iterator it = m_strKeys.find(entry);
@@ -105,11 +106,11 @@ std::string & SettingsManager::AssociateString(LPCSTR p_plugin, LPCSTR p_compone
 		m_strKeys[entry].first = p_default;
 		if (m_fileName.size())
 		{
-			m_strKeys[entry].second = ReadString(m_fileName.c_str(), entry.c_str(), m_strKeys[entry].first.c_str());
+			CopyString(m_strKeys[entry].second, ReadString(m_fileName.c_str(), entry.c_str(), m_strKeys[entry].first.c_str()));
 		}
 		else
 		{
-			m_strKeys[entry].second = m_strKeys[entry].first;
+			CopyString(m_strKeys[entry].second, m_strKeys[entry].first.c_str());
 		}
 		return m_strKeys[entry].second;
 	}
@@ -131,7 +132,7 @@ void SettingsManager::ReadSettings()
 	}
 	for (strKeys_t::iterator i = m_strKeys.begin(); i != m_strKeys.end(); ++i)
 	{
-		i->second.second = ReadString(m_fileName.c_str(), i->first.c_str(), i->second.first.c_str());
+		CopyString(i->second.second, ReadString(m_fileName.c_str(), i->first.c_str(), i->second.first.c_str()));
 	}
 }
 
@@ -164,7 +165,9 @@ void SettingsManager::WriteSetting(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p
 					strKeys_t::iterator strIt = m_strKeys.find(entry);
 					if (strIt != m_strKeys.end())
 					{
-						WriteString(m_fileName.c_str(), entry.c_str(), strIt->second.second.c_str());
+						CHAR buffer[2*(strIt->second.second.size()+1)];
+						CopyString(buffer, strIt->second.second.c_str(), 2*(strIt->second.second.size()+1));
+						WriteString(m_fileName.c_str(), entry.c_str(), buffer);
 					}
 				}
 			}
@@ -190,7 +193,9 @@ void SettingsManager::WriteSettings()
 		}
 		for (strKeys_t::iterator i = m_strKeys.begin(); i != m_strKeys.end(); ++i)
 		{
-			WriteString(m_fileName.c_str(), i->first.c_str(), i->second.second.c_str());
+			CHAR buffer[2*(i->second.second.size()+1)];
+			CopyString(buffer, i->second.second.c_str(), 2*(i->second.second.size()+1));
+			WriteString(m_fileName.c_str(), i->first.c_str(), buffer);
 		}
 	}
 }

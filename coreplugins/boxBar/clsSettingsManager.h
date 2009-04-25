@@ -20,10 +20,12 @@ struct NoCaseCmp
 	}
 };
 
+typedef std::basic_string<TCHAR> tstring;
+
 typedef std::map<std::string, std::pair<INT, INT>, NoCaseCmp> intKeys_t;
 typedef std::map<std::string, std::pair<UINT, UINT>, NoCaseCmp > uIntKeys_t;
 typedef std::map<std::string, std::pair<bool, bool>, NoCaseCmp > boolKeys_t;
-typedef std::map<std::string, std::pair<std::string, std::string>, NoCaseCmp > strKeys_t;
+typedef std::map<std::string, std::pair<std::string, tstring >, NoCaseCmp > strKeys_t;
 
 class SettingsManager
 {
@@ -35,7 +37,7 @@ public:
 	INT &AssociateInt(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key, INT p_default);
 	UINT &AssociateUInt(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key, UINT p_default);
 	bool &AssociateBool(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key, bool p_default);
-	std::string &AssociateString(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key, LPCSTR p_default);
+	tstring &AssociateString(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key, LPCSTR p_default);
 
 	void ReadSettings();
 	void WriteSetting(LPCSTR p_plugin, LPCSTR p_component, LPCSTR p_key);
