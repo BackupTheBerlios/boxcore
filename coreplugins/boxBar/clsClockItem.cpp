@@ -6,8 +6,26 @@
 namespace Plugin_boxBar
 {
 
-clsClockItem::clsClockItem(bool pVertical): clsLabelItem(false)
+/**
+ * @page boxBarRC
+ * @section boxBarClock Clock
+ * The clock item adds a digital clock label to your bar. It also has a tooltip which can display
+ * additional information, such as the date.
+ * The clock is a collection item, so settings for @ref boxBarCollection "Collection Items" apply.
+ * The following properties can be set for the clock
+ * @code boxBar.Clock.Format: %#H:%M @endcode
+ * This sets the format and text of the normal time display for the clock
+ *
+ * @code boxBar.Clock.TipFormat: b%A %d %B %Y @endcode
+ * This sets the format and additional text for the tooltip
+ */
+
+clsClockItem::clsClockItem(bool pVertical):
+		clsLabelItem(false, "Clock"),
+		clockFormat(s_settingsManager.AssociateString(m_pluginPrefix, m_itemPrefix, "Format", "%#H:%M")),
+		clockTipFormat(s_settingsManager.AssociateString(m_pluginPrefix, m_itemPrefix, "TipFormat", "%A %d %B %Y"))
 {
+	PRINT(clockFormat.c_str());
 	style = SN_TOOLBARCLOCK;
 
 	ClockTimer = getTimerID();
@@ -36,16 +54,16 @@ LRESULT clsClockItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			time(&systemTime);
 			TCHAR buffer[256];
 			struct tm *ltp = localtime(&systemTime);
-			_tcsftime(buffer, 256, clockFormat, ltp);
+			_tcsftime(buffer, 256, clockFormat.c_str(), ltp);
 			m_textItem->setText(buffer);
 			if (tipText)
 				delete[] tipText;
 			tipText = new TCHAR[256];
-			_tcsftime(tipText, 256, clockTipFormat, ltp);
+			_tcsftime(tipText, 256, clockTipFormat.c_str(), ltp);
 			setTooltip();
 			SYSTEMTIME lt;
 			GetLocalTime(&lt);
-			bool seconds = _tcsstr(clockFormat, TEXT("%S")) || _tcsstr(clockFormat, TEXT("%#S"));
+			bool seconds = _tcsstr(clockFormat.c_str(), TEXT("%S")) || _tcsstr(clockFormat.c_str(), TEXT("%#S"));
 			SetTimer(barWnd, ClockTimer, seconds ? 1100 - lt.wMilliseconds : 61000 - lt.wSecond * 1000, NULL);
 			InvalidateRect(barWnd, &itemArea, TRUE);
 			PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
@@ -86,10 +104,6 @@ void clsClockItem::TimeControlPanel(Item *pItem, UINT msg, WPARAM wParam, LPARAM
 void clsClockItem::readSettings()
 {
 	LPCSTR textBuffer;
-	textBuffer = ReadString(configFile, "boxBar.clock.format:", "%#H:%M");
-	CopyString(clockFormat, textBuffer, 256);
-	textBuffer = ReadString(configFile, "boxBar.clock.tipformat:", "%A %d %B %Y");
-	CopyString(clockTipFormat, textBuffer, 256);
 	textBuffer = ReadString(configFile, "boxBar.clock.leftClick:","");
 	AssignButton(textBuffer, leftClick, m_broamLeft);
 	textBuffer = ReadString(configFile, "boxBar.clock.leftDblClick:","TimeControlPanel");
