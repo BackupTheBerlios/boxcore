@@ -334,34 +334,12 @@ void Item::setTooltip()
 {
 	if (!tooltipWnd)
 		initTooltips();
-	if (tipText)
-	{
-		UINT writeLoc = 0;
-		TCHAR tempTip[256];
-		bool skipAmp = false;
-		for (UINT i = 0; i <= _tcslen(tipText); ++i)
-		{
-			if (!(skipAmp && tipText[i] == TEXT('&')))
-			{
-				tempTip[writeLoc++] = tipText[i];
-				if (!(tipText[i] == TEXT('&')))
-				{
-					skipAmp = false;
-				}
-			}
-			if (!skipAmp && tipText[i] == TEXT('&'))
-			{
-				skipAmp = true;
-			}
-		}
-		CopyString(tipText, tempTip, _tcslen(tipText)+1);
-	}
 	TOOLINFO toolInfo;
 	ZeroMemory(&toolInfo, sizeof(toolInfo));
 	toolInfo.cbSize = sizeof(toolInfo);
 	toolInfo.hwnd = barWnd;
 	toolInfo.uId = (UINT_PTR)this;
-	toolInfo.uFlags = TTF_SUBCLASS | TTF_TRANSPARENT | TTF_PARSELINKS;
+	toolInfo.uFlags = TTF_SUBCLASS | TTF_TRANSPARENT;
 	toolInfo.rect = itemArea;
 	toolInfo.hinst = hInstance;
 	toolInfo.lpszText = LPSTR_TEXTCALLBACK;
@@ -388,7 +366,7 @@ void Item::initTooltips()
 					 WS_EX_TOPMOST,
 					 TOOLTIPS_CLASS,
 					 NULL,
-					 TTS_ALWAYSTIP | TTS_USEVISUALSTYLE | TTS_NOPREFIX,
+					 TTS_ALWAYSTIP | TTS_NOPREFIX,
 					 CW_USEDEFAULT,
 					 CW_USEDEFAULT,
 					 CW_USEDEFAULT,
