@@ -62,7 +62,7 @@ Task::Task(HWND p_Task, bool pVertical, LPCSTR p_itemName):
 	}
 	if (m_showIcon)
 	{
-		iconItem = new clsIconItem(LoadIcon(NULL, IDI_APPLICATION), iconSize, vertical);
+		iconItem = new clsIconItem(LoadIcon(NULL, IDI_APPLICATION), iconSize);
 		addItem(iconItem);
 	}
 	else
@@ -71,7 +71,7 @@ Task::Task(HWND p_Task, bool pVertical, LPCSTR p_itemName):
 	}
 	if (m_showText || !m_showIcon)
 	{
-		captionItem = new Text(m_caption, style, vertical);
+		captionItem = new Text(m_caption, style);
 		addItem(captionItem);
 	}
 	else

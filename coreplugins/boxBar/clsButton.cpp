@@ -40,10 +40,10 @@ Button::Button(LPCSTR p_itemName) : Collection(false, p_itemName, 3),
 	style = SN_TOOLBARBUTTON;
 	PRINT(TEXT("Button"));
 	spacingBorder = 3;
-	addItem(new clsFlexiSpacer(false));
+	addItem(new clsFlexiSpacer());
 	if (m_hasIcon)
 	{
-		m_iconItem = new clsIconItem(LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(101)), 32, true);
+		m_iconItem = new clsIconItem(LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(101)), 32);
 		addItem(m_iconItem);
 	}
 	else
@@ -52,14 +52,14 @@ Button::Button(LPCSTR p_itemName) : Collection(false, p_itemName, 3),
 	}
 	if (m_hasText)
 	{
-		m_textItem = new Text(m_buttonText.c_str(),SN_TOOLBARBUTTON,false,DIM_BOTH);
+		m_textItem = new Text(m_buttonText.c_str(),SN_TOOLBARBUTTON,DIM_BOTH);
 		addItem(m_textItem);
 	}
 	else
 	{
 		m_textItem = NULL;
 	}
-	addItem(new clsFlexiSpacer(false));
+	addItem(new clsFlexiSpacer());
 	//m_minSizeX = 100;
 	readSettings();
 }

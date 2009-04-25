@@ -34,6 +34,12 @@ protected:
 	int flexibleItemSize;
 
 	bool isBar;
+
+	/** @brief Vertical state of the item
+	  *
+	  * May affect drawing, sizing or calculating functions
+	  */
+	bool &vertical;
 private:
 };
 

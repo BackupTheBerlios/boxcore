@@ -186,7 +186,7 @@ void TaskArea::populateTasks()
 		}
 	}
 	if (vertical && stretchTaskarea)
-		addItem(new clsFlexiSpacer(vertical));
+		addItem(new clsFlexiSpacer());
 	calculateSizes(true);
 	if (!stretchTaskarea)
 		SendMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);

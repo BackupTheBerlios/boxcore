@@ -72,7 +72,7 @@ struct minMaxStruct
 class Item
 {
 public:
-	Item(bool pVertical, LPCSTR p_itemName = NULL, minMaxStruct p_minMax = minMaxStruct());
+	Item(LPCSTR p_itemName = NULL, minMaxStruct p_minMax = minMaxStruct());
 	virtual ~Item();
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -99,12 +99,6 @@ public:
 	int getSize(dimType pDim);
 	bool hitTest(int pX, int pY);
 protected:
-	/** @brief Vertical state of the item
-	  *
-	  * May affect drawing, sizing or calculating functions
-	  */
-	bool &vertical;
-
 	/** @brief Directions in which the item can calculate its size
 	  *
 	  * Set to DIM_BOTH if the item can calculate complete dimensions

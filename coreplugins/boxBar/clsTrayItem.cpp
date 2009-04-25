@@ -13,7 +13,7 @@
 namespace Plugin_boxBar
 {
 
-TrayIcon::TrayIcon(systemTray *trayItem, UINT pIconSize, bool pVertical): clsIconItem(trayItem->hIcon, pIconSize, pVertical)
+TrayIcon::TrayIcon(systemTray *trayItem, UINT pIconSize): clsIconItem(trayItem->hIcon, pIconSize)
 {
 	if (GetTrayInfo == NULL)
 	{

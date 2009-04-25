@@ -5,7 +5,7 @@
 namespace Plugin_boxBar
 {
 
-Text::Text(LPCSTR pText, UINT pStyle, bool pVertical, dimType p_knowsSize): Item(pVertical)
+Text::Text(LPCSTR pText, UINT pStyle, dimType p_knowsSize): Item()
 {
 	m_knowsSize = p_knowsSize;
 	m_wantsStretch = ((m_knowsSize & DIM_HORIZONTAL) ? DIM_NONE : DIM_HORIZONTAL);
@@ -20,7 +20,7 @@ Text::Text(LPCSTR pText, UINT pStyle, bool pVertical, dimType p_knowsSize): Item
 	}
 }
 
-Text::Text(LPCWSTR pText, UINT pStyle, bool pVertical, dimType p_knowsSize): Item(pVertical)
+Text::Text(LPCWSTR pText, UINT pStyle, dimType p_knowsSize): Item()
 {
 	m_knowsSize = p_knowsSize;
 	m_wantsStretch = ((m_knowsSize & DIM_HORIZONTAL) ? DIM_NONE : DIM_HORIZONTAL);

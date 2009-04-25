@@ -39,8 +39,7 @@ bool Item::AssignButton(LPCSTR p_data, mouseFunction & p_hook, LPCSTR & p_broamS
   *
   * Initialises all members to safe values, and sets an items vertical state as requested
   */
-Item::Item(bool pVertical, LPCSTR p_itemName, minMaxStruct p_minMax) :
-		vertical(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "Vertical", pVertical)),
+Item::Item(LPCSTR p_itemName, minMaxStruct p_minMax) :
 		m_maxSizeX(p_minMax.m_maxX),
 		m_itemPrefix(strdup(p_itemName))
 {

@@ -15,7 +15,7 @@ typedef BOOL(*fnGetTrayInfo)(HWND, UINT, PVOID*, ATOM*, UINT);
 class TrayIcon : public clsIconItem
 {
 public:
-	TrayIcon(systemTray *trayItem, UINT pIconSize, bool pVertical);
+	TrayIcon(systemTray *trayItem, UINT pIconSize);
 
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 protected:

@@ -9,7 +9,7 @@ namespace Plugin_boxBar
 class clsFlexiSpacer : public Item
 {
 public:
-	clsFlexiSpacer(bool pVertical);
+	clsFlexiSpacer();
 	virtual ~clsFlexiSpacer();
 
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)

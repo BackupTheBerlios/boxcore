@@ -207,21 +207,21 @@ void TrayArea::populateTray()
 		{
 			if (m_reverseOrder && !vertical)
 			{
-				(dynamic_cast<Collection*>(*columnRev))->addItem(new TrayIcon(trayItem, iconSize, vertical));
+				(dynamic_cast<Collection*>(*columnRev))->addItem(new TrayIcon(trayItem, iconSize));
 				columnRev++;
 				if (columnRev == itemList.rend())
 					columnRev = itemList.rbegin();
 			}
 			else
 			{
-				(dynamic_cast<Collection*>(*column))->addItem(new TrayIcon(trayItem, iconSize, vertical), m_reverseOrder);
+				(dynamic_cast<Collection*>(*column))->addItem(new TrayIcon(trayItem, iconSize), m_reverseOrder);
 				column++;
 				if (column == itemList.end())
 					column = itemList.begin();
 			}
 		}
 		else
-			addItem(new TrayIcon(trayItem, iconSize, vertical), m_reverseOrder);
+			addItem(new TrayIcon(trayItem, iconSize), m_reverseOrder);
 	}
 	if (numRowCols > 0)
 	{
@@ -229,14 +229,14 @@ void TrayArea::populateTray()
 		{
 			if (m_reverseOrder && !vertical)
 			{
-				(dynamic_cast<Collection*>(*columnRev))->addItem(new clsIconItem(NULL, iconSize, vertical));
+				(dynamic_cast<Collection*>(*columnRev))->addItem(new clsIconItem(NULL, iconSize));
 				columnRev++;
 				if (columnRev == itemList.rend())
 					columnRev = itemList.rbegin();
 			}
 			else
 			{
-				(dynamic_cast<Collection*>(*column))->addItem(new clsIconItem(NULL, iconSize, vertical), m_reverseOrder);
+				(dynamic_cast<Collection*>(*column))->addItem(new clsIconItem(NULL, iconSize), m_reverseOrder);
 				column++;
 				if (column == itemList.end())
 					column = itemList.begin();

@@ -604,7 +604,7 @@ void Bar::populateBar()
 		}
 		else if (!stricmp(barItem, "flexispace"))
 		{
-			addItem(new clsFlexiSpacer(vertical));
+			addItem(new clsFlexiSpacer());
 		}
 		else if (!stricmp(barItem, "tasks"))
 		{

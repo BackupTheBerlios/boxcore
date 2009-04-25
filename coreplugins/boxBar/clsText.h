@@ -9,8 +9,8 @@ namespace Plugin_boxBar
 class Text : public Item
 {
 public:
-	Text(LPCSTR pText, UINT pStyle, bool pVertical, dimType p_knowsSize = DIM_VERTICAL);
-	Text(LPCWSTR pText, UINT pStyle, bool pVertical, dimType p_knowsSize = DIM_VERTICAL);
+	Text(LPCSTR pText, UINT pStyle, dimType p_knowsSize = DIM_VERTICAL);
+	Text(LPCWSTR pText, UINT pStyle, dimType p_knowsSize = DIM_VERTICAL);
 	virtual ~Text();
 
 	void setText(LPCSTR pText);

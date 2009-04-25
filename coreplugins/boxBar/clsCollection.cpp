@@ -24,9 +24,10 @@ namespace Plugin_boxBar
  */
 
 Collection::Collection(bool pVertical, LPCSTR p_itemName, INT p_defaultBorder, INT p_defaultSpacing, minMaxStruct p_minMax) :
-		Item(pVertical, p_itemName, p_minMax),
+		Item(p_itemName, p_minMax),
 		spacingBorder(s_settingsManager.AssociateInt(m_pluginPrefix, p_itemName, "Spacing.Border", p_defaultBorder)),
-		spacingItems(s_settingsManager.AssociateInt(m_pluginPrefix, p_itemName, "Spacing.Items", p_defaultSpacing))
+		spacingItems(s_settingsManager.AssociateInt(m_pluginPrefix, p_itemName, "Spacing.Items", p_defaultSpacing)),
+		vertical(s_settingsManager.AssociateBool(m_pluginPrefix, p_itemName, "Vertical", pVertical))
 {
 	m_knowsSize = DIM_BOTH;
 	m_wantsStretch = DIM_NONE;

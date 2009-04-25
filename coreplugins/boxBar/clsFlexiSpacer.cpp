@@ -3,18 +3,10 @@
 namespace Plugin_boxBar
 {
 
-clsFlexiSpacer::clsFlexiSpacer(bool pVertical): Item(pVertical)
+clsFlexiSpacer::clsFlexiSpacer(): Item()
 {
-	if (vertical)
-	{
-		m_knowsSize = DIM_NONE;
-		m_wantsStretch = DIM_VERTICAL;
-	}
-	else
-	{
-		m_knowsSize = DIM_NONE;
-		m_wantsStretch = DIM_HORIZONTAL;
-	}
+	m_knowsSize = DIM_NONE;
+	m_wantsStretch = DIM_BOTH;
 }
 
 clsFlexiSpacer::~clsFlexiSpacer()

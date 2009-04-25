@@ -9,7 +9,7 @@ namespace Plugin_boxBar
 class clsIconItem : public Item
 {
 public:
-	clsIconItem(HICON pIcon, UINT pSize, bool pVertical);
+	clsIconItem(HICON pIcon, UINT pSize);
 	~clsIconItem();
 
 	bool setIcon(HICON pIcon);
