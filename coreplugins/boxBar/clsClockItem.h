@@ -6,11 +6,11 @@
 namespace Plugin_boxBar
 {
 
-class clsClockItem : public Label
+class Clock : public Label
 {
 public:
-	clsClockItem(bool pVertical);
-	virtual ~clsClockItem();
+	Clock(bool pVertical);
+	virtual ~Clock();
 
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	virtual void readSettings();

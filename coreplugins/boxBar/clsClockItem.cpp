@@ -20,7 +20,7 @@ namespace Plugin_boxBar
  * This sets the format and additional text for the tooltip
  */
 
-clsClockItem::clsClockItem(bool pVertical):
+Clock::Clock(bool pVertical):
 		Label(false, "Clock"),
 		clockFormat(s_settingsManager.AssociateString(m_pluginPrefix, m_itemPrefix, "Format", "%#H:%M")),
 		clockTipFormat(s_settingsManager.AssociateString(m_pluginPrefix, m_itemPrefix, "TipFormat", "%A %d %B %Y"))
@@ -35,7 +35,7 @@ clsClockItem::clsClockItem(bool pVertical):
 	_tsetlocale(LC_ALL,TEXT(".ACP"));
 }
 
-clsClockItem::~clsClockItem()
+Clock::~Clock()
 {
 }
 
@@ -43,7 +43,7 @@ clsClockItem::~clsClockItem()
   *
   * @todo: document this function
   */
-LRESULT clsClockItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT Clock::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -85,14 +85,14 @@ LRESULT clsClockItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
   *
   * @todo: document this function
   */
-void clsClockItem::showMenu(Item *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
+void Clock::showMenu(Item *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	PostMessage(hBlackboxWnd, BB_BROADCAST, 0, (LPARAM)"@bbCore.ShowMenu");
 }
 
 #include <string>
 
-void clsClockItem::TimeControlPanel(Item *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
+void Clock::TimeControlPanel(Item *pItem, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	BBExecute(NULL, "open", "control.exe","timedate.cpl",NULL,SW_SHOWNORMAL, true);
 }
@@ -101,7 +101,7 @@ void clsClockItem::TimeControlPanel(Item *pItem, UINT msg, WPARAM wParam, LPARAM
   *
   * @todo: document this function
   */
-void clsClockItem::readSettings()
+void Clock::readSettings()
 {
 	LPCSTR textBuffer;
 	textBuffer = ReadString(configFile, "boxBar.clock.leftClick:","");
@@ -113,7 +113,7 @@ void clsClockItem::readSettings()
 	SetTimer(barWnd, ClockTimer, 1, NULL);
 }
 
-bool clsClockItem::AssignButton(LPCSTR p_data, mouseFunction &p_hook, LPCSTR &p_broamSlot)
+bool Clock::AssignButton(LPCSTR p_data, mouseFunction &p_hook, LPCSTR &p_broamSlot)
 {
 	if (Item::AssignButton(p_data, p_hook, p_broamSlot))
 	{

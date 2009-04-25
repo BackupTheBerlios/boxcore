@@ -600,7 +600,7 @@ void Bar::populateBar()
 		}
 		else if (!stricmp(barItem, "clock"))
 		{
-			addItem(new clsClockItem(vertical));
+			addItem(new Clock(vertical));
 		}
 		else if (!stricmp(barItem, "flexispace"))
 		{
