@@ -1,7 +1,7 @@
 #ifndef CLSCLOCKITEM_H
 #define CLSCLOCKITEM_H
 
-#include "clsLabelItem.h"
+#include "clsLabel.h"
 
 namespace Plugin_boxBar
 {

@@ -23,7 +23,7 @@ boxBar.cpp
 clsTask.cpp
 clsTaskArea.cpp
 
-clsLabelItem.cpp
+clsLabel.cpp
 
 clsWorkspaceLabel.cpp
 

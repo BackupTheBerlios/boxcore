@@ -1,7 +1,7 @@
 #ifndef CLSWORKSPACELABEL_H
 #define CLSWORKSPACELABEL_H
 
-#include "clsLabelItem.h"
+#include "clsLabel.h"
 
 namespace Plugin_boxBar
 {
