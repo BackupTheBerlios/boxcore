@@ -29,8 +29,10 @@ namespace boxBar
  * Determines whether the bar is drawn vertically or horizontally
  *
  * @code boxBar.Items: Button,Tasks,Tray,Clock @endcode
- * Select the items to show on the bar. Available items are @ref boxBarTray, @ref boxBarButton,
- * @ref boxBarTasks and each name links to its appropriate settings in this file.
+ * Select the items to show on the bar. Available items are @ref boxBarButton, @ref boxBarClock,
+ * @ref boxBarTasks, @ref boxBarTray, @ref boxBarWSLabel and each name links to its appropriate settings
+ * in this file. Some item names are followed by the full name in brackets, but you must use the short name
+ * when adding them.
  *
  * @page boxBarRCAdvanced
  * @section boxBarAdv General Settings
@@ -76,6 +78,13 @@ LRESULT CALLBACK Bar::realWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 		return DefWindowProc(hWnd, msg, wParam, lParam);
 
 }
+
+/**
+		 * @page boxBarBroams
+		 * @section boxBarBar General
+		 * @code @boxBar.Percentage XX @endcode
+		 * Changes the boxBar.Percentage setting
+		 */
 
 /** @brief wndProc
   *
@@ -195,13 +204,6 @@ LRESULT Bar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		// ----------------------------------------------------------
 		// Blackbox sends Broams to all windows...
-
-		/**
-		 * @page boxBarBroams
-		 * @section boxBarBar
-		 * @code @boxBar.Percentage XX @endcode
-		 * Changes the boxBar.Percentage setting
-		 */
 	case BB_BROADCAST:
 	{
 		const char *msg_string = (LPCSTR)lParam + 1;

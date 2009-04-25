@@ -14,13 +14,20 @@ namespace boxBar
  * @page boxBarRCAdvanced
  * @section boxBarCollection Collection Item
  * These settings can be applied to several items.
- * These items include @ref boxBarTray "Tray", @ref boxBarTaskArea, @ref boxBarTask.
+ * These items are listed as collection items in their documentation.
  * These settings can also be applied to the bar itself by removing "<item>." from the settings below. Otherwise replace "<item>"
  * with the item that you want to affect.
+ *
  * @code boxBar.<item>.Spacing.Border: <varies> @endcode
  * Space left unused around the border of this item, in pixels.
+ *
  * @code boxBar.<item>.Spacing.Items: <varies> @endcode
  * Space left between items, in pixels.
+ *
+ * @code boxBar.<item>.Vertical: <bar vertical setting> @endcode
+ * Sets whether an item is drawn horizontally or vertically. There are very
+ * few cases where you should change this setting, and most are listed in
+ * @ref boxBarRC.
  */
 
 Collection::Collection(bool pVertical, LPCSTR p_itemName, INT p_defaultBorder, INT p_defaultSpacing, minMaxStruct p_minMax) :

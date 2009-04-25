@@ -9,7 +9,9 @@
  *
  * @section boxBarToc Table of Contents
  * - @ref boxBarChangelog
- * - @ref boxBarSettings
+ * - @subpage boxBarRC
+ * - @subpage boxBarBroams
+ * - @subpage boxBarRCAdvanced
  *
  * @section boxBarChangelog Changelog
  * @subsection boxBar_0_2_0 boxBar 0.2.0 (2008-04-??)
@@ -91,10 +93,6 @@
  * <A HREF="mailto:carsomyr@users.berlios.de">Carsomyr</A>
  *
  * - First release as part of boxCore
- * @section boxBarSettings Settings
- * For settings that you can change in the RC file you can see
- * - @subpage boxBarRC
- * - @subpage boxBarRCAdvanced
  */
 
 /**
@@ -115,4 +113,12 @@
 /**
  * @page boxBarRCAdvanced Advanced RC settings for boxBar
  * Settings listed here should be used with care, as they may have unintended effects.
+ */
+
+/**
+ * @page boxBarBroams Broadcast Messages for boxBar
+ * boxBar will respond to all broadcast messages (bro@@ms) listed here. If you have renamed
+ * the .dll file, please replace boxBar with the new name you gave the file. If an entry refers
+ * to changing a setting, please find the setting in @ref boxBarRC to find out what effect that
+ * will have.
  */

@@ -9,9 +9,10 @@ namespace boxBar
 
 typedef BOOL(*fnGetTrayInfo)(HWND, UINT, PVOID*, ATOM*, UINT);
 
-/** @class TrayIcon
-  * @brief Represents a single tray item in the bar
-  */
+/** @internal
+ * @class TrayIcon
+ * @brief Represents a single tray item in the bar
+ */
 class TrayIcon : public Icon
 {
 public:

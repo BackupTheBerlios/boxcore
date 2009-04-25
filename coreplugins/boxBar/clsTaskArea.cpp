@@ -11,7 +11,7 @@ namespace boxBar
 
 /**
  * @page boxBarRCAdvanced
- * @section boxBarTaskArea TaskArea
+ * @section boxBarTaskAreaAdv TaskArea
  * The TaskArea is created as part of the tasks item, and serves to contain the tasks.
  * The TaskArea is a @ref boxBarCollection, so those settings can be applied.
  * @code boxBar.Tasks.Area.Stretch: true @endcode

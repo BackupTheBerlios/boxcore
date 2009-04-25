@@ -1,8 +1,9 @@
 #ifndef CLSITEM_H
 #define CLSITEM_H
-/** @file clsItem.h
-  * @brief Contains definition for clsItem and supporting structures
-  */
+/** @internal
+ * @file clsItem.h
+ * @brief Contains definition for clsItem and supporting structures
+ */
 
 #include "BBApi.h"
 #include <windows.h>

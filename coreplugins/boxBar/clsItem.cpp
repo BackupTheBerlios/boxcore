@@ -24,15 +24,6 @@ bool Item::AssignButton(LPCSTR p_data, mouseFunction & p_hook, LPCSTR & p_broamS
 	return false;
 }
 
-/**
- * @page boxBarRCAdvanced
- * @section boxBarItem Settings which can be applied to any item
- * @code boxBar.<item>.Vertical: <bar vertical setting> @endcode
- * Sets whether an item is drawn horizontally or vertically. There are very
- * few cases where you should change this setting, and most are listed in
- * @ref boxBarRC.
- */
-
 /** @brief Base constructor
   *
   * @param[in] pVertical Sets if this item is vertical or not

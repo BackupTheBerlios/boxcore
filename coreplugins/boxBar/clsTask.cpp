@@ -22,7 +22,7 @@ namespace boxBar
  *
  * @page boxBarRCAdvanced
  * @section boxBarTasksAdv Tasks
- * Advanced settings for @ref boxBarTasks.
+ * Advanced settings for @ref boxBarTasks. The tasks item is also affected by @ref boxBarTaskAreaAdv
  *
  * @code boxBar.Tasks.Active.Background: true @endcode
  * Sets whether active tasks draw a background for the task.

@@ -3,6 +3,14 @@
 namespace boxBar
 {
 
+/**
+ * @page boxBarRC
+ * @section boxBarWSLabel WSLabel (Workspace Label)
+ * The workspace label displays the current workspace name and can be used
+ * to switch to the next or previous workspace. There are currently no settings
+ * available.
+ */
+
 clsWorkspaceLabel::clsWorkspaceLabel(bool pVertical): Label(pVertical)
 {
 	static int msgs[] = {BB_DESKTOPINFO, 0};
