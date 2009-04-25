@@ -590,9 +590,21 @@ void Bar::populateBar()
 
 	const CHAR * barItems = ReadString(configFile, "boxBar.items:", "button,tasks,tray,clock");
 	CHAR barItem[MAX_PATH];
+	CHAR itemName[MAX_PATH];
 	do
 	{
 		barItems = Tokenize(barItems, barItem, ",");
+		LPSTR sep = strchr(barItem, ':');
+		if (sep)
+		{
+			strcpy(itemName, sep+1);
+			*sep = '\0';
+			OutputDebugStringA(itemName);
+		}
+		else
+		{
+			strcpy(itemName, barItem);
+		}
 		if (!stricmp(barItem, "tray"))
 		{
 			addItem(new TrayArea(vertical));
@@ -600,7 +612,7 @@ void Bar::populateBar()
 		}
 		else if (!stricmp(barItem, "clock"))
 		{
-			addItem(new Clock(vertical));
+			addItem(new Clock());
 		}
 		else if (!stricmp(barItem, "flexispace"))
 		{
@@ -616,7 +628,7 @@ void Bar::populateBar()
 		}
 		else if (!stricmp(barItem, "button"))
 		{
-			addItem(new Button());
+			addItem(new Button(itemName));
 		}
 	}
 	while (strlen(barItems));
