@@ -33,7 +33,7 @@ clsTrayItemCollection.cpp
 
 
 
-clsClockItem.cpp
+clsClock.cpp
 
 clsFlexiSpacer.cpp
 

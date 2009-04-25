@@ -1,4 +1,4 @@
-#include "clsClockItem.h"
+#include "clsClock.h"
 #include <ctime>
 #include <tchar.h>
 #include <locale.h>
