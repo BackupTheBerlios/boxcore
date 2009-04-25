@@ -249,12 +249,12 @@ LRESULT Bar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				}
 			}
 		}
-		else if (toggleWithPlugins && (element = "@BBHidePlugins") && (!stricmp(msg_string, element)))
+		else if (toggleWithPlugins && (element = "BBHidePlugins") && (!stricmp(msg_string, element)))
 		{
 			ShowWindow(barWnd, SW_HIDE);
 			SetDesktopMargin(hWnd, 0, 0);
 		}
-		else if (toggleWithPlugins && (element = "@BBShowPlugins") && (!stricmp(msg_string, element)))
+		else if (toggleWithPlugins && (element = "BBShowPlugins") && (!stricmp(msg_string, element)))
 		{
 			ShowWindow(barWnd, SW_SHOW);
 			if (margin)
