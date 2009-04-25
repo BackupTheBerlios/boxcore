@@ -9,7 +9,7 @@ namespace boxBar
 class Clock : public Label
 {
 public:
-	Clock(bool pVertical);
+	Clock();
 	virtual ~Clock();
 
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

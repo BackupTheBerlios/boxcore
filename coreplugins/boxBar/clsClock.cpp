@@ -20,12 +20,11 @@ namespace boxBar
  * This sets the format and additional text for the tooltip
  */
 
-Clock::Clock(bool pVertical):
+Clock::Clock():
 		Label(false, "Clock"),
 		clockFormat(s_settingsManager.AssociateString(m_pluginPrefix, m_itemPrefix, "Format", "%#H:%M")),
 		clockTipFormat(s_settingsManager.AssociateString(m_pluginPrefix, m_itemPrefix, "TipFormat", "%A %d %B %Y"))
 {
-	PRINT(clockFormat.c_str());
 	style = SN_TOOLBARCLOCK;
 
 	ClockTimer = getTimerID();
