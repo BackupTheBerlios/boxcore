@@ -21,7 +21,7 @@ namespace Plugin_boxBar
  */
 
 clsClockItem::clsClockItem(bool pVertical):
-		clsLabelItem(false, "Clock"),
+		Label(false, "Clock"),
 		clockFormat(s_settingsManager.AssociateString(m_pluginPrefix, m_itemPrefix, "Format", "%#H:%M")),
 		clockTipFormat(s_settingsManager.AssociateString(m_pluginPrefix, m_itemPrefix, "TipFormat", "%A %d %B %Y"))
 {
@@ -78,7 +78,7 @@ LRESULT clsClockItem::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	}
 
-	return clsLabelItem::wndProc(hWnd, msg, wParam, lParam);
+	return Label::wndProc(hWnd, msg, wParam, lParam);
 }
 
 /** @brief showMenu

@@ -6,7 +6,7 @@
 namespace Plugin_boxBar
 {
 
-class clsWorkspaceLabel : public clsLabelItem
+class clsWorkspaceLabel : public Label
 {
 public:
 	clsWorkspaceLabel(bool pVertical);

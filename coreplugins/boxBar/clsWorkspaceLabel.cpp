@@ -3,7 +3,7 @@
 namespace Plugin_boxBar
 {
 
-clsWorkspaceLabel::clsWorkspaceLabel(bool pVertical): clsLabelItem(pVertical)
+clsWorkspaceLabel::clsWorkspaceLabel(bool pVertical): Label(pVertical)
 {
 	static int msgs[] = {BB_DESKTOPINFO, 0};
 	PostMessage(hBlackboxWnd, BB_REGISTERMESSAGE, reinterpret_cast<WPARAM>(barWnd), reinterpret_cast<LPARAM>(msgs));
@@ -38,7 +38,7 @@ LRESULT clsWorkspaceLabel::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 		return 0;
 	}
 	}
-	return clsLabelItem::wndProc(hWnd, msg, wParam, lParam);
+	return Label::wndProc(hWnd, msg, wParam, lParam);
 }
 
 /** @brief nextWorkspace

@@ -6,7 +6,7 @@
 namespace Plugin_boxBar
 {
 
-class clsClockItem : public clsLabelItem
+class clsClockItem : public Label
 {
 public:
 	clsClockItem(bool pVertical);

@@ -7,15 +7,12 @@
 namespace Plugin_boxBar
 {
 
-class clsLabelItem : public Collection
+class Label : public Collection
 {
 public:
-	clsLabelItem(bool pVertical, LPCSTR p_itemName = "Label");
-
-	//virtual void calculateSizes(bool pSizeGiven = false);
+	Label(bool pVertical, LPCSTR p_itemName = "Label");
 protected:
 	Text *m_textItem;
-private:
 };
 
 }
