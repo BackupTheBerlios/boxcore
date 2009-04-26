@@ -4,7 +4,7 @@ namespace boxBar
 {
 
 Icon::Icon(HICON p_icon, UINT p_iconSize):
-	Item(),
+	Item("GenericIcon"),
 	m_icon(CopyIcon(p_icon)),
 	m_iconSize(p_iconSize)
 {
@@ -62,6 +62,8 @@ void Icon::draw(HDC p_context)
 	{
 		if (alphaDraw)
 		{
+			ZeroMemory(m_bufferBits, m_iconSize*m_iconSize*4);
+			ZeroMemory(m_alphaBits, m_iconSize*m_iconSize*4);
 			HDC internalDC = CreateCompatibleDC(p_context);
 			HBITMAP oldBitmap = (HBITMAP) SelectObject(internalDC, m_alphaBitmap);
 			DrawIconEx(internalDC, 0, 0, m_icon, m_iconSize, m_iconSize, NULL, NULL, DI_MASK);

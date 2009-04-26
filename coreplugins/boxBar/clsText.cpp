@@ -5,18 +5,17 @@
 namespace boxBar
 {
 
-Text::Text(LPCSTR pText, UINT pStyle, dimType p_knowsSize): Item()
+Text::Text(LPCSTR pText, UINT pStyle, dimType p_knowsSize):
+	Item("GenericText"),
+	m_styleItem(NULL),
+	m_font(NULL)
 {
 	m_knowsSize = p_knowsSize;
 	m_wantsStretch = ((m_knowsSize & DIM_HORIZONTAL) ? DIM_NONE : DIM_HORIZONTAL);
-	fontStyle = pStyle;
+	SetStyle(pStyle);
 	if (pText)
 	{
-		CopyString(text, pText, 256);
-	}
-	else
-	{
-		text[0] = TEXT('\0');
+		CopyString(m_text, pText, 256);
 	}
 }
 
@@ -24,14 +23,10 @@ Text::Text(LPCWSTR pText, UINT pStyle, dimType p_knowsSize): Item()
 {
 	m_knowsSize = p_knowsSize;
 	m_wantsStretch = ((m_knowsSize & DIM_HORIZONTAL) ? DIM_NONE : DIM_HORIZONTAL);
-	fontStyle = pStyle;
+	SetStyle(pStyle);
 	if (pText)
 	{
-		CopyString(text, pText, 256);
-	}
-	else
-	{
-		text[0] = TEXT('\0');
+		CopyString(m_text, pText, 256);
 	}
 }
 
@@ -68,14 +63,14 @@ void Text::draw(HDC pContext)
 	else
 	{
 		internalDC = pContext;
-		oldColor = SetTextColor(internalDC, bbStyle.getStyleTextColor(fontStyle));
+		oldColor = SetTextColor(internalDC, m_styleItem->TextColor);
 	}
 	SetBkMode(internalDC, TRANSPARENT);
-	HFONT oldFont = (HFONT) SelectObject(internalDC, bbStyle.getStyleFont(fontStyle));
+	HFONT oldFont = (HFONT) SelectObject(internalDC, m_font);
 	RECT testRect = itemArea;
-	DrawTextEx(internalDC, text, -1, &testRect, bbStyle.getStyleTextJustify(fontStyle) | DT_CALCRECT, NULL);
+	DrawText(internalDC, m_text.c_str(), -1, &testRect, m_styleItem->Justify | DT_CALCRECT);
 	if (testRect.right > itemArea.right)
-		PostMessage(barWnd, BOXBAR_NEEDTIP, (WPARAM)text, (LPARAM)this);
+		PostMessage(barWnd, BOXBAR_NEEDTIP, (WPARAM)m_text.c_str(), (LPARAM)this);
 	else
 		PostMessage(barWnd, BOXBAR_NEEDTIP, NULL, (LPARAM)this);
 	testRect = itemArea;
@@ -83,19 +78,19 @@ void Text::draw(HDC pContext)
 	{
 		OffsetRect(&testRect, -itemArea.left, -itemArea.top);
 	}
-	DrawTextEx(internalDC, text, -1, &testRect, bbStyle.getStyleTextJustify(fontStyle) | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS | DT_NOPREFIX, NULL);
+	DrawText(internalDC, m_text.c_str(), -1, &testRect, m_styleItem->Justify | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS | DT_NOPREFIX);
 	SetTextColor(internalDC, oldColor);
 	SelectObject(internalDC, oldFont);
 	if (alphaDraw)
 	{
-		for (int i = 0; i < (itemArea.bottom - itemArea.top)*(itemArea.right - itemArea.left); ++i)
+		for (int i = 0; i < (testRect.bottom)*(testRect.right); ++i)
 		{
 			if (ptPixels[0] || ptPixels[1] || ptPixels[2])
 			{
 				ptPixels[3] = (ptPixels[0]*66 + ptPixels[1]*129 + ptPixels[2]*25)/256;
-				ptPixels[0] = (GetBValue(bbStyle.getStyleTextColor(fontStyle)) * ptPixels[3]) / 256;
-				ptPixels[1] = (GetGValue(bbStyle.getStyleTextColor(fontStyle)) * ptPixels[3]) / 256;
-				ptPixels[2] = (GetRValue(bbStyle.getStyleTextColor(fontStyle)) * ptPixels[3]) / 256;
+				ptPixels[0] = (GetBValue(m_styleItem->TextColor) * ptPixels[3]) / 256;
+				ptPixels[1] = (GetGValue(m_styleItem->TextColor) * ptPixels[3]) / 256;
+				ptPixels[2] = (GetRValue(m_styleItem->TextColor) * ptPixels[3]) / 256;
 			}
 			ptPixels+=4;
 		}
@@ -124,13 +119,11 @@ void Text::calculateSizes(bool pSizeGiven)
 	{
 		SIZE textSize;
 		HDC tempDC = CreateCompatibleDC(NULL);
-		HFONT oldFont = (HFONT) SelectObject(tempDC, bbStyle.getStyleFont(fontStyle));
-		GetTextExtentPoint32(tempDC, text, _tcslen(text), &textSize);
+		HFONT oldFont = (HFONT) SelectObject(tempDC, m_font);
+		GetTextExtentPoint32(tempDC, m_text.c_str(), m_text.size(), &textSize);
 		SelectObject(tempDC, oldFont);
 		DeleteDC(tempDC);
-		minSizeX = textSize.cx;
-		minSizeY = textSize.cy;
-		resize(minSizeX, minSizeY);
+		resize(textSize.cx, textSize.cy);
 	}
 }
 
@@ -138,9 +131,9 @@ void Text::calculateSizes(bool pSizeGiven)
   *
   * @todo: document this function
   */
-void Text::setText(CONST CHAR *pText)
+void Text::SetText(CONST CHAR *pText)
 {
-	CopyString(text, pText, 256);
+	CopyString(m_text, pText, 256);
 	InvalidateRect(barWnd, &itemArea, TRUE);
 	PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 }
@@ -149,9 +142,9 @@ void Text::setText(CONST CHAR *pText)
   *
   * @todo: document this function
   */
-void Text::setText(CONST WCHAR *pText)
+void Text::SetText(CONST WCHAR *pText)
 {
-	CopyString(text, pText, 256);
+	CopyString(m_text, pText, 256);
 	InvalidateRect(barWnd, &itemArea, TRUE);
 	PostMessage(barWnd, BOXBAR_REDRAW, 0, 0);
 }
@@ -161,9 +154,14 @@ void Text::setText(CONST WCHAR *pText)
   *
   * @todo: document this function
   */
-void Text::setStyle(UINT pStyle)
+void Text::SetStyle(UINT pStyle)
 {
-	fontStyle = pStyle;
+	if (m_font)
+	{
+		DeleteObject(m_font);
+	}
+	m_styleItem = reinterpret_cast<StyleItem *>(GetSettingPtr(pStyle));
+	m_font = CreateStyleFont(reinterpret_cast<StyleItem *>(GetSettingPtr(SN_TOOLBAR)));
 }
 
 }

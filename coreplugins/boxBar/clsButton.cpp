@@ -98,7 +98,7 @@ void Button::readSettings()
 {
 	if (m_textItem)
 	{
-		m_textItem->setText(m_buttonText.c_str());
+		m_textItem->SetText(m_buttonText.c_str());
 	}
 	m_minSizeX = ReadInt(configFile, "boxBar.button.minSize.x:",0);
 	m_minSizeY = ReadInt(configFile, "boxBar.button.minSize.y:",0);

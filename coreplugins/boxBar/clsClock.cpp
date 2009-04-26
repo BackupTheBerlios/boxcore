@@ -54,7 +54,7 @@ LRESULT Clock::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			TCHAR buffer[256];
 			struct tm *ltp = localtime(&systemTime);
 			_tcsftime(buffer, 256, clockFormat.c_str(), ltp);
-			m_textItem->setText(buffer);
+			m_textItem->SetText(buffer);
 			if (tipText)
 				delete[] tipText;
 			tipText = new TCHAR[256];

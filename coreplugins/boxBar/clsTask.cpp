@@ -162,7 +162,7 @@ LRESULT Task::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				GetWindowText(taskWnd, m_caption, 256);
 				if (captionItem)
 				{
-					captionItem->setText(m_caption);
+					captionItem->SetText(m_caption);
 				}
 				else
 				{
@@ -194,7 +194,7 @@ LRESULT Task::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 			if (captionItem)
 			{
-				captionItem->setStyle(style);
+				captionItem->SetStyle(style);
 			}
 			return 0;
 		case TASKITEM_FLASHED:
@@ -213,7 +213,7 @@ LRESULT Task::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				}
 				if (captionItem)
 				{
-					captionItem->setStyle(style);
+					captionItem->SetStyle(style);
 				}
 			}
 			return 0;

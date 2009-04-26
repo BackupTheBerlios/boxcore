@@ -17,7 +17,7 @@ Label::Label(bool pVertical, LPCSTR p_itemName) : Collection(pVertical, p_itemNa
 void Label::SetStyle(UINT p_style)
 {
 	style = p_style;
-	m_textItem->setStyle(p_style);
+	m_textItem->SetStyle(p_style);
 }
 
 }

@@ -17,7 +17,7 @@ clsWorkspaceLabel::clsWorkspaceLabel(bool pVertical): Label(pVertical)
 	PostMessage(hBlackboxWnd, BB_REGISTERMESSAGE, reinterpret_cast<WPARAM>(barWnd), reinterpret_cast<LPARAM>(msgs));
 	DesktopInfo deskinfo;
 	GetDesktopInfo(&deskinfo);
-	m_textItem->setText(deskinfo.name);
+	m_textItem->SetText(deskinfo.name);
 	//CopyString(text, deskinfo.name, 256);
 	leftClick = nextWorkspace;
 	rightClick = prevWorkspace;
@@ -41,7 +41,7 @@ LRESULT clsWorkspaceLabel::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 	case BB_DESKTOPINFO:
 	{
 		DesktopInfo *deskinfo = reinterpret_cast<DesktopInfo *>(lParam);
-		m_textItem->setText(deskinfo->name);
+		m_textItem->SetText(deskinfo->name);
 		PostMessage(barWnd, BOXBAR_UPDATESIZE, 0, 0);
 		return 0;
 	}

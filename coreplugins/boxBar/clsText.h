@@ -13,15 +13,17 @@ public:
 	Text(LPCWSTR pText, UINT pStyle, dimType p_knowsSize = DIM_VERTICAL);
 	virtual ~Text();
 
-	void setText(LPCSTR pText);
-	void setText(LPCWSTR pText);
-	void setStyle(UINT pStyle);
+	void SetText(LPCSTR pText);
+	void SetText(LPCWSTR pText);
+	void SetStyle(UINT pStyle);
 
 	virtual void draw(HDC pContext);
 	virtual void calculateSizes(bool pSizeGiven = false);
-protected:
-	TCHAR text[256];
-	UINT fontStyle;
+private:
+	tstring m_text;
+
+	StyleItem *m_styleItem;
+	HFONT m_font;
 };
 
 }
