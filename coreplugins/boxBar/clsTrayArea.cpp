@@ -1,5 +1,5 @@
 #include "BBApi.h"
-#include "clsTrayItemCollection.h"
+#include "clsTrayArea.h"
 #include "clsTrayIcon.h"
 #include <cstdlib>
 #include <tchar.h>

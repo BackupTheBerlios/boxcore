@@ -29,7 +29,7 @@ clsWorkspaceLabel.cpp
 
 
 clsTrayIcon.cpp
-clsTrayItemCollection.cpp
+clsTrayArea.cpp
 
 
 

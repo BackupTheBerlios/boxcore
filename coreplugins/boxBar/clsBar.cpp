@@ -1,7 +1,7 @@
 #include "BBApi.h"
 #include "clsBar.h"
 #include "clsClock.h"
-#include "clsTrayItemCollection.h"
+#include "clsTrayArea.h"
 #include "clsTaskArea.h"
 #include "clsFlexiSpacer.h"
 #include "clsWorkspaceLabel.h"
