@@ -11,6 +11,8 @@ class Label : public Collection
 {
 public:
 	Label(bool pVertical, LPCSTR p_itemName = "Label");
+
+	void SetStyle(UINT p_style);
 protected:
 	Text *m_textItem;
 };

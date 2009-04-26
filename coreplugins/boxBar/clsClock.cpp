@@ -25,7 +25,7 @@ Clock::Clock():
 		clockFormat(s_settingsManager.AssociateString(m_pluginPrefix, m_itemPrefix, "Format", "%#H:%M")),
 		clockTipFormat(s_settingsManager.AssociateString(m_pluginPrefix, m_itemPrefix, "TipFormat", "%A %d %B %Y"))
 {
-	style = SN_TOOLBARCLOCK;
+	SetStyle(SN_TOOLBARCLOCK);
 
 	ClockTimer = getTimerID();
 	readSettings();
