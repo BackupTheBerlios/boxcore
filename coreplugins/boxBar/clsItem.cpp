@@ -32,7 +32,8 @@ bool Item::AssignButton(LPCSTR p_data, mouseFunction & p_hook, LPCSTR & p_broamS
   */
 Item::Item(LPCSTR p_itemName, minMaxStruct p_minMax) :
 		m_maxSizeX(p_minMax.m_maxX),
-		m_itemPrefix(strdup(p_itemName))
+		m_itemPrefix(strdup(p_itemName)),
+		itemAlpha(s_settingsManager.AssociateUInt(m_pluginPrefix, p_itemName, "Alpha", 255))
 {
 	style = 0;
 	itemArea.left = itemArea.right = itemArea.top = itemArea.bottom = 0;
@@ -60,8 +61,6 @@ Item::Item(LPCSTR p_itemName, minMaxStruct p_minMax) :
 	midClick = NULL;
 	X1Click = NULL;
 	X2Click = NULL;
-
-	itemAlpha = 255;
 
 	itemBlend.BlendOp = AC_SRC_OVER;
 	itemBlend.BlendFlags = 0;

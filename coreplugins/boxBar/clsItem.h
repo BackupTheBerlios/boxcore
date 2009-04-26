@@ -135,7 +135,7 @@ protected:
 	static bool alphaDraw;
 
 	/// @brief Alpha
-	BYTE itemAlpha;
+	UINT &itemAlpha;
 
 	bool mouseDown;
 	bool m_dblClk;
