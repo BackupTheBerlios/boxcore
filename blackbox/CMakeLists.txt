@@ -74,6 +74,9 @@ set (PLUGININFO_EMAIL "carsomyr@users.berlios.de")
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/version.h.in
 ${CMAKE_CURRENT_BINARY_DIR}/version.h)
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resource.rc.in
+${CMAKE_CURRENT_BINARY_DIR}/resource.rc)
+
 if(MINGW)
   # resource compilation for mingw
   ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/resource.o
@@ -95,7 +98,7 @@ include_directories(blackbox ${CMAKE_CURRENT_BINARY_DIR})
 #	COMMAND ${DLLTOOL} -d ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def -l ${CMAKE_CURRENT_BINARY_DIR}/libblackbox.a -D blackbox.exe
 #	COMMENT "Building proper library")
 target_link_libraries (blackbox ${UNICOWSLIB}
-	debuglib shellserviceobjects shellservices taskmanager vwm shlwapi version ole32 uuid comctl32 comdlg32 shell32 advapi32 winmm gdi32)
+	debuglib shellserviceobjects shellservices taskmanager vwm shlwapi version uuid comctl32 comdlg32 shell32 advapi32 winmm gdi32)
 set_target_properties (blackbox PROPERTIES
 	IMPORT_SUFFIX .a
 	ENABLE_EXPORTS true
@@ -104,8 +107,8 @@ set_target_properties (blackbox PROPERTIES
 
 if (MINGW)
 set_target_properties (blackbox PROPERTIES
-	LINK_FLAGS "${BOXCORE_FLAGS_STRIP} ${BOXCORE_FLAGS_PROFILE} ${BOXCORE_FLAGS_DEBUG} ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def"
-	COMPILE_FLAGS "${BOXCORE_FLAGS_OPTIMIZE} ${BOXCORE_FLAGS_PROFILE} ${BOXCORE_FLAGS_DEBUG} -Wall -fno-rtti -fno-exceptions -fmessage-length=0"
+	LINK_FLAGS "${BOXCORE_LINK_FLAGS} ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def"
+	COMPILE_FLAGS "${BOXCORE_COMPILE_FLAGS} -Wall -fno-rtti -fno-exceptions -fmessage-length=0"
 )
 endif (MINGW)
 
