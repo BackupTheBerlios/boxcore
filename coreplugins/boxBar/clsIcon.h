@@ -12,14 +12,18 @@ public:
 	Icon(HICON pIcon, UINT pSize);
 	~Icon();
 
-	bool setIcon(HICON pIcon);
+	bool SetIcon(HICON pIcon);
 
 	virtual void draw(HDC pContext);
 	virtual void calculateSizes(bool pSizeGiven = false);
-protected:
-	HICON icon;
-	UINT iconSize;
 private:
+	HICON m_icon;
+	UINT m_iconSize;
+
+	HBITMAP m_alphaBitmap;
+	HBITMAP m_bufferBitmap;
+	BYTE *m_alphaBits;
+	BYTE *m_bufferBits;
 };
 
 }

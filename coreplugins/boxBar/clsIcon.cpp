@@ -3,19 +3,41 @@
 namespace boxBar
 {
 
-Icon::Icon(HICON pIcon, UINT pSize):Item()
+Icon::Icon(HICON p_icon, UINT p_iconSize):
+	Item(),
+	m_icon(CopyIcon(p_icon)),
+	m_iconSize(p_iconSize)
 {
-	icon = CopyIcon(pIcon);
-	iconSize = pSize;
 	m_knowsSize = DIM_BOTH;
 	m_wantsStretch = DIM_NONE;
+
+	if (alphaDraw)
+	{
+	BITMAPINFO bufferInfo;
+	ZeroMemory(&bufferInfo, sizeof(bufferInfo));
+	bufferInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bufferInfo.bmiHeader.biWidth = m_iconSize;
+	bufferInfo.bmiHeader.biHeight = m_iconSize;
+	bufferInfo.bmiHeader.biPlanes = 1;
+	bufferInfo.bmiHeader.biBitCount = 32;
+
+	HDC tempDC = CreateCompatibleDC(NULL);
+	m_alphaBitmap = CreateDIBSection(tempDC, &bufferInfo, DIB_RGB_COLORS, (void **) &m_alphaBits, NULL, 0);
+	m_bufferBitmap = CreateDIBSection(tempDC, &bufferInfo, DIB_RGB_COLORS, (void **) &m_bufferBits, NULL, 0);
+	DeleteDC(tempDC);
+	}
 }
 
 Icon::~Icon()
 {
-	if (icon)
+	if (alphaDraw)
 	{
-		DestroyIcon(icon);
+	DeleteObject(m_alphaBitmap);
+	DeleteObject(m_bufferBitmap);
+	}
+	if (m_icon)
+	{
+		DestroyIcon(m_icon);
 	}
 }
 
@@ -23,79 +45,70 @@ Icon::~Icon()
   *
   * @todo: document this function
   */
-void Icon::calculateSizes(bool pSizeGiven)
+void Icon::calculateSizes(bool p_sizeGiven)
 {
-	minSizeX = iconSize;
-	minSizeY = iconSize;
-	resize(minSizeX, minSizeY);
+	minSizeX = m_iconSize;
+	minSizeY = m_iconSize;
+	resize(m_iconSize, m_iconSize);
 }
 
 /** @brief draw
   *
   * @todo: document this function
   */
-void Icon::draw(HDC pContext)
+void Icon::draw(HDC p_context)
 {
-	if (icon)
+	if (m_icon)
 	{
-		HDC internalDC;
-		HBITMAP alphaBitmap, oldBitmap, maskBitmap;
-		BYTE *ptPixels, *ptPixelsMask;
-		//alphaDraw = false;
 		if (alphaDraw)
 		{
-			internalDC = CreateCompatibleDC(pContext);
-			BITMAPINFO bufferInfo;
-			ZeroMemory(&bufferInfo, sizeof(bufferInfo));
-			bufferInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-			bufferInfo.bmiHeader.biWidth = itemArea.right - itemArea.left;
-			bufferInfo.bmiHeader.biHeight = itemArea.bottom - itemArea.top;
-			bufferInfo.bmiHeader.biPlanes = 1;
-			bufferInfo.bmiHeader.biBitCount = 32;
-			alphaBitmap = CreateDIBSection(pContext, &bufferInfo, DIB_RGB_COLORS, (void **) & ptPixels, NULL, 0);
-			maskBitmap = CreateDIBSection(pContext, &bufferInfo, DIB_RGB_COLORS, (void **) & ptPixelsMask, NULL, 0);
-			oldBitmap = (HBITMAP) SelectObject(internalDC, maskBitmap);
-			DrawIconEx(internalDC, 0, 0, icon, iconSize, iconSize, NULL, NULL, DI_MASK);
-			SelectObject(internalDC, alphaBitmap);
-			DrawIconEx(internalDC, 0, 0, icon, iconSize, iconSize, NULL, NULL, DI_NORMAL);
-			for (int i = 0; i < (itemArea.bottom - itemArea.top)*(itemArea.right - itemArea.left); ++i)
+			HDC internalDC = CreateCompatibleDC(p_context);
+			HBITMAP oldBitmap = (HBITMAP) SelectObject(internalDC, m_alphaBitmap);
+			DrawIconEx(internalDC, 0, 0, m_icon, m_iconSize, m_iconSize, NULL, NULL, DI_MASK);
+			SelectObject(internalDC, m_bufferBitmap);
+			DrawIconEx(internalDC, 0, 0, m_icon, m_iconSize, m_iconSize, NULL, NULL, DI_NORMAL);
+			for (BYTE *pixels = m_bufferBits + 3, *mask = m_alphaBits; pixels < m_bufferBits + m_iconSize*m_iconSize*4; pixels+=4, mask+= 4)
 			{
-				if (ptPixels[3] == 0)
-					ptPixels[3] = 255-ptPixelsMask[0];
-				ptPixels+=4;
-				ptPixelsMask+=4;
+				if (*pixels == 0)
+				{
+					*pixels = 255 - *mask;
+				}
 			}
 			BLENDFUNCTION blendFunc;
 			blendFunc.BlendOp = AC_SRC_OVER;
 			blendFunc.BlendFlags = 0;
 			blendFunc.SourceConstantAlpha = itemAlpha;
 			blendFunc.AlphaFormat = AC_SRC_ALPHA;
-			msimg32.AlphaBlend(pContext, itemArea.left, itemArea.top, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top, internalDC,
+			msimg32.AlphaBlend(p_context, itemArea.left, itemArea.top, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top, internalDC,
 							   0, 0, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top, blendFunc);
 			SelectObject(internalDC, oldBitmap);
-			DeleteObject(alphaBitmap);
-			DeleteObject(maskBitmap);
 			DeleteDC(internalDC);
 		}
 		else
 		{
-			DrawIconEx(pContext, itemArea.left, itemArea.top, icon, iconSize, iconSize, NULL, NULL, DI_NORMAL);
+			DrawIconEx(p_context, itemArea.left, itemArea.top, m_icon, m_iconSize, m_iconSize, NULL, NULL, DI_NORMAL);
 		}
 	}
 }
 
-/** @brief setIcon
-  *
-  * @todo: document this function
-  */
-bool Icon::setIcon(HICON pIcon)
+
+/**
+ * @brief Sets the icon to display
+ *
+ * @param p_icon The new icon to display
+ * @return Returns true if the icon was successfully set
+ *
+ * This function creates a copy of the icon passed in and stores it.
+ * It does not trigger an automatic redraw.
+ */
+bool Icon::SetIcon(HICON p_icon)
 {
-	if (icon)
+	if (m_icon)
 	{
-		DestroyIcon(icon);
+		DestroyIcon(m_icon);
 	}
-	icon = CopyIcon(pIcon);
-	if (icon)
+	m_icon = CopyIcon(p_icon);
+	if (m_icon)
 	{
 		return true;
 	}

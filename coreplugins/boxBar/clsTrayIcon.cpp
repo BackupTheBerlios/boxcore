@@ -54,7 +54,6 @@ TrayIcon::TrayIcon(systemTray *trayItem, UINT pIconSize): Icon(trayItem->hIcon, 
 	}
 	iconCallback = trayItem->uCallbackMessage;
 	popupVisible = false;
-	itemAlpha = 255;
 }
 
 /** @brief wndProc
@@ -167,7 +166,7 @@ LRESULT TrayIcon::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				systemTray *trayItem = GetTrayIcon(i);
 				if ((trayItem->hWnd == iconWnd) && (trayItem->uID == iconID))
 				{
-					setIcon(trayItem->hIcon);
+					SetIcon(trayItem->hIcon);
 					delete [] tipText;
 					tipText = NULL;
 					if (GetTrayInfo)

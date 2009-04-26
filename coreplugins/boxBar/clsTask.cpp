@@ -281,15 +281,15 @@ VOID CALLBACK Task::SmallIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, 
 	{
 		if (p_lResult)
 		{
-			task->iconItem->setIcon(reinterpret_cast<HICON>(p_lResult));
+			task->iconItem->SetIcon(reinterpret_cast<HICON>(p_lResult));
 		}
 		else
 		{
-			if (!task->iconItem->setIcon(reinterpret_cast<HICON>(GetClassLongPtr(task->taskWnd, GCLP_HICONSM))))
+			if (!task->iconItem->SetIcon(reinterpret_cast<HICON>(GetClassLongPtr(task->taskWnd, GCLP_HICONSM))))
 			{
 				if (task->m_fallback)
 				{
-					task->iconItem->setIcon(LoadIcon(NULL, IDI_APPLICATION));
+					task->iconItem->SetIcon(LoadIcon(NULL, IDI_APPLICATION));
 				}
 				else
 				{
@@ -310,15 +310,15 @@ VOID CALLBACK Task::LargeIconProc(HWND p_hWnd, UINT p_uMsg, ULONG_PTR p_dwData, 
 	{
 		if (p_lResult)
 		{
-			task->iconItem->setIcon(reinterpret_cast<HICON>(p_lResult));
+			task->iconItem->SetIcon(reinterpret_cast<HICON>(p_lResult));
 		}
 		else
 		{
-			if (!task->iconItem->setIcon(reinterpret_cast<HICON>(GetClassLongPtr(task->taskWnd, GCLP_HICON))))
+			if (!task->iconItem->SetIcon(reinterpret_cast<HICON>(GetClassLongPtr(task->taskWnd, GCLP_HICON))))
 			{
 				if (task->m_fallback)
 				{
-					task->iconItem->setIcon(LoadIcon(NULL, IDI_APPLICATION));
+					task->iconItem->SetIcon(LoadIcon(NULL, IDI_APPLICATION));
 				}
 				else
 				{
