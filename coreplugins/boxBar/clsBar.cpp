@@ -15,6 +15,8 @@
 #include "../../dynwinapi/clsUser32.h"
 #include "../../utility/stringcopy.h"
 
+#include "../utils/monitor.h"
+
 namespace boxBar
 {
 
@@ -285,7 +287,7 @@ LRESULT Bar::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		WINDOWPOS* wp = (WINDOWPOS*)lParam;
 		RECT monRect;
-		GetMonitorRect(hWnd, &monRect, GETMON_FROM_WINDOW);
+		GetMonitorRect(hWnd, &monRect);
 		int leftthirdX = (monRect.right + 2 * monRect.left) / 3;
 		int rightthirdX = (2 * monRect.right + monRect.left) / 3;
 		if ((wp->x > rightthirdX))
@@ -635,7 +637,7 @@ void Bar::populateBar()
 	}
 	while (strlen(barItems));
 	RECT monRect;
-	GetMonitorRect(barWnd, &monRect, GETMON_FROM_WINDOW);
+	GetMonitorRect(barWnd, &monRect);
 	if (vertical)
 		resize(-1, sizePercentage*(monRect.bottom - monRect.top) / 100);
 	else
@@ -762,7 +764,7 @@ void Bar::readSettings()
 	m_knowsSize = (vertical ? DIM_HORIZONTAL : DIM_VERTICAL);
 	m_wantsStretch = DIM_NONE;
 	RECT monRect;
-	GetMonitorRect(barWnd, &monRect, GETMON_FROM_WINDOW);
+	GetMonitorRect(barWnd, &monRect);
 	if (vertical)
 		resize(-1, sizePercentage*(monRect.bottom - monRect.top) / 100);
 	else

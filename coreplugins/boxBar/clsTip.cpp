@@ -10,6 +10,8 @@
 #include "../../debug/debug.h"
 #include "BBApi.h"
 
+#include "../utils/monitor.h"
+
 #define BOXBAR_BALLOONDONE WM_USER+100
 
 #ifndef NIN_BALLOONSHOW
@@ -149,7 +151,7 @@ void Tip::Kill()
 void Tip::Position(INT p_x, INT p_y)
 {
 	RECT calcRect;
-	GetMonitorRect(m_tipWindow, &calcRect, GETMON_FROM_WINDOW);
+	GetMonitorRect(m_tipWindow, &calcRect);
 	int xCenter = (calcRect.right + calcRect.left)/2;
 	int yCenter = (calcRect.top + calcRect.bottom)/2;
 	bool left = true;

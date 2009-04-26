@@ -56,6 +56,7 @@ clsSettingsManager.cpp
 ../../utility/stringcopy.cpp
 
 ../utils/clsPlugin.cpp
+../utils/monitor.cpp
 )
 
 set (VERSION_MAJOR 0)
