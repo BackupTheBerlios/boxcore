@@ -88,7 +88,7 @@ set_target_properties (boxBar PROPERTIES
 if (MINGW)
 set_target_properties (boxBar PROPERTIES
 	LINK_FLAGS "${BOXCORE_LINK_FLAGS}"
-	COMPILE_FLAGS "-Wall ${BOXCORE_COMPILE_FLAGS} -fno-exceptions -fmessage-length=0"
+	COMPILE_FLAGS "-Wall ${BOXCORE_COMPILE_FLAGS} -fno-exceptions"
 )
 endif (MINGW)
 
