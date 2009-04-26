@@ -1,4 +1,4 @@
-#include "clsTrayItem.h"
+#include "clsTrayIcon.h"
 #include <tchar.h>
 #include "../../dynwinapi/clsUser32.h"
 #include "clsTip.h"

@@ -28,7 +28,7 @@ clsLabel.cpp
 clsWorkspaceLabel.cpp
 
 
-clsTrayItem.cpp
+clsTrayIcon.cpp
 clsTrayItemCollection.cpp
 
 

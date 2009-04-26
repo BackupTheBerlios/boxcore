@@ -1,6 +1,6 @@
 #include "BBApi.h"
 #include "clsTrayItemCollection.h"
-#include "clsTrayItem.h"
+#include "clsTrayIcon.h"
 #include <cstdlib>
 #include <tchar.h>
 
