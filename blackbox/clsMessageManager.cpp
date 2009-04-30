@@ -45,7 +45,11 @@ LRESULT MessageManager::BroadcastMessage(UINT msg, WPARAM wParam, LPARAM lParam)
 		LRESULT retVal = 0;
 		for (tWindowList::iterator i = windowList.begin(); i != windowList.end(); ++i)
 		{
-			retVal = SendMessage(*i, msg, wParam, lParam);
+			LRESULT tmpRetval = SendMessage(*i, msg, wParam, lParam);
+			if (tmpRetval)
+			{
+				retVal = tmpRetval;
+			}
 			if (retVal && msg == BB_DRAGTODESKTOP)
 			{
 				return retVal;
