@@ -81,7 +81,7 @@ if(MINGW)
                                          -i${CMAKE_CURRENT_BINARY_DIR}/resource.rc
                                          -o ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
   SET(BLACKBOX_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
-  set (RC_MANIFEST_LINE "APP_MANIFEST RT_MANIFEST blackbox${BOXCORE_EXE_SUFFIX}.exe.manifest")
+  set (RC_MANIFEST_LINE "APP_MANIFEST RT_MANIFEST blackbox.exe.manifest")
 else(MINGW)
   SET(BLACKBOX_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/resource.rc)
 endif(MINGW)
@@ -118,9 +118,6 @@ set_target_properties (TrayForwarder PROPERTIES
 	COMPILE_FLAGS "${BOXCORE_FLAGS_OPTIMIZE} -Wall -fno-rtti -fno-exceptions -fmessage-length=0"
 )
 endif (MINGW)
-
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/manifest.in
-${CMAKE_CURRENT_BINARY_DIR}/blackbox${BOXCORE_EXE_SUFFIX}.exe.manifest)
 
 if (MINGW)
 set (DEF_HEADER "")
