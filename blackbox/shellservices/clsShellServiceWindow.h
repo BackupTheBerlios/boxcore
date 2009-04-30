@@ -52,8 +52,8 @@ enum eShellHandlers
 {
 	HANDLER_APPBAR, ///< @brief Indicates a handler for messages from SHAppbarMessage()
 	HANDLER_NOTIFYICON, ///< @brief Indicates a handler for messages from Shell_Notifyicon()
-	HANDLER_RESERVED, ///< @brief Indicates a handler for messages from Shell_Notifyicon()
-	HANDLER_NOTIFYICONRECT ///< @brief Indicates a handler for messages from Shell_Notifyicon()
+	HANDLER_RESERVED, ///< @brief Reserved, will implement later
+	HANDLER_NOTIFYICONRECT ///< @brief Indicates a handler for messages from Shell_NotifyIconRect()
 };
 
 /** @internal
@@ -67,7 +67,7 @@ public:
 	ShellServiceWindow(HINSTANCE pInstance, bool pTopmost);
 	virtual ~ShellServiceWindow();
 
-	void RegisterHandler(eShellHandlers pType, ShellServiceHandler *pHandler);
+	void RegisterHandler(UINT pType, ShellServiceHandler *pHandler);
 	void SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom, UINT pEdge);
 private:
 	UINT TaskbarCreated;
@@ -75,7 +75,7 @@ private:
 	static HMODULE m_forwarderModule;
 
 	HWND hTrayWnd;
-	std::map<ULONG_PTR, ShellServiceHandler *> handlers;
+	std::map<UINT, ShellServiceHandler *> handlers;
 	HINSTANCE hInstance;
 
 	HMODULE hUser32;

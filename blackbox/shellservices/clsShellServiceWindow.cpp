@@ -178,7 +178,7 @@ LRESULT CALLBACK ShellServiceWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam,
   *
   * @todo: document this function
   */
-void ShellServiceWindow::RegisterHandler(eShellHandlers pType, ShellServiceHandler *pHandler)
+void ShellServiceWindow::RegisterHandler(UINT pType, ShellServiceHandler *pHandler)
 {
 	handlers[pType] = pHandler;
 }

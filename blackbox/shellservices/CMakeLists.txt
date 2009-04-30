@@ -13,6 +13,14 @@ hash.cpp
 
 ../../dynwinapi/clsShlwapi.cpp
 ../../dynwinapi/clsUser32.cpp
+
+clsService.cpp
+clsServiceManager.cpp
+clsShellTrayWndSrv.cpp
+clsAppbarSrv.cpp
+clsNotifyIconRectSrv.cpp
+clsNotifyIconSrv.cpp
+clsStartupSrv.cpp
 )
 
 add_library (shellservices STATIC ${SYSTEMTRAY_SRCS})

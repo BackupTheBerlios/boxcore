@@ -51,11 +51,14 @@ public:
 	/** @brief Empty virtual destructor */
 	virtual ~ShellServiceHandler() {}
 
+private:
 	/**@brief Function called by ShellServiceWindow for a WM_COPYDATA message
 	  *
 	  * This function must be implemented by derived classes and is the sole purpose of this class
 	  */
 	virtual HRESULT ProcessMessage(DWORD p_cbData, PVOID p_lpData) = 0;
+
+	friend class ShellServiceWindow;
 };
 
 }
