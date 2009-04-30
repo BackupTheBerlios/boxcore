@@ -760,6 +760,23 @@ LRESULT CALLBACK NotifyIconHandler::ProxyWndProc(HWND hWnd, UINT uMsg, WPARAM wP
 				}
 				break;
 			}
+			case 3:
+			{
+				switch (targetMsg)
+				{
+				case WM_LBUTTONUP:
+					SendNotifyMessage(targetWnd, uMsg, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(targetMsg, targetID));
+					SendNotifyMessage(targetWnd, uMsg, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(WM_USER, targetID));
+					break;
+				case WM_RBUTTONUP:
+					SendNotifyMessage(targetWnd, uMsg, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(targetMsg, targetID));
+					SendNotifyMessage(targetWnd, uMsg, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(WM_CONTEXTMENU, targetID));
+					break;
+				default:
+					SendNotifyMessage(targetWnd, uMsg, MAKEWPARAM(mousePos.x, mousePos.y), MAKELPARAM(targetMsg, targetID));
+				}
+				break;
+			}
 			default:
 				SendNotifyMessage(targetWnd, uMsg, targetID, targetMsg);
 			}
