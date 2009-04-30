@@ -11,25 +11,21 @@
 namespace ShellServices
 {
 
-#pragma pack(push, 1)
-struct IconRectStruct_v1
+struct NOTIFYICONIDENTIFIER_V1
 {
-	DWORD dwMagic;
-	DWORD dwMessage;
 	DWORD cbSize;
-	union
-	{
-		HWND hWnd;
-		struct
-		{
-			DWORD hWndL;
-			DWORD hWndH;
-		};
-	};
+	DWORD dwPadding;
+	DWORD hWnd; //HWND hWnd; breaks under 64 bit compilers
 	UINT uID;
 	GUID guidItem;
 };
-#pragma pack(pop)
+
+struct NOTIFYICONIDENTIFIERMSG_V1
+{
+	DWORD dwMagic;
+	DWORD dwMessage;
+	NOTIFYICONIDENTIFIER_V1 nii;
+};
 
 NotifyIconRectHandler::NotifyIconRectHandler()
 {
@@ -44,23 +40,32 @@ NotifyIconRectHandler::~NotifyIconRectHandler()
 
 HRESULT NotifyIconRectHandler::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 {
-	PRINT("Rect handler");
-	IconRectStruct_v1 &data = *reinterpret_cast<IconRectStruct_v1 *>(p_lpData);
-	if (data.dwMagic != 0x34753423)
-		return 0;
-	PRINT("Magic Success");
-	switch (data.dwMessage)
+	switch (p_cbData)
 	{
-	case 1:
+	case sizeof(NOTIFYICONIDENTIFIERMSG_V1):
 	{
-		PRINT("Position case");
-		POINT mousePos;
-		GetCursorPos(&mousePos);
-		return MAKELONG(mousePos.x - 5, mousePos.y - 5);
+		NOTIFYICONIDENTIFIERMSG_V1 &data = *reinterpret_cast<NOTIFYICONIDENTIFIERMSG_V1 *>(p_lpData);
+		if (data.dwMagic != 0x34753423)
+			return 0;
+		switch (data.dwMessage)
+		{
+		case 1:
+		{
+			//Return current cursor position for now, this should be top left corner of icon.
+			POINT mousePos;
+			GetCursorPos(&mousePos);
+			return MAKELONG(mousePos.x, mousePos.y);
+		}
+		case 2:
+			//Return 16x16 as icon size for now
+			return 0x00100010;
+		default:
+			return 0;
+		}
 	}
-	case 2:
-		PRINT("Orientation case");
-		return 0x00180018;
+	default:
+		TRACE("Unexpected NotifyIconGetRect message size: %u", p_cbData);
+		return 0;
 	}
 }
 
