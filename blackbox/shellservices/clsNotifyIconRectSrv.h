@@ -14,8 +14,6 @@
 namespace ShellServices
 {
 
-class NotifyIconRectHandler;
-
 class NotifyIconRectSrv: public Service, public ShellServiceHandler
 {
 public:

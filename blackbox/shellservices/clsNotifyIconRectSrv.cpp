@@ -6,7 +6,6 @@
  */
 
 #include "clsNotifyIconRectSrv.h"
-#include "clsNotifyIconRectHandler.h"
 
 #include "clsServiceManager.h"
 
