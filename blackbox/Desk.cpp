@@ -383,6 +383,10 @@ post_click:
 		break;
 
 		//====================
+	case WM_SETTINGCHANGE:
+		if (Root.bmp)
+			break;
+		RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE);
 	case WM_PAINT:
 	{
 		PAINTSTRUCT ps;
