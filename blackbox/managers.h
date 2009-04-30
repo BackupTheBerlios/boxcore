@@ -27,14 +27,10 @@
 #define MANAGERS_H
 
 #include "shellserviceobjects/clsShellServiceObjects.h"
-#include "shellservices/clsNotifyIconHandler.h"
 #include "clsSystemInfo.h"
-#include <map>
 
 extern clsShellServiceObjects ShellServiceObjectsManager;
 extern clsSystemInfo SystemInfo;
-extern ShellServices::NotifyIconHandler *g_pNotificationIconHandler;
-extern std::map<ATOM,ShellServices::eNotificationIconInfo> g_trayInfoMapping;
 
 #include "clsMessageManager.h"
 extern MessageManager *g_pMessageManager;
@@ -44,5 +40,8 @@ extern TaskManagement::TaskManagerInterface *g_pTaskManager;
 
 #include "vwm/clsVWMInterface.h"
 extern TaskManagement::VWMInterface *g_pVirtualWindowManager;
+
+#include "shellservices/clsServiceManager.h"
+extern ShellServices::ServiceManager g_ServiceManager;
 
 #endif

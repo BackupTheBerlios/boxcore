@@ -98,19 +98,17 @@ RECT OldDT;
 bool bbactive = true;
 BOOL save_opaquemove;
 
-#include "shellservices/clsShellServiceWindow.h"
+//#include "shellservices/clsShellServiceWindow.h"
 #include "shellservices/clsNotifyIconHandler.h"
-#include "shellservices/clsNotifyIconRectHandler.h"
-#include "shellservices/clsAppbarHandler.h"
 #include "tasks/clsTaskManager.h"
 #include "vwm/clsBBVWM.h"
 #include "clsSystemTrayIcon.h"
 #include "clsBBTask.h"
 
-ShellServices::ShellServiceWindow *g_pShellServiceWindow;
-ShellServices::NotifyIconHandler *g_pNotificationIconHandler;
-ShellServices::NotifyIconRectHandler *g_pNotificationIconRectHandler;
-ShellServices::AppbarHandler *g_pAppbarHandler;
+#include "shellservices/clsServiceManager.h"
+
+ShellServices::ServiceManager g_ServiceManager;
+
 TaskManagement::TaskManagerInterface *g_pTaskManager;
 TaskManagement::VWMInterface *g_pVirtualWindowManager;
 
@@ -124,9 +122,6 @@ TaskManagement::LegacyTask *TaskFactory()
 	return new BBTask;
 }
 
-std::map<ATOM,ShellServices::eNotificationIconInfo> g_trayInfoMapping;
-
-//SystemTray SystemTrayManager(hMainInstance);
 clsShellServiceObjects ShellServiceObjectsManager;
 clsSystemInfo SystemInfo;
 
@@ -409,24 +404,6 @@ void RemoveApiExtensions()
 		GlobalDeleteAtom(atomList[i]);
 }
 
-void InitTrayMapping()
-{
-	g_trayInfoMapping[AddAtom("TrayIcon::Window")] = ShellServices::NI_HWND;
-	g_trayInfoMapping[AddAtom("TrayIcon::ID")] = ShellServices::NI_ID;
-	g_trayInfoMapping[AddAtom("TrayIcon::CallbackMessage")] = ShellServices::NI_CALLBACKMESSAGE;
-	g_trayInfoMapping[AddAtom("TrayIcon::Icon")] = ShellServices::NI_ICON;
-	g_trayInfoMapping[AddAtom("TrayIcon::AnsiTip")] = ShellServices::NI_TIP;
-	g_trayInfoMapping[AddAtom("TrayIcon::UnicodeTip")] = ShellServices::NI_TIP;
-	g_trayInfoMapping[AddAtom("TrayIcon::AnsiInfoText")] = ShellServices::NI_INFOTEXT;
-	g_trayInfoMapping[AddAtom("TrayIcon::UnicodeInfoText")] = ShellServices::NI_INFOTEXT;
-	g_trayInfoMapping[AddAtom("TrayIcon::AnsiInfoTitle")] = ShellServices::NI_INFOTITLE;
-	g_trayInfoMapping[AddAtom("TrayIcon::UnicodeInfoTitle")] = ShellServices::NI_INFOTITLE;
-	g_trayInfoMapping[AddAtom("TrayIcon::InfoIcon")] = ShellServices::NI_INFOICON;
-	g_trayInfoMapping[AddAtom("TrayIcon::InfoFlags")] = ShellServices::NI_INFOFLAGS;
-	g_trayInfoMapping[AddAtom("TrayIcon::InfoTimout")] = ShellServices::NI_INFOTIMEOUT;
-	g_trayInfoMapping[AddAtom("TrayIcon::Version")] = ShellServices::NI_VERSION;
-}
-
 //===========================================================================
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
@@ -534,7 +511,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SendMessage(GetDesktopWindow(), 0x400, 0, 0); /* 0x400 = WM_USER */
 
 	// Welcome screen termination for XP and Vista
-	LPCTSTR events[] = { TEXT("Global\\msgina: ShellReadyEvent"), TEXT("msgina: ShellReadyEvent"), "ShellDesktopSwitchEvent" };
+	LPCTSTR events[] = { TEXT("Global\\msgina: ShellReadyEvent"), TEXT("msgina: ShellReadyEvent"), "ShellDesktopSwitchEvent"};
 	for (UINT i=0; i< sizeof(events)/sizeof(events[0]); ++i)
 	{
 		HANDLE hSRE = OpenEvent(EVENT_MODIFY_STATE, FALSE, events[i]);
@@ -570,20 +547,32 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	g_pTaskManager->RegisterCallback(TaskManagement::TASK_GETRECT, TaskGetRectCallback);
 	PRINT("Starting desktop");
 	Desk_Init();
-	PRINT("Creating tray message mapping");
-	InitTrayMapping();
-	g_pShellServiceWindow = new ShellServices::ShellServiceWindow(hMainInstance, true);
-	PRINT("Starting NotifyIcon Handler");
-	g_pNotificationIconHandler = new ShellServices::NotifyIconHandler(SystemTrayIconFactory, true);
-	g_pNotificationIconHandler->RegisterCallback(ShellServices::TCALLBACK_ADD,broadcastAdd);
-	g_pNotificationIconHandler->RegisterCallback(ShellServices::TCALLBACK_MOD,broadcastMod);
-	g_pNotificationIconHandler->RegisterCallback(ShellServices::TCALLBACK_DEL,broadcastRemove);
-	g_pShellServiceWindow->RegisterHandler(ShellServices::HANDLER_NOTIFYICON, g_pNotificationIconHandler);
-	g_pNotificationIconRectHandler = new ShellServices::NotifyIconRectHandler();
-	g_pShellServiceWindow->RegisterHandler(ShellServices::HANDLER_NOTIFYICONRECT, g_pNotificationIconRectHandler);
-	PRINT("Starting AppBar Handler");
-	g_pAppbarHandler = new ShellServices::AppbarHandler();
-	g_pShellServiceWindow->RegisterHandler(ShellServices::HANDLER_APPBAR, g_pAppbarHandler);
+
+	g_ServiceManager.SetServiceProperty("SRV_ShellTrayWnd", "STW_hInstance", hInstance);
+	g_ServiceManager.SetServiceProperty("SRV_ShellTrayWnd", "STW_topMost", reinterpret_cast<PVOID>(true));
+	g_ServiceManager.StartService("SRV_ShellTrayWnd");
+
+	g_ServiceManager.SetServiceProperty("SRV_NotifyIcon", "NI_IconFactory", reinterpret_cast<PVOID>(SystemTrayIconFactory));
+	if (SystemInfo.isOsVista() && !SystemInfo.isOsWin7())
+	{
+		g_ServiceManager.SetServiceProperty("SRV_NotifyIcon", "NI_UseProxy", reinterpret_cast<PVOID>(true));
+	}
+	g_ServiceManager.StartService("SRV_NotifyIcon");
+	g_ServiceManager.SetServiceProperty("SRV_NotifyIcon", "NI_Callback_Add", reinterpret_cast<PVOID>(broadcastAdd));
+	g_ServiceManager.SetServiceProperty("SRV_NotifyIcon", "NI_Callback_Mod", reinterpret_cast<PVOID>(broadcastMod));
+	g_ServiceManager.SetServiceProperty("SRV_NotifyIcon", "NI_Callback_Del", reinterpret_cast<PVOID>(broadcastRemove));
+
+	g_ServiceManager.StartService("SRV_Appbar");
+
+	if (SystemInfo.isOsWin7())
+	{
+		g_ServiceManager.StartService("SRV_NotifyIconRect");
+	}
+	else
+	{
+		g_ServiceManager.RemoveService("SRV_NotifyIconRect");
+	}
+
 	PRINT("Starting SSO's");
 	if (!underExplorer)
 	{
@@ -687,8 +676,10 @@ void shutdown_blackbox()
 	kill_plugins();
 	ShellServiceObjectsManager.stopServiceObjects();
 	//SystemTrayManager.terminate();
-	delete g_pShellServiceWindow;
-	g_pShellServiceWindow = NULL;
+	g_ServiceManager.StopService("SRV_NotifyIconRect");
+	g_ServiceManager.StopService("SRV_Appbar");
+	g_ServiceManager.StopService("SRV_NotifyIcon");
+	g_ServiceManager.StopService("SRV_ShellTrayWnd");
 	Desk_Exit();
 	//Workspaces_Exit();
 	delete g_pTaskManager;
@@ -1003,7 +994,7 @@ case_bb_restart:
 		// sent from the systembar on mouse over, if on mouseover
 		// a tray app's window turned out to be not valid anymore
 	case BB_CLEANTRAY:
-		g_pNotificationIconHandler->CleanTray();
+		g_ServiceManager.ExecServiceCommand("SRV_NotifyIcon", "NI_CleanTray");
 		break;
 
 		//====================
@@ -1538,6 +1529,8 @@ void exec_core_broam(const char *broam)
 	}
 }
 
+#include "shellservices/clsShellTrayWndSrv.h"
+
 void exec_boxcore_broam(const char *broam)
 {
 	char buffer[1024];
@@ -1567,7 +1560,10 @@ void exec_boxcore_broam(const char *broam)
 			bottom = monRect.bottom;
 			break;
 		}
-		g_pShellServiceWindow->SetTaskbarPos(left,top,right,bottom,edge);
+
+		ShellServices::ShellTrayWndSrv *service = NULL;
+		g_ServiceManager.CastService("SRV_ShellTrayWnd", service);
+		service->SetTaskbarPos(left,top,right,bottom,edge);
 	}
 }
 
@@ -1881,7 +1877,7 @@ bool RunEntriesIn (HKEY root_key, LPCSTR subpath, UINT flags)
 	sprintf(path, "Software\\Microsoft\\Windows\\CurrentVersion\\%s", subpath);
 	for (int i=0;i<(SystemInfo.isOs64Bits()?2:1);++i)
 	{
-		if (ERROR_SUCCESS != RegOpenKeyEx(root_key, path, 0, KEY_ALL_ACCESS|(i?KEY_WOW64_64KEY:KEY_WOW64_32KEY), &hKey))
+		if (ERROR_SUCCESS != RegOpenKeyEx(root_key, path, 0, MAXIMUM_ALLOWED|(i?KEY_WOW64_64KEY:KEY_WOW64_32KEY), &hKey))
 			return ret;
 
 		//if busy with x64 section, disable the filesystem redirection
@@ -1972,7 +1968,7 @@ DWORD WINAPI RunStartupThread (void *pv)
 	RunEntriesIn (HKEY_CURRENT_USER, szRun, 0);
 
 	// Run startup items
-	static const short startuptable[4] =
+	/*static const short startuptable[4] =
 	{
 		CSIDL_COMMON_STARTUP,       //0x0018,
 		CSIDL_COMMON_ALTSTARTUP,    //0x001e,
@@ -1984,7 +1980,7 @@ DWORD WINAPI RunStartupThread (void *pv)
 	int i;
 	for (i = 0; i < 4; SystemInfo.isOsVista()?i+=2:++i)
 		if (sh_getfolderpath(szPath, startuptable[i]))
-			RunFolderContents(szPath);
+			RunFolderContents(szPath);*/
 
 	RunEntriesIn (HKEY_CURRENT_USER, szRunOnce, RS_ONCE);
 	//log_printf(2, "Startup Finished.");
@@ -1996,6 +1992,7 @@ DWORD WINAPI RunStartupThread (void *pv)
 void RunStartupStuff(void)
 {
 	DWORD threadId;
+	g_ServiceManager.StartServiceThreaded("SRV_Startup");
 	CloseHandle(CreateThread(NULL, 0, RunStartupThread, NULL, 0, &threadId));
 }
 

@@ -43,6 +43,8 @@
 #include "../utility/stringcopy.h"
 #include "clsBBTask.h"
 
+#include "shellservices/clsNotifyIconSrv.h"
+
 #define ST static
 
 ST char tempBuf[1024];
@@ -54,8 +56,6 @@ ST char pluginrc_path[MAX_PATH];
 ST char stylerc_path[MAX_PATH];
 
 //===========================================================================
-
-
 
 /** @brief Returns the current version
   * @return Formatted version string
@@ -2238,12 +2238,12 @@ void SnapWindowToEdge(WINDOWPOS* wp, LPARAM nDist_or_pContent, UINT Flags)
 	// well, why is this here? Because some plugins call this even if
 	// they reposition themselves rather than being moved by the user.
 	static bool capture;
-	        if (GetCapture() == self)
-	            capture = true;
-	        else if (capture)
-	            capture = false;
-	        else
-	             return;
+	if (GetCapture() == self)
+		capture = true;
+	else if (capture)
+		capture = false;
+	else
+		return;
 
 	HWND parent = (WS_CHILD & GetWindowLongPtr(self, GWL_STYLE)) ? GetParent(self) : NULL;
 
@@ -2488,7 +2488,12 @@ ST void snap_to_edge(struct edges *h, struct edges *v, bool sizing, bool same_le
   */
 int GetTraySize()
 {
-	return g_pNotificationIconHandler->GetTraySize();
+	static ShellServices::NotifyIconSrv *handler = NULL;
+	if (!handler)
+	{
+		g_ServiceManager.CastService("SRV_NotifyIcon", handler);
+	}
+	return handler->GetTraySize();
 }
 
 /** @brief Retrieve a system tray icons information by index
@@ -2497,9 +2502,15 @@ int GetTraySize()
   */
 systemTray* GetTrayIcon(UINT idx)
 {
+	static ShellServices::NotifyIconSrv *handler = NULL;
+	if (!handler)
+	{
+		g_ServiceManager.CastService("SRV_NotifyIcon", handler);
+	}
 	PVOID data[1];
-	ShellServices::eNotificationIconInfo info[1] = {ShellServices::NI_LEGACY};
-	g_pNotificationIconHandler->GetNotificationIconInfo(idx, data,info, 1);
+	ATOM info[1] = {FindAtom(TEXT("TrayIcon::Legacy"))};
+	ShellServices::NotificationIcon *icon = handler->LookupIcon(idx);
+	handler->GetNotificationIconInfo(icon, data,info, 1);
 	return static_cast<SystemTrayIcon *>(data[0])->getSystemTray();
 }
 
@@ -2640,59 +2651,36 @@ bool SetTaskLocation(HWND hwnd, struct taskinfo *t, UINT flags)
 	return false;
 }
 
-BOOL GetTrayInfoReal(ShellServices::NotificationIcon *p_icon, PVOID *p_trayInfo, ATOM *p_infoTypes, CONST UINT p_numInfo)
-{
-	static char ansiTip[128];
-	std::vector<ShellServices::eNotificationIconInfo> request(p_numInfo);
-	std::vector<PVOID> trayInfo(p_numInfo);
-	for (UINT i = 0; i< p_numInfo; ++i)
-	{
-		request[i] = g_trayInfoMapping[p_infoTypes[i]];
-	}
-	if (!g_pNotificationIconHandler->GetNotificationIconInfo(p_icon,&(trayInfo[0]),&(request[0]),p_numInfo))
-	{
-		return FALSE;
-	}
-	for (UINT i = 0; i< p_numInfo; ++i)
-	{
-		switch (request[i])
-		{
-		case ShellServices::NI_VERSION:
-			p_trayInfo[i] = trayInfo[i];
-			break;
-		case ShellServices::NI_TIP:
-			if (p_infoTypes[i] == FindAtom(TEXT("Trayicon::AnsiTip")))
-			{
-				WideCharToMultiByte(CP_ACP,0,reinterpret_cast<LPCWSTR>(trayInfo[i]),-1,ansiTip,128,NULL,NULL);
-				p_trayInfo[i] = ansiTip;
-			}
-			else
-			{
-				p_trayInfo[i] = trayInfo[i];
-			}
-			break;
-		default:
-			return FALSE;
-		}
-	}
-	return TRUE;
-}
-
 extern "C" API_EXPORT BOOL GetTrayInfo(HWND p_hWnd, UINT p_uID, PVOID *p_trayInfo, ATOM *p_infoTypes, UINT p_numInfo)
 {
-	ShellServices::NotificationIcon *icon = g_pNotificationIconHandler->LookupIcon(p_hWnd, p_uID);
-	return GetTrayInfoReal(icon, p_trayInfo, p_infoTypes, p_numInfo);
+	static ShellServices::NotifyIconSrv *handler = NULL;
+	if (!handler)
+	{
+		g_ServiceManager.CastService("SRV_NotifyIcon", handler);
+	}
+	ShellServices::NotificationIcon *icon = handler->LookupIcon(p_hWnd, p_uID);
+	return handler->GetNotificationIconInfo(icon, p_trayInfo, p_infoTypes, p_numInfo);
 }
 
 extern "C" API_EXPORT BOOL GetTrayInfoIndexed(UINT p_index, PVOID *p_trayInfo, ATOM *p_infoTypes, UINT p_numInfo)
 {
-	ShellServices::NotificationIcon *icon = g_pNotificationIconHandler->LookupIcon(p_index);
-	return GetTrayInfoReal(icon, p_trayInfo, p_infoTypes, p_numInfo);
+	static ShellServices::NotifyIconSrv *handler = NULL;
+	if (!handler)
+	{
+		g_ServiceManager.CastService("SRV_NotifyIcon", handler);
+	}
+	ShellServices::NotificationIcon *icon = handler->LookupIcon(p_index);
+	return handler->GetNotificationIconInfo(icon, p_trayInfo, p_infoTypes, p_numInfo);
 }
 
 extern "C" API_EXPORT BOOL GetTrayInfoMsg(WPARAM p_wParam, PVOID *p_trayInfo, ATOM *p_infoTypes, UINT p_numInfo)
 {
-	return GetTrayInfoReal(reinterpret_cast<ShellServices::NotificationIcon *>(p_wParam), p_trayInfo, p_infoTypes, p_numInfo);
+	static ShellServices::NotifyIconSrv *handler = NULL;
+	if (!handler)
+	{
+		g_ServiceManager.CastService("SRV_NotifyIcon", handler);
+	}
+	return handler->GetNotificationIconInfo(reinterpret_cast<ShellServices::NotificationIcon *>(p_wParam), p_trayInfo, p_infoTypes, p_numInfo);
 }
 
 //===========================================================================
