@@ -7,7 +7,6 @@ clsShellServiceWindow.cpp
 clsNotifyIconHandler.cpp
 clsNotificationIcon.cpp
 clsAppbarHandler.cpp
-clsNotifyIconRectHandler.cpp
 
 hash.cpp
 
