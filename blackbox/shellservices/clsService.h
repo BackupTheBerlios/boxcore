@@ -11,6 +11,7 @@
 #include <windows.h>
 
 #include "../../debug/debug.h"
+#include "../clsSystemInfo.h"
 
 namespace ShellServices
 {
@@ -38,6 +39,7 @@ protected:
 
 	bool m_running;
 	static ServiceManager *s_serviceManager;
+	static clsSystemInfo s_systemInfo;
 private:
 	ATOM m_serviceID;
 

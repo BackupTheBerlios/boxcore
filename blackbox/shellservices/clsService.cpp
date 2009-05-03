@@ -98,5 +98,6 @@ bool Service::_SetProperty(ATOM p_property, PVOID p_value)
 }
 
 ServiceManager *Service::s_serviceManager = NULL;
+clsSystemInfo Service::s_systemInfo;
 
 }
