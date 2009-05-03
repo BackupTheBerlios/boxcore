@@ -31,6 +31,7 @@ public:
 	bool ServiceRunning(LPCSTR p_serviceID);
 	Service *GetService(LPCSTR p_serviceID);
 
+	void AddService(Service *p_service);
 	bool RemoveService(LPCSTR p_serviceID);
 
 	bool ExecServiceCommand(LPCSTR p_serviceID, LPCSTR p_command);

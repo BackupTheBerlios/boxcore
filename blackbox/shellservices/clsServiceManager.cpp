@@ -23,11 +23,11 @@ namespace ShellServices
 ServiceManager::ServiceManager()
 {
 	Service::s_serviceManager = this;
-	m_serviceList.push_back(new ShellTrayWndSrv());
-	m_serviceList.push_back(new AppbarSrv());
-	m_serviceList.push_back(new NotifyIconRectSrv());
-	m_serviceList.push_back(new NotifyIconSrv());
-	m_serviceList.push_back(new StartupSrv());
+	AddService(new ShellTrayWndSrv());
+	AddService(new AppbarSrv());
+	AddService(new NotifyIconRectSrv());
+	AddService(new NotifyIconSrv());
+	AddService(new StartupSrv());
 }
 
 ServiceManager::~ServiceManager()
@@ -121,6 +121,11 @@ DWORD WINAPI ServiceManager::ServiceThread(LPVOID lpData)
 {
 	Service *service = reinterpret_cast<Service *>(lpData);
 	return service->Start(service->m_serviceID);
+}
+
+void ServiceManager::AddService(Service *p_service)
+{
+	m_serviceList.push_back(p_service);
 }
 
 }
