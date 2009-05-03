@@ -19,13 +19,15 @@ StartupSrv::StartupSrv():
 		m_vistaOrGreater(true),
 		m_isNT(true)
 {
-	// TODO Auto-generated constructor stub
-
+	SHGetMalloc(&m_shellMalloc);
 }
 
 StartupSrv::~StartupSrv()
 {
-	// TODO Auto-generated destructor stub
+	if (m_shellMalloc)
+	{
+		m_shellMalloc->Free();
+	}
 }
 
 bool StartupSrv::_Start()
@@ -34,7 +36,7 @@ bool StartupSrv::_Start()
 	{
 		RunShellFolder(CSIDL_COMMON_STARTUP);
 		RunShellFolder(CSIDL_STARTUP);
-		if (!m_vistaOrGreater)
+		if (!s_systemInfo.isOsVista())
 		{
 			RunShellFolder(CSIDL_COMMON_ALTSTARTUP);
 			RunShellFolder(CSIDL_ALTSTARTUP);
@@ -65,7 +67,7 @@ HKEY StartupSrv::_CreateSessionInfoKey()
 		TCHAR tzSessionInfo[128] = { 0 };
 		DWORD dwOutSize = 0;
 
-		if (m_vistaOrGreater)
+		if (s_systemInfo.isOsVista())
 		{
 			DWORD dwSessionId = 0;
 
@@ -181,11 +183,9 @@ void StartupSrv::RunShellFolder(UINT p_csidl)
 			while (FindNextFile(hSearch, &findData));
 			FindClose(hSearch);
 		}
-		IMalloc *pMalloc;
-		if (item && SUCCEEDED(SHGetMalloc(&pMalloc)))
+		if (m_shellMalloc)
 		{
-			pMalloc->Free(item);
-			pMalloc->Release();
+			m_shellMalloc->Free(item);
 		}
 	}
 }

@@ -25,8 +25,7 @@ protected:
 	HKEY _CreateSessionInfoKey();
 	bool IsFirstRunThisSession(LPCTSTR pszSubkey);
 private:
-	bool m_vistaOrGreater;
-	bool m_isNT;
+	IMalloc *m_shellMalloc;
 
 	void RunShellFolder(UINT p_csidl);
 };
