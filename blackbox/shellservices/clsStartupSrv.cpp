@@ -15,9 +15,7 @@ namespace ShellServices
 {
 
 StartupSrv::StartupSrv():
-		Service("SRV_Startup"),
-		m_vistaOrGreater(true),
-		m_isNT(true)
+		Service("SRV_Startup")
 {
 	SHGetMalloc(&m_shellMalloc);
 }
@@ -26,7 +24,7 @@ StartupSrv::~StartupSrv()
 {
 	if (m_shellMalloc)
 	{
-		m_shellMalloc->Free();
+		m_shellMalloc->Release();
 	}
 }
 
@@ -119,7 +117,7 @@ bool StartupSrv::IsFirstRunThisSession(LPCTSTR pszSubkey)
 {
 	bool bReturn = false;
 
-	if (m_isNT)
+	if (s_systemInfo.isOsNT())
 	{
 		HKEY hkSessionInfo = _CreateSessionInfoKey();
 
