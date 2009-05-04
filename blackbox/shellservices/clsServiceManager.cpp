@@ -86,7 +86,7 @@ Service *ServiceManager::GetService(LPCSTR p_serviceID)
 		else
 		{
 			TRACE("WARNING: Could not create service %s", p_serviceID);
-		return NULL;
+			return NULL;
 		}
 	}
 }
@@ -124,7 +124,7 @@ bool ServiceManager::SetServiceProperty(LPCSTR p_serviceID, LPCSTR p_property, P
 	if (service)
 	{
 		ATOM serviceID = FindAtomA(p_serviceID);
-			ATOM property = FindAtomA(p_property);
+		ATOM property = FindAtomA(p_property);
 		return service->SetProperty(serviceID, property, p_value);
 	}
 	else
