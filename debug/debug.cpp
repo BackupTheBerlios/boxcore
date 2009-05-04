@@ -9,14 +9,15 @@
 #include <windows.h>
 #include <cstdio>
 
-void trace_printf(const char *pFileName, unsigned int pLine, const char *pFunction, const char *pFormat, ...)
+void trace_printf(const char *pFileName, unsigned int pLine, const char *pFormat, ...)
 {
 	char buffer[4096];
-	sprintf(buffer, "In file %s at line %u.\nFunction %s", pFileName, pLine, pFunction);
+	sprintf(buffer, "In file %s at line %u.\n", pFileName, pLine);
 	OutputDebugStringA(buffer);
 	va_list arg;
 	va_start(arg, pFormat);
 	vsprintf (buffer, pFormat, arg);
 	strcat(buffer, "\n");
 	OutputDebugStringA(buffer);
+	va_end(arg);
 }
