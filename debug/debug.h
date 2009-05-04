@@ -7,7 +7,7 @@
 
 #ifndef DEBUG_H
 
-void trace_printf(const char *pFileName, unsigned int pLine, const char *pFunction, const char *pFormat, ...);
+void trace_printf(const char *pFileName, unsigned int pLine, const char *pFormat, ...);
 
 #ifndef NDEBUG
 #define PRINT(A) OutputDebugString(A)
