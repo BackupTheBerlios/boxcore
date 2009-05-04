@@ -6,26 +6,28 @@
  */
 
 #include "clsShellTrayWndSrv.h"
+#include "clsAppbarSrv.h"
+#include "clsServiceManager.h"
+#include "clsServiceRegistrar.h"
+
+#define SERVICE_NAME "SRV_ShellTrayWnd"
 
 namespace ShellServices
 {
 
 ShellTrayWndSrv::ShellTrayWndSrv():
-		Service("SRV_ShellTrayWnd"),
+		Service(SERVICE_NAME),
 		m_imp(NULL),
 		m_hInstance(NULL),
 		m_topMost(false)
 {
-	m_hInstanceProp = AddAtomA("STW_hInstance");
-	m_topMostProp = AddAtomA("STW_topMost");
-	m_handlerProp = AddAtomA("STW_handler");
+	m_hInstanceProp = RegisterAtom("STW_hInstance");
+	m_topMostProp = RegisterAtom("STW_topMost");
+	m_handlerProp = RegisterAtom("STW_handler");
 }
 
 ShellTrayWndSrv::~ShellTrayWndSrv()
 {
-	DeleteAtom(m_hInstanceProp);
-	DeleteAtom(m_topMostProp);
-	DeleteAtom(m_handlerProp);
 }
 
 bool ShellTrayWndSrv::_SetProperty(ATOM p_property, PVOID p_value)
@@ -45,7 +47,7 @@ bool ShellTrayWndSrv::_SetProperty(ATOM p_property, PVOID p_value)
 		if (m_imp)
 		{
 			std::pair<UINT, ShellServiceHandler *> &handler = *reinterpret_cast<std::pair<UINT, ShellServiceHandler *> *>(p_value);
-			m_imp->RegisterHandler(static_cast<eShellHandlers>(handler.first), handler.second);
+			m_imp->RegisterHandler(handler.first, handler.second);
 			return true;
 		}
 		else
@@ -90,8 +92,16 @@ void ShellTrayWndSrv::SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom
 {
 	if (m_imp)
 	{
-		return m_imp->SetTaskbarPos(pLeft, pTop, pRight, pBottom, pEdge);
+		m_imp->SetTaskbarPos(pLeft, pTop, pRight, pBottom, pEdge);
+	}
+	AppbarSrv *appbarService;
+	s_serviceManager->CastService("SRV_Appbar", appbarService);
+	if (appbarService)
+	{
+		appbarService->SetTaskbarPos(pLeft, pTop, pRight, pBottom, pEdge);
 	}
 }
+
+REGISTER_SERVICE(ShellTrayWndSrv)
 
 }

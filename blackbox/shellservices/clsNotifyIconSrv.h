@@ -48,6 +48,8 @@ private:
 	ATOM m_callbackModProp;
 	ATOM m_callbackDelProp;
 	ATOM m_cleanTrayCommand;
+
+	static ServiceRegistrar s_serviceRegistration;
 };
 
 }

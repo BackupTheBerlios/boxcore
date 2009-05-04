@@ -6,16 +6,19 @@
  */
 
 #include "clsStartupSrv.h"
+#include "clsServiceRegistrar.h"
 #include <shlobj.h>
 #include <regstr.h>
 #include <tchar.h>
 #include <cstdio>
 
+#define SERVICE_NAME "SRV_Startup"
+
 namespace ShellServices
 {
 
 StartupSrv::StartupSrv():
-		Service("SRV_Startup")
+		Service(SERVICE_NAME)
 {
 	SHGetMalloc(&m_shellMalloc);
 }
@@ -187,5 +190,7 @@ void StartupSrv::RunShellFolder(UINT p_csidl)
 		}
 	}
 }
+
+REGISTER_SERVICE(StartupSrv)
 
 }

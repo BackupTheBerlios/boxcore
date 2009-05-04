@@ -8,8 +8,11 @@
 #include "clsNotifyIconRectSrv.h"
 
 #include "clsServiceManager.h"
+#include "clsServiceRegistrar.h"
 
 #include "../../debug/debug.h"
+
+#define SERVICE_NAME "SRV_NotifyIconRect"
 
 namespace ShellServices
 {
@@ -31,7 +34,7 @@ struct NOTIFYICONIDENTIFIERMSG_V1
 };
 
 NotifyIconRectSrv::NotifyIconRectSrv():
-		Service("SRV_NotifyIconRect")
+		Service(SERVICE_NAME)
 {
 }
 
@@ -97,5 +100,7 @@ HRESULT NotifyIconRectSrv::ProcessMessage(DWORD p_cbData, PVOID p_lpData)
 		return 0;
 	}
 }
+
+REGISTER_SERVICE(NotifyIconRectSrv)
 
 }

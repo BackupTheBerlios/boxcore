@@ -15,6 +15,7 @@ namespace ShellServices
 {
 
 class Service;
+typedef Service *(*fnServiceCreator)();
 
 typedef std::list<Service *> t_serviceList;
 
@@ -47,8 +48,10 @@ public:
 private:
 	t_serviceList m_serviceList;
 
+	static Service *KnownService(ATOM p_id, fnServiceCreator p_creator = NULL);
 	static DWORD WINAPI ServiceThread(LPVOID lpData);
 
+	friend class ServiceRegistrar;
 };
 
 

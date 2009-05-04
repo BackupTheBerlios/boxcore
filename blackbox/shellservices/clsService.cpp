@@ -12,14 +12,18 @@ namespace ShellServices
 
 Service::Service(LPCSTR p_serviceName):
 		m_running(false),
-		m_serviceID(AddAtomA(p_serviceName))
+		m_atomList(),
+		m_serviceID(RegisterAtom(p_serviceName))
 
 {
 }
 
 Service::~Service()
 {
-	DeleteAtom(m_serviceID);
+	for (std::list<ATOM>::iterator i = m_atomList.begin(); i != m_atomList.end(); ++i)
+	{
+		DeleteAtom(*i);
+	}
 }
 
 bool Service::Start(ATOM p_serviceID)
@@ -95,6 +99,13 @@ bool Service::_Exec(ATOM p_command)
 bool Service::_SetProperty(ATOM p_property, PVOID p_value)
 {
 	return false;
+}
+
+ATOM Service::RegisterAtom(LPCSTR p_identifier)
+{
+	ATOM temp = AddAtomA(p_identifier);
+	m_atomList.push_back(temp);
+	return temp;
 }
 
 ServiceManager *Service::s_serviceManager = NULL;

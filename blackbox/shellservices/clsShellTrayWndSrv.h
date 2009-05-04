@@ -33,6 +33,8 @@ private:
 	ATOM m_hInstanceProp;
 	ATOM m_topMostProp;
 	ATOM m_handlerProp;
+
+	static ServiceRegistrar s_serviceRegistration;
 };
 
 }

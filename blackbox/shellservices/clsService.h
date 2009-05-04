@@ -13,10 +13,17 @@
 #include "../../debug/debug.h"
 #include "../clsSystemInfo.h"
 
+#include <list>
+#include <map>
+
 namespace ShellServices
 {
 
 class ServiceManager;
+class ServiceRegistrar;
+class Service;
+
+typedef Service *(*fnServiceCreator)();
 
 class Service
 {
@@ -37,16 +44,17 @@ protected:
 	virtual bool _Exec(ATOM p_command);
 	virtual bool _SetProperty(ATOM p_property, PVOID p_value);
 
+	ATOM RegisterAtom(LPCSTR p_identifier);
+
 	bool m_running;
 	static ServiceManager *s_serviceManager;
 	static clsSystemInfo s_systemInfo;
 private:
+	std::list<ATOM> m_atomList;
 	ATOM m_serviceID;
 
 	friend class ServiceManager;
 };
-
-
 
 }
 

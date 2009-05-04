@@ -15,6 +15,7 @@ hash.cpp
 
 clsService.cpp
 clsServiceManager.cpp
+clsServiceRegistrar.cpp
 clsShellTrayWndSrv.cpp
 clsAppbarSrv.cpp
 clsNotifyIconRectSrv.cpp

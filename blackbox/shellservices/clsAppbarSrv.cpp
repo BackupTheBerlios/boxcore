@@ -7,17 +7,20 @@
 
 #include "clsAppbarSrv.h"
 #include "clsServiceManager.h"
+#include "clsServiceRegistrar.h"
 #include "clsAppbarHandler.h"
 
 #include "../../debug/debug.h"
 
 #include <utility>
 
+#define SERVICE_NAME "SRV_Appbar"
+
 namespace ShellServices
 {
 
 AppbarSrv::AppbarSrv():
-		Service("SRV_Appbar"),
+		Service(SERVICE_NAME),
 		m_imp(NULL)
 {
 	// TODO Auto-generated constructor stub
@@ -27,6 +30,14 @@ AppbarSrv::AppbarSrv():
 AppbarSrv::~AppbarSrv()
 {
 	// TODO Auto-generated destructor stub
+}
+
+void AppbarSrv::SetTaskbarPos(int p_left, int p_top, int p_right, int p_bottom, UINT p_edge)
+{
+	if (m_imp)
+	{
+		m_imp->SetTaskbarPos(p_left, p_top, p_right, p_bottom, p_edge);
+	}
 }
 
 bool AppbarSrv::_Start()
@@ -59,5 +70,7 @@ bool AppbarSrv::_Stop()
 		return false;
 	}
 }
+
+REGISTER_SERVICE(AppbarSrv)
 
 }

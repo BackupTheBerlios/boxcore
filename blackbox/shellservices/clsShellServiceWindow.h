@@ -46,17 +46,6 @@ namespace ShellServices
 {
 
 /** @internal
-  * @brief Handler types for WM_COPYDATA messages to the shell window
-  */
-enum eShellHandlers
-{
-	HANDLER_APPBAR, ///< @brief Indicates a handler for messages from SHAppbarMessage()
-	HANDLER_NOTIFYICON, ///< @brief Indicates a handler for messages from Shell_Notifyicon()
-	HANDLER_RESERVED, ///< @brief Reserved, will implement later
-	HANDLER_NOTIFYICONRECT ///< @brief Indicates a handler for messages from Shell_NotifyIconRect()
-};
-
-/** @internal
   * @brief Creates a Shell_Traywnd and provides hooks to
   * allow processing of WM_COPYDAYA messages sent to the window.
   *

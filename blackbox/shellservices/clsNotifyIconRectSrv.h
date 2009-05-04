@@ -24,6 +24,8 @@ private:
 	virtual bool _Stop();
 
 	virtual HRESULT ProcessMessage(DWORD p_cbData, PVOID p_lpData);
+
+	static ServiceRegistrar s_serviceRegistration;
 };
 
 }

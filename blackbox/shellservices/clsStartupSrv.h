@@ -28,6 +28,8 @@ private:
 	IMalloc *m_shellMalloc;
 
 	void RunShellFolder(UINT p_csidl);
+
+	static ServiceRegistrar s_serviceRegistration;
 };
 
 }

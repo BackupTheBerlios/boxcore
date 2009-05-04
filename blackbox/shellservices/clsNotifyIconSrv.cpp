@@ -8,9 +8,12 @@
 #include "clsNotifyIconSrv.h"
 #include "clsNotifyIconHandler.h"
 
+#include "clsServiceRegistrar.h"
 #include "clsServiceManager.h"
 
 #include <vector>
+
+#define SERVICE_NAME "SRV_NotifyIcon"
 
 std::map<ATOM,ShellServices::eNotificationIconInfo> g_trayInfoMapping;
 
@@ -37,7 +40,7 @@ namespace ShellServices
 {
 
 NotifyIconSrv::NotifyIconSrv():
-		Service("SRV_NotifyIcon"),
+		Service(SERVICE_NAME),
 		m_imp(NULL),
 		m_iconFactory(NULL),
 		m_useProxy(false)
@@ -230,5 +233,7 @@ NotificationIcon *NotifyIconSrv::LookupIcon(UINT p_index)
 		return NULL;
 	}
 }
+
+REGISTER_SERVICE(NotifyIconSrv)
 
 }
