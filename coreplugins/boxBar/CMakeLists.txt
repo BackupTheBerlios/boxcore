@@ -95,4 +95,3 @@ set_target_properties (boxBar PROPERTIES
 endif (MINGW)
 
 InstallPlugin(boxBar)
-InstallPluginConfig(boxBar)
