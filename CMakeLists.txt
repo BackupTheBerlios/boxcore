@@ -47,7 +47,7 @@ find_program(ASTYLE_EXECUTABLE astyle
              NO_CMAKE_PATH)
 if (ASTYLE_EXECUTABLE)
 add_custom_target(astyle
-                  COMMAND ${ASTYLE_EXECUTABLE} --options=astyleconfig "*.cpp" "*.h"
+                  COMMAND ${ASTYLE_EXECUTABLE} --options=astyleconfig \"*.cpp\" \"*.h\"
                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
                   COMMENT "Formatting source files...")
 endif (ASTYLE_EXECUTABLE)
@@ -83,6 +83,7 @@ add_subdirectory (coreplugins/boxBar)
 endif (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/coreplugins/)
 
 add_subdirectory (plugins/boxVolume)
+add_subdirectory (plugins/bbInterface)
 
 set (CPACK_COMPONENT_GROUP_CORE_DISPLAY_NAME "Blackbox Core")
 set (CPACK_COMPONENT_GROUP_CORE_EXPANDED True)
