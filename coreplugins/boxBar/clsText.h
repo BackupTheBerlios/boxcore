@@ -9,21 +9,21 @@ namespace boxBar
 class Text : public Item
 {
 public:
-	Text(LPCSTR pText, UINT pStyle, dimType p_knowsSize = DIM_VERTICAL);
-	Text(LPCWSTR pText, UINT pStyle, dimType p_knowsSize = DIM_VERTICAL);
+	template<typename T> Text(T pText, UINT pStyle, dimType p_knowsSize = DIM_VERTICAL);
 	virtual ~Text();
 
-	void SetText(LPCSTR pText);
-	void SetText(LPCWSTR pText);
+	template<typename T> void SetText(T pText);
 	void SetStyle(UINT pStyle);
 
 	virtual void draw(HDC pContext);
 	virtual void calculateSizes(bool pSizeGiven = false);
 private:
-	tstring m_text;
+	std::basic_string<WCHAR> m_text;
 
 	StyleItem *m_styleItem;
 	HFONT m_font;
+
+	ULONG_PTR m_gdiplusToken;
 };
 
 }
