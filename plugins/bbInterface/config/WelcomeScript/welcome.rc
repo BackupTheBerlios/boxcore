@@ -1,0 +1,268 @@
+!---- WTBBI_Frame ----
+@BBInterface Plugin SetPluginProperty UseTooltip false
+@BBInterface Control Create Frame WTBBI_Frame
+@BBInterface Control SetWindowProperty WTBBI_Frame X 55
+@BBInterface Control SetWindowProperty WTBBI_Frame Y 14
+@BBInterface Control SetWindowProperty WTBBI_Frame Width 619
+@BBInterface Control SetWindowProperty WTBBI_Frame Height 495
+@BBInterface Control SetWindowProperty WTBBI_Frame Border true
+@BBInterface Control SetWindowProperty WTBBI_Frame Style "Toolbar"
+@BBInterface Control SetWindowProperty WTBBI_Frame IsVisible true
+@BBInterface Control SetWindowProperty WTBBI_Frame IsToggledWithPlugins false
+@BBInterface Control SetWindowProperty WTBBI_Frame IsOnAllWorkspaces true
+@BBInterface Control SetWindowProperty WTBBI_Frame IsOnTop false
+@BBInterface Control SetWindowProperty WTBBI_Frame AutoHide false
+@BBInterface Control SetWindowProperty WTBBI_Frame IsSlitted false
+@BBInterface Control SetWindowProperty WTBBI_Frame IsTransparent true
+@BBInterface Control SetWindowProperty WTBBI_Frame Transparency 100
+@BBInterface Control SetControlProperty WTBBI_Frame HAlign "Center"
+@BBInterface Control SetControlProperty WTBBI_Frame VAlign "Top"
+@BBInterface Control SetControlProperty WTBBI_Frame HasTitleBar true
+@BBInterface Control SetControlProperty WTBBI_Frame IsLocked false
+@BBInterface Control SetAgent WTBBI_Frame Caption StaticText "Welcome to BBInterface!"
+
+!---- WTBBI_Frame::WTBBI_Close ----
+@BBInterface Control CreateChild WTBBI_Frame Button WTBBI_Close
+@BBInterface Control SetWindowProperty WTBBI_Close X 605
+@BBInterface Control SetWindowProperty WTBBI_Close Y 0
+@BBInterface Control SetWindowProperty WTBBI_Close Width 14
+@BBInterface Control SetWindowProperty WTBBI_Close Height 20
+@BBInterface Control SetWindowProperty WTBBI_Close Border true
+@BBInterface Control SetWindowProperty WTBBI_Close Style "Toolbar"
+@BBInterface Control SetWindowProperty WTBBI_Close IsVisible true
+@BBInterface Control SetControlProperty WTBBI_Close HAlign "Center"
+@BBInterface Control SetControlProperty WTBBI_Close VAlign "Center"
+@BBInterface Control SetAgent WTBBI_Close Caption StaticText "X"
+@BBInterface Control SetAgent WTBBI_Close MouseUp Bro@m "@BBInterface Plugin Load WelcomeScript\messagebox.rc"
+
+!---- WTBBI_Frame::WTBBI_Text ----
+@BBInterface Control CreateChild WTBBI_Frame Label WTBBI_Text
+@BBInterface Control SetWindowProperty WTBBI_Text X 7
+@BBInterface Control SetWindowProperty WTBBI_Text Y 29
+@BBInterface Control SetWindowProperty WTBBI_Text Width 605
+@BBInterface Control SetWindowProperty WTBBI_Text Height 37
+@BBInterface Control SetWindowProperty WTBBI_Text Border true
+@BBInterface Control SetWindowProperty WTBBI_Text Style "Inset"
+@BBInterface Control SetWindowProperty WTBBI_Text IsVisible true
+@BBInterface Control SetControlProperty WTBBI_Text HAlign "Left"
+@BBInterface Control SetControlProperty WTBBI_Text VAlign "TopWrap"
+@BBInterface Control SetAgent WTBBI_Text Caption StaticText "Welcome to BBInterface, a plugin designed to let do all sorts of exciting things with BlackBox for Windows.  This interface you see right here was created using just a script file and BBInterface, but it can do a whole lot more as well."
+
+!---- WTBBI_Frame::WTBBI_Text2 ----
+@BBInterface Control CreateChild WTBBI_Frame Label WTBBI_Text2
+@BBInterface Control SetWindowProperty WTBBI_Text2 X 7
+@BBInterface Control SetWindowProperty WTBBI_Text2 Y 73
+@BBInterface Control SetWindowProperty WTBBI_Text2 Width 605
+@BBInterface Control SetWindowProperty WTBBI_Text2 Height 28
+@BBInterface Control SetWindowProperty WTBBI_Text2 Border true
+@BBInterface Control SetWindowProperty WTBBI_Text2 Style "Inset"
+@BBInterface Control SetWindowProperty WTBBI_Text2 IsVisible true
+@BBInterface Control SetControlProperty WTBBI_Text2 HAlign "Left"
+@BBInterface Control SetControlProperty WTBBI_Text2 VAlign "TopWrap"
+@BBInterface Control SetAgent WTBBI_Text2 Caption StaticText "BBInterface is designed around the idea of 'Controls' interacting with 'Agents'.  Essentially, you have things that can do stuff.  Below you'll see examples of what BBInterface is currently capable of."
+
+!---- WTBBI_Frame::WTBBI_CLabel1 ----
+@BBInterface Control CreateChild WTBBI_Frame Label WTBBI_CLabel1
+@BBInterface Control SetWindowProperty WTBBI_CLabel1 X 7
+@BBInterface Control SetWindowProperty WTBBI_CLabel1 Y 108
+@BBInterface Control SetWindowProperty WTBBI_CLabel1 Width 199
+@BBInterface Control SetWindowProperty WTBBI_CLabel1 Height 68
+@BBInterface Control SetWindowProperty WTBBI_CLabel1 Border true
+@BBInterface Control SetWindowProperty WTBBI_CLabel1 Style "Inset"
+@BBInterface Control SetWindowProperty WTBBI_CLabel1 IsVisible true
+@BBInterface Control SetControlProperty WTBBI_CLabel1 HAlign "Left"
+@BBInterface Control SetControlProperty WTBBI_CLabel1 VAlign "TopWrap"
+@BBInterface Control SetAgent WTBBI_CLabel1 Caption StaticText "Next to this box are Buttons.  Buttons can perform actions when clicked and released.  The ones to the right launch the calculator and make Winamp start playing."
+
+!---- WTBBI_Frame::WTBBI_CLabel2 ----
+@BBInterface Control CreateChild WTBBI_Frame Label WTBBI_CLabel2
+@BBInterface Control SetWindowProperty WTBBI_CLabel2 X 307
+@BBInterface Control SetWindowProperty WTBBI_CLabel2 Y 108
+@BBInterface Control SetWindowProperty WTBBI_CLabel2 Width 199
+@BBInterface Control SetWindowProperty WTBBI_CLabel2 Height 68
+@BBInterface Control SetWindowProperty WTBBI_CLabel2 Border true
+@BBInterface Control SetWindowProperty WTBBI_CLabel2 Style "Inset"
+@BBInterface Control SetWindowProperty WTBBI_CLabel2 IsVisible true
+@BBInterface Control SetControlProperty WTBBI_CLabel2 HAlign "Left"
+@BBInterface Control SetControlProperty WTBBI_CLabel2 VAlign "TopWrap"
+@BBInterface Control SetAgent WTBBI_CLabel2 Caption StaticText "These are Switch Buttons.  They're a lot like buttons, but they have two states - up and down.  They can control actions or true/false things, like 'Mute'."
+
+!---- WTBBI_Frame::WTBBI_CLabel3 ----
+@BBInterface Control CreateChild WTBBI_Frame Label WTBBI_CLabel3
+@BBInterface Control SetWindowProperty WTBBI_CLabel3 X 7
+@BBInterface Control SetWindowProperty WTBBI_CLabel3 Y 183
+@BBInterface Control SetWindowProperty WTBBI_CLabel3 Width 175
+@BBInterface Control SetWindowProperty WTBBI_CLabel3 Height 65
+@BBInterface Control SetWindowProperty WTBBI_CLabel3 Border true
+@BBInterface Control SetWindowProperty WTBBI_CLabel3 Style "Inset"
+@BBInterface Control SetWindowProperty WTBBI_CLabel3 IsVisible true
+@BBInterface Control SetControlProperty WTBBI_CLabel3 HAlign "Left"
+@BBInterface Control SetControlProperty WTBBI_CLabel3 VAlign "TopWrap"
+@BBInterface Control SetAgent WTBBI_CLabel3 Caption StaticText "These are Labels.  They basically display text.  You can set their style, alignment, and word wrapping properties."
+
+!---- WTBBI_Frame::WTBBI_CLabel4 ----
+@BBInterface Control CreateChild WTBBI_Frame Label WTBBI_CLabel4
+@BBInterface Control SetWindowProperty WTBBI_CLabel4 X 307
+@BBInterface Control SetWindowProperty WTBBI_CLabel4 Y 183
+@BBInterface Control SetWindowProperty WTBBI_CLabel4 Width 199
+@BBInterface Control SetWindowProperty WTBBI_CLabel4 Height 65
+@BBInterface Control SetWindowProperty WTBBI_CLabel4 Border true
+@BBInterface Control SetWindowProperty WTBBI_CLabel4 Style "Inset"
+@BBInterface Control SetWindowProperty WTBBI_CLabel4 IsVisible true
+@BBInterface Control SetControlProperty WTBBI_CLabel4 HAlign "Left"
+@BBInterface Control SetControlProperty WTBBI_CLabel4 VAlign "TopWrap"
+@BBInterface Control SetAgent WTBBI_CLabel4 Caption StaticText "Sliders allow you to control scale values, like Volume, Treble, and Bass.  You can set them up to control most scales on your sound card."
+
+!---- WTBBI_Frame::WTBBI_CLabel5 ----
+@BBInterface Control CreateChild WTBBI_Frame Label WTBBI_CLabel5
+@BBInterface Control SetWindowProperty WTBBI_CLabel5 X 7
+@BBInterface Control SetWindowProperty WTBBI_CLabel5 Y 255
+@BBInterface Control SetWindowProperty WTBBI_CLabel5 Width 605
+@BBInterface Control SetWindowProperty WTBBI_CLabel5 Height 57
+@BBInterface Control SetWindowProperty WTBBI_CLabel5 Border true
+@BBInterface Control SetWindowProperty WTBBI_CLabel5 Style "Inset"
+@BBInterface Control SetWindowProperty WTBBI_CLabel5 IsVisible true
+@BBInterface Control SetControlProperty WTBBI_CLabel5 HAlign "Left"
+@BBInterface Control SetControlProperty WTBBI_CLabel5 VAlign "TopWrap"
+@BBInterface Control SetAgent WTBBI_CLabel5 Caption StaticText "Lastly, possibly the most important control is the Frame.  The Frame control doesn't do anything itself, but it can contain child controls.  All the controls you see here are on one large Frame.  The entire Frame controls the window attributes, like position and transparency, of all the children controls automatically.  This makes it possible to make some complex and useful interfaces."
+
+!---- WTBBI_Frame::WTBBI_CLabel6 ----
+@BBInterface Control CreateChild WTBBI_Frame Label WTBBI_CLabel6
+@BBInterface Control SetWindowProperty WTBBI_CLabel6 X 7
+@BBInterface Control SetWindowProperty WTBBI_CLabel6 Y 319
+@BBInterface Control SetWindowProperty WTBBI_CLabel6 Width 605
+@BBInterface Control SetWindowProperty WTBBI_CLabel6 Height 169
+@BBInterface Control SetWindowProperty WTBBI_CLabel6 Border true
+@BBInterface Control SetWindowProperty WTBBI_CLabel6 Style "Inset"
+@BBInterface Control SetWindowProperty WTBBI_CLabel6 IsVisible true
+@BBInterface Control SetControlProperty WTBBI_CLabel6 HAlign "Left"
+@BBInterface Control SetControlProperty WTBBI_CLabel6 VAlign "TopWrap"
+@BBInterface Control SetAgent WTBBI_CLabel6 Caption StaticText "For the most part, all this can be done via the mouse, and you'll rarely need to touch the configuration file.\n\nControl + Drag = Move control\nShift + Control + Drag = Move parent control\nControl + Right Click = Show menu (gives access to most BBInterface functions)\nAlt + Drag = Resize control\n\nTo start creating controls, simply Control + Right Click on any existing control, go to Interface Operations, Create Control, and then select a control of your choice.\n\nAnother tool at your disposal is the module system. This is basically controls being managed through the menu, and saved as individual files. Useful when you want to share your creations, or use controls that others made."
+
+!---- WTBBI_Frame::WTBBI_Button1 ----
+@BBInterface Control CreateChild WTBBI_Frame Button WTBBI_Button1
+@BBInterface Control SetWindowProperty WTBBI_Button1 X 220
+@BBInterface Control SetWindowProperty WTBBI_Button1 Y 114
+@BBInterface Control SetWindowProperty WTBBI_Button1 Width 75
+@BBInterface Control SetWindowProperty WTBBI_Button1 Height 26
+@BBInterface Control SetWindowProperty WTBBI_Button1 Border true
+@BBInterface Control SetWindowProperty WTBBI_Button1 Style "Toolbar"
+@BBInterface Control SetWindowProperty WTBBI_Button1 IsVisible true
+@BBInterface Control SetControlProperty WTBBI_Button1 HAlign "Center"
+@BBInterface Control SetControlProperty WTBBI_Button1 VAlign "Center"
+@BBInterface Control SetAgent WTBBI_Button1 Caption StaticText "Calculator"
+@BBInterface Control SetAgent WTBBI_Button1 MouseUp Run "calc.exe"
+
+!---- WTBBI_Frame::WTBBI_Button2 ----
+@BBInterface Control CreateChild WTBBI_Frame Button WTBBI_Button2
+@BBInterface Control SetWindowProperty WTBBI_Button2 X 220
+@BBInterface Control SetWindowProperty WTBBI_Button2 Y 147
+@BBInterface Control SetWindowProperty WTBBI_Button2 Width 75
+@BBInterface Control SetWindowProperty WTBBI_Button2 Height 26
+@BBInterface Control SetWindowProperty WTBBI_Button2 Border true
+@BBInterface Control SetWindowProperty WTBBI_Button2 Style "Toolbar"
+@BBInterface Control SetWindowProperty WTBBI_Button2 IsVisible true
+@BBInterface Control SetControlProperty WTBBI_Button2 HAlign "Center"
+@BBInterface Control SetControlProperty WTBBI_Button2 VAlign "Center"
+@BBInterface Control SetAgent WTBBI_Button2 Caption StaticText "Winamp Play"
+@BBInterface Control SetAgent WTBBI_Button2 MouseUp Winamp 40045
+
+!---- WTBBI_Frame::WTBBI_Switch1 ----
+@BBInterface Control CreateChild WTBBI_Frame SwitchButton WTBBI_Switch1
+@BBInterface Control SetWindowProperty WTBBI_Switch1 X 520
+@BBInterface Control SetWindowProperty WTBBI_Switch1 Y 112
+@BBInterface Control SetWindowProperty WTBBI_Switch1 Width 82
+@BBInterface Control SetWindowProperty WTBBI_Switch1 Height 27
+@BBInterface Control SetWindowProperty WTBBI_Switch1 Border true
+@BBInterface Control SetWindowProperty WTBBI_Switch1 Style "Toolbar"
+@BBInterface Control SetWindowProperty WTBBI_Switch1 IsVisible true
+@BBInterface Control SetControlProperty WTBBI_Switch1 HAlign "Center"
+@BBInterface Control SetControlProperty WTBBI_Switch1 VAlign "Center"
+@BBInterface Control SetAgent WTBBI_Switch1 Caption StaticText "Toggle Plugins"
+@BBInterface Control SetAgent WTBBI_Switch1 Pressed Bro@m "@BBHidePlugins"
+@BBInterface Control SetAgent WTBBI_Switch1 Unpressed Bro@m "@BBShowPlugins"
+@BBInterface Control SetControlProperty WTBBI_Switch1 Pressed false
+
+!---- WTBBI_Frame::WTBBI_Switch2 ----
+@BBInterface Control CreateChild WTBBI_Frame SwitchButton WTBBI_Switch2
+@BBInterface Control SetWindowProperty WTBBI_Switch2 X 520
+@BBInterface Control SetWindowProperty WTBBI_Switch2 Y 145
+@BBInterface Control SetWindowProperty WTBBI_Switch2 Width 82
+@BBInterface Control SetWindowProperty WTBBI_Switch2 Height 26
+@BBInterface Control SetWindowProperty WTBBI_Switch2 Border true
+@BBInterface Control SetWindowProperty WTBBI_Switch2 Style "Toolbar"
+@BBInterface Control SetWindowProperty WTBBI_Switch2 IsVisible true
+@BBInterface Control SetControlProperty WTBBI_Switch2 HAlign "Center"
+@BBInterface Control SetControlProperty WTBBI_Switch2 VAlign "Center"
+@BBInterface Control SetAgent WTBBI_Switch2 Caption StaticText "Winamp Shuffle"
+@BBInterface Control SetAgent WTBBI_Switch2 Pressed Winamp 40023
+@BBInterface Control SetAgent WTBBI_Switch2 Unpressed Winamp 40023
+@BBInterface Control SetControlProperty WTBBI_Switch2 Pressed true
+
+!---- WTBBI_Frame::WTBBI_Lab1 ----
+@BBInterface Control CreateChild WTBBI_Frame Label WTBBI_Lab1
+@BBInterface Control SetWindowProperty WTBBI_Lab1 X 195
+@BBInterface Control SetWindowProperty WTBBI_Lab1 Y 196
+@BBInterface Control SetWindowProperty WTBBI_Lab1 Width 105
+@BBInterface Control SetWindowProperty WTBBI_Lab1 Height 18
+@BBInterface Control SetWindowProperty WTBBI_Lab1 Border true
+@BBInterface Control SetWindowProperty WTBBI_Lab1 Style "Toolbar"
+@BBInterface Control SetWindowProperty WTBBI_Lab1 IsVisible true
+@BBInterface Control SetControlProperty WTBBI_Lab1 HAlign "Left"
+@BBInterface Control SetControlProperty WTBBI_Lab1 VAlign "Center"
+@BBInterface Control SetAgent WTBBI_Lab1 Caption StaticText "Left Toolbar"
+
+!---- WTBBI_Frame::WTBBI_Lab2 ----
+@BBInterface Control CreateChild WTBBI_Frame Label WTBBI_Lab2
+@BBInterface Control SetWindowProperty WTBBI_Lab2 X 195
+@BBInterface Control SetWindowProperty WTBBI_Lab2 Y 221
+@BBInterface Control SetWindowProperty WTBBI_Lab2 Width 105
+@BBInterface Control SetWindowProperty WTBBI_Lab2 Height 16
+@BBInterface Control SetWindowProperty WTBBI_Lab2 Border true
+@BBInterface Control SetWindowProperty WTBBI_Lab2 Style "Inset"
+@BBInterface Control SetWindowProperty WTBBI_Lab2 IsVisible true
+@BBInterface Control SetControlProperty WTBBI_Lab2 HAlign "Right"
+@BBInterface Control SetControlProperty WTBBI_Lab2 VAlign "Center"
+@BBInterface Control SetAgent WTBBI_Lab2 Caption StaticText "Right Inset"
+
+!---- WTBBI_Frame::WTBBI_Slide1 ----
+@BBInterface Control CreateChild WTBBI_Frame Slider WTBBI_Slide1
+@BBInterface Control SetWindowProperty WTBBI_Slide1 X 546
+@BBInterface Control SetWindowProperty WTBBI_Slide1 Y 197
+@BBInterface Control SetWindowProperty WTBBI_Slide1 Width 56
+@BBInterface Control SetWindowProperty WTBBI_Slide1 Height 16
+@BBInterface Control SetWindowProperty WTBBI_Slide1 Border true
+@BBInterface Control SetWindowProperty WTBBI_Slide1 Style "Toolbar"
+@BBInterface Control SetWindowProperty WTBBI_Slide1 IsVisible true
+@BBInterface Control SetControlProperty WTBBI_Slide1 Value 0.740000
+@BBInterface Control SetControlProperty WTBBI_Slide1 Vertical false
+@BBInterface Control SetControlProperty WTBBI_Slide1 Reversed false
+@BBInterface Control SetControlProperty WTBBI_Slide1 Appearance 0
+
+!---- WTBBI_Frame::WTBBI_Slide2 ----
+@BBInterface Control CreateChild WTBBI_Frame Slider WTBBI_Slide2
+@BBInterface Control SetWindowProperty WTBBI_Slide2 X 521
+@BBInterface Control SetWindowProperty WTBBI_Slide2 Y 193
+@BBInterface Control SetWindowProperty WTBBI_Slide2 Width 18
+@BBInterface Control SetWindowProperty WTBBI_Slide2 Height 47
+@BBInterface Control SetWindowProperty WTBBI_Slide2 Border true
+@BBInterface Control SetWindowProperty WTBBI_Slide2 Style "Toolbar"
+@BBInterface Control SetWindowProperty WTBBI_Slide2 IsVisible true
+@BBInterface Control SetControlProperty WTBBI_Slide2 Value 0.787879
+@BBInterface Control SetControlProperty WTBBI_Slide2 Vertical true
+@BBInterface Control SetControlProperty WTBBI_Slide2 Reversed false
+@BBInterface Control SetControlProperty WTBBI_Slide2 Appearance 2
+
+!---- WTBBI_Frame::WTBBI_Slide3 ----
+@BBInterface Control CreateChild WTBBI_Frame Slider WTBBI_Slide3
+@BBInterface Control SetWindowProperty WTBBI_Slide3 X 546
+@BBInterface Control SetWindowProperty WTBBI_Slide3 Y 220
+@BBInterface Control SetWindowProperty WTBBI_Slide3 Width 56
+@BBInterface Control SetWindowProperty WTBBI_Slide3 Height 17
+@BBInterface Control SetWindowProperty WTBBI_Slide3 Border true
+@BBInterface Control SetWindowProperty WTBBI_Slide3 Style "Toolbar"
+@BBInterface Control SetWindowProperty WTBBI_Slide3 IsVisible true
+@BBInterface Control SetControlProperty WTBBI_Slide3 Value 0.347826
+@BBInterface Control SetControlProperty WTBBI_Slide3 Vertical false
+@BBInterface Control SetControlProperty WTBBI_Slide3 Reversed false
+@BBInterface Control SetControlProperty WTBBI_Slide3 Appearance 1

@@ -1,0 +1,33 @@
+@BBInterface Plugin SetPluginProperty SuppressErrors true
+@BBInterface Control Create Frame WTBBI_Msgbox
+@BBInterface Control SetWindowProperty WTBBI_Msgbox X 107
+@BBInterface Control SetWindowProperty WTBBI_Msgbox Y 99
+@BBInterface Control SetWindowProperty WTBBI_Msgbox Width 333
+@BBInterface Control SetWindowProperty WTBBI_Msgbox Height 155
+@BBInterface Control SetWindowProperty WTBBI_Msgbox Transparency 100
+@BBInterface Control SetWindowProperty WTBBI_Msgbox IsToggledWithPlugins false
+@BBInterface Control SetWindowProperty WTBBI_Msgbox IsOnAllWorkspaces true
+@BBInterface Control SetWindowProperty WTBBI_Msgbox IsVisible true
+@BBInterface Control SetWindowProperty WTBBI_Msgbox IsTransparent true
+@BBInterface Control SetWindowProperty WTBBI_Msgbox IsOnTop false
+@BBInterface Control SetWindowProperty WTBBI_Msgbox IsSnappy true
+@BBInterface Control SetWindowProperty WTBBI_Msgbox IsSlitted false
+@BBInterface Control SetControlProperty WTBBI_Msgbox HasTitleBar false
+@BBInterface Control CreateChild WTBBI_Msgbox Label WTBBI_MsgboxText
+@BBInterface Control SetWindowProperty WTBBI_MsgboxText X 11
+@BBInterface Control SetWindowProperty WTBBI_MsgboxText Y 11
+@BBInterface Control SetWindowProperty WTBBI_MsgboxText Width 311
+@BBInterface Control SetWindowProperty WTBBI_MsgboxText Height 100
+@BBInterface Control SetControlProperty WTBBI_MsgboxText HAlign "Left"
+@BBInterface Control SetControlProperty WTBBI_MsgboxText VAlign "TopWrap"
+@BBInterface Control SetControlProperty WTBBI_MsgboxText Style "Inset"
+@BBInterface Control SetAgent WTBBI_MsgboxText Caption StaticText "You can show the welcome interface at any time by performing Control+Right Click, Configuration, Show Welcome Interface.\n\nEnjoy the plugin!\n\n - psyci"
+@BBInterface Control CreateChild WTBBI_Msgbox Button WTBBI_MsgboxBtn
+@BBInterface Control SetWindowProperty WTBBI_MsgboxBtn X 115
+@BBInterface Control SetWindowProperty WTBBI_MsgboxBtn Y 116
+@BBInterface Control SetWindowProperty WTBBI_MsgboxBtn Width 96
+@BBInterface Control SetWindowProperty WTBBI_MsgboxBtn Height 32
+@BBInterface Control SetAgent WTBBI_MsgboxBtn Caption StaticText "OK"
+@BBInterface Control SetAgent WTBBI_MsgboxBtn MouseUp Bro@m "@BBInterface Control Delete WTBBI_Msgbox"
+@BBInterface Control Delete WTBBI_Frame
+@BBInterface Plugin SetPluginProperty UseTooltip true
