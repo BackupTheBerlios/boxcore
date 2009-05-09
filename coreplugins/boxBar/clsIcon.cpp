@@ -4,27 +4,27 @@ namespace boxBar
 {
 
 Icon::Icon(HICON p_icon, UINT p_iconSize):
-	Item("GenericIcon"),
-	m_icon(CopyIcon(p_icon)),
-	m_iconSize(p_iconSize)
+		Item("GenericIcon"),
+		m_icon(CopyIcon(p_icon)),
+		m_iconSize(p_iconSize)
 {
 	m_knowsSize = DIM_BOTH;
 	m_wantsStretch = DIM_NONE;
 
 	if (alphaDraw)
 	{
-	BITMAPINFO bufferInfo;
-	ZeroMemory(&bufferInfo, sizeof(bufferInfo));
-	bufferInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	bufferInfo.bmiHeader.biWidth = m_iconSize;
-	bufferInfo.bmiHeader.biHeight = m_iconSize;
-	bufferInfo.bmiHeader.biPlanes = 1;
-	bufferInfo.bmiHeader.biBitCount = 32;
+		BITMAPINFO bufferInfo;
+		ZeroMemory(&bufferInfo, sizeof(bufferInfo));
+		bufferInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+		bufferInfo.bmiHeader.biWidth = m_iconSize;
+		bufferInfo.bmiHeader.biHeight = m_iconSize;
+		bufferInfo.bmiHeader.biPlanes = 1;
+		bufferInfo.bmiHeader.biBitCount = 32;
 
-	HDC tempDC = CreateCompatibleDC(NULL);
-	m_alphaBitmap = CreateDIBSection(tempDC, &bufferInfo, DIB_RGB_COLORS, (void **) &m_alphaBits, NULL, 0);
-	m_bufferBitmap = CreateDIBSection(tempDC, &bufferInfo, DIB_RGB_COLORS, (void **) &m_bufferBits, NULL, 0);
-	DeleteDC(tempDC);
+		HDC tempDC = CreateCompatibleDC(NULL);
+		m_alphaBitmap = CreateDIBSection(tempDC, &bufferInfo, DIB_RGB_COLORS, (void **) &m_alphaBits, NULL, 0);
+		m_bufferBitmap = CreateDIBSection(tempDC, &bufferInfo, DIB_RGB_COLORS, (void **) &m_bufferBits, NULL, 0);
+		DeleteDC(tempDC);
 	}
 }
 
@@ -32,8 +32,8 @@ Icon::~Icon()
 {
 	if (alphaDraw)
 	{
-	DeleteObject(m_alphaBitmap);
-	DeleteObject(m_bufferBitmap);
+		DeleteObject(m_alphaBitmap);
+		DeleteObject(m_bufferBitmap);
 	}
 	if (m_icon)
 	{
