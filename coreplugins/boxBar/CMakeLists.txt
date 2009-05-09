@@ -69,7 +69,7 @@ set (VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}${VERSION_SUFFIX
 set (AUTHOR Carsomyr)
 
 set (PLUGININFO_NAME ${PROJECT_NAME})
-set (PLUGININFO_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}${VERSION_SUFFIX}")
+set (PLUGININFO_VERSION ${VERSION})
 set (PLUGININFO_AUTHOR ${AUTHOR})
 set (PLUGININFO_URL "http://developer.berlios.de/projects/boxcore/")
 set (PLUGININFO_EMAIL "carsomyr@users.berlios.de")
@@ -78,8 +78,10 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/version.h.in ${CMAKE_CURRENT_BINARY_
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/CPackConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/CPackConfig.cmake)
 
 add_library(boxBar MODULE ${BOXBAR_SRCS})
+PluginOption(boxBar ON)
+
 include_directories(boxBar ${CMAKE_CURRENT_BINARY_DIR} ${BLACKBOX_INCLUDE_DIR})
-target_link_libraries(boxBar ${UNICOWSLIB} ${BOXCORE_LIBRARY_DEBUG} blackbox comctl32 gdi32 ole32 uuid)
+target_link_libraries(boxBar ${UNICOWSLIB} ${BOXCORE_LIBRARY_DEBUG} blackbox comctl32 gdi32 ole32 uuid gdiplus)
 set_target_properties (boxBar PROPERTIES
 	PREFIX ""
 	VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}${VERSION_SUFFIX}"
@@ -92,11 +94,5 @@ set_target_properties (boxBar PROPERTIES
 )
 endif (MINGW)
 
-install(TARGETS boxBar LIBRARY DESTINATION plugins/${PROJECT_NAME} COMPONENT ${PROJECT_NAME})
-if (UPDATE_PACKAGE)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/config/boxBar.rc DESTINATION plugins/${PROJECT_NAME}/sampleconfig COMPONENT ${PROJECT_NAME}Config)
-else (UPDATE_PACKAGE)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/config/boxBar.rc DESTINATION plugins/${PROJECT_NAME} COMPONENT ${PROJECT_NAME}Config)
-endif (UPDATE_PACKAGE)
-
-set (CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_CURRENT_BINARY_DIR};${PROJECT_NAME};ALL;/" PARENT_SCOPE)
+InstallPlugin(boxBar)
+InstallPluginConfig(boxBar)
