@@ -496,18 +496,23 @@ void agenttype_systemmonitor_updatevalue(int monitor_type)
 			long double diff_idle_time;
 			BOOL status;
 			SYSTEM_TIME_INFORMATION SysTimeInfo;
-			SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION SysPerfInfo;
+			SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION SysPerfInfo[16];
 
 			//Get metrics
-			status = agenttype_systemmonitor_ntquerysysteminformation(SystemTimeOfDayInformation, &SysTimeInfo, sizeof(SysTimeInfo), NULL );
-			if (status == NO_ERROR) status = agenttype_systemmonitor_ntquerysysteminformation(SystemProcessorPerformanceInformation, &SysPerfInfo, sizeof(SysPerfInfo), NULL );
+			status = agenttype_systemmonitor_ntquerysysteminformation(SystemTimeOfDayInformation, &SysTimeInfo, sizeof(SYSTEM_TIMEOFDAY_INFORMATION), NULL );
+			if (status == NO_ERROR) status = agenttype_systemmonitor_ntquerysysteminformation(SystemProcessorPerformanceInformation, SysPerfInfo, sizeof(SysPerfInfo), NULL );
 
 			//If we succeeded
 			if (status == NO_ERROR)
 			{
 				//Convert to long doubles
-				long double current_system_time = (long double) SysTimeInfo.liKeSystemTime.QuadPart;
-				long double current_idle_time = (long double) SysPerfInfo.IdleTime.QuadPart;
+				long double current_system_time = (long double) SysTimeInfo.liKeSystemTime.QuadPart;//(long double) SysPerfInfo[0].KernelTime.QuadPart + (long double) SysPerfInfo[0].UserTime.QuadPart;
+				long double current_idle_time = 0;
+				for (int i = 0; i < agenttype_systemmonitor_number_processors; ++i)
+					{
+					current_idle_time += (long double) SysPerfInfo[i].IdleTime.QuadPart;
+					}
+				current_idle_time /= agenttype_systemmonitor_number_processors;
 
 				//If this is the first time
 				if (agenttype_systemmonitor_last_system_time == 0)
@@ -521,7 +526,7 @@ void agenttype_systemmonitor_updatevalue(int monitor_type)
 					diff_idle_time = current_idle_time - agenttype_systemmonitor_last_idle_time;
 
 					//Calculate usage
-					foundvalue = 1.0 - (((diff_idle_time / diff_system_time)) / agenttype_systemmonitor_number_processors);
+					foundvalue = 1.0 - (diff_idle_time / (diff_system_time));
 					if (foundvalue < 0.0) foundvalue = 0.0;
 					if (foundvalue > 1.0) foundvalue = 1.0;
 				}
