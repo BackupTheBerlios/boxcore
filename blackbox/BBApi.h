@@ -81,10 +81,6 @@
 /* windows include */
 /*------------------------------------------ */
 
-#define WIN32_LEAN_AND_MEAN
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
 #ifndef WINVER
 #define WINVER 0x0502
 #endif
