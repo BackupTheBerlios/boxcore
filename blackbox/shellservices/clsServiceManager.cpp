@@ -39,6 +39,7 @@ bool ServiceManager::StartService(LPCSTR p_serviceID)
 	Service *service = GetService(p_serviceID);
 	if (service)
 	{
+		TRACE("Starting %s", p_serviceID);
 		return service->Start(serviceID);
 	}
 	else
@@ -52,6 +53,7 @@ bool ServiceManager::StartServiceThreaded(LPCSTR p_serviceID)
 	Service *service = GetService(p_serviceID);
 	if (service)
 	{
+		TRACE("Starting %s threaded", p_serviceID);
 		CloseHandle(CreateThread(NULL, 0, ServiceThread, service, 0, NULL));
 		return true;
 	}
@@ -64,6 +66,7 @@ bool ServiceManager::StartServiceThreaded(LPCSTR p_serviceID)
 bool ServiceManager::StopService(LPCSTR p_serviceID)
 {
 	ATOM serviceID = FindAtomA(p_serviceID);
+	TRACE("Stopping %s", p_serviceID);
 	return m_serviceList.end() != std::find_if(m_serviceList.begin(), m_serviceList.end(), std::bind2nd(std::mem_fun(&Service::Stop), serviceID));
 }
 
