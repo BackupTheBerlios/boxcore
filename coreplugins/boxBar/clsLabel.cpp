@@ -14,6 +14,11 @@ Label::Label(bool pVertical, LPCSTR p_itemName) : Collection(pVertical, p_itemNa
 	addItem(m_textItem);
 }
 
+LRESULT Label::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	return Item::wndProc(hWnd, msg, wParam, lParam);
+}
+
 void Label::SetStyle(UINT p_style)
 {
 	style = p_style;
