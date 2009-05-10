@@ -54,4 +54,4 @@ set_target_properties (bbInterface PROPERTIES
 )
 endif (MINGW)
 
-InstallPlugin(bbInterface)
+InstallPlugin(bbInterface NO)

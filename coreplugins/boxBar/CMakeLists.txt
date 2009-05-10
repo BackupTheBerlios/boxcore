@@ -94,4 +94,6 @@ set_target_properties (boxBar PROPERTIES
 )
 endif (MINGW)
 
+set (STANDARD_PLUGIN 1)
+set (boxBar_DESCRIPTION "A highly configurable system bar plugin")
 InstallPlugin(boxBar)

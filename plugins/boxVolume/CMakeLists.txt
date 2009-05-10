@@ -17,4 +17,4 @@ set_target_properties (boxVolume  PROPERTIES
 )
 endif(MINGW)
 
-InstallPlugin(boxVolume)
+InstallPlugin(boxVolume NO)
