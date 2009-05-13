@@ -49,11 +49,12 @@
 #include <locale.h>
 
 #include "blackbox.h"
-#include "shellserviceobjects/clsShellServiceObjects.h"
 #include "clsSystemInfo.h"
 #include "../debug/debug.h"
 #include "../utility/stringcopy.h"
 #include "callbacks.h"
+
+#include <vector>
 
 
 //====================
@@ -122,7 +123,6 @@ TaskManagement::LegacyTask *TaskFactory()
 	return new BBTask;
 }
 
-clsShellServiceObjects ShellServiceObjectsManager;
 clsSystemInfo SystemInfo;
 
 MessageManager *g_pMessageManager;
@@ -383,7 +383,7 @@ bool check_options (LPCSTR lpCmdLine)
 
 //const wchar_t *atomNames[] = {L"boxCore::running",L"boxCore::hasTrayIconEvent",L"boxCore::hasSetTaskbarPos"};
 const wchar_t *atomNames[] = {L"boxCore::running",L"boxCore::hasGetTrayInfo"};
-vector<ATOM> atomList;
+std::vector<ATOM> atomList;
 
 /**
   *
@@ -458,6 +458,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	init_runtime_libs();
 	multimon = NULL != pGetMonitorInfoA;
 	OleInitialize(0);
+	//CoInitialize(NULL);
 	//SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 
 	// ------------------------------------------
@@ -552,7 +553,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	g_ServiceManager.SetServiceProperty("SRV_ShellTrayWnd", "STW_topMost", reinterpret_cast<PVOID>(true));
 	g_ServiceManager.StartService("SRV_ShellTrayWnd");
 
-	g_ServiceManager.SetServiceProperty("SRV_NotifyIcon", "NI_IconFactory", reinterpret_cast<PVOID>(SystemTrayIconFactory));
+	if (!g_ServiceManager.SetServiceProperty("SRV_NotifyIcon", "NI_IconFactory", reinterpret_cast<PVOID>(SystemTrayIconFactory)))
+	{
+		OutputDebugString("Setting a property failed");
+	}
 	if (SystemInfo.isOsVista() && !SystemInfo.isOsWin7())
 	{
 		g_ServiceManager.SetServiceProperty("SRV_NotifyIcon", "NI_UseProxy", reinterpret_cast<PVOID>(true));
@@ -568,34 +572,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	{
 		g_ServiceManager.StartService("SRV_NotifyIconRect");
 	}
-	else
+
+	if (!underExplorer)
 	{
-		g_ServiceManager.RemoveService("SRV_NotifyIconRect");
+		g_ServiceManager.StartService("SRV_SSO");
 	}
 
-	PRINT("Starting SSO's");
-	if (!underExplorer)
+	/*if (!underExplorer)
 	{
 		if (SystemInfo.isOsVista())
 		{
-			CLSID CLSID_VistaStartup =
-				{ 0x35CEC8A3, 0x2BE6, 0x11D2,
-				  { 0x87, 0x73, 0x92, 0xE2, 0x20, 0x52, 0x41, 0x53 }
-				};
-			clsClsidInjected vistaInject(CLSID_VistaStartup);
-			//clsClsidRegKeys vistaKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\explorer\\ShellServiceObjects");
-			//vector<wstring> vistaWhitelist;
-			//vistaWhitelist.push_back(L"{7007ACCF-3202-11D1-AAD2-00805FC1270E}");
-			//vistaKey.setWhitelist(vistaWhitelist);
-			ShellServiceObjectsManager.startServiceObjects(vistaInject);
-			//ShellServiceObjectsManager.startServiceObjects(vistaKey);
+
 		}
 		else
 		{
 			clsClsidRegValues normalKey(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad");
 			ShellServiceObjectsManager.startServiceObjects(normalKey);
 		}
-	}
+	}*/
 	PRINT("Initialising API extensions");
 	InitApiExtensions();
 	PRINT("Starting Plugins");
@@ -674,8 +668,8 @@ void shutdown_blackbox()
 	WM_ShellHook = (unsigned)-1; // dont accept shell messages anymore
 	Menu_All_Delete();
 	kill_plugins();
-	ShellServiceObjectsManager.stopServiceObjects();
 	//SystemTrayManager.terminate();
+	g_ServiceManager.StopService("SRV_SSO");
 	g_ServiceManager.StopService("SRV_NotifyIconRect");
 	g_ServiceManager.StopService("SRV_Appbar");
 	g_ServiceManager.StopService("SRV_NotifyIcon");
@@ -994,7 +988,7 @@ case_bb_restart:
 		// sent from the systembar on mouse over, if on mouseover
 		// a tray app's window turned out to be not valid anymore
 	case BB_CLEANTRAY:
-		g_ServiceManager.ExecServiceCommand("SRV_NotifyIcon", "NI_CleanTray");
+		g_ServiceManager.Call("SRV_NotifyIcon", "NI_CleanTray");
 		break;
 
 		//====================

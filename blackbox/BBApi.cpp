@@ -43,7 +43,7 @@
 #include "../utility/stringcopy.h"
 #include "clsBBTask.h"
 
-#include "shellservices/clsNotifyIconSrv.h"
+using ShellServices::Arg;
 
 #define ST static
 
@@ -2488,12 +2488,9 @@ ST void snap_to_edge(struct edges *h, struct edges *v, bool sizing, bool same_le
   */
 int GetTraySize()
 {
-	static ShellServices::NotifyIconSrv *handler = NULL;
-	if (!handler)
-	{
-		g_ServiceManager.CastService("SRV_NotifyIcon", handler);
-	}
-	return handler->GetTraySize();
+	UINT traySize;
+	g_ServiceManager.Call("SRV_NotifyIcon", "FN_GetTraySize", Arg<UINT &>(traySize));
+	return traySize;
 }
 
 /** @brief Retrieve a system tray icons information by index
@@ -2502,15 +2499,15 @@ int GetTraySize()
   */
 systemTray* GetTrayIcon(UINT idx)
 {
-	static ShellServices::NotifyIconSrv *handler = NULL;
-	if (!handler)
-	{
-		g_ServiceManager.CastService("SRV_NotifyIcon", handler);
-	}
 	PVOID data[1];
 	ATOM info[1] = {FindAtom(TEXT("TrayIcon::Legacy"))};
-	ShellServices::NotificationIcon *icon = handler->LookupIcon(idx);
-	handler->GetNotificationIconInfo(icon, data,info, 1);
+	ShellServices::NotificationIcon *icon;
+	g_ServiceManager.Call("SRV_NotifyIcon", "FN_LookupIcon", Arg<ShellServices::NotificationIcon *&>(icon), Arg<UINT>(idx));
+	g_ServiceManager.Call("SRV_NotifyIcon", "FN_GetNotificationIconInfo",
+						  Arg<ShellServices::NotificationIcon *>(icon),
+						  Arg<PVOID *>(data),
+						  Arg<ATOM *>(info),
+						  Arg<UINT>(1));
 	return static_cast<SystemTrayIcon *>(data[0])->getSystemTray();
 }
 
@@ -2653,34 +2650,38 @@ bool SetTaskLocation(HWND hwnd, struct taskinfo *t, UINT flags)
 
 extern "C" API_EXPORT BOOL GetTrayInfo(HWND p_hWnd, UINT p_uID, PVOID *p_trayInfo, ATOM *p_infoTypes, UINT p_numInfo)
 {
-	static ShellServices::NotifyIconSrv *handler = NULL;
-	if (!handler)
-	{
-		g_ServiceManager.CastService("SRV_NotifyIcon", handler);
-	}
-	ShellServices::NotificationIcon *icon = handler->LookupIcon(p_hWnd, p_uID);
-	return handler->GetNotificationIconInfo(icon, p_trayInfo, p_infoTypes, p_numInfo);
+	ShellServices::NotificationIcon *icon;
+	g_ServiceManager.Call("SRV_NotifyIcon", "FN_LookupIcon",
+						  Arg<ShellServices::NotificationIcon *&>(icon),
+						  Arg<HWND>(p_hWnd),
+						  Arg<UINT>(p_numInfo));
+	return g_ServiceManager.Call("SRV_NotifyIcon", "FN_GetNotificationIconInfo",
+								 Arg<ShellServices::NotificationIcon *>(icon),
+								 Arg<PVOID *>(p_trayInfo),
+								 Arg<ATOM *>(p_infoTypes),
+								 Arg<UINT>(p_numInfo));
 }
 
 extern "C" API_EXPORT BOOL GetTrayInfoIndexed(UINT p_index, PVOID *p_trayInfo, ATOM *p_infoTypes, UINT p_numInfo)
 {
-	static ShellServices::NotifyIconSrv *handler = NULL;
-	if (!handler)
-	{
-		g_ServiceManager.CastService("SRV_NotifyIcon", handler);
-	}
-	ShellServices::NotificationIcon *icon = handler->LookupIcon(p_index);
-	return handler->GetNotificationIconInfo(icon, p_trayInfo, p_infoTypes, p_numInfo);
+	ShellServices::NotificationIcon *icon;
+	g_ServiceManager.Call("SRV_NotifyIcon", "FN_LookupIcon",
+						  Arg<ShellServices::NotificationIcon *&>(icon),
+						  Arg<UINT>(p_index));
+	return g_ServiceManager.Call("SRV_NotifyIcon", "FN_GetNotificationIconInfo",
+								 Arg<ShellServices::NotificationIcon *>(icon),
+								 Arg<PVOID *>(p_trayInfo),
+								 Arg<ATOM *>(p_infoTypes),
+								 Arg<UINT>(p_numInfo));
 }
 
 extern "C" API_EXPORT BOOL GetTrayInfoMsg(WPARAM p_wParam, PVOID *p_trayInfo, ATOM *p_infoTypes, UINT p_numInfo)
 {
-	static ShellServices::NotifyIconSrv *handler = NULL;
-	if (!handler)
-	{
-		g_ServiceManager.CastService("SRV_NotifyIcon", handler);
-	}
-	return handler->GetNotificationIconInfo(reinterpret_cast<ShellServices::NotificationIcon *>(p_wParam), p_trayInfo, p_infoTypes, p_numInfo);
+	return g_ServiceManager.Call("SRV_NotifyIcon", "FN_GetNotificationIconInfo",
+								 Arg<ShellServices::NotificationIcon *>(reinterpret_cast<ShellServices::NotificationIcon *>(p_wParam)),
+								 Arg<PVOID *>(p_trayInfo),
+								 Arg<ATOM *>(p_infoTypes),
+								 Arg<UINT>(p_numInfo));
 }
 
 //===========================================================================
