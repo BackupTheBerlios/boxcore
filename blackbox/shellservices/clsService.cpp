@@ -91,6 +91,31 @@ bool Service::SetProperty(ATOM p_serviceID, ATOM p_property, PVOID p_value)
 	}
 }
 
+bool Service::Call(ATOM p_command)
+{
+	return false;
+}
+
+bool Service::Call(ATOM p_command, const ServiceArg &p_arg1)
+{
+	return false;
+}
+
+bool Service::Call(ATOM p_command, const ServiceArg &p_arg1, const ServiceArg &p_arg2)
+{
+	return false;
+}
+
+bool Service::Call(ATOM p_command, const ServiceArg &p_arg1, const ServiceArg &p_arg2, const ServiceArg &p_arg3)
+{
+	return false;
+}
+
+bool Service::Call(ATOM p_command, const ServiceArg &p_arg1, const ServiceArg &p_arg2, const ServiceArg &p_arg3, const ServiceArg &p_arg4)
+{
+	return false;
+}
+
 bool Service::_Exec(ATOM p_command)
 {
 	return false;

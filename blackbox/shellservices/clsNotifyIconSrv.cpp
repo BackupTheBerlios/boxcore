@@ -12,6 +12,7 @@
 #include "clsServiceManager.h"
 
 #include <vector>
+#include <typeinfo>
 
 #define SERVICE_NAME "SRV_NotifyIcon"
 
@@ -51,6 +52,9 @@ NotifyIconSrv::NotifyIconSrv():
 	m_callbackModProp = AddAtomA("NI_Callback_Mod");
 	m_callbackDelProp = AddAtomA("NI_Callback_Del");
 	m_cleanTrayCommand = AddAtomA("NI_CleanTray");
+	m_getNotificationIconInfoFn = RegisterAtom("FN_GetNotificationIconInfo");
+	m_lookupIconFn = RegisterAtom("FN_LookupIcon");
+	m_GetTraySizeFn = RegisterAtom("FN_GetTraySize");
 }
 
 NotifyIconSrv::~NotifyIconSrv()
@@ -123,8 +127,7 @@ bool NotifyIconSrv::_Start()
 	{
 		PRINT("Starting NotifyIcon service");
 		m_imp = new NotifyIconHandler(reinterpret_cast<LegacyNotficationIconFactory>(m_iconFactory), m_useProxy);
-		std::pair<UINT, PVOID> handler(1, m_imp);
-		s_serviceManager->SetServiceProperty("SRV_ShellTrayWnd", "STW_handler", &handler);
+		s_serviceManager->Call("SRV_ShellTrayWnd", "STW_handler", Arg<UINT>(1), Arg<ShellServiceHandler *>(m_imp));
 		InitTrayMapping();
 		return true;
 	}
@@ -149,7 +152,7 @@ bool NotifyIconSrv::_Stop()
 	}
 }
 
-bool NotifyIconSrv::_Exec(ATOM p_command)
+bool NotifyIconSrv::Call(ATOM p_command)
 {
 	if (p_command == m_cleanTrayCommand)
 	{
@@ -157,18 +160,6 @@ bool NotifyIconSrv::_Exec(ATOM p_command)
 		return true;
 	}
 	return false;
-}
-
-UINT NotifyIconSrv::GetTraySize()
-{
-	if (m_imp)
-	{
-		return m_imp->GetTraySize();
-	}
-	else
-	{
-		return 0;
-	}
 }
 
 bool NotifyIconSrv::GetNotificationIconInfo(NotificationIcon *p_icon, PVOID p_return[], ATOM p_info[], UINT p_count)
@@ -210,28 +201,79 @@ bool NotifyIconSrv::GetNotificationIconInfo(NotificationIcon *p_icon, PVOID p_re
 	return true;
 }
 
-NotificationIcon *NotifyIconSrv::LookupIcon(HWND p_hWnd, UINT p_uID)
+#undef PRINT
+#define PRINT(x) OutputDebugStringA(x);
+
+bool NotifyIconSrv::Call(ATOM p_function, const ServiceArg &p_arg1)
 {
-	if (m_imp)
+	if (p_function == m_GetTraySizeFn)
 	{
-		return m_imp->LookupIcon(p_hWnd, p_uID);
+		typedef Arg<UINT &> type1;
+		if (CHECK_ARG(1))
+		{
+			MAKE_ARG(1) = m_imp->GetTraySize();
+			return true;
+		}
+		PRINT("Argument mismatch in " SERVICE_NAME ", 1 Arg call");
 	}
-	else
-	{
-		return NULL;
-	}
+	PRINT("1 Arg call not found in " SERVICE_NAME);
+	return false;
 }
 
-NotificationIcon *NotifyIconSrv::LookupIcon(UINT p_index)
+bool NotifyIconSrv::Call(ATOM p_function, const ServiceArg &p_arg1, const ServiceArg &p_arg2)
 {
-	if (m_imp)
+	if (p_function == m_lookupIconFn)
 	{
-		return m_imp->LookupIcon(p_index);
+		typedef Arg<NotificationIcon *&> type1;
+		typedef Arg<UINT> type2;
+		if (CHECK_ARG(1) && CHECK_ARG(2))
+		{
+			MAKE_ARG(1) = m_imp->LookupIcon(MAKE_ARG(2));
+			return true;
+		}
+		PRINT("Argument mismatch in " SERVICE_NAME ", 2 Arg call");
 	}
-	else
+	PRINT("2 Arg call not found in " SERVICE_NAME);
+	return false;
+}
+
+bool NotifyIconSrv::Call(ATOM p_function, const ServiceArg &p_arg1,
+						 const ServiceArg &p_arg2, const ServiceArg &p_arg3)
+{
+	if (p_function == m_lookupIconFn)
 	{
-		return NULL;
+		typedef Arg<NotificationIcon *&> type1;
+		typedef Arg<HWND> type2;
+		typedef Arg<UINT> type3;
+		if (CHECK_ARG(1) && CHECK_ARG(2) && CHECK_ARG(3))
+		{
+			MAKE_ARG(1) = m_imp->LookupIcon(MAKE_ARG(2), MAKE_ARG(3));
+			return true;
+		}
+		PRINT("Argument mismatch in " SERVICE_NAME ", 3 Arg call");
 	}
+	PRINT("3 Arg call not found in " SERVICE_NAME);
+	return false;
+}
+
+bool NotifyIconSrv::Call(ATOM p_function, const ServiceArg &p_arg1,
+						 const ServiceArg &p_arg2, const ServiceArg &p_arg3,
+						 const ServiceArg &p_arg4)
+{
+	if (p_function == m_getNotificationIconInfoFn)
+	{
+		typedef Arg<NotificationIcon *> type1;
+		typedef Arg<PVOID *> type2;
+		typedef Arg<ATOM *> type3;
+		typedef Arg<UINT> type4;
+		if (CHECK_ARG(1) && CHECK_ARG(2) && CHECK_ARG(3) && CHECK_ARG(4))
+		{
+			return GetNotificationIconInfo(MAKE_ARG(1), MAKE_ARG(2), MAKE_ARG(3), MAKE_ARG(4));
+		}
+		PRINT("Argument mismatch in " SERVICE_NAME ", 4 Arg call");
+	}
+	PRINT("4 arg not found  in " SERVICE_NAME);
+	return false;
 }
 
 REGISTER_SERVICE(NotifyIconSrv)

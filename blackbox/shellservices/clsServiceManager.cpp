@@ -16,11 +16,13 @@
 
 #include <functional>
 #include <algorithm>
+#include <typeinfo>
 
 namespace ShellServices
 {
 
-ServiceManager::ServiceManager()
+ServiceManager::ServiceManager():
+		m_serviceList()
 {
 	Service::s_serviceManager = this;
 }
@@ -109,18 +111,6 @@ bool ServiceManager::RemoveService(LPCSTR p_serviceID)
 	}
 }
 
-bool ServiceManager::ExecServiceCommand(LPCSTR p_serviceID, LPCSTR p_command)
-{
-	ATOM serviceID = FindAtomA(p_serviceID);
-	ATOM command = FindAtomA(p_command);
-	for (t_serviceList::iterator i = m_serviceList.begin(); i != m_serviceList.end(); ++i)
-	{
-		if ((*i)->Exec(serviceID, command))
-			return true;
-	}
-	return false;
-}
-
 bool ServiceManager::SetServiceProperty(LPCSTR p_serviceID, LPCSTR p_property, PVOID p_value)
 {
 	Service *service = GetService(p_serviceID);
@@ -145,6 +135,36 @@ DWORD WINAPI ServiceManager::ServiceThread(LPVOID lpData)
 void ServiceManager::AddService(Service *p_service)
 {
 	m_serviceList.push_back(p_service);
+}
+
+bool ServiceManager::Call(LPCSTR p_serviceID, LPCSTR p_function, const ServiceArg &p_arg1, const ServiceArg &p_arg2, const ServiceArg &p_arg3, const ServiceArg &p_arg4)
+{
+	Service *service = GetService(p_serviceID);
+	if (service)
+	{
+		ATOM function = FindAtomA(p_function);
+		if (function)
+		{
+			if (typeid(p_arg4) != typeid(ServiceArg))
+			{
+				return service->Call(function, p_arg1, p_arg2, p_arg3, p_arg4);
+			}
+			if (typeid(p_arg3) != typeid(ServiceArg))
+			{
+				return service->Call(function, p_arg1, p_arg2, p_arg3);
+			}
+			if (typeid(p_arg2) != typeid(ServiceArg))
+			{
+				return service->Call(function, p_arg1, p_arg2);
+			}
+			if (typeid(p_arg1) != typeid(ServiceArg))
+			{
+				return service->Call(function, p_arg1);
+			}
+			return service->Call(function);
+		}
+	}
+	return false;
 }
 
 Service *ServiceManager::KnownService(ATOM p_id, fnServiceCreator p_creator)

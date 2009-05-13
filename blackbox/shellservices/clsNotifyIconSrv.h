@@ -25,19 +25,22 @@ public:
 	NotifyIconSrv();
 	virtual ~NotifyIconSrv();
 
-	UINT GetTraySize();
-	bool GetNotificationIconInfo(NotificationIcon *p_icon, PVOID p_return[], ATOM p_info[], UINT p_count);
-	NotificationIcon *LookupIcon(HWND p_hWnd, UINT p_uID);
-	NotificationIcon *LookupIcon(UINT p_index);
-
-	NotifyIconHandler *m_imp;
+	virtual bool Call(ATOM p_function);
+	virtual bool Call(ATOM p_function, const ServiceArg &p_arg1);
+	virtual bool Call(ATOM p_function, const ServiceArg &p_arg1, const ServiceArg &p_arg2);
+	virtual bool Call(ATOM p_function, const ServiceArg &p_arg1,
+					  const ServiceArg &p_arg2, const ServiceArg &p_arg3);
+	virtual bool Call(ATOM p_function, const ServiceArg &p_arg1,
+					  const ServiceArg &p_arg2, const ServiceArg &p_arg3,
+					  const ServiceArg &p_arg4);
 protected:
 	virtual bool _Start();
 	virtual bool _Stop();
 	virtual bool _SetProperty(ATOM p_property, PVOID p_value);
-	virtual bool _Exec(ATOM p_command);
 private:
-	//NotifyIconHandler *m_imp;
+	NotifyIconHandler *m_imp;
+
+	bool GetNotificationIconInfo(NotificationIcon *p_icon, PVOID p_return[], ATOM p_info[], UINT p_count);
 
 	PVOID m_iconFactory;
 	bool m_useProxy;
@@ -48,6 +51,9 @@ private:
 	ATOM m_callbackModProp;
 	ATOM m_callbackDelProp;
 	ATOM m_cleanTrayCommand;
+	ATOM m_getNotificationIconInfoFn;
+	ATOM m_lookupIconFn;
+	ATOM m_GetTraySizeFn;
 
 	static ServiceRegistrar s_serviceRegistration;
 };

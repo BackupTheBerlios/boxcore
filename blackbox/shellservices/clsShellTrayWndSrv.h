@@ -20,6 +20,7 @@ public:
 	ShellTrayWndSrv();
 	virtual ~ShellTrayWndSrv();
 
+	virtual bool Call(ATOM p_command, const ServiceArg &p_arg1, const ServiceArg &p_arg2);
 	void SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom, UINT pEdge);
 protected:
 	virtual bool _Start();

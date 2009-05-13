@@ -46,8 +46,7 @@ bool AppbarSrv::_Start()
 	{
 		PRINT("Starting Appbar Service");
 		m_imp = new AppbarHandler();
-		std::pair<UINT, PVOID> handler(0, m_imp);
-		s_serviceManager->SetServiceProperty("SRV_ShellTrayWnd", "STW_handler", &handler);
+		s_serviceManager->Call("SRV_ShellTrayWnd", "STW_handler", Arg<UINT>(0), Arg<ShellServiceHandler *>(m_imp));
 		return true;
 	}
 	else

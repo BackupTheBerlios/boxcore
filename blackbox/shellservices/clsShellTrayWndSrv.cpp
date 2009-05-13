@@ -10,6 +10,8 @@
 #include "clsServiceManager.h"
 #include "clsServiceRegistrar.h"
 
+#include <typeinfo>
+
 #define SERVICE_NAME "SRV_ShellTrayWnd"
 
 namespace ShellServices
@@ -100,6 +102,20 @@ void ShellTrayWndSrv::SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom
 	{
 		appbarService->SetTaskbarPos(pLeft, pTop, pRight, pBottom, pEdge);
 	}
+}
+
+bool ShellTrayWndSrv::Call(ATOM p_command, const ServiceArg &p_arg1, const ServiceArg &p_arg2)
+{
+	if (p_command == m_handlerProp)
+	{
+		if (typeid(p_arg1) == typeid(Arg<UINT>) && typeid(p_arg2) == typeid(Arg<ShellServiceHandler *>))
+		{
+			m_imp->RegisterHandler(static_cast<const Arg<UINT> &>(p_arg1).m_value,
+								   static_cast<const Arg<ShellServiceHandler *> &>(p_arg2).m_value);
+			return true;
+		}
+	}
+	return false;
 }
 
 REGISTER_SERVICE(ShellTrayWndSrv)

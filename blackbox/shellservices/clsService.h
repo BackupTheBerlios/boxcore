@@ -16,6 +16,8 @@
 #include <list>
 #include <map>
 
+#include "ServiceArgs.h"
+
 namespace ShellServices
 {
 
@@ -38,6 +40,16 @@ public:
 	bool Exec(ATOM p_serviceID, ATOM p_command);
 
 	bool SetProperty(ATOM p_serviceID, ATOM p_property, PVOID p_value);
+
+	virtual bool Call(ATOM p_function);
+	virtual bool Call(ATOM p_function, const ServiceArg &p_arg1);
+	virtual bool Call(ATOM p_function, const ServiceArg &p_arg1,
+					  const ServiceArg &p_arg2);
+	virtual bool Call(ATOM p_function, const ServiceArg &p_arg1,
+					  const ServiceArg &p_arg2, const ServiceArg &p_arg3);
+	virtual bool Call(ATOM p_function, const ServiceArg &p_arg1,
+					  const ServiceArg &p_arg2, const ServiceArg &p_arg3,
+					  const ServiceArg &p_arg4);
 protected:
 	virtual bool _Start() = 0;
 	virtual bool _Stop() = 0;

@@ -11,6 +11,8 @@
 #include <windows.h>
 #include <list>
 
+#include "ServiceArgs.h"
+
 namespace ShellServices
 {
 
@@ -35,9 +37,11 @@ public:
 	void AddService(Service *p_service);
 	bool RemoveService(LPCSTR p_serviceID);
 
-	bool ExecServiceCommand(LPCSTR p_serviceID, LPCSTR p_command);
-
 	bool SetServiceProperty(LPCSTR p_serviceID, LPCSTR p_property, PVOID p_value);
+
+	bool Call(LPCSTR p_serviceID, LPCSTR p_function, const ServiceArg &p_arg1 = ServiceArg(),
+			  const ServiceArg &p_arg2 = ServiceArg(), const ServiceArg &p_arg3 = ServiceArg(),
+			  const ServiceArg &p_arg4 = ServiceArg());
 
 	template<typename T>
 	void CastService(LPCSTR p_serviceID, T&p_destination)
