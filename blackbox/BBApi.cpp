@@ -2654,7 +2654,7 @@ extern "C" API_EXPORT BOOL GetTrayInfo(HWND p_hWnd, UINT p_uID, PVOID *p_trayInf
 	g_ServiceManager.Call("SRV_NotifyIcon", "FN_LookupIcon",
 						  Arg<ShellServices::NotificationIcon *&>(icon),
 						  Arg<HWND>(p_hWnd),
-						  Arg<UINT>(p_numInfo));
+						  Arg<UINT>(p_uID));
 	return g_ServiceManager.Call("SRV_NotifyIcon", "FN_GetNotificationIconInfo",
 								 Arg<ShellServices::NotificationIcon *>(icon),
 								 Arg<PVOID *>(p_trayInfo),
