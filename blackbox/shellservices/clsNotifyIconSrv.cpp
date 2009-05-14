@@ -201,9 +201,6 @@ bool NotifyIconSrv::GetNotificationIconInfo(NotificationIcon *p_icon, PVOID p_re
 	return true;
 }
 
-#undef PRINT
-#define PRINT(x) OutputDebugStringA(x);
-
 bool NotifyIconSrv::Call(ATOM p_function, const ServiceArg &p_arg1)
 {
 	if (p_function == m_GetTraySizeFn)
