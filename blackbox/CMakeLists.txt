@@ -58,6 +58,28 @@ config/shellfolders.rc
 config/stickywindows.ini
 )
 
+set (SHELLSERVICES_SRCS
+shellservices/clsShellServiceWindow.cpp
+shellservices/clsNotifyIconHandler.cpp
+shellservices/clsNotificationIcon.cpp
+shellservices/clsAppbarHandler.cpp
+
+shellservices/hash.cpp
+
+../dynwinapi/clsShlwapi.cpp
+../dynwinapi/clsUser32.cpp
+
+shellservices/clsService.cpp
+shellservices/clsServiceManager.cpp
+shellservices/clsServiceRegistrar.cpp
+shellservices/clsShellTrayWndSrv.cpp
+shellservices/clsAppbarSrv.cpp
+shellservices/clsNotifyIconRectSrv.cpp
+shellservices/clsNotifyIconSrv.cpp
+shellservices/clsStartupSrv.cpp
+shellservices/clsShellServiceObjectsSrv.cpp
+)
+
 set (BLACKBOX_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" PARENT_SCOPE)
 
 set (VERSION_MAJOR 0)
@@ -76,12 +98,12 @@ ${CMAKE_CURRENT_BINARY_DIR}/version.h)
 
 if(MINGW)
   # resource compilation for mingw
+  set (RC_MANIFEST_LINE "APP_MANIFEST RT_MANIFEST blackbox.exe.manifest")
   ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/resource.o
                      COMMAND ${WINDRES} -I${CMAKE_CURRENT_SOURCE_DIR}
                                          -i${CMAKE_CURRENT_BINARY_DIR}/resource.rc
                                          -o ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
   SET(BLACKBOX_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
-  set (RC_MANIFEST_LINE "APP_MANIFEST RT_MANIFEST blackbox.exe.manifest")
 else(MINGW)
   SET(BLACKBOX_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/resource.rc)
 endif(MINGW)
@@ -89,13 +111,13 @@ endif(MINGW)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resource.rc.in
 ${CMAKE_CURRENT_BINARY_DIR}/resource.rc)
 
-add_executable (blackbox WIN32 ${BLACKBOX_CORE_SRCS} ${BLACKBOX_MENU_SRCS} ${BLACKBOX_NEW_SRCS} ${BLACKBOX_RESOURCES} )
+add_executable (blackbox WIN32 ${BLACKBOX_CORE_SRCS} ${BLACKBOX_MENU_SRCS} ${BLACKBOX_NEW_SRCS} ${BLACKBOX_RESOURCES} ${SHELLSERVICES_SRCS} )
 include_directories(blackbox ${CMAKE_CURRENT_BINARY_DIR})
 #add_custom_command (TARGET blackbox POST_BUILD
 #	COMMAND ${DLLTOOL} -d ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def -l ${CMAKE_CURRENT_BINARY_DIR}/libblackbox.a -D blackbox.exe
 #	COMMENT "Building proper library")
 target_link_libraries (blackbox ${UNICOWSLIB}
-	debuglib shellserviceobjects shellservices taskmanager vwm shlwapi version ole32 uuid comctl32 comdlg32 shell32 advapi32 winmm gdi32)
+	debuglib shellserviceobjects taskmanager vwm shlwapi version ole32 uuid comctl32 comdlg32 shell32 advapi32 winmm gdi32)
 set_target_properties (blackbox PROPERTIES
 	IMPORT_SUFFIX .a
 	ENABLE_EXPORTS true
@@ -105,7 +127,7 @@ set_target_properties (blackbox PROPERTIES
 if (MINGW)
 set_target_properties (blackbox PROPERTIES
 	LINK_FLAGS "${BOXCORE_LINK_FLAGS} ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def"
-	COMPILE_FLAGS "${BOXCORE_COMPILE_FLAGS} -Wall -fno-rtti -fno-exceptions -fmessage-length=0"
+	COMPILE_FLAGS "${BOXCORE_COMPILE_FLAGS} -Wall -fno-exceptions -fmessage-length=0"
 )
 endif (MINGW)
 
@@ -129,24 +151,26 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libBlackbox.def.in
 ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def)
 
 add_subdirectory (shellserviceobjects)
-add_subdirectory (shellservices)
+#add_subdirectory (shellservices)
 add_subdirectory (tasks)
 add_subdirectory (vwm)
 
 install(TARGETS blackbox RUNTIME DESTINATION . COMPONENT Blackbox)
-#install (FILES ${CMAKE_CURRENT_BINARY_DIR}/blackbox.exe.manifest DESTINATION . COMPONENT Blackbox)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/${BLACKBOX_CONFIG} DESTINATION . COMPONENT BlackboxConfig)
 
-set (CPACK_COMPONENTS_ALL Blackbox BlackboxConfig PARENT_SCOPE)
-set (CPACK_COMPONENT_BLACKBOX_DISPLAY_NAME "Blackbox" PARENT_SCOPE)
-set (CPACK_COMPONENT_BLACKBOX_DESCRIPTION
-	"The main blockbox executable" PARENT_SCOPE)
-set (CPACK_COMPONENT_BLACKBOX_REQUIRED True PARENT_SCOPE)
-set (CPACK_COMPONENT_BLACKBOXCONFIG_DISPLAY_NAME "Blackbox default configuration" PARENT_SCOPE)
-set (CPACK_COMPONENT_BLACKBOXCONFIG_DESCRIPTION
-	"The config files for blackbox core" PARENT_SCOPE)
+#set (CPACK_COMPONENTS_ALL Blackbox BlackboxConfig PARENT_SCOPE)
+cpack_add_component(Blackbox
+                    DISPLAY_NAME "Blackbox"
+                    DESCRIPTION "The main blockbox executable"
+                    REQUIRED
+                    GROUP Core
+                    INSTALL_TYPES Standard Full StandardUpdate FullUpdate
+                   ) 
 
-set (CPACK_COMPONENT_BLACKBOX_GROUP "Core" PARENT_SCOPE)
-set (CPACK_COMPONENT_BLACKBOX_INSTALL_TYPES Full Upgrade PARENT_SCOPE)
-set (CPACK_COMPONENT_BLACKBOXCONFIG_GROUP "Core" PARENT_SCOPE)
-set (CPACK_COMPONENT_BLACKBOXCONFIG_INSTALL_TYPES Full PARENT_SCOPE)
+cpack_add_component(BlackboxConfig
+                    DISPLAY_NAME "Blackbox default configuration"
+                    DESCRIPTION "The config files for blackbox core"
+                    GROUP "Core"
+                    DEPENDS Blackbox
+                    INSTALL_TYPES Standard Full
+                   )
