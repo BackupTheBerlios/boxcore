@@ -9,17 +9,20 @@
 #define CLSAPPBARSRV_H_
 
 #include "clsService.h"
+#include "clsShellServiceHandler.h"
 
 namespace ShellServices
 {
 
 class AppbarHandler;
 
-class AppbarSrv: public ShellServices::Service
+class AppbarSrv: public ShellServices::Service, ShellServiceHandler
 {
 public:
 	AppbarSrv();
 	virtual ~AppbarSrv();
+
+	virtual HRESULT ProcessMessage(DWORD p_cbData, PVOID p_lpData);
 
 	virtual bool Call(ATOM p_function, const ServiceArg &p_arg1,
 						  const ServiceArg &p_arg2);
@@ -27,7 +30,8 @@ protected:
 	virtual bool _Start();
 	virtual bool _Stop();
 private:
-	AppbarHandler *m_imp;
+	RECT m_taskbarRect;
+	UINT m_taskbarEdge;
 
 	ATOM m_SetTaskbarPosFn;
 
