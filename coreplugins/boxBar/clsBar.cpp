@@ -17,6 +17,16 @@
 
 #include "../utils/monitor.h"
 
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif
+#include <GdiPlus.h>
+#undef min
+#undef max
+
 namespace boxBar
 {
 
@@ -836,6 +846,9 @@ INT Bar::BeginPlugin()
 	s_settingsManager.ReadSettings();
 	readSettings();
 
+	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+	Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
+
 	margin = 0;
 
 	WNDCLASSEX wc;
@@ -922,6 +935,7 @@ void Bar::EndPlugin()
 	for (itemList_t::iterator i = itemList.begin(); i != itemList.end(); ++i)
 		delete (*i);
 	itemList.clear();
+	Gdiplus::GdiplusShutdown(m_gdiplusToken);
 	bbApiLoader.freeLibrary();
 	if (eraseBrush)
 		DeleteObject(eraseBrush);

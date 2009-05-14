@@ -77,6 +77,8 @@ private:
 
 	INT BeginPlugin();
 	void EndPlugin();
+
+	ULONG_PTR m_gdiplusToken;
 };
 
 }
