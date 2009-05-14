@@ -42,13 +42,6 @@ public:
 	bool Call(LPCSTR p_serviceID, LPCSTR p_function, const ServiceArg &p_arg1 = ServiceArg(),
 			  const ServiceArg &p_arg2 = ServiceArg(), const ServiceArg &p_arg3 = ServiceArg(),
 			  const ServiceArg &p_arg4 = ServiceArg());
-
-	template<typename T>
-	void CastService(LPCSTR p_serviceID, T&p_destination)
-	{
-		Service *service = GetService(p_serviceID);
-		p_destination = static_cast<T>(service);
-	}
 private:
 	t_serviceList m_serviceList;
 
