@@ -29,7 +29,6 @@
   */
 
 #include "clsShellServiceWindow.h"
-#include "clsAppbarHandler.h"
 #include "../../debug/debug.h"
 #include <stdlib.h>
 

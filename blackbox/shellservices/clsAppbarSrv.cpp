@@ -8,7 +8,6 @@
 #include "clsAppbarSrv.h"
 #include "clsServiceManager.h"
 #include "clsServiceRegistrar.h"
-#include "clsAppbarHandler.h"
 
 #include "../../debug/debug.h"
 #include "../../dynwinapi/clsShlwapi.h"
