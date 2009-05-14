@@ -62,7 +62,6 @@ set (SHELLSERVICES_SRCS
 shellservices/clsShellServiceWindow.cpp
 shellservices/clsNotifyIconHandler.cpp
 shellservices/clsNotificationIcon.cpp
-shellservices/clsAppbarHandler.cpp
 
 shellservices/hash.cpp
 
