@@ -99,7 +99,6 @@ RECT OldDT;
 bool bbactive = true;
 BOOL save_opaquemove;
 
-//#include "shellservices/clsShellServiceWindow.h"
 #include "shellservices/clsNotifyIconHandler.h"
 #include "tasks/clsTaskManager.h"
 #include "vwm/clsBBVWM.h"
@@ -1555,9 +1554,9 @@ void exec_boxcore_broam(const char *broam)
 			break;
 		}
 
-		ShellServices::ShellTrayWndSrv *service = NULL;
-		g_ServiceManager.CastService("SRV_ShellTrayWnd", service);
-		service->SetTaskbarPos(left,top,right,bottom,edge);
+		RECT rect = {left, top, right, bottom};
+		using ShellServices::Arg;
+		g_ServiceManager.Call("SRV_Appbar", "FN_SetTaskbarPos", Arg<RECT &>(rect), Arg<UINT>(edge));
 	}
 }
 
