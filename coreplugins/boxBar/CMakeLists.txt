@@ -80,6 +80,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/CPackConfig.cmake.in ${CMAKE_CURRENT
 add_library(boxBar MODULE ${BOXBAR_SRCS})
 PluginOption(boxBar ON)
 
+add_definitions(-DNOMINMAX)
 include_directories(boxBar ${CMAKE_CURRENT_BINARY_DIR} ${BLACKBOX_INCLUDE_DIR})
 target_link_libraries(boxBar ${UNICOWSLIB} ${BOXCORE_LIBRARY_DEBUG} blackbox comctl32 gdi32 ole32 uuid gdiplus)
 set_target_properties (boxBar PROPERTIES
