@@ -1,6 +1,7 @@
 if (NOT BOXCORE_OPTIONS_INCLUDED)
 set (BOXCORE_OPTIONS_INCLUDED 1)
 message (STATUS "Processing boxCore options")
+
 option(BOXCORE_ENABLE_UNICOWS "Should we link against unicows.dll?" OFF)
 option(BOXCORE_UNICODE "Compile unicode versions of the core and plugins" ON)
 option(BOXCORE_UPDATE_PACKAGE "Should we move configs to a sample folder" OFF)
@@ -49,7 +50,11 @@ endfunction (AllowUnicode)
 endif (BOXCORE_UNICODE)
 
 function(PluginOption pluginName state)
-    option(PLUGIN_${pluginName} "Enable building the ${pluginName} plugin" ${state})
+    if (${BOXCORE_FULL_TREE})
+        option(PLUGIN_${pluginName} "Enable building the ${pluginName} plugin" ${state})
+    else (${BOXCORE_FULL_TREE})
+        option(PLUGIN_${pluginName} "Enable building the ${pluginName} plugin" ON)
+    endif (${BOXCORE_FULL_TREE})
 
     if (PLUGIN_${pluginName})
         set_target_properties(${pluginName} PROPERTIES EXCLUDE_FROM_ALL false)
@@ -58,37 +63,43 @@ function(PluginOption pluginName state)
     endif (PLUGIN_${pluginName})
 endfunction(PluginOption pluginName state)
 
-macro(InstallPlugin pluginName)
+function(InstallPlugin pluginName)
     if (PLUGIN_${pluginName})
-        string(TOUPPER ${pluginName} PLUGINNAME)
         install(TARGETS ${pluginName} DESTINATION plugins/${pluginName} COMPONENT ${pluginName})
         install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/config/ DESTINATION plugins/${pluginName}/sampleconfig COMPONENT ${pluginName}SampleConfig)
         install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/config/ DESTINATION plugins/${pluginName} COMPONENT ${pluginName}Config)
         
-        set (CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_CURRENT_BINARY_DIR};${PROJECT_NAME};ALL;/" PARENT_SCOPE)
-        set (CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} ${pluginName} ${pluginName}Config ${pluginName}SampleConfig PARENT_SCOPE)
-        set (CPACK_COMPONENT_${PLUGINNAME}_DEPENDS ${pluginName}SampleConfig PARENT_SCOPE)
-        set (CPACK_COMPONENT_${PLUGINNAME}SAMPLECONFIG_HIDDEN True PARENT_SCOPE)
-        set (CPACK_COMPONENT_${PLUGINNAME}CONFIG_DEPENDS ${pluginName} PARENT_SCOPE)
-        set (CPACK_COMPONENT_${PLUGINNAME}_DISPLAY_NAME ${pluginName} PARENT_SCOPE)
-        set (CPACK_COMPONENT_${PLUGINNAME}_DESCRIPTION
-	        ${${pluginName}_DESCRIPTION} PARENT_SCOPE)
-	    set (CPACK_COMPONENT_${PLUGINNAME}CONFIG_DISPLAY_NAME "${pluginName} config" PARENT_SCOPE)
-	    set (CPACK_COMPONENT_${PLUGINNAME}CONFIG_DESCRIPTION
-	        "The default configuration files for the ${pluginName} plugin" PARENT_SCOPE)
         if (${STANDARD_PLUGIN})
-            set (CPACK_COMPONENT_${PLUGINNAME}_INSTALL_TYPES Standard Full StandardUpdate FullUpdate PARENT_SCOPE)
-            set (CPACK_COMPONENT_${PLUGINNAME}CONFIG_INSTALL_TYPES Standard Full PARENT_SCOPE)
-            set (CPACK_COMPONENT_${PLUGINNAME}_GROUP "CorePlugins" PARENT_SCOPE)
-            set (CPACK_COMPONENT_${PLUGINNAME}CONFIG_GROUP "CorePlugins" PARENT_SCOPE)
+            set (NORMAL_TYPES Standard Full)
+            set (UPDATE_TYPES StandardUpdate FullUpdate) 
+            set (GROUP "CorePlugins")
         else (${STANDARD_PLUGIN})
-            set (CPACK_COMPONENT_${PLUGINNAME}_INSTALL_TYPES Full FullUpdate PARENT_SCOPE)
-            set (CPACK_COMPONENT_${PLUGINNAME}CONFIG_INSTALL_TYPES Full PARENT_SCOPE)
-            set (CPACK_COMPONENT_${PLUGINNAME}_GROUP "Plugins" PARENT_SCOPE)
-            set (CPACK_COMPONENT_${PLUGINNAME}CONFIG_GROUP "Plugins" PARENT_SCOPE)
+            set (NORMAL_TYPES Full)
+            set (UPDATE_TYPES FullUpdate)
+            set (GROUP "Plugins")
         endif (${STANDARD_PLUGIN})
+        
+        cpack_add_component(${pluginName} 
+                            DISPLAY_NAME ${pluginName} 
+                            DESCRIPTION ${${pluginName}_DESCRIPTION}
+                            GROUP ${GROUP}
+                            DEPENDS ${pluginName}SampleConfig
+                            INSTALL_TYPES ${NORMAL_TYPES} ${UPDATE_TYPES} 
+                           ) 
+                           
+        cpack_add_component(${pluginName}SampleConfig
+                            HIDDEN
+                           )
+                           
+        cpack_add_component(${pluginName}Config
+                            DISPLAY_NAME "${pluginName} config"
+                            DESCRIPTION "The default configuration files for the ${pluginName} plugin"
+                            GROUP ${GROUP}
+                            DEPENDS ${pluginName}
+                            INSTALL_TYPES ${NORMAL_TYPES}
+                           )
     endif (PLUGIN_${pluginName})
-endmacro(InstallPlugin pluginName)
+endfunction(InstallPlugin pluginName)
 
 function(InstallPluginHelper pluginName helper)
     if (PLUGIN_${pluginName})

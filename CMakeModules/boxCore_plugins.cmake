@@ -1,3 +1,5 @@
+include (CPack)
+
 find_path(BLACKBOX_INCLUDE_DIR "BBApi.h" PATHS "." "../../blackbox" DOC "Location of BBApi.h")
 message (STATUS "Found BBApi.h in ${BLACKBOX_INCLUDE_DIR}")
 
