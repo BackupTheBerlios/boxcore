@@ -21,7 +21,8 @@ ShellTrayWndSrv::ShellTrayWndSrv():
 		Service(SERVICE_NAME),
 		m_imp(NULL),
 		m_hInstance(NULL),
-		m_topMost(false)
+		m_topMost(false),
+		m_SetTaskbarPosFn(RegisterAtom("FN_SetTaskbarPos"))
 {
 	m_hInstanceProp = RegisterAtom("STW_hInstance");
 	m_topMostProp = RegisterAtom("STW_topMost");
@@ -90,31 +91,32 @@ bool ShellTrayWndSrv::_Stop()
 	}
 }
 
-void ShellTrayWndSrv::SetTaskbarPos(int pLeft, int pTop, int pRight, int pBottom, UINT pEdge)
+bool ShellTrayWndSrv::Call(ATOM p_function, const ServiceArg &p_arg1, const ServiceArg &p_arg2)
 {
-	if (m_imp)
+	if (p_function == m_handlerProp)
 	{
-		m_imp->SetTaskbarPos(pLeft, pTop, pRight, pBottom, pEdge);
-	}
-	AppbarSrv *appbarService;
-	s_serviceManager->CastService("SRV_Appbar", appbarService);
-	if (appbarService)
-	{
-		appbarService->SetTaskbarPos(pLeft, pTop, pRight, pBottom, pEdge);
-	}
-}
-
-bool ShellTrayWndSrv::Call(ATOM p_command, const ServiceArg &p_arg1, const ServiceArg &p_arg2)
-{
-	if (p_command == m_handlerProp)
-	{
-		if (typeid(p_arg1) == typeid(Arg<UINT>) && typeid(p_arg2) == typeid(Arg<ShellServiceHandler *>))
+		typedef Arg<UINT> type1;
+		typedef Arg<ShellServiceHandler *> type2;
+		if (CHECK_ARG(1) && CHECK_ARG(2))
 		{
-			m_imp->RegisterHandler(static_cast<const Arg<UINT> &>(p_arg1).m_value,
-								   static_cast<const Arg<ShellServiceHandler *> &>(p_arg2).m_value);
+			m_imp->RegisterHandler(MAKE_ARG(1), MAKE_ARG(2));
 			return true;
 		}
+		PRINT("Argument check failed in " SERVICE_NAME " for 2 args");
 	}
+	else if (p_function == m_SetTaskbarPosFn)
+	{
+		typedef Arg<RECT &> type1;
+		typedef Arg<UINT> type2;
+		if (CHECK_ARG(1) && CHECK_ARG(2))
+		{
+			RECT &arg1 = MAKE_ARG(1);
+			m_imp->SetTaskbarPos(arg1.left, arg1.top, arg1.right, arg1.bottom, MAKE_ARG(2));
+			return true;
+		}
+		PRINT("Argument check failed in " SERVICE_NAME " for 2 args");
+	}
+	PRINT("2 Arg call not found in " SERVICE_NAME);
 	return false;
 }
 

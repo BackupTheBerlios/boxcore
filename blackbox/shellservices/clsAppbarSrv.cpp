@@ -13,6 +13,7 @@
 #include "../../debug/debug.h"
 
 #include <utility>
+#include <typeinfo>
 
 #define SERVICE_NAME "SRV_Appbar"
 
@@ -21,23 +22,14 @@ namespace ShellServices
 
 AppbarSrv::AppbarSrv():
 		Service(SERVICE_NAME),
-		m_imp(NULL)
+		m_imp(NULL),
+		m_SetTaskbarPosFn(RegisterAtom("FN_SetTaskbarPos"))
 {
-	// TODO Auto-generated constructor stub
-
 }
 
 AppbarSrv::~AppbarSrv()
 {
 	// TODO Auto-generated destructor stub
-}
-
-void AppbarSrv::SetTaskbarPos(int p_left, int p_top, int p_right, int p_bottom, UINT p_edge)
-{
-	if (m_imp)
-	{
-		m_imp->SetTaskbarPos(p_left, p_top, p_right, p_bottom, p_edge);
-	}
 }
 
 bool AppbarSrv::_Start()
@@ -68,6 +60,26 @@ bool AppbarSrv::_Stop()
 	{
 		return false;
 	}
+}
+
+bool AppbarSrv::Call(ATOM p_function, const ServiceArg &p_arg1,
+					  const ServiceArg &p_arg2)
+{
+	if (p_function == m_SetTaskbarPosFn)
+	{
+		typedef Arg<RECT &> type1;
+		typedef Arg<UINT> type2;
+		if (CHECK_ARG(1) && CHECK_ARG(2))
+		{
+			RECT &arg1 = MAKE_ARG(1);
+			m_imp->SetTaskbarPos(arg1.left, arg1.top, arg1.right, arg1.bottom, MAKE_ARG(2));
+			s_serviceManager->Call("SRV_ShellTrayWnd", "FN_SetTaskbarPos", p_arg1, p_arg2);
+			return true;
+		}
+		PRINT("Argument check failed in " SERVICE_NAME " for 2 args");
+	}
+	PRINT("2 Arg call not found in " SERVICE_NAME);
+	return false;
 }
 
 REGISTER_SERVICE(AppbarSrv)

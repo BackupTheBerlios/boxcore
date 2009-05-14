@@ -21,12 +21,15 @@ public:
 	AppbarSrv();
 	virtual ~AppbarSrv();
 
-	void SetTaskbarPos(int p_left, int p_top, int p_right, int p_bottom, UINT p_edge);
+	virtual bool Call(ATOM p_function, const ServiceArg &p_arg1,
+						  const ServiceArg &p_arg2);
 protected:
 	virtual bool _Start();
 	virtual bool _Stop();
 private:
 	AppbarHandler *m_imp;
+
+	ATOM m_SetTaskbarPosFn;
 
 	static ServiceRegistrar s_serviceRegistration;
 };
