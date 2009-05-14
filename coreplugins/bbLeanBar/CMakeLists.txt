@@ -15,8 +15,8 @@ set_target_properties (bbLeanBar PROPERTIES PREFIX "")
 
 if (MINGW)
 set_target_properties (bbLeanBar PROPERTIES
-	LINK_FLAGS "-mwindows -s"
-	COMPILE_FLAGS "-Wall -Os -fno-rtti -fno-exceptions -fomit-frame-pointer"
+	LINK_FLAGS "${BOXCORE_LINK_FLAGS}"
+	COMPILE_FLAGS "${BOXCORE_COMPILE_FLAGS} -fno-rtti"
 )
 endif (MINGW)
 
