@@ -59,13 +59,11 @@ void Collection::draw(HDC pContext)
 {
 	if (style)
 	{
-		HDC internalDC;
-		HBITMAP internalBitmap, origBitmap;
 		if (alphaDraw)
 		{
-			internalDC = CreateCompatibleDC(pContext);
-			internalBitmap = CreateDIBSection(internalDC, &itemBitmapInfo, DIB_RGB_COLORS, NULL, NULL, 0);
-			origBitmap = (HBITMAP) SelectObject(internalDC, internalBitmap);
+			HDC internalDC = CreateCompatibleDC(pContext);
+			HBITMAP internalBitmap = CreateDIBSection(internalDC, &itemBitmapInfo, DIB_RGB_COLORS, NULL, NULL, 0);
+			HBITMAP origBitmap = (HBITMAP) SelectObject(internalDC, internalBitmap);
 			RECT tempArea = itemArea;
 			OffsetRect(&tempArea, -itemArea.left, -itemArea.top);
 			BitBlt(internalDC, tempArea.left, tempArea.top, tempArea.right, tempArea.bottom,
