@@ -1,40 +1,47 @@
 #include "clsIcon.h"
 
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif
+#include <GdiPlus.h>
+#undef min
+#undef max
+
 namespace boxBar
 {
 
 Icon::Icon(HICON p_icon, UINT p_iconSize):
 		Item("GenericIcon"),
 		m_icon(CopyIcon(p_icon)),
-		m_iconSize(p_iconSize)
+		m_iconSize(p_iconSize),
+		m_bufferValid(false)
 {
 	m_knowsSize = DIM_BOTH;
 	m_wantsStretch = DIM_NONE;
 
-	if (alphaDraw)
-	{
-		BITMAPINFO bufferInfo;
-		ZeroMemory(&bufferInfo, sizeof(bufferInfo));
-		bufferInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-		bufferInfo.bmiHeader.biWidth = m_iconSize;
-		bufferInfo.bmiHeader.biHeight = m_iconSize;
-		bufferInfo.bmiHeader.biPlanes = 1;
-		bufferInfo.bmiHeader.biBitCount = 32;
+	BITMAPINFO bufferInfo;
+	ZeroMemory(&bufferInfo, sizeof(bufferInfo));
+	bufferInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bufferInfo.bmiHeader.biWidth = m_iconSize;
+	bufferInfo.bmiHeader.biHeight = m_iconSize;
+	bufferInfo.bmiHeader.biPlanes = 1;
+	bufferInfo.bmiHeader.biBitCount = 32;
 
-		HDC tempDC = CreateCompatibleDC(NULL);
-		m_alphaBitmap = CreateDIBSection(tempDC, &bufferInfo, DIB_RGB_COLORS, (void **) &m_alphaBits, NULL, 0);
-		m_bufferBitmap = CreateDIBSection(tempDC, &bufferInfo, DIB_RGB_COLORS, (void **) &m_bufferBits, NULL, 0);
-		DeleteDC(tempDC);
-	}
+	HDC tempDC = CreateCompatibleDC(NULL);
+	m_alphaBitmap = CreateDIBSection(tempDC, &bufferInfo, DIB_RGB_COLORS, (void **) &m_alphaBits, NULL, 0);
+	m_bufferBitmap = CreateDIBSection(tempDC, &bufferInfo, DIB_RGB_COLORS, (void **) &m_bufferBits, NULL, 0);
+	m_bitmap = NULL;
+	DeleteDC(tempDC);
 }
 
 Icon::~Icon()
 {
-	if (alphaDraw)
-	{
-		DeleteObject(m_alphaBitmap);
-		DeleteObject(m_bufferBitmap);
-	}
+	delete m_bitmap;
+	DeleteObject(m_alphaBitmap);
+	DeleteObject(m_bufferBitmap);
 	if (m_icon)
 	{
 		DestroyIcon(m_icon);
@@ -60,10 +67,12 @@ void Icon::draw(HDC p_context)
 {
 	if (m_icon)
 	{
-		if (alphaDraw)
+		if (!m_bufferValid)
 		{
 			ZeroMemory(m_bufferBits, m_iconSize*m_iconSize*4);
 			ZeroMemory(m_alphaBits, m_iconSize*m_iconSize*4);
+			delete m_bitmap;
+			m_bitmap = NULL;
 			HDC internalDC = CreateCompatibleDC(p_context);
 			HBITMAP oldBitmap = (HBITMAP) SelectObject(internalDC, m_alphaBitmap);
 			DrawIconEx(internalDC, 0, 0, m_icon, m_iconSize, m_iconSize, NULL, NULL, DI_MASK);
@@ -76,20 +85,14 @@ void Icon::draw(HDC p_context)
 					*pixels = 255 - *mask;
 				}
 			}
-			BLENDFUNCTION blendFunc;
-			blendFunc.BlendOp = AC_SRC_OVER;
-			blendFunc.BlendFlags = 0;
-			blendFunc.SourceConstantAlpha = itemAlpha;
-			blendFunc.AlphaFormat = AC_SRC_ALPHA;
-			msimg32.AlphaBlend(p_context, itemArea.left, itemArea.top, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top, internalDC,
-							   0, 0, itemArea.right - itemArea.left, itemArea.bottom - itemArea.top, blendFunc);
 			SelectObject(internalDC, oldBitmap);
 			DeleteDC(internalDC);
+			m_bitmap = new Gdiplus::Bitmap(m_iconSize, m_iconSize, m_iconSize * 4, PixelFormat32bppPARGB, m_bufferBits);
+			m_bitmap->RotateFlip(Gdiplus::RotateNoneFlipY);
+			m_bufferValid = true;
 		}
-		else
-		{
-			DrawIconEx(p_context, itemArea.left, itemArea.top, m_icon, m_iconSize, m_iconSize, NULL, NULL, DI_NORMAL);
-		}
+		Gdiplus::Graphics canvas(p_context);
+		canvas.DrawImage(m_bitmap, itemArea.left, itemArea.top, m_iconSize, m_iconSize);
 	}
 }
 
@@ -105,6 +108,7 @@ void Icon::draw(HDC p_context)
  */
 bool Icon::SetIcon(HICON p_icon)
 {
+	m_bufferValid = false;
 	if (m_icon)
 	{
 		DestroyIcon(m_icon);

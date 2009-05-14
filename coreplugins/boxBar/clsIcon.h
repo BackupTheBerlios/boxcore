@@ -3,6 +3,11 @@
 
 #include "clsItem.h"
 
+namespace Gdiplus
+{
+class Bitmap;
+}
+
 namespace boxBar
 {
 
@@ -18,12 +23,15 @@ public:
 	virtual void calculateSizes(bool pSizeGiven = false);
 private:
 	HICON m_icon;
-	UINT m_iconSize;
+	INT m_iconSize;
 
 	HBITMAP m_alphaBitmap;
 	HBITMAP m_bufferBitmap;
 	BYTE *m_alphaBits;
 	BYTE *m_bufferBits;
+	Gdiplus::Bitmap *m_bitmap;
+
+	bool m_bufferValid;
 };
 
 }
