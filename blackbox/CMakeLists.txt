@@ -116,7 +116,7 @@ include_directories(blackbox ${CMAKE_CURRENT_BINARY_DIR})
 #	COMMAND ${DLLTOOL} -d ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def -l ${CMAKE_CURRENT_BINARY_DIR}/libblackbox.a -D blackbox.exe
 #	COMMENT "Building proper library")
 target_link_libraries (blackbox ${UNICOWSLIB}
-	debuglib shellserviceobjects taskmanager vwm shlwapi version ole32 uuid comctl32 comdlg32 shell32 advapi32 winmm gdi32)
+	debuglib taskmanager vwm shlwapi version ole32 uuid comctl32 comdlg32 shell32 advapi32 winmm gdi32)
 set_target_properties (blackbox PROPERTIES
 	IMPORT_SUFFIX .a
 	ENABLE_EXPORTS true
@@ -149,13 +149,11 @@ endif (MINGW)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libBlackbox.def.in
 ${CMAKE_CURRENT_BINARY_DIR}/libBlackbox.def)
 
-add_subdirectory (shellserviceobjects)
-#add_subdirectory (shellservices)
 add_subdirectory (tasks)
 add_subdirectory (vwm)
 
 install(TARGETS blackbox RUNTIME DESTINATION . COMPONENT Blackbox)
-install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/${BLACKBOX_CONFIG} DESTINATION . COMPONENT BlackboxConfig)
+install (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/config/ DESTINATION . COMPONENT BlackboxConfig)
 
 #set (CPACK_COMPONENTS_ALL Blackbox BlackboxConfig PARENT_SCOPE)
 cpack_add_component(Blackbox

@@ -127,7 +127,7 @@ bool NotifyIconSrv::_Start()
 	{
 		PRINT("Starting NotifyIcon service");
 		m_imp = new NotifyIconHandler(reinterpret_cast<LegacyNotficationIconFactory>(m_iconFactory), m_useProxy);
-		s_serviceManager->Call("SRV_ShellTrayWnd", "STW_handler", Arg<UINT>(1), Arg<ShellServiceHandler *>(m_imp));
+		s_serviceManager->Call("SRV_ShellTrayWnd", "FN_SetHandler", Arg<UINT>(1), Arg<ShellServiceHandler *>(m_imp));
 		InitTrayMapping();
 		return true;
 	}

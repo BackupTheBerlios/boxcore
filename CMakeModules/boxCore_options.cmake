@@ -73,10 +73,12 @@ function(InstallPlugin pluginName)
             set (NORMAL_TYPES Standard Full)
             set (UPDATE_TYPES StandardUpdate FullUpdate) 
             set (GROUP "CorePlugins")
+            set (EXTRA "")
         else (${STANDARD_PLUGIN})
             set (NORMAL_TYPES Full)
             set (UPDATE_TYPES FullUpdate)
             set (GROUP "Plugins")
+            set (EXTRA DOWNLOADED ARCHIVE_FILE ${pluginName}-${VERSION}-${PACKAGE_ARCH}.zip)
         endif (${STANDARD_PLUGIN})
         
         cpack_add_component(${pluginName} 
@@ -84,7 +86,8 @@ function(InstallPlugin pluginName)
                             DESCRIPTION ${${pluginName}_DESCRIPTION}
                             GROUP ${GROUP}
                             DEPENDS ${pluginName}SampleConfig
-                            INSTALL_TYPES ${NORMAL_TYPES} ${UPDATE_TYPES} 
+                            INSTALL_TYPES ${NORMAL_TYPES} ${UPDATE_TYPES}
+                            ${EXTRA} 
                            ) 
                            
         cpack_add_component(${pluginName}SampleConfig

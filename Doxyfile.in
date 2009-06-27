@@ -581,7 +581,7 @@ RECURSIVE = yes
 # excluded from the INPUT source files. This way you can easily exclude a
 # subdirectory from a directory tree whose root is specified with the INPUT tag.
 
-EXCLUDE = 
+EXCLUDE = @CMAKE_CURRENT_SOURCE_DIR@/blackbox
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or
 # directories that are symbolic links (a Unix filesystem feature) are excluded
@@ -774,7 +774,7 @@ HTML_FOOTER = "@CMAKE_CURRENT_SOURCE_DIR@/footer.html"
 # the style sheet file to the HTML output directory, so don't put your own
 # stylesheet in the HTML output directory as well, or it will be erased!
 
-HTML_STYLESHEET = "@CMAKE_CURRENT_SOURCE_DIR@/stylesheet.css"
+#HTML_STYLESHEET = "@CMAKE_CURRENT_SOURCE_DIR@/stylesheet.css"
 
 # If the HTML_ALIGN_MEMBERS tag is set to YES, the members of classes,
 # files or namespaces will be aligned in HTML using tables. If set to
@@ -835,7 +835,7 @@ CHM_FILE = boxcore.chm
 # the HTML help compiler (hhc.exe). If non-empty doxygen will try to run
 # the HTML help compiler on the generated index.hhp.
 
-HHC_LOCATION = @DOXYGEN_HHC@
+HHC_LOCATION = @DOXYGEN_HHC_EXECUTABLE@
 
 # If the GENERATE_HTMLHELP tag is set to YES, the GENERATE_CHI flag
 # controls if a separate .chi index file is generated (YES) or that

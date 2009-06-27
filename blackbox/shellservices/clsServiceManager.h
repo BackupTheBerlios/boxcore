@@ -37,7 +37,7 @@ public:
 	void AddService(Service *p_service);
 	bool RemoveService(LPCSTR p_serviceID);
 
-	bool SetServiceProperty(LPCSTR p_serviceID, LPCSTR p_property, PVOID p_value);
+	bool SetServiceProperty(LPCSTR p_serviceID, LPCSTR p_property, const ServiceArg &p_value);
 
 	bool Call(LPCSTR p_serviceID, LPCSTR p_function, const ServiceArg &p_arg1 = ServiceArg(),
 			  const ServiceArg &p_arg2 = ServiceArg(), const ServiceArg &p_arg3 = ServiceArg(),

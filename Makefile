@@ -1,5 +1,6 @@
 all:
 	$(MAKE) -s -C build32
+	$(MAKE) -s -C build32_ansi
 	$(MAKE) -s -C build64
 
 cmake:
@@ -29,3 +30,8 @@ package_source:
 clean:
 	$(MAKE) clean -s -C build32
 	$(MAKE) clean -s -C build64
+
+cleanbuild:
+	rm -R build*
+	./setup_cross.sh
+

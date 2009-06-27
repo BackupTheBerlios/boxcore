@@ -115,7 +115,7 @@ bool AppbarSrv::_Start()
 	if (!m_running)
 	{
 		PRINT("Starting Appbar Service");
-		s_serviceManager->Call("SRV_ShellTrayWnd", "STW_handler", Arg<UINT>(0), Arg<ShellServiceHandler *>(this));
+		s_serviceManager->Call("SRV_ShellTrayWnd", "FN_SetHandler", Arg<UINT>(0), Arg<ShellServiceHandler *>(this));
 		m_running = true;
 	}
 	return m_running;
@@ -126,14 +126,14 @@ bool AppbarSrv::_Stop()
 	if (m_running)
 	{
 		PRINT("Stopping Appbar Service");
-		s_serviceManager->Call("SRV_ShellTrayWnd", "STW_handler", Arg<UINT>(0), Arg<ShellServiceHandler *>(NULL));
+		s_serviceManager->Call("SRV_ShellTrayWnd", "FN_SetHandler", Arg<UINT>(0), Arg<ShellServiceHandler *>(NULL));
 		m_running = false;
 	}
 	return !m_running;
 }
 
 bool AppbarSrv::Call(ATOM p_function, const ServiceArg &p_arg1,
-					  const ServiceArg &p_arg2)
+					 const ServiceArg &p_arg2)
 {
 	if (p_function == m_SetTaskbarPosFn)
 	{

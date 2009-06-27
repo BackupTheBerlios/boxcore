@@ -509,9 +509,9 @@ void agenttype_systemmonitor_updatevalue(int monitor_type)
 				long double current_system_time = (long double) SysTimeInfo.liKeSystemTime.QuadPart;//(long double) SysPerfInfo[0].KernelTime.QuadPart + (long double) SysPerfInfo[0].UserTime.QuadPart;
 				long double current_idle_time = 0;
 				for (int i = 0; i < agenttype_systemmonitor_number_processors; ++i)
-					{
+				{
 					current_idle_time += (long double) SysPerfInfo[i].IdleTime.QuadPart;
-					}
+				}
 				current_idle_time /= agenttype_systemmonitor_number_processors;
 
 				//If this is the first time

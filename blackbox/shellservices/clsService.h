@@ -58,6 +58,8 @@ protected:
 
 	ATOM RegisterAtom(LPCSTR p_identifier);
 
+	ATOM m_SetPropertyFn;
+
 	bool m_running;
 	static ServiceManager *s_serviceManager;
 	static clsSystemInfo s_systemInfo;

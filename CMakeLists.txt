@@ -18,28 +18,28 @@ include(boxCore_options)
 find_package(Doxygen)
 
 if (DOXYGEN_EXECUTABLE)
-set (DOXYGEN_HHC_EXECUTABLE "hhc" CACHE FILEPATH "Path to the hhc program")
-if (DOXYGEN_DOT_EXECUTABLE)
-set (USE_DOT "YES")
-else (DOXYGEN_DOT_EXECUTABLE)
-set (USE_DOT "NO")
-endif (DOXYGEN_DOT_EXECUTABLE)
+    if (DOXYGEN_DOT_EXECUTABLE)
+        set (USE_DOT "YES")
+    else (DOXYGEN_DOT_EXECUTABLE)
+        set (USE_DOT "NO")
+    endif (DOXYGEN_DOT_EXECUTABLE)
 
-option (INTERNALDOCS "Generate internal project documentation?" OFF)
-option (DOCS_CHM "Generate a .chm file?" OFF)
+    option (BOXCORE_DOCS_CHM "Generate a .chm file?" OFF)
+    if (BOXCORE_DOCS_CHM)
+        set (DOXYGEN_HHC_EXECUTABLE "hhc" CACHE FILEPATH "Path to the hhc program")
+    else (BOXCORE_DOCS_CHM)
+        set (DOXYGEN_HHC_EXECUTABLE "")
+    endif (BOXCORE_DOCS_CHM)
+    
+    option (INTERNALDOCS "Generate internal project documentation?" OFF)
+    if (INTERNALDOCS)
+        set (INTERNAL_DOCS "YES")
+    else (INTERNALDOCS)
+        set (INTERNAL_DOCS "NO")
+    endif (INTERNALDOCS)
 
-if (DOCS_CHM)
-set (DOXYGEN_HHC ${DOXYGEN_HHC_EXECUTABLE})
-endif (DOCS_CHM)
-
-if (INTERNALDOCS)
-set (INTERNAL_DOCS "YES")
-else (INTERNALDOCS)
-set (INTERNAL_DOCS "NO")
-endif (INTERNALDOCS)
-
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY IMMEDIATE)
-add_custom_target(doc ${DOXYGEN_EXECUTABLE})
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY IMMEDIATE)
+    add_custom_target(doc ${DOXYGEN_EXECUTABLE})
 endif (DOXYGEN_EXECUTABLE)
 
 find_program(ASTYLE_EXECUTABLE astyle 
@@ -52,22 +52,13 @@ add_custom_target(astyle
                   COMMENT "Formatting source files...")
 endif (ASTYLE_EXECUTABLE)
 
-set (CPACK_ALL_INSTALL_TYPES Full Upgrade)
-
 add_subdirectory (debug)
-
-add_subdirectory (blackbox)
-
-install (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/styles DESTINATION . COMPONENT Styles)
 
 set (CPACK_SOURCE_GENERATOR "ZIP")
 set (CPACK_SOURCE_IGNORE_FILES ".hg/;build*;styles/*;config/*;.hgtags;.hgignore;bb4win64.cbp;bb4win64.layout;packages/*")
-set (CPACK_GENERATOR "ZIP")
-set (CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_CURRENT_BINARY_DIR};boxCore-package;ALL;/;${CMAKE_CURRENT_BINARY_DIR};Blackbox;ALL;/")
 set (CPACK_PACKAGE_NAME "boxCore-package")
-set (CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}/blackbox/Blackbox.ico")
-set (CPACK_NSIS_MUI_UNIICON "${CMAKE_CURRENT_SOURCE_DIR}/blackbox/Blackbox.ico")
-set (CPACK_NSIS_COMPRESSOR "/FINAL /SOLID lzma")
+set (CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}/blackbox/boxCore.ico")
+set (CPACK_NSIS_MUI_UNIICON "${CMAKE_CURRENT_SOURCE_DIR}/blackbox/boxCore.ico")
 set (CPACK_PACKAGE_VERSION ${VERSION})
 set (CPACK_PACKAGE_VENDOR "Carsomyr")
 set (CPACK_PACKAGE_INSTALL_DIRECTORY "Blackbox-${PACKAGE_ARCH}")
@@ -75,6 +66,22 @@ set (CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${P
 set (CPACK_INCLUDE_TOPLEVEL_DIRECTORY False)
 set (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/license.txt")
 set (CPACK_NSIS_DISPLAY_NAME "Blackbox for Windows")
+
+include (CPack)
+
+#cpack_configure_downloads(http://download.berlios.de/boxcore/
+#                          UPLOAD_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Uploads
+#                         )
+
+add_subdirectory (blackbox)
+
+install (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/styles DESTINATION . COMPONENT Styles)
+
+cpack_add_component(Styles
+                    DISPLAY_NAME "Styles"
+                    DESCRIPTION "A set of initial styles"
+                    INSTALL_TYPES Standard Full
+                   ) 
 
 if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/coreplugins/)
 add_subdirectory (coreplugins/bbKeys)
@@ -85,14 +92,22 @@ endif (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/coreplugins/)
 add_subdirectory (plugins/boxVolume)
 add_subdirectory (plugins/bbInterface)
 
-set (CPACK_COMPONENT_GROUP_CORE_DISPLAY_NAME "Blackbox Core")
-set (CPACK_COMPONENT_GROUP_CORE_EXPANDED True)
-set (CPACK_COMPONENT_GROUP_CORE_DESCRIPTION
-	"The main executable and config files")
+cpack_add_component_group(Core
+                DISPLAY_NAME "Shell"
+                DESCRIPTION "The main executable and config files"
+                EXPANDED
+               )
+               
+cpack_add_install_type(Standard
+                       DISPLAY_NAME "Standard"
+                      )
 
 set (CPACK_COMPONENT_GROUP_COREPLUGINS_DISPLAY_NAME "Core Plugins")
 set (CPACK_COMPONENT_GROUP_COREPLUGINS_EXPANDED True)
 set (CPACK_COMPONENT_GROUP_COREPLUGINS_DESCRIPTION
-	"The main plugins intended for use with the shell")
-
-include (CPack)
+	"The default plugins for the shell. Not installing all of these will give you an error message on first startup")
+	
+set (CPACK_COMPONENT_GROUP_PLUGINS_DISPLAY_NAME "Plugins")
+set (CPACK_COMPONENT_GROUP_PLUGINS_EXPANDED True)
+set (CPACK_COMPONENT_GROUP_PLUGINS_DESCRIPTION
+    "Extra plugins that you can install")

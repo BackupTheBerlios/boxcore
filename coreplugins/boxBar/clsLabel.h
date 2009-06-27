@@ -11,6 +11,7 @@ class Label : public Collection
 {
 public:
 	Label(bool pVertical, LPCSTR p_itemName = "Label");
+	virtual ~Label() {};
 
 	virtual LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 

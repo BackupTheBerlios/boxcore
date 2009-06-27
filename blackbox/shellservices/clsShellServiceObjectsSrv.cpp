@@ -106,7 +106,10 @@ bool ShellServiceObjectsSrv::_Start()
 		{
 			StartRegistryValues(TEXT("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ShellServiceObjectDelayLoad"));
 		}
-		s_serviceManager->Call("SRV_ShellTrayWnd", "STW_handler", Arg<UINT>(2), Arg<ShellServiceHandler *>(this));
+		s_serviceManager->Call("SRV_ShellTrayWnd",
+							   "FN_SetHandler",
+							   Arg<UINT>(2),
+							   Arg<ShellServiceHandler *>(this));
 		m_running = true;
 	}
 	else
@@ -118,8 +121,7 @@ bool ShellServiceObjectsSrv::_Start()
 
 bool ShellServiceObjectsSrv::_Stop()
 {
-	std::pair<UINT, ShellServiceHandler *> handler(2, NULL);
-	s_serviceManager->SetServiceProperty("SRV_ShellTrayWnd", "STW_handler", &handler);
+	s_serviceManager->Call("SRV_ShellTrayWnd", "FN_SetHandler", Arg<UINT>(2), Arg<ShellServiceHandler *>(NULL));
 	for (SSOlist_t::iterator i = m_SSOlist.begin(); i != m_SSOlist.end(); ++i)
 	{
 		i->second->Exec(&CGID_ShellServiceObject, OLECMDID_SAVE, OLECMDEXECOPT_DODEFAULT, NULL, NULL);

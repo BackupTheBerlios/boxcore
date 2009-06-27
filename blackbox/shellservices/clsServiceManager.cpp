@@ -111,14 +111,16 @@ bool ServiceManager::RemoveService(LPCSTR p_serviceID)
 	}
 }
 
-bool ServiceManager::SetServiceProperty(LPCSTR p_serviceID, LPCSTR p_property, PVOID p_value)
+bool ServiceManager::SetServiceProperty(LPCSTR p_serviceID, LPCSTR p_property, const ServiceArg &p_value)
 {
 	Service *service = GetService(p_serviceID);
 	if (service)
 	{
-		ATOM serviceID = FindAtomA(p_serviceID);
+		//ATOM serviceID = FindAtomA(p_serviceID);
+		ATOM propertyFn = FindAtom(TEXT("FN_SetProperty"));
 		ATOM property = FindAtomA(p_property);
-		return service->SetProperty(serviceID, property, p_value);
+		return service->Call(propertyFn, Arg<ATOM>(property), p_value);
+		//return service->SetProperty(serviceID, property, p_value);
 	}
 	else
 	{

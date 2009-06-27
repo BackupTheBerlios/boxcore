@@ -25,7 +25,7 @@ public:
 	virtual HRESULT ProcessMessage(DWORD p_cbData, PVOID p_lpData);
 
 	virtual bool Call(ATOM p_function, const ServiceArg &p_arg1,
-						  const ServiceArg &p_arg2);
+					  const ServiceArg &p_arg2);
 protected:
 	virtual bool _Start();
 	virtual bool _Stop();

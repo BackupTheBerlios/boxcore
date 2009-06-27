@@ -109,6 +109,8 @@ BOOL save_opaquemove;
 
 ShellServices::ServiceManager g_ServiceManager;
 
+using ShellServices::Arg;
+
 TaskManagement::TaskManagerInterface *g_pTaskManager;
 TaskManagement::VWMInterface *g_pVirtualWindowManager;
 
@@ -548,22 +550,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	PRINT("Starting desktop");
 	Desk_Init();
 
-	g_ServiceManager.SetServiceProperty("SRV_ShellTrayWnd", "STW_hInstance", hInstance);
-	g_ServiceManager.SetServiceProperty("SRV_ShellTrayWnd", "STW_topMost", reinterpret_cast<PVOID>(true));
+	g_ServiceManager.SetServiceProperty("SRV_ShellTrayWnd",
+	                                    "PROP_hInstance",
+	                                    Arg<HINSTANCE>(hInstance));
+	g_ServiceManager.SetServiceProperty("SRV_ShellTrayWnd",
+	                                    "PROP_topMost",
+	                                    Arg<bool>(true));
 	g_ServiceManager.StartService("SRV_ShellTrayWnd");
 
-	if (!g_ServiceManager.SetServiceProperty("SRV_NotifyIcon", "NI_IconFactory", reinterpret_cast<PVOID>(SystemTrayIconFactory)))
+	if (!g_ServiceManager.SetServiceProperty("SRV_NotifyIcon", "NI_IconFactory", Arg<ShellServices::LegacyNotificationIcon* (*)()>(SystemTrayIconFactory)))
 	{
 		OutputDebugString("Setting a property failed");
 	}
 	if (SystemInfo.isOsVista() && !SystemInfo.isOsWin7())
 	{
-		g_ServiceManager.SetServiceProperty("SRV_NotifyIcon", "NI_UseProxy", reinterpret_cast<PVOID>(true));
+		g_ServiceManager.SetServiceProperty("SRV_NotifyIcon", "NI_UseProxy", Arg<bool>(true));
 	}
 	g_ServiceManager.StartService("SRV_NotifyIcon");
-	g_ServiceManager.SetServiceProperty("SRV_NotifyIcon", "NI_Callback_Add", reinterpret_cast<PVOID>(broadcastAdd));
-	g_ServiceManager.SetServiceProperty("SRV_NotifyIcon", "NI_Callback_Mod", reinterpret_cast<PVOID>(broadcastMod));
-	g_ServiceManager.SetServiceProperty("SRV_NotifyIcon", "NI_Callback_Del", reinterpret_cast<PVOID>(broadcastRemove));
+	g_ServiceManager.SetServiceProperty("SRV_NotifyIcon", "NI_Callback_Add", Arg<void (*)(void*)>(broadcastAdd));
+	g_ServiceManager.SetServiceProperty("SRV_NotifyIcon", "NI_Callback_Mod", Arg<void (*)(void*)>(broadcastMod));
+	g_ServiceManager.SetServiceProperty("SRV_NotifyIcon", "NI_Callback_Del", Arg<void (*)(void*)>(broadcastRemove));
 
 	g_ServiceManager.StartService("SRV_Appbar");
 

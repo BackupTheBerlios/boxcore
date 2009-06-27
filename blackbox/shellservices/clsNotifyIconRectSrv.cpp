@@ -48,7 +48,7 @@ bool NotifyIconRectSrv::_Start()
 	if (!m_running)
 	{
 		PRINT("Starting NotifyIconRect Service");
-		s_serviceManager->Call("SRV_ShellTrayWnd", "STW_handler", Arg<UINT>(3), Arg<ShellServiceHandler *>(this));
+		s_serviceManager->Call("SRV_ShellTrayWnd", "FN_SetHandler", Arg<UINT>(3), Arg<ShellServiceHandler *>(this));
 		m_running = true;
 	}
 	return m_running;
@@ -59,8 +59,7 @@ bool NotifyIconRectSrv::_Stop()
 	if (m_running)
 	{
 		PRINT("Stopping NotifyIconRect Service");
-		std::pair<UINT, ShellServiceHandler *> handler(3, NULL);
-		s_serviceManager->SetServiceProperty("SRV_ShellTrayWnd", "STW_handler", &handler);
+		s_serviceManager->Call("SRV_ShellTrayWnd", "FN_SetHandler", Arg<UINT>(3), Arg<ShellServiceHandler *>(NULL));
 		return true;
 	}
 	else

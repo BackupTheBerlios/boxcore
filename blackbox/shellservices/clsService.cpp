@@ -13,8 +13,8 @@ namespace ShellServices
 Service::Service(LPCSTR p_serviceName):
 		m_running(false),
 		m_atomList(),
-		m_serviceID(RegisterAtom(p_serviceName))
-
+		m_serviceID(RegisterAtom(p_serviceName)),
+		m_SetPropertyFn(RegisterAtom("FN_SetProperty"))
 {
 }
 

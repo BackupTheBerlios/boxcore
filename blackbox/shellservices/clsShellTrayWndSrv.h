@@ -32,8 +32,8 @@ private:
 
 	ATOM m_hInstanceProp;
 	ATOM m_topMostProp;
-	ATOM m_handlerProp;
-	ATOM m_SetTaskbarPosFn;
+	ATOM m_fnSetHandler;
+	ATOM m_fnSetTaskbarPos;
 
 	static ServiceRegistrar s_serviceRegistration;
 };
